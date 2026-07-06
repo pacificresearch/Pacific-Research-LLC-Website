@@ -456,6 +456,24 @@ def evaluate(opp):
         opp, setaside_eligible, value_num
     )
 
+    # Richer decision fields.
+    fte = _estimate_fte(_haystack(opp))
+    personnel = str(fte) if fte else "Not stated"
+    location_display, country_code, is_international = _extract_location(opp)
+    location_type = "International" if is_international else "CONUS / US"
+    staffing = _staffing_type(opp)
+    incumbent = ("inherit" in staffing.lower()) or ("take over" in staffing.lower())
+    timeframe = _timeframe_note(opp)
+    fit = _fit_label(tier, tech_match, matched_kw)
+    if setaside_eligible:
+        llc_note = "Yes — LLC may bid" + (" (SDVOSB cert req'd)" if is_sdvosb else "")
+    else:
+        llc_note = "No — set-aside excludes PRG"
+    win_score, win_band, win_emoji, win_note = _win_assessment(
+        setaside_label, setaside_eligible, is_sdvosb, tier,
+        tech_match, matched_kw, is_solo, fte, value_num, incumbent,
+    )
+
     return {
         "solicitation": (
             opp.get("solicitationNumber")
@@ -485,6 +503,19 @@ def evaluate(opp):
         "is_solo": is_solo,
         "solo_score": solo_score,
         "solo_reason": solo_reason,
+        "personnel": personnel,
+        "fte_num": fte,
+        "location": location_display,
+        "location_type": location_type,
+        "is_international": is_international,
+        "staffing_type": staffing,
+        "timeframe": timeframe,
+        "fit": fit,
+        "llc_eligible": llc_note,
+        "win_score": win_score,
+        "win_band": win_band,
+        "win_emoji": win_emoji,
+        "win_note": win_note,
         "score": score,
         "lb_score": lb_score,
         "link": opp.get("uiLink", ""),
@@ -721,6 +752,168 @@ def classify_solo(opp, setaside_eligible, value_num):
     return (is_solo, score, "One-person doable: " + reason)
 
 
+# --- Location, staffing, timeframe, fit, and win-likelihood --------------------
+
+_DOMESTIC_COUNTRY = {"USA", "US", "UNITED STATES", "USA ", ""}
+
+# Signals that an incumbent already performs the work (you'd take over / may
+# inherit staff) vs. a brand-new requirement (you hire from scratch).
+_INCUMBENT_SIGNALS = [
+    "incumbent", "currently being performed", "current contractor",
+    "predecessor", "transition-in", "transition in", "phase-in", "phase in",
+    "seamless transition", "right of first refusal", "currently performed",
+    "existing contract", "follow-on", "recompete",
+]
+_NEW_REQ_SIGNALS = [
+    "new requirement", "new contract", "stand up", "stand-up", "no incumbent",
+    "newly established", "first time",
+]
+
+
+def _extract_location(opp):
+    """Return (display, country_code, is_international)."""
+    pop = opp.get("placeOfPerformance") or {}
+    if not isinstance(pop, dict):
+        return ("Not stated", "", False)
+
+    def _name(key):
+        v = pop.get(key)
+        if isinstance(v, dict):
+            return v.get("name") or v.get("code") or ""
+        return v or ""
+
+    city = _name("city")
+    state = pop.get("state") or {}
+    state_code = state.get("code") or state.get("name") if isinstance(state, dict) else state
+    country = pop.get("country") or {}
+    country_code = ""
+    country_name = ""
+    if isinstance(country, dict):
+        country_code = (country.get("code") or "").upper()
+        country_name = country.get("name") or ""
+    else:
+        country_code = str(country).upper()
+
+    is_intl = bool(country_code) and country_code not in _DOMESTIC_COUNTRY \
+        and "UNITED STATES" not in country_name.upper()
+
+    parts = [p for p in [city, state_code] if p]
+    display = ", ".join(parts)
+    if is_intl:
+        display = (display + " · " if display else "") + (country_name or country_code)
+    if not display:
+        display = country_name or country_code or "Not stated"
+    return (_clean(display, 34), country_code, is_intl)
+
+
+def _staffing_type(opp):
+    """Guess whether you'd hire new staff or take over existing personnel."""
+    text = _haystack(opp)
+    if _keyword_hits(text, _INCUMBENT_SIGNALS):
+        return "Take over / may inherit incumbent staff"
+    if _keyword_hits(text, _NEW_REQ_SIGNALS):
+        return "New requirement — hire fresh"
+    return "Unclear — verify in notice"
+
+
+def _timeframe_note(opp):
+    """Actionable timeframe: response deadline + any period-of-performance hint."""
+    deadline = opp.get("responseDeadLine") or "Not stated"
+    text = _haystack(opp)
+    options = len(re.findall(r"option\s+(?:year|period)", text))
+    has_base = "base period" in text or "base year" in text
+    pop = ""
+    if has_base and options:
+        pop = f"1 base + {options} option yr(s)"
+    elif options:
+        pop = f"{options} option period(s) referenced"
+    elif has_base:
+        pop = "base period (see notice)"
+    resp = str(deadline).split("T")[0] if deadline else "Not stated"
+    return f"Respond by {resp}" + (f"; POP: {pop}" if pop else "")
+
+
+def _fit_label(tier, tech_match, matched_kw):
+    """Plain-English fit rating for PRG's capabilities."""
+    if tier == "primary" and len(matched_kw) >= 3:
+        return "Strong"
+    if tech_match:
+        return "Moderate"
+    if tier == "low_barrier":
+        return "Adjacent"
+    return "Weak / off-target"
+
+
+def _win_assessment(setaside_label, setaside_eligible, is_sdvosb, tier,
+                    tech_match, matched_kw, is_solo, fte, value_num, incumbent):
+    """Composite win-likelihood score (0-100) with a RAG band.
+
+    Blends: can PRG even bid (set-aside), capability fit, how executable it is
+    for a small/solo shop, value sanity, and incumbent headwind. Heuristic —
+    a planning aid, not a guarantee.
+    """
+    # Hard gate: if PRG can't bid, it's Red regardless of everything else.
+    if not setaside_eligible:
+        return (12, "Red", "🔴", "Ineligible — set-aside excludes PRG")
+
+    score = 0
+    # 1. Set-aside advantage (less competition in PRG's lane) — up to 35
+    if is_sdvosb:
+        score += 35
+    elif setaside_label == "VOSB":
+        score += 28
+    elif setaside_label == "Total SB":
+        score += 22
+    elif setaside_label == "None":
+        score += 10          # unrestricted = open competition, harder
+    else:
+        score += 14
+
+    # 2. Capability fit — up to 30
+    score += min(len(matched_kw) * 5, 22)
+    if tier == "primary":
+        score += 8
+    elif tier == "low_barrier":
+        score += 4
+
+    # 3. Executability for a small/solo shop — up to 25
+    if is_solo:
+        score += 25
+    elif fte is None:
+        score += 12
+    elif fte <= 3:
+        score += 16
+    elif fte <= 10:
+        score += 8
+    else:
+        score += 3          # big team is hard for a new small co
+
+    # 4. Value sanity — up to 10
+    if value_num is None:
+        score += 5
+    elif value_num <= SIMPLIFIED_ACQ_THRESHOLD:
+        score += 10
+    elif value_num <= 2_000_000:
+        score += 6
+    elif value_num > 10_000_000:
+        score += 2
+
+    # 5. Incumbent headwind
+    if incumbent:
+        score -= 12
+
+    score = max(0, min(100, score))
+    if score >= 80:
+        band, emoji, note = "Green", "🟢", "Strong — pursue"
+    elif score >= 60:
+        band, emoji, note = "Yellow", "🟡", "Good — worth pursuing"
+    elif score >= 40:
+        band, emoji, note = "Orange", "🟠", "Stretch — needs partner/effort"
+    else:
+        band, emoji, note = "Red", "🔴", "Low odds — likely skip"
+    return (score, band, emoji, note)
+
+
 def _date_range(days_back):
     """Return (postedFrom, postedTo) as MM/DD/YYYY strings."""
     today = dt.date.today()
@@ -734,18 +927,22 @@ def _date_range(days_back):
 # ---------------------------------------------------------------------------
 
 def _opportunity_table(rows, eligible_key, reason_key):
-    """Render a standard reviewed-opportunity Markdown table from result rows."""
+    """Render a standard reviewed-opportunity Markdown table from result rows.
+
+    Rows are ordered by win score (best first) so the strongest bets sit on top.
+    """
     lines = [
-        "| Solicitation # | Title | Agency | NAICS | Set-Aside | Est. Value "
-        "| Eligible? (Yes/No) | Short Reason / Gap Analysis |",
-        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
+        "| Win | Rating | Solicitation # | Title | Agency | Set-Aside "
+        "| Est. Value | Personnel | Solo? | Location | Short Reason |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
     ]
-    for r in rows:
-        elig = "**YES**" if r[eligible_key] else "**NO**"
+    for r in sorted(rows, key=lambda x: x["win_score"], reverse=True):
+        solo = "Yes" if r["is_solo"] else "No"
         lines.append(
+            f"| {r['win_score']} | {r['win_emoji']} {r['win_band']} "
             f"| {r['solicitation']} | {r['title']} | {r['agency']} "
-            f"| {r['naics']} | {r['setaside']} | {r['value_display']} "
-            f"| {elig} | {r[reason_key]} |"
+            f"| {r['setaside']} | {r['value_display']} | {r['personnel']} "
+            f"| {solo} | {r['location']} | {r[reason_key]} |"
         )
     return lines
 
@@ -892,15 +1089,18 @@ def render_report(results):
         )
     else:
         lines.append(
-            "| Solicitation # | Title | Agency | NAICS | Set-Aside | Est. Value "
-            "| Why One-Person Doable |"
+            "| Win | Rating | Solicitation # | Title | Agency | Set-Aside "
+            "| Est. Value | Timeframe | Location | Why One-Person Doable |"
         )
-        lines.append("| :--- | :--- | :--- | :--- | :--- | :--- | :--- |")
-        for r in solo:
+        lines.append(
+            "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |"
+        )
+        for r in sorted(solo, key=lambda x: x["win_score"], reverse=True):
             lines.append(
+                f"| {r['win_score']} | {r['win_emoji']} {r['win_band']} "
                 f"| {r['solicitation']} | {r['title']} | {r['agency']} "
-                f"| {r['naics']} | {r['setaside']} | {r['value_display']} "
-                f"| {r['solo_reason']} |"
+                f"| {r['setaside']} | {r['value_display']} | {r['timeframe']} "
+                f"| {r['location']} | {r['solo_reason']} |"
             )
         if len(solo) < 10:
             lines.append("")
@@ -976,30 +1176,29 @@ def _render_recommendation(lines, i, r):
 # ---------------------------------------------------------------------------
 
 # Column layouts for each worksheet: (header, result-key-or-callable).
-_CORE_COLS = [
-    ("Solicitation #", "solicitation"),
+# Full decision-dashboard columns, ordered for go/no-go review.
+_RICH_COLS = [
+    ("Win Score", "win_score"),
+    ("Rating", lambda r: f"{r['win_emoji']} {r['win_band']}"),
+    ("Verdict", "win_note"),
     ("Title", "title"),
     ("Agency", "agency"),
-    ("NAICS", "naics"),
+    ("Fit for PRG", "fit"),
     ("Set-Aside", "setaside"),
+    ("Eligible as LLC?", "llc_eligible"),
     ("Est. Value (Revenue)", "value_display"),
-    ("Eligible?", lambda r: "YES" if r["eligible"] else "NO"),
-    ("Reason / Gap Analysis", "reason"),
-    ("Response Deadline", "response_deadline"),
-    ("Link", "link"),
-]
-_LOWBAR_COLS = [
+    ("Personnel (FTE)", "personnel"),
+    ("Hire New or Take Over?", "staffing_type"),
+    ("Solo-Doable?", lambda r: "Yes" if r["is_solo"] else "No"),
+    ("Timeframe", "timeframe"),
+    ("Location", "location"),
+    ("Intl / CONUS", "location_type"),
+    ("NAICS", "naics"),
     ("Solicitation #", "solicitation"),
-    ("Title", "title"),
-    ("Agency", "agency"),
-    ("NAICS", "naics"),
-    ("Set-Aside", "setaside"),
-    ("Est. Value (Revenue)", "value_display"),
-    ("Eligible?", lambda r: "YES" if r["low_barrier_eligible"] else "NO"),
-    ("Why It's Winnable", "lb_reason"),
-    ("Response Deadline", "response_deadline"),
     ("Link", "link"),
 ]
+_CORE_COLS = _RICH_COLS
+_LOWBAR_COLS = _RICH_COLS + [("Why It's Winnable", "lb_reason")]
 _SUB_COLS = [
     ("Solicitation #", "solicitation"),
     ("Title", "title"),
@@ -1011,17 +1210,7 @@ _SUB_COLS = [
     ("Subcontracting Angle", "sub_angle"),
     ("Link", "link"),
 ]
-_SOLO_COLS = [
-    ("Solicitation #", "solicitation"),
-    ("Title", "title"),
-    ("Agency", "agency"),
-    ("NAICS", "naics"),
-    ("Set-Aside", "setaside"),
-    ("Est. Value (Revenue)", "value_display"),
-    ("Why One-Person Doable", "solo_reason"),
-    ("Response Deadline", "response_deadline"),
-    ("Link", "link"),
-]
+_SOLO_COLS = _RICH_COLS + [("Why One-Person Doable", "solo_reason")]
 
 
 def _cell(row, spec):
@@ -1075,22 +1264,41 @@ def export_spreadsheet(results, path):
     header_font = Font(bold=True, color="FFFFFF")
     header_fill = PatternFill("solid", fgColor="1F4E78")
     wrap = Alignment(vertical="top", wrap_text=True)
+    band_fill = {
+        "Green": PatternFill("solid", fgColor="C6E7D0"),
+        "Yellow": PatternFill("solid", fgColor="FBEBB0"),
+        "Orange": PatternFill("solid", fgColor="F6D3A6"),
+        "Red": PatternFill("solid", fgColor="F3C2BC"),
+    }
 
     for sheet_name, cols, rows in sheets:
         ws = wb.create_sheet(title=sheet_name[:31])  # Excel caps sheet names at 31
-        ws.append([h for h, _ in cols])
+        headers = [h for h, _ in cols]
+        ws.append(headers)
         for c in range(1, len(cols) + 1):
             cell = ws.cell(row=1, column=c)
             cell.font = header_font
             cell.fill = header_fill
             cell.alignment = wrap
+        # Best bets first.
+        rows = sorted(rows, key=lambda r: r.get("win_score", 0), reverse=True)
+        rag_cols = [i for i, h in enumerate(headers, start=1)
+                    if h in ("Win Score", "Rating")]
         for r in rows:
             ws.append([_cell(r, spec) for _, spec in cols])
+            fill = band_fill.get(r.get("win_band"))
+            if fill:
+                for ci in rag_cols:
+                    ws.cell(row=ws.max_row, column=ci).fill = fill
         # Column widths + wrapping.
         widths = {
-            "Title": 45, "Agency": 28, "Reason / Gap Analysis": 60,
-            "Why It's Winnable": 55, "Subcontracting Angle": 55, "Link": 35,
-            "Est. Value (Revenue)": 22, "Why One-Person Doable": 60,
+            "Title": 45, "Agency": 26, "Reason / Gap Analysis": 60,
+            "Why It's Winnable": 50, "Subcontracting Angle": 50, "Link": 32,
+            "Est. Value (Revenue)": 20, "Why One-Person Doable": 55,
+            "Win Score": 10, "Rating": 12, "Verdict": 26, "Fit for PRG": 14,
+            "Set-Aside": 14, "Eligible as LLC?": 24, "Personnel (FTE)": 13,
+            "Hire New or Take Over?": 34, "Solo-Doable?": 12, "Timeframe": 30,
+            "Location": 26, "Intl / CONUS": 13, "Solicitation #": 20,
         }
         for idx, (h, _) in enumerate(cols, start=1):
             ws.column_dimensions[get_column_letter(idx)].width = widths.get(h, 16)

@@ -81,7 +81,22 @@ Opportunities**, **Low-Barrier (Warm Body)**, and **Subcontracting** — each
 with filterable, frozen headers. The **Solo-Friendly** tab flags small-scale
 knowledge work (research, analysis, writing, data, reviews) that one person
 could realistically deliver, scored down for crew/physical/large-team signals
-and large dollar values. If
+and large dollar values.
+
+Each row is a **decision dashboard** ordered best-bet first, with:
+
+- **Win Score (0–100)** and a **RAG rating** — 🟢 Green (80+, pursue),
+  🟡 Yellow (60–79, good), 🟠 Orange (40–59, stretch), 🔴 Red (<40, likely
+  skip / ineligible). The Win Score and Rating cells are color-coded in Excel.
+  The score blends set-aside advantage, capability fit, executability for a
+  small/solo shop, value sanity, and incumbent headwind. It is a planning
+  heuristic, not a guarantee.
+- **Fit for PRG**, **Set-Aside**, **Eligible as LLC?**, **Est. Value**,
+  **Personnel (FTE)**, **Hire New or Take Over?** (incumbent detection),
+  **Solo-Doable?**, **Timeframe**, **Location**, and **Intl / CONUS** (filter
+  this column to separate overseas consulting from domestic work).
+
+If
 `openpyxl` is not installed, the script automatically falls back to writing one
 CSV file per section (which Excel opens directly). When run interactively
 (e.g. double-clicked on Windows) the window stays open until you press Enter,
