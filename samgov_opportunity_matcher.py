@@ -39,7 +39,7 @@ import os
 import re
 import sys
 import textwrap
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 
 try:
     import requests
@@ -516,6 +516,10 @@ def evaluate(opp):
         "win_band": win_band,
         "win_emoji": win_emoji,
         "win_note": win_note,
+        "poc": _extract_poc(opp),
+        "psc": (opp.get("classificationCode") or "").strip(),
+        "posted": (opp.get("postedDate") or "").split("T")[0],
+        "naics_desc": TARGET_NAICS.get(naics) or LOW_BARRIER_NAICS.get(naics) or "",
         "score": score,
         "lb_score": lb_score,
         "link": opp.get("uiLink", ""),
@@ -609,6 +613,21 @@ def _extract_awardee(opp):
     awardee = award.get("awardee") or {}
     name = awardee.get("name") if isinstance(awardee, dict) else None
     return _clean(name, max_len=30) if name else ""
+
+
+def _extract_poc(opp):
+    """Return government points of contact as a list of {name,email,phone,type}."""
+    out = []
+    for p in (opp.get("pointOfContact") or []):
+        if not isinstance(p, dict):
+            continue
+        out.append({
+            "name": (p.get("fullName") or p.get("name") or "").strip(),
+            "email": (p.get("email") or "").strip(),
+            "phone": (p.get("phone") or "").strip(),
+            "type": (p.get("type") or "").strip(),
+        })
+    return out
 
 
 # Dollar-amount parsing for the estimated-value column. Matches figures like
@@ -1352,6 +1371,271 @@ def _default_output_path():
     return os.path.join(home, "PRG_Contracts.xlsx")
 
 
+def _desktop_path(filename):
+    """Return `filename` on the user's Desktop (or home dir fallback)."""
+    base = _default_output_path()
+    return os.path.join(os.path.dirname(base), filename)
+
+
+# ---------------------------------------------------------------------------
+# 6. EXECUTIVE HTML REPORT
+# ---------------------------------------------------------------------------
+
+def _html_escape(text):
+    return (str(text).replace("&", "&amp;").replace("<", "&lt;")
+            .replace(">", "&gt;").replace('"', "&quot;"))
+
+
+def _svg_hbars(items, value_fmt, default_color="#1E3A5F", width=680):
+    """Horizontal bar chart as inline SVG. `items` = list of (label, value)
+    or (label, value, color). Returns an SVG string."""
+    items = [it for it in items if (it[1] or 0) > 0]
+    if not items:
+        return '<p class="empty">No published values to chart yet.</p>'
+    maxv = max(it[1] for it in items) or 1
+    row_h, pad, label_w = 34, 10, 200
+    bar_max = width - label_w - 96
+    height = pad * 2 + row_h * len(items)
+    out = [f'<svg viewBox="0 0 {width} {height}" class="chart" '
+           f'preserveAspectRatio="xMinYMin meet" role="img">']
+    y = pad
+    for it in items:
+        label, val = it[0], it[1]
+        color = it[2] if len(it) > 2 else default_color
+        bw = max(2.0, (val / maxv) * bar_max)
+        yc = y + row_h / 2
+        out.append(f'<text x="0" y="{yc + 4:.0f}" class="c-lab">'
+                   f'{_html_escape(_clean(label, 26))}</text>')
+        out.append(f'<rect x="{label_w}" y="{y + 6:.0f}" width="{bw:.1f}" '
+                   f'height="{row_h - 14}" rx="3" fill="{color}"/>')
+        out.append(f'<text x="{label_w + bw + 8:.1f}" y="{yc + 4:.0f}" '
+                   f'class="c-val">{_html_escape(value_fmt(val))}</text>')
+        y += row_h
+    out.append("</svg>")
+    return "".join(out)
+
+
+_RAG_HEX = {"Green": "#2E7D4F", "Yellow": "#D9A62A",
+            "Orange": "#DB7A2B", "Red": "#C0392B"}
+
+
+def export_html_report(results, path, days):
+    """Write a self-contained executive HTML report of the opportunity pipeline."""
+    eligible = [r for r in results if r["raw_setaside_eligible"]]
+    ranked = sorted(eligible, key=lambda r: r["win_score"], reverse=True)
+
+    # --- KPIs ---
+    total_value = sum(r["value_num"] for r in eligible if r["value_num"])
+    n_active = len(eligible)
+    n_solo = sum(1 for r in eligible if r["is_solo"])
+    n_sdvosb = sum(1 for r in eligible if r["is_sdvosb"])
+    n_green = sum(1 for r in eligible if r["win_band"] == "Green")
+    agency_counts = Counter(r["agency"] for r in eligible if r["agency"] != "N/A")
+    top_agency, top_agency_n = (agency_counts.most_common(1)[0]
+                                if agency_counts else ("—", 0))
+
+    # --- Chart data ---
+    agency_value = Counter()
+    for r in eligible:
+        if r["value_num"]:
+            agency_value[r["agency"]] += r["value_num"]
+    chart_agency = [(a, v) for a, v in agency_value.most_common(8)]
+    rag_counts = Counter(r["win_band"] for r in eligible)
+    chart_rag = [(b, rag_counts.get(b, 0), _RAG_HEX[b])
+                 for b in ("Green", "Yellow", "Orange", "Red")]
+
+    kpis = [
+        ("Total Pipeline Value", _format_currency(total_value) if total_value else "N/A",
+         "sum of published values"),
+        ("Eligible Opportunities", str(n_active), "PRG can bid"),
+        ("Solo-Friendly", str(n_solo), "one-person doable"),
+        ("SDVOSB Set-Asides", str(n_sdvosb), "your direct lane"),
+        ("Top Agency", _clean(top_agency, 22), f"{top_agency_n} opportunities"),
+    ]
+
+    # --- Assemble HTML ---
+    p = ['<!doctype html><html lang="en"><head><meta charset="utf-8">',
+         '<meta name="viewport" content="width=device-width, initial-scale=1">',
+         f'<title>PRG Pipeline Executive Report — {dt.date.today().isoformat()}</title>',
+         "<style>", _REPORT_CSS, "</style></head><body>"]
+    p.append('<div class="wrap">')
+
+    # Header
+    p.append('<header><p class="eyebrow">Executive Pipeline Report</p>'
+             f'<h1>{COMPANY_NAME} — Federal Opportunity Pipeline</h1>'
+             f'<p class="sub">{SOCIOECONOMIC_STATUS} · generated '
+             f'{dt.date.today().isoformat()} · last {days} days · '
+             f'{len(results)} notices screened</p></header>')
+
+    # KPI cards
+    p.append('<section class="kpis">')
+    for label, val, sub in kpis:
+        p.append(f'<div class="kpi"><div class="kpi-v">{_html_escape(val)}</div>'
+                 f'<div class="kpi-l">{_html_escape(label)}</div>'
+                 f'<div class="kpi-s">{_html_escape(sub)}</div></div>')
+    p.append('</section>')
+
+    # Charts
+    p.append('<section class="charts">')
+    p.append('<div class="card"><h3>Pipeline Value by Agency</h3>'
+             + _svg_hbars(chart_agency, _format_currency, "#1E3A5F") + '</div>')
+    p.append('<div class="card"><h3>Opportunities by Win Rating</h3>'
+             + _svg_hbars(chart_rag, lambda v: str(int(v))) + '</div>')
+    p.append('</section>')
+
+    # Contract matrix
+    p.append('<section><h2>Contract / Opportunity Matrix</h2>'
+             '<div class="scroll"><table><thead><tr>'
+             '<th>Rating</th><th>Win</th><th>Solicitation #</th><th>Agency</th>'
+             '<th>Est. Value</th><th>Set-Aside</th><th>NAICS / PSC</th>'
+             '<th>Personnel</th><th>Solo</th><th>Location</th><th>Respond By</th>'
+             '</tr></thead><tbody>')
+    for r in ranked:
+        chip = (f'<span class="chip" style="background:{_RAG_HEX[r["win_band"]]}">'
+                f'{r["win_band"]}</span>')
+        deadline = str(r["response_deadline"]).split("T")[0]
+        naics_psc = r["naics"] + (f" / {r['psc']}" if r["psc"] else "")
+        p.append("<tr>"
+                 f"<td>{chip}</td><td class='num'>{r['win_score']}</td>"
+                 f"<td>{_html_escape(r['solicitation'])}</td>"
+                 f"<td>{_html_escape(r['agency'])}</td>"
+                 f"<td class='num'>{_html_escape(r['value_display'])}</td>"
+                 f"<td>{_html_escape(r['setaside'])}</td>"
+                 f"<td>{_html_escape(naics_psc)}</td>"
+                 f"<td>{_html_escape(r['personnel'])}</td>"
+                 f"<td>{'Yes' if r['is_solo'] else '—'}</td>"
+                 f"<td>{_html_escape(r['location'])}</td>"
+                 f"<td>{_html_escape(deadline)}</td></tr>")
+    if not ranked:
+        p.append('<tr><td colspan="11" class="empty">No eligible '
+                 'opportunities in this window.</td></tr>')
+    p.append('</tbody></table></div></section>')
+
+    # Deep dive (top opportunities)
+    p.append('<section><h2>Deep Dive — Top Opportunities</h2>')
+    for r in ranked[:8]:
+        p.append('<div class="dive">')
+        p.append(f'<div class="dive-h"><span class="chip" '
+                 f'style="background:{_RAG_HEX[r["win_band"]]}">{r["win_band"]} '
+                 f'· {r["win_score"]}</span> <strong>{_html_escape(r["title"])}</strong>'
+                 f' <span class="muted">({_html_escape(r["solicitation"])})</span></div>')
+        scope = r["naics_desc"] or "professional services"
+        p.append(f'<p><b>Scope:</b> {_html_escape(r["title"])} — '
+                 f'{_html_escape(r["agency"])} ({_html_escape(scope)}).</p>')
+        # Personnel roster
+        if r["poc"]:
+            roster = []
+            for c in r["poc"][:3]:
+                bits = [b for b in [c["name"], c["email"], c["phone"]] if b]
+                if bits:
+                    role = f'{c["type"]}: ' if c["type"] else ""
+                    roster.append(role + " · ".join(_html_escape(b) for b in bits))
+            if roster:
+                p.append('<p><b>Gov. Contacts:</b> ' + " &nbsp;|&nbsp; ".join(roster)
+                         + '</p>')
+        else:
+            p.append('<p><b>Gov. Contacts:</b> <span class="muted">not listed in '
+                     'notice — check the SAM.gov posting.</span></p>')
+        # Risk / action
+        risks = [f"Respond by {str(r['response_deadline']).split('T')[0]}"]
+        if r["is_sdvosb"]:
+            risks.append("keep SDVOSB certification active through award")
+        if r["fte_num"] and r["fte_num"] >= 1:
+            risks.append("50% self-performance applies (FAR 52.219-14)")
+        if "inherit" in r["staffing_type"].lower():
+            risks.append("incumbent present — differentiate to unseat")
+        p.append('<p><b>Risk / Action:</b> ' + "; ".join(_html_escape(x) for x in risks)
+                 + '.</p>')
+        p.append('</div>')
+    if not ranked:
+        p.append('<p class="empty">Nothing to deep-dive this run.</p>')
+    p.append('</section>')
+
+    # Pipeline insights
+    p.append('<section><h2>Growth &amp; Pipeline Insights</h2><div class="card">')
+    if agency_counts:
+        foot = ", ".join(f"{_html_escape(a)} ({n})"
+                         for a, n in agency_counts.most_common(3))
+        p.append(f'<p><b>Strongest agency footprints:</b> {foot}.</p>')
+        targets = [a for a, _ in agency_counts.most_common(3)]
+        p.append('<p><b>Recommended target agencies for future bids:</b> '
+                 + _html_escape(", ".join(targets)) + '. Concentrate capability '
+                 'statements and Sources Sought responses here to build past '
+                 'performance where PRG already sees demand.</p>')
+        naics_counts = Counter(r["naics"] for r in eligible)
+        strong_naics = ", ".join(f"{n} ({c})" for n, c in naics_counts.most_common(3))
+        p.append(f'<p><b>Strongest NAICS demand:</b> {_html_escape(strong_naics)}.</p>')
+    else:
+        p.append('<p class="empty">Not enough eligible data yet — widen the '
+                 'search window and re-run.</p>')
+    p.append('</div></section>')
+
+    p.append('<footer>Heuristic planning report generated from live SAM.gov '
+             'data. Win scores and estimates are decision aids, not guarantees. '
+             'Verify scope, value, and contacts in each official notice before '
+             f'bidding. · {COMPANY_NAME} · {dt.date.today().isoformat()}</footer>')
+    p.append('</div></body></html>')
+
+    if not path.lower().endswith(".html"):
+        path += ".html"
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write("".join(p))
+    return path
+
+
+_REPORT_CSS = """
+:root{--paper:#F4F6F9;--surface:#fff;--ink:#14263C;--muted:#5A6B7E;
+--line:#DCE1E8;--primary:#1E3A5F;--accent:#9A6B1C;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:36px 22px 70px}
+header{border-bottom:3px solid var(--accent);padding-bottom:18px;margin-bottom:24px}
+.eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+color:var(--accent);font-weight:700;margin:0 0 8px}
+h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(24px,4vw,34px);
+margin:0 0 8px;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:13.5px;margin:0}
+h2{font-family:Georgia,serif;font-size:21px;margin:34px 0 12px;
+border-bottom:1px solid var(--line);padding-bottom:6px}
+h3{font-size:14px;margin:0 0 10px;color:var(--ink)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:26px}
+@media(max-width:820px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--primary);
+border-radius:10px;padding:14px 16px}
+.kpi-v{font-family:Georgia,serif;font-size:24px;font-weight:700;color:var(--primary);
+font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi-l{font-size:12px;font-weight:700;margin-top:4px}
+.kpi-s{font-size:11px;color:var(--muted)}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:8px}
+@media(max-width:820px){.charts{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.chart{width:100%;height:auto}
+.c-lab{fill:var(--ink);font-size:12px}
+.c-val{fill:var(--muted);font-size:12px;font-weight:700}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:820px;font-size:12.5px}
+thead th{background:#EEF1F5;text-align:left;padding:9px 11px;font-size:10.5px;
+letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody td{padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.chip{display:inline-block;color:#fff;font-size:10.5px;font-weight:700;
+padding:2px 8px;border-radius:20px;white-space:nowrap}
+.dive{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+padding:14px 18px;margin-bottom:12px}
+.dive-h{margin-bottom:6px;font-size:15px}
+.dive p{margin:4px 0;font-size:13px}
+.muted{color:var(--muted)}
+.empty{color:var(--muted);font-style:italic;padding:14px}
+footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
+font-size:11.5px;color:var(--muted)}
+@media print{body{background:#fff}.wrap{max-width:100%;padding:0}
+.card,.dive,.kpi{break-inside:avoid}}
+"""
+
+
 # ---------------------------------------------------------------------------
 # MAIN
 # ---------------------------------------------------------------------------
@@ -1380,6 +1664,11 @@ def parse_args(argv):
                              "Falls back to CSV files if openpyxl is missing.")
     parser.add_argument("--no-excel", action="store_true",
                         help="Skip writing the spreadsheet (console output only).")
+    parser.add_argument("--report", default=None, metavar="FILE",
+                        help="Path for the executive HTML report. By default it "
+                             "is saved as PRG_Executive_Report.html on your Desktop.")
+    parser.add_argument("--no-report", action="store_true",
+                        help="Skip writing the executive HTML report.")
     parser.add_argument("--no-print", action="store_true",
                         help="Suppress the console Markdown report.")
     return parser.parse_args(argv)
@@ -1430,12 +1719,21 @@ def main(argv=None):
         render_report(results)
 
     # Always save a spreadsheet by default (to the Desktop) unless opted out.
+    saved = []
     if not args.no_excel:
         out_path = args.excel or _default_output_path()
-        written = export_spreadsheet(results, out_path)
+        saved.append(export_spreadsheet(results, out_path))
+
+    # Save the executive HTML report by default (to the Desktop) unless opted out.
+    if not args.no_report:
+        report_path = args.report or _desktop_path("PRG_Executive_Report.html")
+        saved.append(export_html_report(results, report_path, args.days))
+
+    if saved:
         sys.stderr.write(
             "\n============================================================\n"
-            f"  SPREADSHEET SAVED:\n  {written}\n"
+            "  FILES SAVED:\n" + "".join(f"  {s}\n" for s in saved)
+            + "  (Open the .html report in your browser; the .xlsx in Excel.)\n"
             "============================================================\n"
         )
 
