@@ -854,6 +854,25 @@ def _export_csv(sheets, path):
     return ", ".join(written)
 
 
+def _default_output_path():
+    """Best-guess path for the output workbook: PRG_Contracts.xlsx on the
+    user's Desktop (handles OneDrive-redirected Desktops), falling back to the
+    home directory if no Desktop folder is found.
+    """
+    home = os.path.expanduser("~")
+    profile = os.environ.get("USERPROFILE", home)
+    candidates = [
+        os.path.join(profile, "Desktop"),
+        os.path.join(profile, "OneDrive", "Desktop"),
+        os.path.join(home, "Desktop"),
+        os.path.join(home, "OneDrive", "Desktop"),
+    ]
+    for folder in candidates:
+        if os.path.isdir(folder):
+            return os.path.join(folder, "PRG_Contracts.xlsx")
+    return os.path.join(home, "PRG_Contracts.xlsx")
+
+
 # ---------------------------------------------------------------------------
 # MAIN
 # ---------------------------------------------------------------------------
@@ -876,14 +895,14 @@ def parse_args(argv):
                         help="Max opportunities per NAICS query (default: 100).")
     parser.add_argument("--api-key", default=None,
                         help="Override the SAM.gov API key.")
-    parser.add_argument("--excel", nargs="?", const="screening_report.xlsx",
-                        default=None, metavar="FILE",
-                        help="Also write results to an Excel workbook "
-                             "(default filename: screening_report.xlsx). "
+    parser.add_argument("--excel", default=None, metavar="FILE",
+                        help="Path for the Excel workbook. By default it is "
+                             "saved as PRG_Contracts.xlsx on your Desktop. "
                              "Falls back to CSV files if openpyxl is missing.")
+    parser.add_argument("--no-excel", action="store_true",
+                        help="Skip writing the spreadsheet (console output only).")
     parser.add_argument("--no-print", action="store_true",
-                        help="Suppress the console Markdown report "
-                             "(useful with --excel).")
+                        help="Suppress the console Markdown report.")
     return parser.parse_args(argv)
 
 
@@ -931,9 +950,23 @@ def main(argv=None):
     if not args.no_print:
         render_report(results)
 
-    if args.excel:
-        written = export_spreadsheet(results, args.excel)
-        sys.stderr.write(f"\nSpreadsheet written to: {written}\n")
+    # Always save a spreadsheet by default (to the Desktop) unless opted out.
+    if not args.no_excel:
+        out_path = args.excel or _default_output_path()
+        written = export_spreadsheet(results, out_path)
+        sys.stderr.write(
+            "\n============================================================\n"
+            f"  SPREADSHEET SAVED:\n  {written}\n"
+            "============================================================\n"
+        )
+
+    # Keep the window open when run interactively (e.g. double-clicked on
+    # Windows) so the output and saved-file path don't vanish instantly.
+    try:
+        if sys.stdout.isatty():
+            input("\nDone. Press Enter to close this window...")
+    except (EOFError, KeyboardInterrupt):
+        pass
 
     return 0
 

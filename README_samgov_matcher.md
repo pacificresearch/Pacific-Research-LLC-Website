@@ -49,22 +49,32 @@ python3 samgov_opportunity_matcher.py --api-key SAM-…  # override the API key
 
 ### Excel / CSV output
 
-```bash
-# Write an Excel workbook (screening_report.xlsx) with one tab per section,
-# in addition to printing the report:
-python3 samgov_opportunity_matcher.py --days 90 --excel
+By **default** the script saves an Excel workbook named **`PRG_Contracts.xlsx`
+to your Desktop** every time it runs — no extra flags needed:
 
-# Choose your own filename:
+```bash
+python3 samgov_opportunity_matcher.py --days 90      # -> Desktop/PRG_Contracts.xlsx
+```
+
+Overrides:
+
+```bash
+# Choose your own path/filename:
 python3 samgov_opportunity_matcher.py --days 90 --excel my_report.xlsx
 
-# Only write the spreadsheet, skip the console output:
-python3 samgov_opportunity_matcher.py --days 90 --excel --no-print
+# Skip the spreadsheet entirely (console output only):
+python3 samgov_opportunity_matcher.py --days 90 --no-excel
+
+# Skip the console report (spreadsheet only):
+python3 samgov_opportunity_matcher.py --days 90 --no-print
 ```
 
 The workbook has three tabs — **Core Opportunities**, **Low-Barrier (Warm
 Body)**, and **Subcontracting** — each with filterable, frozen headers. If
 `openpyxl` is not installed, the script automatically falls back to writing one
-CSV file per section (which Excel opens directly).
+CSV file per section (which Excel opens directly). When run interactively
+(e.g. double-clicked on Windows) the window stays open until you press Enter,
+so the output and the saved-file location don't disappear.
 
 The API key defaults to the value baked into the script but can be overridden
 with the `--api-key` flag or the `SAM_API_KEY` environment variable (preferred,
