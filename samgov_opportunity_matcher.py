@@ -519,6 +519,7 @@ def evaluate(opp):
         "poc": _extract_poc(opp),
         "psc": (opp.get("classificationCode") or "").strip(),
         "posted": (opp.get("postedDate") or "").split("T")[0],
+        "deadline_days": _deadline_days(opp),
         "naics_desc": TARGET_NAICS.get(naics) or LOW_BARRIER_NAICS.get(naics) or "",
         "score": score,
         "lb_score": lb_score,
@@ -850,6 +851,18 @@ def _timeframe_note(opp):
         pop = "base period (see notice)"
     resp = str(deadline).split("T")[0] if deadline else "Not stated"
     return f"Respond by {resp}" + (f"; POP: {pop}" if pop else "")
+
+
+def _deadline_days(opp):
+    """Days from today until the response deadline, or None if unparseable."""
+    raw = opp.get("responseDeadLine") or ""
+    if not raw:
+        return None
+    try:
+        d = dt.date.fromisoformat(str(raw)[:10])
+    except ValueError:
+        return None
+    return (d - dt.date.today()).days
 
 
 def _fit_label(tier, tech_match, matched_kw):
@@ -1419,6 +1432,74 @@ _RAG_HEX = {"Green": "#2E7D4F", "Yellow": "#D9A62A",
             "Orange": "#DB7A2B", "Red": "#C0392B"}
 
 
+def _key_findings_html(ranked, eligible):
+    """Build the 'Key Findings & Things to Keep in Mind' review callout."""
+    if not eligible:
+        return ('<section class="findings"><h2>Key Findings</h2>'
+                '<p class="empty">No eligible opportunities this run — widen the '
+                'search window and check again.</p></section>')
+
+    closing = sorted(
+        [r for r in eligible
+         if r["deadline_days"] is not None and 0 <= r["deadline_days"] <= 14],
+        key=lambda r: r["deadline_days"],
+    )
+    solos = [r for r in ranked if r["is_solo"]]
+    valued = [r for r in eligible if r["value_num"]]
+    top_value = max(valued, key=lambda r: r["value_num"]) if valued else None
+    green_yellow = [r for r in ranked if r["win_band"] in ("Green", "Yellow")]
+
+    items = []
+
+    # Urgent deadlines first.
+    if closing:
+        names = "; ".join(
+            f'{_html_escape(_clean(r["title"], 40))} '
+            f'(<b>{r["deadline_days"]}d</b>, {_html_escape(r["solicitation"])})'
+            for r in closing[:4])
+        items.append(('🔴', 'Closing soon — act now',
+                      f'{len(closing)} eligible opportunit'
+                      f'{"y" if len(closing) == 1 else "ies"} close within 14 days: '
+                      f'{names}.'))
+
+    # Best bets.
+    if green_yellow:
+        names = "; ".join(
+            f'{_html_escape(_clean(r["title"], 40))} '
+            f'({r["win_emoji"]} {r["win_score"]})' for r in green_yellow[:3])
+        items.append(('⭐', 'Strongest fits to pursue',
+                      f'{names}.'))
+
+    # Best solo play.
+    if solos:
+        r = solos[0]
+        items.append(('🧑‍💻', 'Best solo (you + AI) play',
+                      f'{_html_escape(_clean(r["title"], 50))} '
+                      f'({_html_escape(r["solicitation"])}) — {r["win_emoji"]} '
+                      f'{r["win_score"]}, {_html_escape(r["value_display"])}.'))
+
+    # Biggest opportunity.
+    if top_value:
+        items.append(('💰', 'Largest published value',
+                      f'{_html_escape(_clean(top_value["title"], 50))} — '
+                      f'{_html_escape(top_value["value_display"])} '
+                      f'({_html_escape(top_value["agency"])}).'))
+
+    # Standing reminders.
+    items.append(('✅', 'Keep in mind',
+                  'Respond same-day where you can; keep SDVOSB certification '
+                  'active through award; SDVOSB set-asides require ≥50% '
+                  'self-performance (FAR 52.219-14); a Sources Sought response '
+                  'is cheap and can shape the eventual solicitation.'))
+
+    rows = "".join(
+        f'<div class="find"><span class="find-i">{ic}</span>'
+        f'<div><b>{_html_escape(t)}</b> — {body}</div></div>'
+        for ic, t, body in items)
+    return (f'<section class="findings"><h2>Key Findings &amp; Things to Keep '
+            f'in Mind</h2>{rows}</section>')
+
+
 def export_html_report(results, path, days):
     """Write a self-contained executive HTML report of the opportunity pipeline."""
     eligible = [r for r in results if r["raw_setaside_eligible"]]
@@ -1475,6 +1556,9 @@ def export_html_report(results, path, days):
                  f'<div class="kpi-s">{_html_escape(sub)}</div></div>')
     p.append('</section>')
 
+    # Key findings / review
+    p.append(_key_findings_html(ranked, eligible))
+
     # Charts
     p.append('<section class="charts">')
     p.append('<div class="card"><h3>Pipeline Value by Agency</h3>'
@@ -1494,6 +1578,11 @@ def export_html_report(results, path, days):
         chip = (f'<span class="chip" style="background:{_RAG_HEX[r["win_band"]]}">'
                 f'{r["win_band"]}</span>')
         deadline = str(r["response_deadline"]).split("T")[0]
+        dd = r["deadline_days"]
+        if dd is not None and 0 <= dd <= 7:
+            deadline = f'<b class="urgent">{deadline} · {dd}d 🔴</b>'
+        elif dd is not None and 0 <= dd <= 14:
+            deadline = f'{deadline} · {dd}d 🟠'
         naics_psc = r["naics"] + (f" / {r['psc']}" if r["psc"] else "")
         p.append("<tr>"
                  f"<td>{chip}</td><td class='num'>{r['win_score']}</td>"
@@ -1505,7 +1594,7 @@ def export_html_report(results, path, days):
                  f"<td>{_html_escape(r['personnel'])}</td>"
                  f"<td>{'Yes' if r['is_solo'] else '—'}</td>"
                  f"<td>{_html_escape(r['location'])}</td>"
-                 f"<td>{_html_escape(deadline)}</td></tr>")
+                 f"<td>{deadline}</td></tr>")
     if not ranked:
         p.append('<tr><td colspan="11" class="empty">No eligible '
                  'opportunities in this window.</td></tr>')
@@ -1628,6 +1717,13 @@ padding:14px 18px;margin-bottom:12px}
 .dive-h{margin-bottom:6px;font-size:15px}
 .dive p{margin:4px 0;font-size:13px}
 .muted{color:var(--muted)}
+.urgent{color:#C0392B}
+.findings{background:#FBF6EC;border:1px solid var(--accent);border-radius:12px;
+padding:8px 20px 16px;margin:8px 0 26px}
+.findings h2{border:none;margin:14px 0 8px;font-size:19px}
+.find{display:flex;gap:10px;padding:7px 0;border-top:1px solid #EADFC6;font-size:13px}
+.find:first-of-type{border-top:none}
+.find-i{font-size:16px;flex:none;width:22px;text-align:center}
 .empty{color:var(--muted);font-style:italic;padding:14px}
 footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
 font-size:11.5px;color:var(--muted)}
@@ -1669,6 +1765,10 @@ def parse_args(argv):
                              "is saved as PRG_Executive_Report.html on your Desktop.")
     parser.add_argument("--no-report", action="store_true",
                         help="Skip writing the executive HTML report.")
+    parser.add_argument("--outdir", default=None, metavar="FOLDER",
+                        help="Save date-stamped Excel + HTML into this folder "
+                             "(creates it if needed). Used by the scheduled "
+                             "weekly/monthly automation to keep a history.")
     parser.add_argument("--no-print", action="store_true",
                         help="Suppress the console Markdown report.")
     return parser.parse_args(argv)
@@ -1718,15 +1818,21 @@ def main(argv=None):
     if not args.no_print:
         render_report(results)
 
-    # Always save a spreadsheet by default (to the Desktop) unless opted out.
+    # Resolve output paths. --outdir writes date-stamped files into a folder
+    # (for the scheduled automation history); otherwise write to the Desktop.
+    stamp = dt.date.today().isoformat()
+    if args.outdir:
+        os.makedirs(args.outdir, exist_ok=True)
+        xlsx_path = os.path.join(args.outdir, f"PRG_Contracts_{stamp}.xlsx")
+        report_path = os.path.join(args.outdir, f"PRG_Executive_Report_{stamp}.html")
+    else:
+        xlsx_path = args.excel or _default_output_path()
+        report_path = args.report or _desktop_path("PRG_Executive_Report.html")
+
     saved = []
     if not args.no_excel:
-        out_path = args.excel or _default_output_path()
-        saved.append(export_spreadsheet(results, out_path))
-
-    # Save the executive HTML report by default (to the Desktop) unless opted out.
+        saved.append(export_spreadsheet(results, xlsx_path))
     if not args.no_report:
-        report_path = args.report or _desktop_path("PRG_Executive_Report.html")
         saved.append(export_html_report(results, report_path, args.days))
 
     if saved:

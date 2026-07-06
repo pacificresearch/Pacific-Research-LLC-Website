@@ -139,6 +139,32 @@ The report analyzes the live opportunity pipeline; for awarded contracts it
 also surfaces the awardee and award amount, so the same layout doubles as a
 portfolio dashboard once contracts are won.
 
+### Scheduled automation (Windows)
+
+To run the scans hands-off, `automation/setup_prg_automation.ps1` registers two
+Windows scheduled tasks and keeps a dated history:
+
+- **Weekly** — Mondays 9:00 AM, `--days 10`, saved to
+  `Desktop\PRG_SAMgov_Reports\Weekly\`
+- **Monthly** — 1st of month 9:00 AM, `--days 90`, saved to
+  `Desktop\PRG_SAMgov_Reports\Monthly\`
+
+Each run writes date-stamped `PRG_Contracts_<date>.xlsx` and
+`PRG_Executive_Report_<date>.html`. Set it up once by pasting this into
+PowerShell:
+
+```powershell
+iex (irm "https://raw.githubusercontent.com/pacificresearch/Pacific-Research-LLC-Website/claude/samgov-opportunity-matcher-0a3c2f/automation/setup_prg_automation.ps1")
+```
+
+The `--outdir FOLDER` flag drives this (date-stamped files into a folder);
+manage or remove the tasks any time in Windows **Task Scheduler**.
+
+The executive report opens with a **Key Findings & Things to Keep in Mind**
+review — opportunities closing within 14 days (🔴 within 7), strongest fits,
+best solo play, largest value, and standing compliance reminders — so a
+scheduled report is a ready-to-scan briefing, not just raw data.
+
 ## Notes
 
 - SAM.gov requires `postedFrom`/`postedTo` date filters (`MM/DD/YYYY`) and caps
