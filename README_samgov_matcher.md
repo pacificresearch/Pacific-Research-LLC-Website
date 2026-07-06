@@ -9,16 +9,29 @@ prints a clean Markdown screening report to the console.
 ## What it does
 
 1. **Query construction** — pulls active opportunities from the SAM.gov
-   Opportunities API for each target NAICS code (`541715`, `541611`, `541990`,
-   `811210`) within a posted-date window.
+   Opportunities API for each **core-target NAICS** code (`541715`, `541611`,
+   `541990`, `811210`) *and* each **low-barrier NAICS** code (staffing,
+   administrative, facilities, and health-support categories) within a
+   posted-date window.
 2. **Socioeconomic filtering** — inspects each notice's `typeOfSetAside` code
    and flags it as **SDVOSB**, **Total SB**, **VOSB**, another restricted
    set-aside, or **None (Unrestricted)**, and decides whether PRG may bid.
 3. **Capability matching** — scans the title, description, and NAICS/PSC codes
-   for clinical-research, data-management, and biomedical-equipment keywords.
-4. **Output generation** — prints a Markdown report with a full reviewed-list
-   table (with Yes/No eligibility and a short reason/gap analysis) plus the top
-   three best-matching opportunities.
+   for clinical-research, data-management, and biomedical-equipment keywords,
+   and separately for staffing / "warm body" support signals.
+4. **Output generation** — prints a Markdown report with four sections:
+   1. **Complete list of reviewed opportunities** (core-target NAICS) with
+      Yes/No eligibility and a short reason/gap analysis.
+   2. **Actionable recommendations** — the top three best-matching prime
+      opportunities.
+   3. **Low-barrier / "warm body" opportunities** — adjacent staffing,
+      administrative, and support work under secondary NAICS codes that PRG can
+      reasonably win by fielding qualified personnel, without deep domain
+      specialization.
+   4. **Subcontracting & teaming opportunities** — awarded primes and large
+      unrestricted solicitations where the realistic path is teaming as a
+      subcontractor (unrestricted primes must meet FAR 52.219-9 small-business
+      subcontracting goals, making an SDVOSB an attractive teammate).
 
 ## Requirements
 
