@@ -721,6 +721,140 @@ def _render_recommendation(lines, i, r):
 
 
 # ---------------------------------------------------------------------------
+# 5. SPREADSHEET EXPORT (Excel / CSV)
+# ---------------------------------------------------------------------------
+
+# Column layouts for each worksheet: (header, result-key-or-callable).
+_CORE_COLS = [
+    ("Solicitation #", "solicitation"),
+    ("Title", "title"),
+    ("Agency", "agency"),
+    ("NAICS", "naics"),
+    ("Set-Aside", "setaside"),
+    ("Eligible?", lambda r: "YES" if r["eligible"] else "NO"),
+    ("Reason / Gap Analysis", "reason"),
+    ("Response Deadline", "response_deadline"),
+    ("Link", "link"),
+]
+_LOWBAR_COLS = [
+    ("Solicitation #", "solicitation"),
+    ("Title", "title"),
+    ("Agency", "agency"),
+    ("NAICS", "naics"),
+    ("Set-Aside", "setaside"),
+    ("Eligible?", lambda r: "YES" if r["low_barrier_eligible"] else "NO"),
+    ("Why It's Winnable", "lb_reason"),
+    ("Response Deadline", "response_deadline"),
+    ("Link", "link"),
+]
+_SUB_COLS = [
+    ("Solicitation #", "solicitation"),
+    ("Title", "title"),
+    ("Agency", "agency"),
+    ("NAICS", "naics"),
+    ("Set-Aside", "setaside"),
+    ("Notice Type", "notice_type"),
+    ("Subcontracting Angle", "sub_angle"),
+    ("Link", "link"),
+]
+
+
+def _cell(row, spec):
+    """Resolve a column spec (key or callable) against a result row."""
+    value = spec(row) if callable(spec) else row.get(spec, "")
+    # Un-escape the Markdown pipe-escaping for spreadsheet cells.
+    return str(value).replace("\\|", "|")
+
+
+def _split_sections(results):
+    """Return the (core, low_barrier, subcontracting) row groups for export."""
+    primary = [r for r in results if r["naics_tier"] == "primary"]
+    low_barrier = sorted(
+        [r for r in results
+         if r["naics_tier"] == "low_barrier" and r["low_barrier_eligible"]],
+        key=lambda r: r["lb_score"], reverse=True,
+    )
+    subs = sorted(
+        [r for r in results if r["is_subcontracting"]],
+        key=lambda r: r["score"], reverse=True,
+    )
+    return primary, low_barrier, subs
+
+
+def export_spreadsheet(results, path):
+    """Write results to an Excel workbook (.xlsx) if openpyxl is available,
+    otherwise fall back to a set of CSV files. Returns the path actually written.
+    """
+    primary, low_barrier, subs = _split_sections(results)
+    sheets = [
+        ("Core Opportunities", _CORE_COLS, primary),
+        ("Low-Barrier (Warm Body)", _LOWBAR_COLS, low_barrier),
+        ("Subcontracting", _SUB_COLS, subs),
+    ]
+
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill, Alignment
+        from openpyxl.utils import get_column_letter
+    except ImportError:
+        return _export_csv(sheets, path)
+
+    wb = Workbook()
+    wb.remove(wb.active)  # drop the default empty sheet
+
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill("solid", fgColor="1F4E78")
+    wrap = Alignment(vertical="top", wrap_text=True)
+
+    for sheet_name, cols, rows in sheets:
+        ws = wb.create_sheet(title=sheet_name[:31])  # Excel caps sheet names at 31
+        ws.append([h for h, _ in cols])
+        for c in range(1, len(cols) + 1):
+            cell = ws.cell(row=1, column=c)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = wrap
+        for r in rows:
+            ws.append([_cell(r, spec) for _, spec in cols])
+        # Column widths + wrapping.
+        widths = {
+            "Title": 45, "Agency": 28, "Reason / Gap Analysis": 60,
+            "Why It's Winnable": 55, "Subcontracting Angle": 55, "Link": 35,
+        }
+        for idx, (h, _) in enumerate(cols, start=1):
+            ws.column_dimensions[get_column_letter(idx)].width = widths.get(h, 16)
+        for row in ws.iter_rows(min_row=2):
+            for cell in row:
+                cell.alignment = wrap
+        ws.freeze_panes = "A2"
+        if ws.max_row >= 1:
+            ws.auto_filter.ref = f"A1:{get_column_letter(len(cols))}{ws.max_row}"
+
+    if not path.lower().endswith(".xlsx"):
+        path = path + ".xlsx"
+    wb.save(path)
+    return path
+
+
+def _export_csv(sheets, path):
+    """Fallback: write one CSV per section next to `path`."""
+    import csv
+    base = path[:-5] if path.lower().endswith(".xlsx") else path
+    base = base[:-4] if base.lower().endswith(".csv") else base
+    written = []
+    for sheet_name, cols, rows in sheets:
+        slug = sheet_name.lower().replace(" ", "_").replace("(", "").replace(")", "")
+        fname = f"{base}_{slug}.csv"
+        with open(fname, "w", newline="", encoding="utf-8") as fh:
+            writer = csv.writer(fh)
+            writer.writerow([h for h, _ in cols])
+            for r in rows:
+                writer.writerow([_cell(r, spec) for _, spec in cols])
+        written.append(fname)
+    return ", ".join(written)
+
+
+# ---------------------------------------------------------------------------
 # MAIN
 # ---------------------------------------------------------------------------
 
@@ -742,6 +876,14 @@ def parse_args(argv):
                         help="Max opportunities per NAICS query (default: 100).")
     parser.add_argument("--api-key", default=None,
                         help="Override the SAM.gov API key.")
+    parser.add_argument("--excel", nargs="?", const="screening_report.xlsx",
+                        default=None, metavar="FILE",
+                        help="Also write results to an Excel workbook "
+                             "(default filename: screening_report.xlsx). "
+                             "Falls back to CSV files if openpyxl is missing.")
+    parser.add_argument("--no-print", action="store_true",
+                        help="Suppress the console Markdown report "
+                             "(useful with --excel).")
     return parser.parse_args(argv)
 
 
@@ -786,7 +928,13 @@ def main(argv=None):
         reverse=True,
     )
 
-    render_report(results)
+    if not args.no_print:
+        render_report(results)
+
+    if args.excel:
+        written = export_spreadsheet(results, args.excel)
+        sys.stderr.write(f"\nSpreadsheet written to: {written}\n")
+
     return 0
 
 
