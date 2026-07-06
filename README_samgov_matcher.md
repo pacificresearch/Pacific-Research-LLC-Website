@@ -76,8 +76,12 @@ for open solicitations it is any dollar figure found in the notice text, or
 The console report also prints an estimated total pipeline value across the
 opportunities PRG can pursue.
 
-The workbook has three tabs — **Core Opportunities**, **Low-Barrier (Warm
-Body)**, and **Subcontracting** — each with filterable, frozen headers. If
+The workbook has four tabs — **Solo-Friendly (1-Person)**, **Core
+Opportunities**, **Low-Barrier (Warm Body)**, and **Subcontracting** — each
+with filterable, frozen headers. The **Solo-Friendly** tab flags small-scale
+knowledge work (research, analysis, writing, data, reviews) that one person
+could realistically deliver, scored down for crew/physical/large-team signals
+and large dollar values. If
 `openpyxl` is not installed, the script automatically falls back to writing one
 CSV file per section (which Excel opens directly). When run interactively
 (e.g. double-clicked on Windows) the window stays open until you press Enter,

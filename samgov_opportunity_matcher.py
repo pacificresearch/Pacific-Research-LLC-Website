@@ -116,6 +116,10 @@ LOW_BARRIER_NAICS = OrderedDict(
         ("561612", "Security Guards & Patrol Services"),
         ("561720", "Janitorial Services"),
         ("488190", "Other Support Activities for Air Transportation"),
+        # Research / analysis / writing codes — rich in solo-doable knowledge work
+        ("541720", "R&D in Social Sciences & Humanities"),
+        ("541910", "Marketing Research & Public Opinion Polling"),
+        ("611710", "Educational Support Services"),
     ]
 )
 
@@ -164,6 +168,44 @@ SUBCONTRACT_KEYWORDS = [
     "subcontract", "subcontracting plan", "subcontractor", "teaming",
     "small business subcontracting", "sub-award", "subaward", "joint venture",
 ]
+
+# --- "Solo-friendly" detection ------------------------------------------------
+# Knowledge/office work that one capable person (with an AI assistant) can
+# deliver: research, analysis, writing, data, reviews, small advisory tasks.
+SOLO_FRIENDLY_KEYWORDS = [
+    "research", "study", "studies", "analysis", "analytical", "report",
+    "white paper", "assessment", "evaluation", "survey", "market research",
+    "literature review", "systematic review", "data analysis", "data entry",
+    "data management", "transcription", "translation", "editing", "proofreading",
+    "technical writing", "writing", "documentation", "curriculum",
+    "training material", "instructional design", "consulting", "advisory",
+    "subject matter expert", "sme", "abstract", "records review", "chart review",
+    "medical coding", "coding", "audit support", "program support",
+    "administrative support", "grant writing", "proposal support",
+    "policy analysis", "feasibility", "needs assessment", "sbir", "sttr",
+    "phase i", "spreadsheet", "database design", "analyst", "review of",
+]
+
+# Signals that a task needs a crew, physical presence, or a large team —
+# these push an opportunity OUT of "solo-friendly".
+SOLO_EXCLUDE_KEYWORDS = [
+    "construction", "renovation", "janitorial", "custodial", "security guard",
+    "guard services", "landscaping", "grounds maintenance", "hvac", "plumbing",
+    "roofing", "food service", "warehouse", "fleet", "installation",
+    "manufacture", "manufacturing", "onsite staffing", "full-time equivalents",
+    "ftes", "24/7", "around the clock", "nationwide", "multiple locations",
+    "guards", "custodians", "shift work", "call center", "help desk",
+]
+
+# Firm-Fixed-Price small-buy thresholds (FAR): micro-purchase and the
+# Simplified Acquisition Threshold — smaller usually means solo-doable.
+MICRO_PURCHASE = 10_000
+SIMPLIFIED_ACQ_THRESHOLD = 250_000
+
+_FTE_RE = re.compile(
+    r"(\d{1,3})\s*(?:\+\s*)?(?:full[-\s]?time|fte'?s?|full time equivalents?)",
+    re.IGNORECASE,
+)
 
 # Set-aside codes/labels that this company is eligible for. SAM.gov returns a
 # `typeOfSetAside` code and a `typeOfSetAsideDescription`. We map the codes.
@@ -410,6 +452,9 @@ def evaluate(opp):
         lb_score += 1  # bonus if it also brushes core capability
 
     value_display, value_num = _extract_value(opp)
+    is_solo, solo_score, solo_reason = classify_solo(
+        opp, setaside_eligible, value_num
+    )
 
     return {
         "solicitation": (
@@ -437,6 +482,9 @@ def evaluate(opp):
         "is_subcontracting": is_sub,
         "notice_type": notice_type or "N/A",
         "sub_angle": sub_angle,
+        "is_solo": is_solo,
+        "solo_score": solo_score,
+        "solo_reason": solo_reason,
         "score": score,
         "lb_score": lb_score,
         "link": opp.get("uiLink", ""),
@@ -602,6 +650,77 @@ def _extract_value(opp):
     return ("Not stated", None)
 
 
+def _estimate_fte(text):
+    """Largest full-time-equivalent headcount mentioned in the text, or None."""
+    counts = []
+    for m in _FTE_RE.findall(text or ""):
+        try:
+            counts.append(int(m))
+        except ValueError:
+            continue
+    return max(counts) if counts else None
+
+
+def classify_solo(opp, setaside_eligible, value_num):
+    """Assess whether one person (with an AI assistant) could realistically
+    deliver this contract. Returns (is_solo, solo_score, reason).
+
+    Heuristic — favors small-dollar knowledge work (research, analysis,
+    writing, data, review) and penalizes crew/physical/large-team signals.
+    """
+    text = _haystack(opp)
+    hits = _keyword_hits(text, SOLO_FRIENDLY_KEYWORDS)
+    excludes = _keyword_hits(text, SOLO_EXCLUDE_KEYWORDS)
+    fte = _estimate_fte(text)
+
+    score = 0
+    score += min(len(hits), 5)                 # knowledge-work signals
+    score -= 2 * min(len(excludes), 4)         # crew / physical / big-team signals
+
+    # Dollar size: smaller = more solo-doable.
+    if value_num is None:
+        score += 1                             # unstated (often small buys)
+    elif value_num <= MICRO_PURCHASE:
+        score += 3
+    elif value_num <= SIMPLIFIED_ACQ_THRESHOLD:
+        score += 2
+    elif value_num > 1_000_000:
+        score -= 3
+
+    # Headcount: a solo shop can't field a big team.
+    if fte is None:
+        score += 1
+    elif fte <= 1:
+        score += 2
+    elif fte <= 2:
+        score += 1
+    else:
+        score -= 4
+
+    is_solo = (
+        setaside_eligible
+        and score >= 3
+        and len(hits) >= 1
+        and (fte is None or fte <= 2)
+        and (value_num is None or value_num <= SIMPLIFIED_ACQ_THRESHOLD * 2)
+    )
+
+    # Compose a short "why it's solo-doable" note.
+    bits = []
+    if hits:
+        bits.append(f"knowledge work ({', '.join(hits[:3])})")
+    if value_num is not None and value_num <= SIMPLIFIED_ACQ_THRESHOLD:
+        bits.append(f"small dollar value ({_format_currency(value_num)})")
+    elif value_num is None:
+        bits.append("small/unstated value")
+    if fte is not None and fte <= 2:
+        bits.append(f"~{fte} person")
+    if excludes:
+        bits.append(f"⚠ check for crew work ({excludes[0]})")
+    reason = "; ".join(bits) + "." if bits else "Light-scope knowledge task."
+    return (is_solo, score, "One-person doable: " + reason)
+
+
 def _date_range(days_back):
     """Return (postedFrom, postedTo) as MM/DD/YYYY strings."""
     today = dt.date.today()
@@ -646,6 +765,8 @@ def render_report(results):
     primary = [r for r in results if r["naics_tier"] == "primary"]
     low_barrier = [r for r in results if r["naics_tier"] == "low_barrier"]
     subcontract = [r for r in results if r["is_subcontracting"]]
+    solo = sorted([r for r in results if r["is_solo"]],
+                  key=lambda r: r["solo_score"], reverse=True)
 
     # --- Section 1: complete list (core-target NAICS) --------------------
     lines.append("### 1. Complete List of Reviewed Opportunities (Core-Target NAICS)")
@@ -754,6 +875,42 @@ def render_report(results):
             )
     lines.append("")
 
+    # --- Section 5: solo-friendly (one-person) ---------------------------
+    lines.append("### 5. Solo-Friendly Opportunities (You + an AI Assistant)")
+    lines.append("")
+    lines.append(
+        "_Small-scale knowledge work — research, analysis, writing, data, and "
+        "reviews — that one capable person could realistically deliver without "
+        "a team. Ranked by fit; verify scope in the full notice before bidding._"
+    )
+    lines.append("")
+    if not solo:
+        lines.append(
+            "_No clearly solo-doable opportunities surfaced in this window. "
+            "Widen `--days`, or add research/analysis NAICS (e.g. 541720, "
+            "541990, 611710) and re-run._"
+        )
+    else:
+        lines.append(
+            "| Solicitation # | Title | Agency | NAICS | Set-Aside | Est. Value "
+            "| Why One-Person Doable |"
+        )
+        lines.append("| :--- | :--- | :--- | :--- | :--- | :--- | :--- |")
+        for r in solo:
+            lines.append(
+                f"| {r['solicitation']} | {r['title']} | {r['agency']} "
+                f"| {r['naics']} | {r['setaside']} | {r['value_display']} "
+                f"| {r['solo_reason']} |"
+            )
+        if len(solo) < 10:
+            lines.append("")
+            lines.append(
+                f"_Only {len(solo)} solo-friendly match"
+                f"{'' if len(solo) == 1 else 'es'} this window — widen "
+                f"`--days` to 120 or 180 to surface more._"
+            )
+    lines.append("")
+
     # --- Summary footer ---------------------------------------------------
     total = len(results)
     n_elig = sum(1 for r in primary if r["eligible"])
@@ -854,6 +1011,17 @@ _SUB_COLS = [
     ("Subcontracting Angle", "sub_angle"),
     ("Link", "link"),
 ]
+_SOLO_COLS = [
+    ("Solicitation #", "solicitation"),
+    ("Title", "title"),
+    ("Agency", "agency"),
+    ("NAICS", "naics"),
+    ("Set-Aside", "setaside"),
+    ("Est. Value (Revenue)", "value_display"),
+    ("Why One-Person Doable", "solo_reason"),
+    ("Response Deadline", "response_deadline"),
+    ("Link", "link"),
+]
 
 
 def _cell(row, spec):
@@ -864,7 +1032,7 @@ def _cell(row, spec):
 
 
 def _split_sections(results):
-    """Return the (core, low_barrier, subcontracting) row groups for export."""
+    """Return the (core, low_barrier, subcontracting, solo) row groups."""
     primary = [r for r in results if r["naics_tier"] == "primary"]
     low_barrier = sorted(
         [r for r in results
@@ -875,15 +1043,20 @@ def _split_sections(results):
         [r for r in results if r["is_subcontracting"]],
         key=lambda r: r["score"], reverse=True,
     )
-    return primary, low_barrier, subs
+    solo = sorted(
+        [r for r in results if r["is_solo"]],
+        key=lambda r: r["solo_score"], reverse=True,
+    )
+    return primary, low_barrier, subs, solo
 
 
 def export_spreadsheet(results, path):
     """Write results to an Excel workbook (.xlsx) if openpyxl is available,
     otherwise fall back to a set of CSV files. Returns the path actually written.
     """
-    primary, low_barrier, subs = _split_sections(results)
+    primary, low_barrier, subs, solo = _split_sections(results)
     sheets = [
+        ("Solo-Friendly (1-Person)", _SOLO_COLS, solo),
         ("Core Opportunities", _CORE_COLS, primary),
         ("Low-Barrier (Warm Body)", _LOWBAR_COLS, low_barrier),
         ("Subcontracting", _SUB_COLS, subs),
@@ -917,7 +1090,7 @@ def export_spreadsheet(results, path):
         widths = {
             "Title": 45, "Agency": 28, "Reason / Gap Analysis": 60,
             "Why It's Winnable": 55, "Subcontracting Angle": 55, "Link": 35,
-            "Est. Value (Revenue)": 22,
+            "Est. Value (Revenue)": 22, "Why One-Person Doable": 60,
         }
         for idx, (h, _) in enumerate(cols, start=1):
             ws.column_dimensions[get_column_letter(idx)].width = widths.get(h, 16)
