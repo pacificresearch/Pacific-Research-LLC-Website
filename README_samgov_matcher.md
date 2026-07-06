@@ -69,6 +69,13 @@ python3 samgov_opportunity_matcher.py --days 90 --no-excel
 python3 samgov_opportunity_matcher.py --days 90 --no-print
 ```
 
+Each tab includes an **Est. Value (Revenue)** column — the dollar amount the
+contract would generate. For award notices this is the actual awarded amount;
+for open solicitations it is any dollar figure found in the notice text, or
+"Not stated" (SAM rarely publishes a value up front, so no figure is invented).
+The console report also prints an estimated total pipeline value across the
+opportunities PRG can pursue.
+
 The workbook has three tabs — **Core Opportunities**, **Low-Barrier (Warm
 Body)**, and **Subcontracting** — each with filterable, frozen headers. If
 `openpyxl` is not installed, the script automatically falls back to writing one

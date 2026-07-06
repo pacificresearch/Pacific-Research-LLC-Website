@@ -36,6 +36,7 @@ Notes:
 import argparse
 import datetime as dt
 import os
+import re
 import sys
 import textwrap
 from collections import OrderedDict
@@ -408,6 +409,8 @@ def evaluate(opp):
     if tech_match:
         lb_score += 1  # bonus if it also brushes core capability
 
+    value_display, value_num = _extract_value(opp)
+
     return {
         "solicitation": (
             opp.get("solicitationNumber")
@@ -419,6 +422,8 @@ def evaluate(opp):
         "naics": naics or "N/A",
         "naics_tier": tier,
         "setaside": setaside_label,
+        "value_display": value_display,
+        "value_num": value_num,
         "eligible": eligible,
         "low_barrier_eligible": low_barrier_eligible,
         "reason": reason,
@@ -527,6 +532,76 @@ def _extract_awardee(opp):
     return _clean(name, max_len=30) if name else ""
 
 
+# Dollar-amount parsing for the estimated-value column. Matches figures like
+# "$1,200,000", "$1.2M", "$500K", "$3 million".
+_DOLLAR_RE = re.compile(
+    r"\$\s?([\d,]+(?:\.\d+)?)\s?(billion|million|thousand|bn|mil|b|m|k)?\b",
+    re.IGNORECASE,
+)
+_DOLLAR_MULTIPLIER = {
+    "billion": 1e9, "bn": 1e9, "b": 1e9,
+    "million": 1e6, "mil": 1e6, "m": 1e6,
+    "thousand": 1e3, "k": 1e3,
+}
+
+
+def _format_currency(amount):
+    """Human-friendly currency formatting: $1.2M, $500K, $12,000."""
+    try:
+        amount = float(amount)
+    except (TypeError, ValueError):
+        return "Not stated"
+    if amount >= 1e9:
+        return f"${amount / 1e9:.1f}B"
+    if amount >= 1e6:
+        return f"${amount / 1e6:.1f}M"
+    if amount >= 1e3:
+        return f"${amount / 1e3:.0f}K"
+    return f"${amount:,.0f}"
+
+
+def _parse_dollar_amounts(text):
+    """Return a list of dollar figures (floats) found in free text."""
+    amounts = []
+    for num, unit in _DOLLAR_RE.findall(text or ""):
+        try:
+            value = float(num.replace(",", ""))
+        except ValueError:
+            continue
+        value *= _DOLLAR_MULTIPLIER.get((unit or "").lower(), 1)
+        if value >= 1000:  # ignore trivial figures / page refs
+            amounts.append(value)
+    return amounts
+
+
+def _extract_value(opp):
+    """Estimate the contract's dollar value (i.e. the revenue it would generate).
+
+    Priority:
+      1. Award amount, when the notice is an award (the real contract value).
+      2. The largest dollar figure mentioned in the notice title/description.
+      3. "Not stated" — SAM rarely publishes a value for open solicitations.
+
+    Returns (display_string, numeric_value_or_None).
+    """
+    award = opp.get("award") or {}
+    raw = award.get("amount") if isinstance(award, dict) else None
+    if raw not in (None, "", 0, "0"):
+        try:
+            amt = float(str(raw).replace("$", "").replace(",", "").strip())
+            if amt > 0:
+                return (_format_currency(amt), amt)
+        except ValueError:
+            pass
+
+    candidates = _parse_dollar_amounts(_haystack(opp))
+    if candidates:
+        amt = max(candidates)
+        return (f"~{_format_currency(amt)} (from notice text)", amt)
+
+    return ("Not stated", None)
+
+
 def _date_range(days_back):
     """Return (postedFrom, postedTo) as MM/DD/YYYY strings."""
     today = dt.date.today()
@@ -542,15 +617,16 @@ def _date_range(days_back):
 def _opportunity_table(rows, eligible_key, reason_key):
     """Render a standard reviewed-opportunity Markdown table from result rows."""
     lines = [
-        "| Solicitation # | Title | Agency | NAICS | Set-Aside "
+        "| Solicitation # | Title | Agency | NAICS | Set-Aside | Est. Value "
         "| Eligible? (Yes/No) | Short Reason / Gap Analysis |",
-        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
     ]
     for r in rows:
         elig = "**YES**" if r[eligible_key] else "**NO**"
         lines.append(
             f"| {r['solicitation']} | {r['title']} | {r['agency']} "
-            f"| {r['naics']} | {r['setaside']} | {elig} | {r[reason_key]} |"
+            f"| {r['naics']} | {r['setaside']} | {r['value_display']} "
+            f"| {elig} | {r[reason_key]} |"
         )
     return lines
 
@@ -666,15 +742,15 @@ def render_report(results):
         )
     else:
         lines.append(
-            "| Solicitation # | Title | Agency | NAICS | Set-Aside "
+            "| Solicitation # | Title | Agency | NAICS | Set-Aside | Est. Value "
             "| Notice Type | Subcontracting Angle |"
         )
-        lines.append("| :--- | :--- | :--- | :--- | :--- | :--- | :--- |")
+        lines.append("| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |")
         for r in subs_sorted:
             lines.append(
                 f"| {r['solicitation']} | {r['title']} | {r['agency']} "
-                f"| {r['naics']} | {r['setaside']} | {r['notice_type']} "
-                f"| {r['sub_angle']} |"
+                f"| {r['naics']} | {r['setaside']} | {r['value_display']} "
+                f"| {r['notice_type']} | {r['sub_angle']} |"
             )
     lines.append("")
 
@@ -682,6 +758,14 @@ def render_report(results):
     total = len(results)
     n_elig = sum(1 for r in primary if r["eligible"])
     n_sdvosb = sum(1 for r in results if r["is_sdvosb"])
+
+    # Total stated value across everything PRG could pursue (prime-eligible core
+    # + low-barrier plays), where a dollar figure was actually published.
+    pursuable = {id(r): r for r in
+                 [x for x in primary if x["eligible"]] + lb_eligible}.values()
+    valued = [r["value_num"] for r in pursuable if r["value_num"]]
+    pipeline_total = sum(valued)
+
     lines.append("---")
     lines.append(
         f"*Screened **{total}** opportunit"
@@ -692,6 +776,15 @@ def render_report(results):
         f"**{len(subs_sorted)}** subcontracting/teaming targets, "
         f"**{n_sdvosb}** SDVOSB set-asides.*"
     )
+    if valued:
+        lines.append("")
+        lines.append(
+            f"*Estimated pipeline value (where a dollar figure was published): "
+            f"**{_format_currency(pipeline_total)}** across {len(valued)} "
+            f"opportunit{'y' if len(valued) == 1 else 'ies'}. Most open "
+            f"solicitations do not publish a value, so this is a floor, not a "
+            f"total — treat all figures as rough estimates.*"
+        )
 
     print("\n".join(lines))
 
@@ -713,6 +806,7 @@ def _render_recommendation(lines, i, r):
         f"    *   **Set-Aside:** {r['setaside']}"
         + ("  ✅ SDVOSB direct fit" if r["is_sdvosb"] else "")
     )
+    lines.append(f"    *   **Est. Contract Value (revenue):** {r['value_display']}")
     lines.append(f"    *   **Why it fits:** capability signals → {kw}.")
     lines.append(f"    *   **Response Deadline:** {deadline}")
     if r.get("link"):
@@ -731,6 +825,7 @@ _CORE_COLS = [
     ("Agency", "agency"),
     ("NAICS", "naics"),
     ("Set-Aside", "setaside"),
+    ("Est. Value (Revenue)", "value_display"),
     ("Eligible?", lambda r: "YES" if r["eligible"] else "NO"),
     ("Reason / Gap Analysis", "reason"),
     ("Response Deadline", "response_deadline"),
@@ -742,6 +837,7 @@ _LOWBAR_COLS = [
     ("Agency", "agency"),
     ("NAICS", "naics"),
     ("Set-Aside", "setaside"),
+    ("Est. Value (Revenue)", "value_display"),
     ("Eligible?", lambda r: "YES" if r["low_barrier_eligible"] else "NO"),
     ("Why It's Winnable", "lb_reason"),
     ("Response Deadline", "response_deadline"),
@@ -753,6 +849,7 @@ _SUB_COLS = [
     ("Agency", "agency"),
     ("NAICS", "naics"),
     ("Set-Aside", "setaside"),
+    ("Est. Value (Revenue)", "value_display"),
     ("Notice Type", "notice_type"),
     ("Subcontracting Angle", "sub_angle"),
     ("Link", "link"),
@@ -820,6 +917,7 @@ def export_spreadsheet(results, path):
         widths = {
             "Title": 45, "Agency": 28, "Reason / Gap Analysis": 60,
             "Why It's Winnable": 55, "Subcontracting Angle": 55, "Link": 35,
+            "Est. Value (Revenue)": 22,
         }
         for idx, (h, _) in enumerate(cols, start=1):
             ws.column_dimensions[get_column_letter(idx)].width = widths.get(h, 16)
