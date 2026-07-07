@@ -1232,6 +1232,8 @@ _RICH_COLS = [
 _CORE_COLS = _RICH_COLS
 _LOWBAR_COLS = _RICH_COLS + [("Why It's Winnable", "lb_reason")]
 _SUB_COLS = [
+    ("Win Score", "win_score"),
+    ("Rating", lambda r: f"{r['win_emoji']} {r['win_band']}"),
     ("Solicitation #", "solicitation"),
     ("Title", "title"),
     ("Agency", "agency"),
