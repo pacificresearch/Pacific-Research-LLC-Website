@@ -417,6 +417,8 @@ def evaluate(opp):
     is_awarded = ("award" in (notice_type or "").lower()) or bool(
         (isinstance(award, dict) and (award.get("awardee") or award.get("amount")))
     )
+    _dd = _deadline_days(opp)
+    is_expired = _dd is not None and _dd < 0
 
     # Prime eligibility for the CORE table = allowed to bid AND technically relevant.
     eligible = setaside_eligible and tech_match
@@ -506,6 +508,7 @@ def evaluate(opp):
         "lb_match": lb_match,
         "is_subcontracting": is_sub,
         "is_awarded": is_awarded,
+        "is_expired": is_expired,
         "notice_type": notice_type or "N/A",
         "sub_angle": sub_angle,
         "is_solo": is_solo,
@@ -1011,7 +1014,7 @@ def render_report(results):
     lines.append("")
 
     # Award notices (already won) only belong in the subcontracting view.
-    prime = [r for r in results if not r["is_awarded"]]
+    prime = [r for r in results if not r["is_awarded"] and not r["is_expired"]]
     primary = [r for r in prime if r["naics_tier"] == "primary"]
     low_barrier = [r for r in prime if r["naics_tier"] == "low_barrier"]
     subcontract = [r for r in results if r["is_subcontracting"]]
@@ -1281,7 +1284,7 @@ def _split_sections(results):
     Award notices (already-won contracts) are excluded from every
     pursue-as-prime group and appear only under Subcontracting.
     """
-    prime = [r for r in results if not r["is_awarded"]]
+    prime = [r for r in results if not r["is_awarded"] and not r["is_expired"]]
     primary = [r for r in prime if r["naics_tier"] == "primary"]
     low_barrier = sorted(
         [r for r in prime
@@ -1593,8 +1596,8 @@ def export_html_report(results, path, days):
     """Write a self-contained executive HTML report of the opportunity pipeline."""
     # Pursue-as-prime view: eligible AND not already awarded (awarded ones live
     # in the Subcontracting category only).
-    eligible = [r for r in results
-                if r["raw_setaside_eligible"] and not r["is_awarded"]]
+    eligible = [r for r in results if r["raw_setaside_eligible"]
+                and not r["is_awarded"] and not r["is_expired"]]
     ranked = sorted(eligible, key=lambda r: r["win_score"], reverse=True)
 
     # --- KPIs ---
@@ -1643,12 +1646,23 @@ def export_html_report(results, path, days):
              f'{dt.date.today().isoformat()} · last {days} days · '
              f'{len(results)} notices screened</p></header>')
 
-    # KPI cards
+    # KPI cards — each count card is a clickable filter for the matrix below.
+    kpi_filter = {
+        "Eligible Opportunities": "all",
+        "Best Bets (Green)": "band:Green",
+        "Solo-Friendly": "solo",
+        "SDVOSB Set-Asides": "sdvosb",
+        "International": "intl",
+    }
     p.append('<section class="kpis">')
     for label, val, sub in kpis:
-        p.append(f'<div class="kpi"><div class="kpi-v">{_html_escape(val)}</div>'
+        filt = kpi_filter.get(label)
+        attrs = (f' class="kpi clickable" data-filter="{filt}" tabindex="0" '
+                 f'role="button"' if filt else ' class="kpi"')
+        hint = ' <span class="kpi-go">▸ click to filter</span>' if filt else ''
+        p.append(f'<div{attrs}><div class="kpi-v">{_html_escape(val)}</div>'
                  f'<div class="kpi-l">{_html_escape(label)}</div>'
-                 f'<div class="kpi-s">{_html_escape(sub)}</div></div>')
+                 f'<div class="kpi-s">{_html_escape(sub)}{hint}</div></div>')
     p.append('</section>')
 
     # Key findings / review
@@ -1662,13 +1676,24 @@ def export_html_report(results, path, days):
              + _svg_hbars(chart_rag, lambda v: str(int(v))) + '</div>')
     p.append('</section>')
 
-    # Contract matrix
-    p.append('<section><h2>Contract / Opportunity Matrix</h2>'
-             '<div class="scroll"><table><thead><tr>'
+    # Contract matrix (interactive: filter buttons + live search).
+    p.append('<section><h2>Contract / Opportunity Matrix</h2>')
+    p.append('<div class="filterbar">'
+             '<button class="fb active" data-filter="all">All</button>'
+             '<button class="fb" data-filter="band:Green">🟢 Best bets</button>'
+             '<button class="fb" data-filter="band:Yellow">🟡 On the fence</button>'
+             '<button class="fb" data-filter="band:Red">🔴 Skip</button>'
+             '<button class="fb" data-filter="solo">🧑‍💻 Solo</button>'
+             '<button class="fb" data-filter="intl">🌍 International</button>'
+             '<button class="fb" data-filter="sdvosb">SDVOSB</button>'
+             '<input id="q" class="fsearch" type="search" '
+             'placeholder="Search title / agency / #…">'
+             '<span id="count" class="count"></span></div>')
+    p.append('<div class="scroll"><table id="matrix"><thead><tr>'
              '<th>Rating</th><th>Win</th><th>Solicitation #</th><th>Agency</th>'
              '<th>Est. Value</th><th>Set-Aside</th><th>NAICS / PSC</th>'
              '<th>Personnel</th><th>Solo</th><th>Location</th><th>Respond By</th>'
-             '</tr></thead><tbody>')
+             '</tr></thead><tbody id="matrixBody">')
     for r in ranked:
         chip = (f'<span class="chip" style="background:{_RAG_HEX[r["win_band"]]}">'
                 f'{r["win_band"]}</span>')
@@ -1683,17 +1708,24 @@ def export_html_report(results, path, days):
         if r["link"]:
             sol = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
                    f'rel="noopener">{sol}</a>')
-        p.append("<tr>"
-                 f"<td>{chip}</td><td class='num'>{r['win_score']}</td>"
-                 f"<td>{sol}</td>"
-                 f"<td>{_html_escape(r['agency'])}</td>"
-                 f"<td class='num'>{_html_escape(r['value_display'])}</td>"
-                 f"<td>{_html_escape(r['setaside'])}</td>"
-                 f"<td>{_html_escape(naics_psc)}</td>"
-                 f"<td>{_html_escape(r['personnel'])}</td>"
-                 f"<td>{'Yes' if r['is_solo'] else '—'}</td>"
-                 f"<td>{_html_escape(r['location'])}</td>"
-                 f"<td>{deadline}</td></tr>")
+        searchtext = _html_escape(
+            f"{r['solicitation']} {r['title']} {r['agency']} {r['naics']}".lower())
+        p.append(
+            f'<tr data-band="{r["win_band"]}" '
+            f'data-solo="{1 if r["is_solo"] else 0}" '
+            f'data-intl="{1 if r["is_international"] else 0}" '
+            f'data-sdvosb="{1 if r["is_sdvosb"] else 0}" '
+            f'data-text="{searchtext}">'
+            f"<td>{chip}</td><td class='num'>{r['win_score']}</td>"
+            f"<td>{sol}</td>"
+            f"<td>{_html_escape(r['agency'])}</td>"
+            f"<td class='num'>{_html_escape(r['value_display'])}</td>"
+            f"<td>{_html_escape(r['setaside'])}</td>"
+            f"<td>{_html_escape(naics_psc)}</td>"
+            f"<td>{_html_escape(r['personnel'])}</td>"
+            f"<td>{'Yes' if r['is_solo'] else '—'}</td>"
+            f"<td>{_html_escape(r['location'])}</td>"
+            f"<td>{deadline}</td></tr>")
     if not ranked:
         p.append('<tr><td colspan="11" class="empty">No eligible '
                  'opportunities in this window.</td></tr>')
@@ -1798,6 +1830,7 @@ def export_html_report(results, path, days):
              'data. Win scores and estimates are decision aids, not guarantees. '
              'Verify scope, value, and contacts in each official notice before '
              f'bidding. · {COMPANY_NAME} · {dt.date.today().isoformat()}</footer>')
+    p.append('<script>' + _REPORT_JS + '</script>')
     p.append('</div></body></html>')
 
     if not path.lower().endswith(".html"):
@@ -1876,8 +1909,69 @@ padding:8px 20px 16px;margin:8px 0 26px}
 .empty{color:var(--muted);font-style:italic;padding:14px}
 footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
 font-size:11.5px;color:var(--muted)}
+.kpi.clickable{cursor:pointer;transition:box-shadow .12s,transform .12s}
+.kpi.clickable:hover{box-shadow:0 4px 14px rgba(20,38,60,.14);transform:translateY(-1px)}
+.kpi.clickable:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.kpi-go{color:var(--accent);font-weight:700;white-space:nowrap}
+.filterbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
+.fb{font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);
+background:var(--surface);border:1px solid var(--line);border-radius:20px;
+padding:6px 13px;cursor:pointer}
+.fb:hover{border-color:var(--primary)}
+.fb.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.fsearch{font:inherit;font-size:13px;padding:6px 12px;border:1px solid var(--line);
+border-radius:20px;min-width:190px;flex:1 1 190px;max-width:320px}
+.count{font-size:12.5px;color:var(--muted);font-weight:600;white-space:nowrap}
 @media print{body{background:#fff}.wrap{max-width:100%;padding:0}
-.card,.dive,.kpi{break-inside:avoid}}
+.card,.dive,.kpi{break-inside:avoid}.filterbar{display:none}}
+"""
+
+
+_REPORT_JS = r"""
+(function(){
+  var body=document.getElementById('matrixBody');
+  if(!body) return;
+  var rows=[].slice.call(body.querySelectorAll('tr[data-band]'));
+  var countEl=document.getElementById('count');
+  var qEl=document.getElementById('q');
+  var buttons=[].slice.call(document.querySelectorAll('.fb'));
+  var state={filter:'all',q:''};
+
+  function matchFilter(tr,f){
+    if(f==='all') return true;
+    if(f==='solo') return tr.getAttribute('data-solo')==='1';
+    if(f==='intl') return tr.getAttribute('data-intl')==='1';
+    if(f==='sdvosb') return tr.getAttribute('data-sdvosb')==='1';
+    if(f.indexOf('band:')===0) return tr.getAttribute('data-band')===f.slice(5);
+    return true;
+  }
+  function apply(){
+    var shown=0;
+    rows.forEach(function(tr){
+      var ok=matchFilter(tr,state.filter) &&
+        (!state.q || (tr.getAttribute('data-text')||'').indexOf(state.q)>-1);
+      tr.style.display=ok?'':'none';
+      if(ok) shown++;
+    });
+    if(countEl) countEl.textContent='Showing '+shown+' of '+rows.length;
+    buttons.forEach(function(b){
+      b.classList.toggle('active',b.getAttribute('data-filter')===state.filter);
+    });
+  }
+  function setFilter(f){ state.filter=f; apply();
+    document.getElementById('matrix').scrollIntoView({behavior:'smooth',block:'start'}); }
+
+  buttons.forEach(function(b){
+    b.addEventListener('click',function(){ state.filter=b.getAttribute('data-filter'); apply(); });
+  });
+  document.querySelectorAll('.kpi.clickable').forEach(function(k){
+    var go=function(){ setFilter(k.getAttribute('data-filter')); };
+    k.addEventListener('click',go);
+    k.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();go();} });
+  });
+  if(qEl) qEl.addEventListener('input',function(){ state.q=qEl.value.toLowerCase().trim(); apply(); });
+  apply();
+})();
 """
 
 
