@@ -79,12 +79,12 @@ for open solicitations it is any dollar figure found in the notice text, or
 The console report also prints an estimated total pipeline value across the
 opportunities PRG can pursue.
 
-The workbook has thirteen tabs — **Top 10 – Do These First**, **Solo-Friendly
+The workbook has fourteen tabs — **Top 10 – Do These First**, **Solo-Friendly
 (1-Person)**, **Core Opportunities**, **Low-Barrier (Warm Body)**,
 **International (Consulting)**, **VA (OSDBU)**, **HHS (OSDBU)**, **DTRA**,
-**Subcontracting**, **Recompete Radar**, **WATCHLIST (prep, future)**, **KILL
-LOG (screened out)**, and **Resources (Hunt & Help)** — each with filterable,
-frozen headers.
+**Subcontracting**, **Recompete Radar**, **WATCH-TEMPLATE (hire-to-win)**,
+**WATCHLIST (prep, future)**, **KILL LOG (screened out)**, and **Resources (Hunt
+& Help)** — each with filterable, frozen headers.
 
 ### Priority-agency focus (VA / HHS / DTRA)
 
@@ -144,8 +144,46 @@ PWS/attachments) and gets a disposition:
   maintenance, logistics, guards, trade labor), Gate 3 coverage (24/7, on-call,
   guaranteed response, embedded/daily on-site), Gate 1 self-performance (≥3
   FTE — needs a team).
+- **WATCH-TEMPLATE** → *hire-to-win* (see below).
 - **FUTURE** → pre-solicitations and Sources Sought that fit PRG go to the
   **WATCHLIST** (prep and shape the requirement; not biddable yet).
+
+### Hireable credential vs. unhireable authorization (the win-and-manage axis)
+
+The single most important scoring dimension for PRG's win-and-manage model is
+**who** the required credential attaches to. For any credential/authorization
+requirement, the screen asks: *can this capability be supplied by ONE individual
+hired W-2 onto PRG?*
+
+- **Type A — individual credential** (a licensed/certified **person**: board-
+  certified physicist, RN, physician, PE, licensed counselor, certified coder,
+  etc.). PRG can hire that person W-2 — their labor counts toward the 50% self-
+  performance rule and PRG project-manages. **Potentially winnable → routed to
+  the new WATCH-TEMPLATE bucket, never killed.** Each entry lists the exact
+  credential needed and an **ACTION: secure a contingent (on-award) commitment
+  letter from a [credential-holder]**. These are pulled OUT of the bid lists (not
+  bid-ready until the partner is lined up) and into their own **WATCH-TEMPLATE
+  (hire-to-win)** Excel tab and a 🧩 HTML section.
+- **Type B — corporate / OEM / proprietary authorization** (a certified
+  **company**: "manufacturer's authorized service provider", "authorized JCI/
+  Metasys provider", Fluke-authorized calibration, dealer/channel authorization,
+  proprietary-system access). The authorization belongs to a corporation PRG
+  can't put on payroll; subbing the principal purpose to that firm is an illegal
+  pass-through (>50% subcontracted). **Cannot be solved by hiring one person →
+  HARD KILL**, regardless of set-aside or dollar size.
+
+### Capital / workforce required upfront (hard kill)
+
+PRG has no upfront capital, so any opportunity whose compliant performance would
+require **pre-funding a workforce, trade training, OEM certification, equipment,
+a lab, bonding, or a facility BEFORE award** is killed. Signals: multiple
+trained/certified technicians, a trade crew, owned equipment / ISO-17025 lab,
+Type-B corporate authorization, or bonding. The only winnable structure is **one
+contingent specialist (or PRG's own labor)** secured with a single on-award
+commitment letter — anything requiring speculative pre-award hiring or
+investment is out. (Example: a VA medical-gas job needs a *team* of ASSE-certified
+techs plus calibrated test equipment → killed on this rule, even though "ASSE"
+looks like a single credential.)
 - **Soft signals** (score down, never auto-fail): ~2 FTE, <10 days to respond,
   bonding/insurance, incumbent present, open competition (no SDVOSB
   preference), and NAICS catch-all codes flagged "verify scope".
@@ -261,13 +299,16 @@ run is annotated "already vetted [date]: [verdict]" (cache at
 `~/.prg_screen_cache.json`).
 
 Run `python samgov_opportunity_matcher.py --selftest` to verify the rules
-against the known cases: VA 36C26026Q0674 (medical-gas credential wall),
-FDA 75F40126R00051 (NCTR O&M CBA/workforce wall), BLM 140L3726Q0100 (Class III
-cultural-resource CRUP + fieldwork), a GE MAC 5500 ECG PM (OEM pass-through),
-and State/Embassy-Manila 19RP3826Q0057 (stale pre-sol + overseas post +
-commodity supply + unrestricted, verdict EXPIRED with the commodity kill and
-overseas-post flag both firing underneath) — and USSOCOM H9242126QE036 (SaaS
-license resale) and an NCIA in-lane sources-sought (WATCH, flagged not killed),
+against the known cases: VA 36C26026Q0674 (medical gas → ASSE-cert techs +
+equipment = **capital/workforce-required** kill), VA 36C24426Q0491 (Erie VAMC
+Metasys/JCI → **Type B** corporate OEM authorization kill), Navy N0040626Q0335
+(Fluke calibration → Type B OEM-authorization kill), FDA 75F40126R00051 (NCTR
+O&M CBA/workforce wall), BLM 140L3726Q0100 (cultural-resource CRUP + fieldwork),
+a GE MAC 5500 ECG PM (Type B OEM pass-through), and State/Embassy-Manila
+19RP3826Q0057 (stale pre-sol + overseas post + commodity supply + unrestricted,
+EXPIRED) — all NO-BID/EXPIRED; **VA 36C26126Q0797** (Medical Physicist → **Type
+A** individual credential → **WATCH-TEMPLATE**, hireable, *not* killed); and
+USSOCOM H9242126QE036 (SaaS resale) + an NCIA in-lane sources-sought (WATCH),
 which must **not** be hard-killed.
 
 **Pro features:**

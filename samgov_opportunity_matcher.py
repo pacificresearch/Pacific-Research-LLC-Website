@@ -331,15 +331,54 @@ def _classify_notice(notice_type):
         return "FORECAST"
     return "SOLICITATION"
 
-# GATE 2 — professional/trade credentials the solo founder does NOT hold.
-CREDENTIAL_BLOCKLIST = [
-    "asse", "medical gas", "licensed electrician", "master electrician",
-    "journeyman", "licensed plumber", "hvac certification", "epa 608",
+# --- The single most important axis: HIREABLE credential vs UNHIREABLE
+# authorization (PRG's win-and-manage model) ---------------------------------
+#
+# TYPE A — INDIVIDUAL CREDENTIAL (a licensed/certified PERSON). PRG can hire the
+# person W-2 (their labor counts toward the 50% self-performance rule) and
+# project-manage. POTENTIALLY WINNABLE → route to WATCH-TEMPLATE, never kill.
+# The test: can the capability be supplied by ONE individual on PRG's payroll?
+INDIVIDUAL_CREDENTIAL_TEMPLATE = [
     "professional engineer", "p.e. stamp", "pe stamp", "registered architect",
-    "commercial driver", "cdl", "state medical license", "rn license",
-    "registered nurse license", "physician license", "pharmacist license",
-    "boiler operator", "certified industrial hygienist", "asbestos",
-    "lead abatement", "stationary engineer", "nfpa 99",
+    "state medical license", "rn license", "registered nurse license",
+    "physician license", "licensed physician", "pharmacist license",
+    "certified industrial hygienist", "board certified", "board-certified",
+    "medical physicist", "health physicist", "radiation safety officer",
+    "licensed counselor", "licensed clinical", "licensed psychologist",
+    "licensed social worker", "certified professional coder",
+    "american board of radiology", "licensed dietitian", "licensed physicist",
+]
+# TYPE B — CORPORATE / OEM / PROPRIETARY authorization (a certified COMPANY).
+# The authorization belongs to a corporation PRG cannot put on payroll; subbing
+# the principal purpose to that firm breaches the 50% limitation on
+# subcontracting (illegal pass-through). Cannot be solved by hiring one person →
+# HARD KILL. (OEM_PASSTHROUGH_KILL is folded in below.)
+CORP_AUTHORIZATION_KILL = [
+    "authorized dealer", "authorized distributor of", "channel partner",
+    "written authorization from the manufacturer", "manufacturer's authorization",
+    "manufacturer authorization", "certified by the manufacturer",
+    "sole authorized", "proprietary system", "proprietary building automation",
+    "proprietary software license required",
+    # named proprietary control / calibration systems that require the offeror to
+    # BE a corporate-authorized provider (unhireable via one W-2 person):
+    "metasys", "johnson controls", "cepheid", "fluke", "siemens desigo",
+    "honeywell ebi", "niagara framework", "andover continuum",
+]
+# IMPROVEMENT 2 — capital / workforce that must exist BEFORE award. PRG has no
+# upfront capital: it can only field ONE contingent specialist (or its own
+# labor). Anything needing multiple trained/certified technicians, a trade crew,
+# owned equipment / a lab, or a facility at proposal time → HARD KILL.
+CAPITAL_WORKFORCE_KILL = [
+    "asse", "medical gas", "nfpa 99",
+    "licensed electrician", "master electrician", "journeyman",
+    "licensed plumber", "hvac certification", "epa 608", "boiler operator",
+    "asbestos", "lead abatement", "stationary engineer",
+    "commercial driver", "cdl",
+    "certified technicians", "trained technicians", "multiple technicians",
+    "team of certified", "crew of", "iso 17025", "iso/iec 17025",
+    "accredited calibration", "calibration laboratory", "a2la accredited",
+    "must own equipment", "offeror must own", "own a laboratory",
+    "furnish all equipment and personnel", "provide all tools and equipment",
 ]
 # GATE 1 — workforce / CBA signals: incumbent-workforce takeover PRG can't staff.
 WORKFORCE_KILL_KEYWORDS = [
@@ -1106,10 +1145,16 @@ def evaluate(opp):
     fte = _estimate_fte(_haystack(opp))
     personnel = str(fte) if fte else "Not stated"
     (disposition, kill_gate, kill_reason, soft_flags, needs_scope_check,
-     score_up_bonus, pp_wall) = screen_gates(
+     score_up_bonus, pp_wall, credential_needed, template_action) = screen_gates(
         opp, fte, deadline_days, naics, setaside_label, notice_type)
     disqualified = disposition == "FAIL"
     is_future = disposition == "FUTURE"
+    is_watch_template = disposition == "WATCH-TEMPLATE"
+    # Capital/workforce required upfront (Improvement 2): flag Type B / capital /
+    # bonding kills so the report can call out "no upfront capital" explicitly.
+    capital_required = disqualified and (
+        "Type B" in kill_gate or "capital/workforce" in kill_gate
+        or "bonding" in kill_gate)
     location_display, country_code, is_international = _extract_location(opp)
     location_type = "International" if is_international else "CONUS / US"
     staffing = _staffing_type(opp)
@@ -1177,7 +1222,7 @@ def evaluate(opp):
         and not disqualified
         and not buyer_is_international)
 
-    # Verdict precedence: timing → notice-type → kills → urgency → fit.
+    # Verdict precedence: timing → notice-type → hire-to-win → kills → urgency → fit.
     is_watch = notice_class in WATCH_NOTICE_CLASSES
     if is_expired:
         verdict = "EXPIRED"
@@ -1185,6 +1230,8 @@ def evaluate(opp):
         verdict = "MARKET-INTEL"
     elif is_watch:
         verdict = "WATCH"
+    elif is_watch_template:
+        verdict = "WATCH-TEMPLATE"    # Type A individual credential — hire-to-win
     elif disqualified:
         verdict = "NO-BID"
     elif short_fuse:
@@ -1197,6 +1244,8 @@ def evaluate(opp):
         verdict = "BID"
     # Route WATCH items to the watchlist; keep awarded → subcontracting/market-intel.
     is_future = is_watch and not is_expired and not is_awarded
+    # WATCH-TEMPLATE items go to their own hire-to-win bucket (not a bid, not a kill).
+    watch_template = is_watch_template and not is_expired and not is_awarded
     loe = _estimate_loe(opp, value_num, notice_type)
     deadline_headline = ""
     if verdict == "SHORT-FUSE":
@@ -1247,6 +1296,10 @@ def evaluate(opp):
         "previously_vetted": "",
         "disqualified": disqualified,
         "is_future": is_future,
+        "watch_template": watch_template,
+        "credential_needed": credential_needed,
+        "template_action": template_action,
+        "capital_required": capital_required,
         "kill_gate": kill_gate,
         "kill_reason": kill_reason,
         "future_reason": kill_reason if is_future else "",
@@ -1496,15 +1549,25 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
     """Keyword-level pass of PRG's deep-screen gates (a first-pass triage — the
     definitive screen still requires reading the PWS/attachments).
 
-    Returns (disposition, gate, reason, soft_flags, needs_scope_check) where
-    disposition is one of PASS / FAIL / FUTURE. Gates apply in order; the first
-    failure stops and is recorded.
+    Returns (disposition, gate, reason, soft_flags, needs_scope_check,
+    score_up_bonus, pp_wall, credential_needed, template_action) where
+    disposition is one of PASS / FAIL / FUTURE / WATCH-TEMPLATE. Gates apply in
+    order; the first failure stops and is recorded.
     """
     text = _haystack(opp)
     nt = (notice_type or "").lower()
 
     def _fail(gate, reason):
-        return ("FAIL", gate, reason, [], False, 0, False)
+        return ("FAIL", gate, reason, [], False, 0, False, "", "")
+
+    def _template(cred):
+        # Type A individual credential — winnable IF a contingent credentialed
+        # teaming partner is secured. Route to the WATCH-TEMPLATE bucket, not kill.
+        action = ("ACTION: secure a contingent (on-award) commitment letter from "
+                  f"a {cred}")
+        return ("WATCH-TEMPLATE", "Gate 2 (Type A individual credential)",
+                f"hireable — needs contingent teaming partner ({cred})",
+                [], False, 0, False, cred, action)
 
     # GATE 0.5 — structural eligibility (must hold an asset/vehicle today).
     st = _keyword_hits(text, STRUCTURAL_FAIL_KEYWORDS)
@@ -1512,11 +1575,36 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
         return _fail("Gate 0.5 (structural)",
                      f"requires an asset/vehicle PRG lacks — '{st[0]}'")
 
-    # GATE 2 — professional/trade credential the founder does not hold.
-    cred = _keyword_hits(text, CREDENTIAL_BLOCKLIST)
-    if cred:
-        return _fail("Gate 2 (credential)",
-                     f"requires a credential PRG lacks — '{cred[0]}'")
+    # TYPE B — corporate / OEM / proprietary-system authorization (UNHIREABLE).
+    # The authorization belongs to a company PRG can't put on payroll; subbing the
+    # principal purpose is an illegal pass-through (>50% subcontracted) → HARD
+    # KILL. Exempt pure software/product resale (SaaS/license/reseller), where
+    # "OEM authorization" is an ASSET to acquire, not bench labor to perform.
+    if not any(x in text for x in OEM_EXEMPT_CONTEXT):
+        tb = _keyword_hits(text, OEM_PASSTHROUGH_KILL + CORP_AUTHORIZATION_KILL)
+        if tb:
+            return _fail("Gate 2 (Type B corp authorization)",
+                         f"unhireable — corporate/OEM authorization pass-through ('{tb[0]}')")
+        if any(w in text for w in _OEM_WORK) and any(s in text for s in _OEM_SPEC):
+            return _fail("Gate 2 (Type B corp authorization)",
+                         "brand-specific equipment maintenance to manufacturer spec — no bench")
+
+    # IMPROVEMENT 2 — capital / workforce required BEFORE award (PRG has none):
+    # multiple trained/certified technicians, a trade crew, owned equipment/lab,
+    # or a facility that must exist at proposal time → HARD KILL. The winnable
+    # structure is ONE contingent specialist, not speculative pre-award hiring.
+    cap = _keyword_hits(text, CAPITAL_WORKFORCE_KILL)
+    if cap:
+        return _fail("Gate 2 (capital/workforce upfront)",
+                     f"requires pre-award workforce/equipment PRG can't pre-fund ('{cap[0]}')")
+
+    # TYPE A — a specific individual professional credential (a licensed/certified
+    # PERSON). PRG can hire that person W-2, so this is winnable with a contingent
+    # partner → WATCH-TEMPLATE (checked before scope so a hireable credential is
+    # never mis-killed by a generic scope word like "calibration").
+    cred_a = _keyword_hits(text, INDIVIDUAL_CREDENTIAL_TEMPLATE)
+    if cred_a:
+        return _template(cred_a[0])
 
     # FIX 1/5 — specialty field-science / permit work (cultural, environmental,
     # field-crew). Degree/experience adjacency never satisfies these (FIX 4).
@@ -1527,29 +1615,6 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
     if "principal investigator" in text and any(c in text for c in _PI_FIELD_CONTEXT):
         return _fail("Gate 2 (specialty PI)",
                      "requires a field-science principal investigator PRG lacks")
-
-    # PASS-THROUGH / OEM-SPECIFIC MAINTENANCE — the sharpest LOS trap. Brand-
-    # named equipment maintenance/calibration/repair to manufacturer spec needs a
-    # lab or OEM authorization PRG can't self-perform → kill regardless of set-
-    # aside or dollar size. Exempt product/software resale (SaaS/license/reseller)
-    # where "OEM authorization" is an ASSET to acquire, not bench labor to perform.
-    if not any(x in text for x in OEM_EXEMPT_CONTEXT):
-        oem = _keyword_hits(text, OEM_PASSTHROUGH_KILL)
-        if oem:
-            return _fail("Gate 2 (OEM pass-through)",
-                         f"OEM-authorized equipment service PRG can't self-perform — '{oem[0]}'")
-        if any(w in text for w in _OEM_WORK) and any(s in text for s in _OEM_SPEC):
-            return _fail("Gate 2 (OEM pass-through)",
-                         "brand-specific equipment maintenance to manufacturer spec — no bench")
-
-    # FIX 2 — generic personnel-credential requirement (catches future variants).
-    # FIX 3 — a hard kill regardless of how fast the permit itself processes; the
-    # scarce resource is the qualified person, not the paperwork.
-    if (_CRED_REQUIRE_RE.search(text)
-            and not any(x in text for x in CREDENTIAL_EXEMPT_CONTEXT)
-            and not any(h in text for h in HELD_CREDENTIALS)):
-        return _fail("Gate 2 (credential req)",
-                     "notice requires a permit/license PRG does not hold")
 
     # GATE 1 — workforce / CBA takeover a solo shop can't staff.
     wf = _keyword_hits(text, WORKFORCE_KILL_KEYWORDS)
@@ -1585,6 +1650,15 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
         return _fail("Gate 1 (self-perform)",
                      f"~{fte} FTE — needs a team; can't self-perform 50%")
 
+    # TYPE A (generic) — a "shall/must hold a <license/certification>" that
+    # survived every kill above. An individual can hold it, so it's a hire-to-win
+    # (WATCH-TEMPLATE), not a kill — unless PRG already holds it or it's a
+    # product/reseller asset rather than a personnel credential.
+    if (_CRED_REQUIRE_RE.search(text)
+            and not any(x in text for x in CREDENTIAL_EXEMPT_CONTEXT)
+            and not any(h in text for h in HELD_CREDENTIALS)):
+        return _template("licensed/certified individual")
+
     # Soft signals — score down / flag, never fail on their own.
     soft = []
     if fte == 2:
@@ -1618,9 +1692,10 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
     if any(k in nt for k in FUTURE_NOTICE_MARKERS):
         return ("FUTURE", "Gate 0 (timing)",
                 "market research / pre-solicitation — prep for the eventual RFP",
-                soft, needs_scope_check, score_up_bonus, pp_wall)
+                soft, needs_scope_check, score_up_bonus, pp_wall, "", "")
 
-    return ("PASS", "", "", soft, needs_scope_check, score_up_bonus, pp_wall)
+    return ("PASS", "", "", soft, needs_scope_check, score_up_bonus, pp_wall,
+            "", "")
 
 
 def _estimate_fte(text):
@@ -1954,7 +2029,8 @@ def render_report(results):
 
     # Award notices (already won) only belong in the subcontracting view.
     prime = [r for r in results if not r["is_awarded"] and not r["is_expired"]
-             and not r["disqualified"] and not r["is_future"]]
+             and not r["disqualified"] and not r["is_future"]
+             and not r.get("watch_template")]
     primary = [r for r in prime if r["naics_tier"] == "primary"]
     low_barrier = [r for r in prime if r["naics_tier"] == "low_barrier"]
     subcontract = [r for r in results if r["is_subcontracting"]]
@@ -2227,7 +2303,8 @@ def _split_sections(results):
     pursue-as-prime group and appear only under Subcontracting.
     """
     prime = [r for r in results if not r["is_awarded"] and not r["is_expired"]
-             and not r["disqualified"] and not r["is_future"]]
+             and not r["disqualified"] and not r["is_future"]
+             and not r.get("watch_template")]
     primary = [r for r in prime if r["naics_tier"] == "primary"]
     low_barrier = sorted(
         [r for r in prime
@@ -2301,13 +2378,28 @@ _WATCHLIST_COLS = [
     ("Link", "link"),
 ]
 
+# WATCH-TEMPLATE (hire-to-win): Type A individual-credential opportunities PRG
+# could win IF a contingent credentialed teaming partner is secured.
+_TEMPLATE_COLS = [
+    ("Credential Needed", "credential_needed"),
+    ("ACTION", "template_action"),
+    ("Title", "title"),
+    ("Agency", "agency"),
+    ("Set-Aside", "setaside"),
+    ("NAICS", "naics"),
+    ("Respond By", "response_deadline"),
+    ("Solicitation #", "solicitation"),
+    ("Link", "link"),
+]
+
 
 def _top10(results):
     """The single best-bet shortlist: highest-scoring eligible, pursuable
     opportunities (not awarded, not expired), ranked, capped at 10."""
     pool = [r for r in results if r["raw_setaside_eligible"]
             and not r["is_awarded"] and not r["is_expired"]
-            and not r["disqualified"] and not r["is_future"]]
+            and not r["disqualified"] and not r["is_future"]
+            and not r.get("watch_template")]
     pool.sort(key=lambda r: r["win_score"], reverse=True)
     # Return shallow copies with a rank, so we don't mutate the shared results.
     top = []
@@ -2344,9 +2436,12 @@ def export_spreadsheet(results, path, recompetes=None):
             key=lambda r: r["win_score"], reverse=True,
         )
         sheets.append((a["label"], _CORE_COLS, agency_rows))
+    template_rows = sorted([r for r in results if r.get("watch_template")],
+                           key=lambda r: r["win_score"], reverse=True)
     sheets += [
         ("Subcontracting", _SUB_COLS, subs),
         ("Recompete Radar", _RECOMPETE_COLS, recompetes or []),
+        ("WATCH-TEMPLATE (hire-to-win)", _TEMPLATE_COLS, template_rows),
         ("WATCHLIST (prep, future)", _WATCHLIST_COLS, watchlist),
         ("KILL LOG (screened out)", _KILL_COLS, killed),
         ("Resources (Hunt & Help)", _RESOURCE_COLS, _resource_rows()),
@@ -2425,6 +2520,7 @@ def export_spreadsheet(results, path, recompetes=None):
             "Location": 26, "Intl / CONUS": 13, "Buyer Type": 24,
             "Solicitation #": 20, "Category": 20, "Resource": 42,
             "What it's for": 66, "URL": 52, "Priority Agency": 16,
+            "Credential Needed": 30, "ACTION": 62, "Respond By": 20,
         }
         for idx, (h, _) in enumerate(cols, start=1):
             ws.column_dimensions[get_column_letter(idx)].width = widths.get(h, 16)
@@ -2681,7 +2777,8 @@ def export_html_report(results, path, days, recompetes=None):
     # in the Subcontracting category only).
     eligible = [r for r in results if r["raw_setaside_eligible"]
                 and not r["is_awarded"] and not r["is_expired"]
-                and not r["disqualified"] and not r["is_future"]]
+                and not r["disqualified"] and not r["is_future"]
+                and not r.get("watch_template")]
     ranked = sorted(eligible, key=lambda r: r["win_score"], reverse=True)
     top10 = ranked[:10]
     killed = [r for r in results if r["disqualified"]
@@ -3022,6 +3119,42 @@ def export_html_report(results, path, days, recompetes=None):
                  'was unreachable this run). Widen --recompete-months and retry.</p>')
     p.append('</section>')
 
+    # WATCH-TEMPLATE — Type A individual-credential opportunities (hire-to-win).
+    templates = sorted([r for r in results if r.get("watch_template")],
+                       key=lambda r: r["win_score"], reverse=True)
+    p.append('<section><h2>🧩 WATCH-TEMPLATE — Hire-to-Win (individual '
+             'credential)</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'These need a licensed/certified <b>person</b> PRG doesn\'t have on '
+             'staff — but that person is <b>hireable W-2</b>, so their labor '
+             'counts toward the 50% self-performance rule and PRG project-'
+             'manages. Winnable IF you line up a contingent (on-award) commitment '
+             'letter from the credential-holder <b>before</b> the deadline. Not a '
+             'kill — a template to build a team around.</p>')
+    if templates:
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>Credential Needed</th><th>Title</th><th>Agency</th>'
+                 '<th>Set-Aside</th><th>NAICS</th><th>Respond By</th>'
+                 '<th>ACTION</th><th>Solicitation #</th></tr></thead><tbody>')
+        for r in templates[:100]:
+            sol = _html_escape(r["solicitation"])
+            if _is_http(r["link"]):
+                sol = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
+                       f'rel="noopener">{sol}</a>')
+            p.append(f"<tr><td><b>{_html_escape(r['credential_needed'])}</b></td>"
+                     f"<td>{_html_escape(_clean(r['title'], 55))}</td>"
+                     f"<td>{_html_escape(r['agency'])}</td>"
+                     f"<td>{_html_escape(r['setaside'])}</td>"
+                     f"<td>{_html_escape(r['naics'])}</td>"
+                     f"<td>{str(r['response_deadline']).split('T')[0]}</td>"
+                     f"<td>{_html_escape(r['template_action'])}</td>"
+                     f"<td>{sol}</td></tr>")
+        p.append('</tbody></table></div>')
+    else:
+        p.append('<p class="empty">No individual-credential (hire-to-win) '
+                 'opportunities this run.</p>')
+    p.append('</section>')
+
     # WATCHLIST — FUTURE items (pre-sols / sources sought that fit): prep, don't bid.
     p.append('<section><h2>👀 Watchlist — Prep, Don’t Bid Yet</h2>')
     p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
@@ -3288,7 +3421,8 @@ _REPORT_JS = r"""
 
 _SELFTEST_CASES = [
     {
-        "label": "VA 36C26026Q0674 — medical gas (ASSE credential wall + LOS)",
+        "label": "VA 36C26026Q0674 — medical gas (ASSE-cert techs + equipment = "
+                 "capital/workforce required → KILL on Improvement 2)",
         "opp": {
             "solicitationNumber": "36C26026Q0674",
             "noticeId": "st1",
@@ -3304,6 +3438,73 @@ _SELFTEST_CASES = [
             "responseDeadLine": "2026-12-01",
         },
         "expect_verdict": "NO-BID",
+        "expect_truthy": ["capital_required"],
+    },
+    {
+        "label": "VA 36C26126Q0797 — Medical Physicist (Type A individual "
+                 "credential, ABR board-certified → WATCH-TEMPLATE, hireable)",
+        "opp": {
+            "solicitationNumber": "36C26126Q0797",
+            "noticeId": "st1a",
+            "title": "Medical Physicist Services — Radiation Therapy QA",
+            "description": ("The contractor shall provide the services of a "
+                            "board-certified medical physicist (certified by the "
+                            "American Board of Radiology) to perform annual "
+                            "quality-assurance surveys and calibration of the "
+                            "radiation therapy system. Key personnel: the "
+                            "physicist shall be board certified."),
+            "naicsCode": "541380",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Veterans Affairs",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "WATCH-TEMPLATE",
+        "expect_truthy": ["watch_template", "credential_needed"],
+        "expect_falsy": ["disqualified"],
+    },
+    {
+        "label": "VA 36C24426Q0491 — Erie VAMC Metasys/JCI (Type B corporate OEM "
+                 "authorization → KILL + capital-required)",
+        "opp": {
+            "solicitationNumber": "36C24426Q0491",
+            "noticeId": "st1b",
+            "title": "Building Automation System Maintenance — Metasys",
+            "description": ("Maintenance and service of the Johnson Controls "
+                            "Metasys building automation system. The offeror must "
+                            "be an authorized JCI service provider with written "
+                            "authorization from the manufacturer to service the "
+                            "proprietary system."),
+            "naicsCode": "238220",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Veterans Affairs",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+        "expect_truthy": ["capital_required"],
+    },
+    {
+        "label": "Navy N0040626Q0335 — Fluke calibration (Type B OEM calibration "
+                 "authorization → KILL)",
+        "opp": {
+            "solicitationNumber": "N0040626Q0335",
+            "noticeId": "st1c",
+            "title": "Calibration of Fluke Test Equipment",
+            "description": ("Calibration and repair of Fluke test equipment. Work "
+                            "shall be performed by a Fluke-authorized calibration "
+                            "provider to manufacturer specification."),
+            "naicsCode": "811210",
+            "typeOfSetAside": "SBA",
+            "typeOfSetAsideDescription": "Total Small Business",
+            "fullParentPathName": "Department of the Navy",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+        "expect_truthy": ["capital_required"],
     },
     {
         "label": "FDA 75F40126R00051 — NCTR O&M (CBA + workforce + PP wall)",
