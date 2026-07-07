@@ -432,6 +432,70 @@ OVERSEAS_POST_KEYWORDS = [
     "u.s. mission", "us mission", "overseas post",
 ]
 
+# Priority agencies PRG actively targets — their OSDBU offices run active SDVOSB
+# outreach. The OSDBU sites (osdbu.va.gov, osdbu.hhs.gov, dtra.mil) are forecast/
+# outreach PORTALS with no clean public API, but the underlying solicitations
+# post to SAM.gov (we already pull them by NAICS) and the awards/incumbents are
+# in USASpending. So we filter both feeds by agency, give each its own tab, and
+# link the portal for manual forecast review. `match` is checked against the
+# notice's full parent-path / office / title (a sub-agency like DTRA never shows
+# in the trimmed department name). `usaspending_tier` picks toptier vs subtier
+# for the awarded-contract (Recompete Radar) pull.
+AGENCY_TARGETS = [
+    {
+        "key": "VA", "label": "VA (OSDBU)",
+        "match": ("veterans affairs", "veterans health", "veterans benefits",
+                  "department of veterans"),
+        "usaspending_name": "Department of Veterans Affairs",
+        "usaspending_tier": "toptier",
+        "portal": "https://osdbu.va.gov/",
+        "portal_note": "VA OSDBU — VIP/SDVOSB verification, events & forecast",
+    },
+    {
+        "key": "HHS", "label": "HHS (OSDBU)",
+        "match": ("health and human services", "national institutes of health",
+                  "centers for disease control", "food and drug administration",
+                  "indian health service", "health resources and services",
+                  "substance abuse and mental health"),
+        "usaspending_name": "Department of Health and Human Services",
+        "usaspending_tier": "toptier",
+        "portal": "https://osdbu.hhs.gov/",
+        "portal_note": "HHS OSDBU — vendor outreach, forecast & events",
+    },
+    {
+        "key": "DTRA", "label": "DTRA",
+        "match": ("defense threat reduction", "dtra"),
+        "usaspending_name": "Defense Threat Reduction Agency",
+        "usaspending_tier": "subtier",
+        "portal": "https://www.dtra.mil/Mission/Acquisition/",
+        "portal_note": "DTRA acquisition & small-business programs",
+    },
+]
+
+
+def _agency_bucket(opp):
+    """Return the AGENCY_TARGETS key (VA/HHS/DTRA) an opportunity belongs to, or
+    "". Checks the full parent path / office / title, not just the trimmed
+    department name, so a sub-agency (e.g. DTRA under DoD) is still detected."""
+    blob = " ".join(str(opp.get(k, "")) for k in (
+        "fullParentPathName", "organizationName", "departmentName",
+        "subTier", "office", "officeAddress", "title")).lower()
+    for a in AGENCY_TARGETS:
+        if any(m in blob for m in a["match"]):
+            return a["key"]
+    return ""
+
+
+def _agency_bucket_name(*names):
+    """Bucket one or more agency-name strings (e.g. USASpending awarding agency /
+    sub-agency) into an AGENCY_TARGETS key, or ""."""
+    low = " ".join(str(n or "") for n in names).lower()
+    for a in AGENCY_TARGETS:
+        if any(m in low for m in a["match"]):
+            return a["key"]
+    return ""
+
+
 # FIX 2 — the only credentials PRG actually holds (satisfy a "must hold" req).
 HELD_CREDENTIALS = ["acrp-cp", "acrp-pm", "sdvosb", "sam registration", "sam.gov"]
 # Contexts where "must hold X" is a product/reseller ASSET, not a personnel
@@ -553,10 +617,15 @@ def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
     return collected
 
 
-def fetch_recompetes(naics_codes, months_ahead=18, max_pages=10):
+def fetch_recompetes(naics_codes, months_ahead=18, max_pages=10, agency=None):
     """Recompete Radar: find existing federal contracts under PRG's NAICS codes
     whose period of performance ends within `months_ahead` months — i.e. the
     upcoming rebids to position for early. Uses the keyless USASpending.gov API.
+
+    When `agency` (an AGENCY_TARGETS dict) is given, the pull is filtered to that
+    awarding agency (top- or sub-tier) so the incumbents + recompetes at a
+    priority agency (VA / HHS / DTRA) are surfaced even if they'd fall outside
+    the general soonest-first page window.
 
     Returns a list of dicts sorted by soonest end date. Network/parse errors
     degrade to an empty list so the rest of the run is unaffected.
@@ -569,15 +638,22 @@ def fetch_recompetes(naics_codes, months_ahead=18, max_pages=10):
     # action-date window to the last ~3 years keeps the already-expired prefix
     # small. (Requesting only well-known field names avoids a 422 that would
     # zero out the whole feature.)
+    filters = {
+        "award_type_codes": ["A", "B", "C", "D"],   # definitive contracts
+        "naics_codes": list(naics_codes),
+        "time_period": [{
+            "start_date": (today - dt.timedelta(days=365 * 3)).isoformat(),
+            "end_date": today.isoformat(),
+        }],
+    }
+    if agency:
+        filters["agencies"] = [{
+            "type": "awarding",
+            "tier": agency.get("usaspending_tier", "toptier"),
+            "name": agency["usaspending_name"],
+        }]
     base = {
-        "filters": {
-            "award_type_codes": ["A", "B", "C", "D"],   # definitive contracts
-            "naics_codes": list(naics_codes),
-            "time_period": [{
-                "start_date": (today - dt.timedelta(days=365 * 3)).isoformat(),
-                "end_date": today.isoformat(),
-            }],
-        },
+        "filters": filters,
         "fields": [
             "Award ID", "Recipient Name", "Award Amount",
             "Period of Performance Current End Date",
@@ -630,6 +706,8 @@ def fetch_recompetes(naics_codes, months_ahead=18, max_pages=10):
                     "months_left": round((end - today).days / 30.4, 1),
                     "agency": a.get("Awarding Agency")
                               or a.get("Awarding Sub Agency") or "N/A",
+                    "agency_bucket": agency["key"] if agency else _agency_bucket_name(
+                        a.get("Awarding Agency"), a.get("Awarding Sub Agency")),
                     "naics": naics_val,
                 })
             if passed_horizon or len(results) < 100:
@@ -972,6 +1050,7 @@ def evaluate(opp):
         ),
         "title": _clean(opp.get("title", "Untitled")),
         "agency": _extract_agency(opp),
+        "agency_bucket": _agency_bucket(opp),
         "naics": naics or "N/A",
         "naics_tier": tier,
         "setaside": setaside_label,
@@ -2015,6 +2094,7 @@ _RECOMPETE_COLS = [
     ("Incumbent (who to beat / team with)", "recipient"),
     ("Award Amount", "amount_display"),
     ("Agency", "agency"),
+    ("Priority Agency", lambda r: r.get("agency_bucket") or "—"),
     ("NAICS", "naics"),
     ("Award ID", "award_id"),
 ]
@@ -2093,6 +2173,17 @@ def export_spreadsheet(results, path, recompetes=None):
         ("Core Opportunities", _CORE_COLS, primary),
         ("Low-Barrier (Warm Body)", _LOWBAR_COLS, low_barrier),
         ("International (Consulting)", _CORE_COLS, international),
+    ]
+    # Priority-agency tabs (VA / HHS / DTRA): live, still-open opportunities at
+    # each target agency, drawn from the same SAM.gov pull, ranked by win score.
+    for a in AGENCY_TARGETS:
+        agency_rows = sorted(
+            [r for r in results if r.get("agency_bucket") == a["key"]
+             and not r["is_awarded"] and not r["is_expired"]],
+            key=lambda r: r["win_score"], reverse=True,
+        )
+        sheets.append((a["label"], _CORE_COLS, agency_rows))
+    sheets += [
         ("Subcontracting", _SUB_COLS, subs),
         ("Recompete Radar", _RECOMPETE_COLS, recompetes or []),
         ("WATCHLIST (prep, future)", _WATCHLIST_COLS, watchlist),
@@ -2673,6 +2764,31 @@ def export_html_report(results, path, days, recompetes=None):
                  'this window — most notices are domestic (CONUS).</p>')
     p.append('</section>')
 
+    # Priority-agency focus (VA / HHS / DTRA): OSDBU portals + live counts.
+    p.append('<section><h2>🏛️ Priority Agencies — OSDBU Focus</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'PRG-target agencies with active SDVOSB outreach. Their '
+             'solicitations post to SAM.gov (pulled below) and their awards to '
+             'USASpending (Recompete Radar). The OSDBU sites themselves are '
+             'forecast / outreach portals — review them by hand for the '
+             'pre-SAM.gov pipeline.</p>')
+    p.append('<div class="scroll"><table><thead><tr>'
+             '<th>Agency</th><th>Live Opportunities (this pull)</th>'
+             '<th>Upcoming Recompetes</th><th>OSDBU / Acquisition Portal</th>'
+             '</tr></thead><tbody>')
+    for a in AGENCY_TARGETS:
+        live = [r for r in eligible if r.get("agency_bucket") == a["key"]]
+        rc = [r for r in (recompetes or []) if r.get("agency_bucket") == a["key"]]
+        portal = _html_escape(a["portal"])
+        p.append(
+            f"<tr><td><b>{_html_escape(a['label'])}</b></td>"
+            f"<td class='num'>{len(live)}</td>"
+            f"<td class='num'>{len(rc)}</td>"
+            f'<td><a href="{portal}" target="_blank" rel="noopener">'
+            f"{portal}</a><br><span class='muted' style='font-size:12px'>"
+            f"{_html_escape(a['portal_note'])}</span></td></tr>")
+    p.append('</tbody></table></div></section>')
+
     # Recompete Radar — upcoming rebids (from USASpending.gov).
     p.append('<section><h2>🔭 Recompete Radar — Upcoming Rebids</h2>')
     p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
@@ -2683,7 +2799,7 @@ def export_html_report(results, path, days, recompetes=None):
         p.append('<div class="scroll"><table><thead><tr>'
                  '<th>Ends In</th><th>PoP End</th>'
                  '<th>Incumbent (beat / team)</th><th>Award Amount</th>'
-                 '<th>Agency</th><th>NAICS</th><th>Award ID</th>'
+                 '<th>Agency</th><th>Priority</th><th>NAICS</th><th>Award ID</th>'
                  '</tr></thead><tbody>')
         for r in recompetes:
             soon = r["months_left"] <= 6
@@ -2693,6 +2809,7 @@ def export_html_report(results, path, days, recompetes=None):
                      f"<td>{_html_escape(r['recipient'])}</td>"
                      f"<td class='num'>{_html_escape(r['amount_display'])}</td>"
                      f"<td>{_html_escape(_clean(r['agency'], 34))}</td>"
+                     f"<td>{_html_escape(r.get('agency_bucket') or '—')}</td>"
                      f"<td>{_html_escape(str(r['naics']))}</td>"
                      f"<td>{_html_escape(r['award_id'])}</td></tr>")
         p.append('</tbody></table></div>')
@@ -3317,6 +3434,20 @@ def main(argv=None):
         recompetes = fetch_recompetes(
             list(TARGET_NAICS), months_ahead=args.recompete_months
         )
+        # Targeted pulls for priority agencies (VA / HHS / DTRA) so their
+        # incumbents + recompetes surface even outside the general page window.
+        seen_awards = {r["award_id"] for r in recompetes}
+        for a in AGENCY_TARGETS:
+            sys.stderr.write(f"    + {a['key']} awarded-contract pull...\n")
+            extra = fetch_recompetes(
+                list(TARGET_NAICS), months_ahead=args.recompete_months,
+                max_pages=5, agency=a,
+            )
+            for r in extra:
+                if r["award_id"] not in seen_awards:
+                    seen_awards.add(r["award_id"])
+                    recompetes.append(r)
+        recompetes.sort(key=lambda r: r["end_date"])
         sys.stderr.write(f"    {len(recompetes)} contract(s) expiring soon\n")
 
     # Evaluate every opportunity.

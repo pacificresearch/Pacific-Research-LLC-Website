@@ -79,11 +79,30 @@ for open solicitations it is any dollar figure found in the notice text, or
 The console report also prints an estimated total pipeline value across the
 opportunities PRG can pursue.
 
-The workbook has nine tabs — **Top 10 – Do These First**, **Solo-Friendly
+The workbook has twelve tabs — **Top 10 – Do These First**, **Solo-Friendly
 (1-Person)**, **Core Opportunities**, **Low-Barrier (Warm Body)**,
-**International (Consulting)**, **Subcontracting**, **Recompete Radar**,
-**WATCHLIST (prep, future)**, and **KILL LOG (screened out)** — each with
-filterable, frozen headers.
+**International (Consulting)**, **VA (OSDBU)**, **HHS (OSDBU)**, **DTRA**,
+**Subcontracting**, **Recompete Radar**, **WATCHLIST (prep, future)**, and
+**KILL LOG (screened out)** — each with filterable, frozen headers.
+
+### Priority-agency focus (VA / HHS / DTRA)
+
+The OSDBU sites you may have been told to "search" — **osdbu.va.gov**,
+**osdbu.hhs.gov**, and **dtra.mil** — are forecast / outreach **portals**, not
+queryable APIs. But the actual work flows through systems that *are* queryable:
+their **solicitations post to SAM.gov** (already pulled here by NAICS) and their
+**awards / incumbents live in USASpending** (the free, keyless API). So the
+matcher:
+
+- tags every opportunity with its **priority agency** (VA / HHS / DTRA) — even a
+  sub-agency like DTRA that hides under "Department of Defense" in the trimmed
+  name — and gives each its own **tab** of live, still-open opportunities;
+- runs **agency-targeted USASpending pulls** for VA, HHS, and DTRA so their
+  incumbents + upcoming recompetes surface in the Recompete Radar (with a
+  **Priority Agency** column) even if they'd fall outside the general window;
+- adds an **🏛️ Priority Agencies — OSDBU Focus** section to the HTML report with
+  live/recompete counts and a direct link to each OSDBU / acquisition portal for
+  the manual, pre-SAM.gov forecast review those sites are actually for.
 
 ### Deep-screen gates (auto-triage)
 
