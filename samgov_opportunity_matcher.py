@@ -207,36 +207,60 @@ _FTE_RE = re.compile(
     re.IGNORECASE,
 )
 
+# --- Company certifications ---------------------------------------------------
+# Toggle these on as PRG earns them; each unlocks the matching set-aside as
+# "eligible to bid". SDVOSB is assumed. HUBZone is location-based — flip it on
+# only if PRG's principal office is in a HUBZone (check the SBA HUBZone map).
+IS_HUBZONE_CERTIFIED = False
+IS_8A_CERTIFIED = False
+IS_WOSB_CERTIFIED = False
+
 # Set-aside codes/labels that this company is eligible for. SAM.gov returns a
 # `typeOfSetAside` code and a `typeOfSetAsideDescription`. We map the codes.
 # See: https://open.gsa.gov/api/opportunities-api/  (set-aside code table)
 SDVOSB_SETASIDE_CODES = {"SDVOSBC", "SDVOSBS"}          # SDVOSB set-aside / sole source
 SMALL_BUSINESS_SETASIDE_CODES = {"SBA", "SBP"}          # Total Small Business
-# Codes that are eligible but broader (8a, HUBZone, WOSB, etc.) -- treated as
-# "restricted" but flagged separately because they may exclude us.
-OTHER_SETASIDE_CODES = {
-    "8A", "8AN", "HZC", "HZS", "WOSB", "WOSBSS", "EDWOSB", "EDWOSBSS",
-    "VSA", "VSS",  # VOSB (not necessarily SDVOSB)
-}
+VOSB_SETASIDE_CODES = {"VSA", "VSS"}                    # VOSB (SDVOSB qualifies)
+HUBZONE_CODES = {"HZC", "HZS"}
+EIGHTA_CODES = {"8A", "8AN"}
+WOSB_CODES = {"WOSB", "WOSBSS", "EDWOSB", "EDWOSBSS"}
+
+# Target PSC (Product/Service) codes — more specific than NAICS. Queried in
+# addition to NAICS to catch work classified by service type, which pros do.
+TARGET_PSC = OrderedDict([
+    ("R408", "Program Management / Support Services"),
+    ("R499", "Other Professional Services"),
+    ("R707", "Management Support Services"),
+    ("B505", "Special Studies/Analysis — Data"),
+    ("B506", "Special Studies/Analysis — Medical"),
+    ("Q301", "Medical — Laboratory Testing / Analysis"),
+    ("AN11", "R&D — Health/Medical (applied research)"),
+])
 
 # Notice types that represent a completed award (a prime now exists to sub under).
 AWARD_NOTICE_MARKERS = ("award",)
+
+# USASpending.gov public API (keyless) — used for the Recompete Radar: finds
+# existing contracts under PRG's NAICS that are expiring soon (upcoming rebids).
+USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 
 
 # ---------------------------------------------------------------------------
 # 2. API QUERY CONSTRUCTION
 # ---------------------------------------------------------------------------
 
-def fetch_opportunities(api_key, naics_code, posted_from, posted_to, limit):
-    """Query the SAM.gov Opportunities API for a single NAICS code.
+def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
+                        code_param="ncode"):
+    """Query the SAM.gov Opportunities API for a single NAICS or PSC code.
 
-    Returns a list of opportunity dicts (possibly empty). Network / API
-    errors are caught and surfaced as an empty list plus a stderr warning so
-    that one bad request does not abort the whole run.
+    `code_param` is "ncode" for a NAICS code or "ccode" for a PSC (Product/
+    Service) code. Returns a list of opportunity dicts (possibly empty).
+    Network / API errors are caught and surfaced as an empty list plus a
+    stderr warning so that one bad request does not abort the whole run.
     """
     params = {
         "api_key": api_key,
-        "ncode": naics_code,          # filter by NAICS code
+        code_param: code,             # ncode=NAICS or ccode=PSC
         "postedFrom": posted_from,    # MM/DD/YYYY (required)
         "postedTo": posted_to,        # MM/DD/YYYY (required)
         "limit": min(limit, 1000),    # API max page size is 1000
@@ -268,19 +292,85 @@ def fetch_opportunities(api_key, naics_code, posted_from, posted_to, limit):
                 break
     except requests.exceptions.HTTPError as exc:
         sys.stderr.write(
-            f"WARNING: HTTP error querying NAICS {naics_code}: {exc}\n"
+            f"WARNING: HTTP error querying {code_param} {code}: {exc}\n"
             f"         Response: {getattr(exc.response, 'text', '')[:300]}\n"
         )
     except requests.exceptions.RequestException as exc:
         sys.stderr.write(
-            f"WARNING: Network error querying NAICS {naics_code}: {exc}\n"
+            f"WARNING: Network error querying {code_param} {code}: {exc}\n"
         )
     except ValueError as exc:  # JSON decode error
         sys.stderr.write(
-            f"WARNING: Could not decode JSON for NAICS {naics_code}: {exc}\n"
+            f"WARNING: Could not decode JSON for {code_param} {code}: {exc}\n"
         )
 
     return collected
+
+
+def fetch_recompetes(naics_codes, months_ahead=18, limit=100):
+    """Recompete Radar: find existing federal contracts under PRG's NAICS codes
+    whose period of performance ends within `months_ahead` months — i.e. the
+    upcoming rebids to position for early. Uses the keyless USASpending.gov API.
+
+    Returns a list of dicts sorted by soonest end date. Network/parse errors
+    degrade to an empty list so the rest of the run is unaffected.
+    """
+    today = dt.date.today()
+    horizon = today + dt.timedelta(days=int(months_ahead * 30.4))
+    body = {
+        "filters": {
+            "award_type_codes": ["A", "B", "C", "D"],   # definitive contracts + IDVs
+            "naics_codes": list(naics_codes),
+            "time_period": [{
+                "start_date": (today - dt.timedelta(days=365 * 6)).isoformat(),
+                "end_date": today.isoformat(),
+            }],
+        },
+        "fields": [
+            "Award ID", "Recipient Name", "Award Amount",
+            "Period of Performance Current End Date",
+            "Awarding Agency", "Awarding Sub Agency", "NAICS",
+        ],
+        "sort": "Award Amount",
+        "order": "desc",
+        "limit": min(limit, 100),
+        "page": 1,
+    }
+    out = []
+    try:
+        resp = requests.post(USASPENDING_URL, json=body, timeout=45)
+        resp.raise_for_status()
+        for a in (resp.json().get("results") or []):
+            end_raw = a.get("Period of Performance Current End Date") or ""
+            try:
+                end = dt.date.fromisoformat(str(end_raw)[:10])
+            except ValueError:
+                continue
+            if not (today <= end <= horizon):
+                continue          # keep only contracts expiring in the window
+            months_left = round((end - today).days / 30.4, 1)
+            amt = a.get("Award Amount")
+            try:
+                amt = float(amt) if amt not in (None, "") else None
+            except (TypeError, ValueError):
+                amt = None
+            out.append({
+                "award_id": a.get("Award ID") or "N/A",
+                "recipient": a.get("Recipient Name") or "N/A",
+                "amount": amt,
+                "amount_display": _format_currency(amt) if amt else "Not stated",
+                "end_date": end.isoformat(),
+                "months_left": months_left,
+                "agency": a.get("Awarding Agency") or a.get("Awarding Sub Agency")
+                          or "N/A",
+                "naics": a.get("NAICS") or a.get("naics") or "N/A",
+            })
+    except requests.exceptions.RequestException as exc:
+        sys.stderr.write(f"WARNING: Recompete Radar (USASpending) unavailable: {exc}\n")
+    except ValueError as exc:
+        sys.stderr.write(f"WARNING: Recompete Radar JSON decode failed: {exc}\n")
+    out.sort(key=lambda r: r["end_date"])
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -309,15 +399,16 @@ def classify_setaside(opp):
 
     if code in SDVOSB_SETASIDE_CODES:
         return ("SDVOSB", True, True)
+    if code in VOSB_SETASIDE_CODES:
+        return ("VOSB", True, False)          # SDVOSB qualifies for VOSB set-asides
     if code in SMALL_BUSINESS_SETASIDE_CODES:
         return ("Total SB", True, False)
-    if code in OTHER_SETASIDE_CODES:
-        # Small-business program but not one PRG necessarily qualifies for.
-        label = desc or code
-        # VOSB set-asides are open to SDVOSBs; treat as eligible.
-        if code in {"VSA", "VSS"}:
-            return ("VOSB", True, False)
-        return (label, False, False)
+    if code in HUBZONE_CODES:
+        return ("HUBZone", IS_HUBZONE_CERTIFIED, False)
+    if code in EIGHTA_CODES:
+        return ("8(a)", IS_8A_CERTIFIED, False)
+    if code in WOSB_CODES:
+        return ("WOSB", IS_WOSB_CERTIFIED, False)
     if not code:
         return ("None", True, False)  # Unrestricted -> anyone (incl. SB) may bid
     # Unknown / other restricted set-aside.
@@ -1306,17 +1397,56 @@ def _split_sections(results):
     return primary, low_barrier, subs, solo, international
 
 
-def export_spreadsheet(results, path):
+_RECOMPETE_COLS = [
+    ("Ends In", lambda r: f"{r['months_left']} mo"),
+    ("PoP End Date", "end_date"),
+    ("Incumbent (who to beat / team with)", "recipient"),
+    ("Award Amount", "amount_display"),
+    ("Agency", "agency"),
+    ("NAICS", "naics"),
+    ("Award ID", "award_id"),
+]
+
+_TOP10_COLS = [
+    ("Rank", "rank"),
+    ("Win Score", "win_score"),
+    ("Rating", lambda r: f"{r['win_emoji']} {r['win_band']}"),
+    ("Title", "title"),
+    ("Agency", "agency"),
+    ("Set-Aside", "setaside"),
+    ("Est. Value", "value_display"),
+    ("Solo?", lambda r: "Yes" if r["is_solo"] else "No"),
+    ("Respond By", "response_deadline"),
+    ("Solicitation #", "solicitation"),
+    ("Link", "link"),
+]
+
+
+def _top10(results):
+    """The single best-bet shortlist: highest-scoring eligible, pursuable
+    opportunities (not awarded, not expired), ranked, capped at 10."""
+    pool = [r for r in results if r["raw_setaside_eligible"]
+            and not r["is_awarded"] and not r["is_expired"]]
+    pool.sort(key=lambda r: r["win_score"], reverse=True)
+    top = pool[:10]
+    for i, r in enumerate(top, 1):
+        r["rank"] = i
+    return top
+
+
+def export_spreadsheet(results, path, recompetes=None):
     """Write results to an Excel workbook (.xlsx) if openpyxl is available,
     otherwise fall back to a set of CSV files. Returns the path actually written.
     """
     primary, low_barrier, subs, solo, international = _split_sections(results)
     sheets = [
+        ("Top 10 - Do These First", _TOP10_COLS, _top10(results)),
         ("Solo-Friendly (1-Person)", _SOLO_COLS, solo),
         ("Core Opportunities", _CORE_COLS, primary),
         ("Low-Barrier (Warm Body)", _LOWBAR_COLS, low_barrier),
         ("International (Consulting)", _CORE_COLS, international),
         ("Subcontracting", _SUB_COLS, subs),
+        ("Recompete Radar", _RECOMPETE_COLS, recompetes or []),
     ]
 
     try:
@@ -1592,13 +1722,15 @@ def _key_findings_html(ranked, eligible):
             f'in Mind</h2>{rows}</section>')
 
 
-def export_html_report(results, path, days):
+def export_html_report(results, path, days, recompetes=None):
     """Write a self-contained executive HTML report of the opportunity pipeline."""
+    recompetes = recompetes or []
     # Pursue-as-prime view: eligible AND not already awarded (awarded ones live
     # in the Subcontracting category only).
     eligible = [r for r in results if r["raw_setaside_eligible"]
                 and not r["is_awarded"] and not r["is_expired"]]
     ranked = sorted(eligible, key=lambda r: r["win_score"], reverse=True)
+    top10 = ranked[:10]
 
     # --- KPIs ---
     total_value = sum(r["value_num"] for r in eligible if r["value_num"])
@@ -1667,6 +1799,38 @@ def export_html_report(results, path, days):
 
     # Key findings / review
     p.append(_key_findings_html(ranked, eligible))
+
+    # Top 10 — Do These First
+    p.append('<section><h2>🎯 Top 10 — Do These First</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'Your highest-scoring, still-open, bid-as-prime opportunities — '
+             'the shortlist to act on this week.</p>')
+    if top10:
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>#</th><th>Rating</th><th>Win</th><th>Title</th>'
+                 '<th>Agency</th><th>Set-Aside</th><th>Est. Value</th>'
+                 '<th>Solo</th><th>Respond By</th></tr></thead><tbody>')
+        for i, r in enumerate(top10, 1):
+            chip = (f'<span class="chip" style="background:'
+                    f'{_RAG_HEX[r["win_band"]]}">{r["win_band"]}</span>')
+            title = _html_escape(_clean(r["title"], 60))
+            if r["link"]:
+                title = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
+                         f'rel="noopener">{title}</a>')
+            dl = str(r["response_deadline"]).split("T")[0]
+            if r["deadline_days"] is not None and 0 <= r["deadline_days"] <= 7:
+                dl = f'<b class="urgent">{dl} · {r["deadline_days"]}d 🔴</b>'
+            p.append(f"<tr><td class='num'><b>{i}</b></td><td>{chip}</td>"
+                     f"<td class='num'>{r['win_score']}</td><td>{title}</td>"
+                     f"<td>{_html_escape(r['agency'])}</td>"
+                     f"<td>{_html_escape(r['setaside'])}</td>"
+                     f"<td class='num'>{_html_escape(r['value_display'])}</td>"
+                     f"<td>{'Yes' if r['is_solo'] else '—'}</td>"
+                     f"<td>{dl}</td></tr>")
+        p.append('</tbody></table></div>')
+    else:
+        p.append('<p class="empty">No eligible open opportunities this run.</p>')
+    p.append('</section>')
 
     # Charts
     p.append('<section class="charts">')
@@ -1805,6 +1969,34 @@ def export_html_report(results, path, days):
     else:
         p.append('<p class="empty">No eligible international opportunities in '
                  'this window — most notices are domestic (CONUS).</p>')
+    p.append('</section>')
+
+    # Recompete Radar — upcoming rebids (from USASpending.gov).
+    p.append('<section><h2>🔭 Recompete Radar — Upcoming Rebids</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'Existing contracts in your NAICS that expire soon — position now '
+             'to compete the rebid (or team with the incumbent). This is where '
+             'most contracts are actually won.</p>')
+    if recompetes:
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>Ends In</th><th>PoP End</th>'
+                 '<th>Incumbent (beat / team)</th><th>Award Amount</th>'
+                 '<th>Agency</th><th>NAICS</th><th>Award ID</th>'
+                 '</tr></thead><tbody>')
+        for r in recompetes:
+            soon = r["months_left"] <= 6
+            ends = (f'<b class="urgent">{r["months_left"]} mo 🔴</b>' if soon
+                    else f'{r["months_left"]} mo')
+            p.append(f"<tr><td>{ends}</td><td>{_html_escape(r['end_date'])}</td>"
+                     f"<td>{_html_escape(r['recipient'])}</td>"
+                     f"<td class='num'>{_html_escape(r['amount_display'])}</td>"
+                     f"<td>{_html_escape(_clean(r['agency'], 34))}</td>"
+                     f"<td>{_html_escape(str(r['naics']))}</td>"
+                     f"<td>{_html_escape(r['award_id'])}</td></tr>")
+        p.append('</tbody></table></div>')
+    else:
+        p.append('<p class="empty">No expiring contracts found (or USASpending '
+                 'was unreachable this run). Widen --recompete-months and retry.</p>')
     p.append('</section>')
 
     # Pipeline insights
@@ -2014,6 +2206,13 @@ def parse_args(argv):
                              "weekly/monthly automation to keep a history.")
     parser.add_argument("--no-print", action="store_true",
                         help="Suppress the console Markdown report.")
+    parser.add_argument("--no-psc", action="store_true",
+                        help="Skip the extra PSC (Product/Service Code) queries.")
+    parser.add_argument("--no-recompetes", action="store_true",
+                        help="Skip the Recompete Radar (USASpending.gov) lookup.")
+    parser.add_argument("--recompete-months", type=int, default=18, metavar="N",
+                        help="Recompete horizon: contracts expiring within N "
+                             "months (default: 18).")
     return parser.parse_args(argv)
 
 
@@ -2049,6 +2248,30 @@ def main(argv=None):
             seen.add(key)
             all_opps.append(opp)
 
+    # Also query by target PSC (Product/Service) codes — more specific than
+    # NAICS, catches work classified by service type.
+    if not args.no_psc:
+        for psc in TARGET_PSC:
+            batch = fetch_opportunities(
+                api_key, psc, posted_from, posted_to, args.limit, code_param="ccode"
+            )
+            sys.stderr.write(f"  PSC {psc}: {len(batch)} record(s)\n")
+            for opp in batch:
+                key = opp.get("noticeId") or opp.get("solicitationNumber") or id(opp)
+                if key in seen:
+                    continue
+                seen.add(key)
+                all_opps.append(opp)
+
+    # Recompete Radar — upcoming rebids from USASpending.gov (keyless API).
+    recompetes = []
+    if not args.no_recompetes:
+        sys.stderr.write("  Recompete Radar: querying USASpending.gov...\n")
+        recompetes = fetch_recompetes(
+            list(TARGET_NAICS), months_ahead=args.recompete_months
+        )
+        sys.stderr.write(f"    {len(recompetes)} contract(s) expiring soon\n")
+
     # Evaluate every opportunity.
     results = [evaluate(opp) for opp in all_opps]
 
@@ -2075,12 +2298,13 @@ def main(argv=None):
     saved = []
     if not args.no_excel:
         try:
-            saved.append(export_spreadsheet(results, xlsx_path))
+            saved.append(export_spreadsheet(results, xlsx_path, recompetes))
         except Exception as exc:  # never let one save abort the other
             sys.stderr.write(f"WARNING: could not save spreadsheet: {exc}\n")
     if not args.no_report:
         try:
-            saved.append(export_html_report(results, report_path, args.days))
+            saved.append(export_html_report(results, report_path, args.days,
+                                            recompetes))
         except Exception as exc:
             sys.stderr.write(f"WARNING: could not save HTML report: {exc}\n")
 

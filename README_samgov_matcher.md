@@ -76,9 +76,29 @@ for open solicitations it is any dollar figure found in the notice text, or
 The console report also prints an estimated total pipeline value across the
 opportunities PRG can pursue.
 
-The workbook has five tabs — **Solo-Friendly (1-Person)**, **Core
-Opportunities**, **Low-Barrier (Warm Body)**, **International (Consulting)**,
-and **Subcontracting** — each with filterable, frozen headers. The
+The workbook has seven tabs — **Top 10 – Do These First**, **Solo-Friendly
+(1-Person)**, **Core Opportunities**, **Low-Barrier (Warm Body)**,
+**International (Consulting)**, **Subcontracting**, and **Recompete Radar** —
+each with filterable, frozen headers.
+
+**Pro features:**
+
+- **Top 10 – Do These First** — the single highest-scoring, still-open,
+  bid-as-prime shortlist, so you act instead of scrolling 1,000+ rows.
+- **Recompete Radar** — existing federal contracts in your NAICS that expire
+  within N months (default 18), pulled from the keyless **USASpending.gov**
+  API: the incumbent, the award amount, the agency, and the end date. These
+  upcoming rebids are where most contracts are actually won. Tune with
+  `--recompete-months N`; skip with `--no-recompetes`.
+- **PSC search** — in addition to NAICS, the tool queries target **PSC
+  (Product/Service) codes** (R408, R499, R707, B505/B506, Q301, AN11) for
+  service-classified work NAICS can miss. Skip with `--no-psc`.
+- **Certification toggles** — `IS_HUBZONE_CERTIFIED`, `IS_8A_CERTIFIED`,
+  `IS_WOSB_CERTIFIED` near the top of the script. Flip one on as PRG earns it
+  and the matching set-asides immediately count as eligible.
+- **Interactive report** — clickable KPI cards and filter buttons (All / Best
+  bets / On the fence / Skip / Solo / International / SDVOSB) plus a live search
+  box filter the matrix in place. The
 **International** tab is a dedicated category for opportunities with an overseas
 place of performance (separate from domestic/CONUS work), and the executive
 report has a matching 🌍 International section and KPI. The **Solo-Friendly** tab flags small-scale
