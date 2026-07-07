@@ -1415,24 +1415,42 @@ def _default_output_path():
     user's Desktop (handles OneDrive-redirected Desktops), falling back to the
     home directory if no Desktop folder is found.
     """
+    desktop = _resolve_desktop()
+    return os.path.join(desktop, "PRG_Contracts.xlsx")
+
+
+def _resolve_desktop():
+    """Return the user's REAL, visible Desktop folder.
+
+    On Windows we ask the registry for the actual Desktop known-folder path
+    (this correctly returns the OneDrive-redirected desktop when that is what
+    the user sees). Elsewhere / on failure we fall back to the best guess,
+    preferring a OneDrive Desktop over the hidden literal one.
+    """
+    # Authoritative on Windows: the Shell Folders registry key holds the fully
+    # resolved Desktop path, redirection included.
+    try:
+        import winreg  # Windows only
+        key = r"Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders"
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key) as k:
+            val, _ = winreg.QueryValueEx(k, "Desktop")
+            val = os.path.expandvars(val)
+            if os.path.isdir(val):
+                return val
+    except Exception:
+        pass
+
     home = os.path.expanduser("~")
     profile = os.environ.get("USERPROFILE", home)
-    # Prefer the OneDrive Desktop first: when OneDrive "Known Folder" redirection
-    # is on (very common on Windows), that is the desktop the user actually sees;
-    # the plain %USERPROFILE%\Desktop still physically exists but is hidden.
-    candidates = [
+    for folder in (
         os.path.join(profile, "OneDrive", "Desktop"),
         os.path.join(home, "OneDrive", "Desktop"),
         os.path.join(profile, "Desktop"),
         os.path.join(home, "Desktop"),
-    ]
-    existing = [f for f in candidates if os.path.isdir(f)]
-    if existing:
-        # Among existing desktops, pick the one most recently modified — that is
-        # the one the user is actively using.
-        best = max(existing, key=lambda f: os.path.getmtime(f))
-        return os.path.join(best, "PRG_Contracts.xlsx")
-    return os.path.join(home, "PRG_Contracts.xlsx")
+    ):
+        if os.path.isdir(folder):
+            return folder
+    return home
 
 
 def _desktop_path(filename):
