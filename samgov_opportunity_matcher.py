@@ -289,6 +289,30 @@ STRUCTURAL_FAIL_KEYWORDS = [
 FUTURE_NOTICE_MARKERS = ("presolicitation", "sources sought", "special notice",
                          "forecast", "intent to")
 
+# --- Stage-0 timing / notice-type gating (runs BEFORE capability scoring) -----
+WATCH_NOTICE_CLASSES = {"PRESOL", "SOURCES_SOUGHT", "SPECIAL", "RFI", "FORECAST"}
+SHORT_FUSE_CALENDAR_DAYS = 7      # ~5 business days
+
+
+def _classify_notice(notice_type):
+    """Map a SAM.gov notice type to a routing class."""
+    nt = (notice_type or "").lower()
+    if "amendment" in nt or "modification" in nt:
+        return "AMENDMENT"
+    if "award" in nt:
+        return "AWARD"
+    if "sources sought" in nt:
+        return "SOURCES_SOUGHT"
+    if "presolicitation" in nt or "pre-solicitation" in nt or "presol" in nt:
+        return "PRESOL"
+    if "request for information" in nt or nt.strip() == "rfi":
+        return "RFI"
+    if "special notice" in nt:
+        return "SPECIAL"
+    if "forecast" in nt:
+        return "FORECAST"
+    return "SOLICITATION"
+
 # GATE 2 — professional/trade credentials the solo founder does NOT hold.
 CREDENTIAL_BLOCKLIST = [
     "asse", "medical gas", "licensed electrician", "master electrician",
@@ -769,18 +793,43 @@ def evaluate(opp):
         if win_score >= 68 and win_band != "Green":
             win_band, win_emoji, win_note = "Green", "🟢", "Best bet — pursue"
 
-    # Go/No-Go verdict for a zero-past-performance first-time offeror.
-    if disqualified:
+    # --- STAGE 0: timing + notice-type gating (takes precedence over scoring) ---
+    notice_class = _classify_notice(notice_type)
+    short_fuse = (deadline_days is not None
+                  and 0 <= deadline_days <= SHORT_FUSE_CALENDAR_DAYS)
+    text_l = _haystack(opp)
+    is_sbir = ("sbir" in text_l or "sttr" in text_l
+               or "small business innovation research" in text_l)
+    cycle_program = (f"{_extract_agency(opp)} SBIR/STTR" if is_sbir else "")
+    respond_recommended = (
+        notice_class in ("SOURCES_SOUGHT", "SPECIAL", "RFI")
+        and tier in ("primary", "low_barrier") and not disqualified)
+
+    # Verdict precedence: timing → notice-type → kills → urgency → fit.
+    is_watch = notice_class in WATCH_NOTICE_CLASSES
+    if is_expired:
+        verdict = "EXPIRED"
+    elif is_awarded or notice_class == "AWARD":
+        verdict = "MARKET-INTEL"
+    elif is_watch:
+        verdict = "WATCH"
+    elif disqualified:
         verdict = "NO-BID"
-    elif is_future:
-        verdict = "RESEARCH"
+    elif short_fuse:
+        verdict = "SHORT-FUSE"
     elif pp_wall and incumbent:
         verdict = "RESEARCH"          # PP wall + incumbent = long odds first time
     elif setaside_label == "None" and win_score < 55:
         verdict = "RESEARCH"          # open competition, weak edge
     else:
         verdict = "BID"
+    # Route WATCH items to the watchlist; keep awarded → subcontracting/market-intel.
+    is_future = is_watch and not is_expired and not is_awarded
     loe = _estimate_loe(opp, value_num, notice_type)
+    deadline_headline = ""
+    if verdict == "SHORT-FUSE":
+        deadline_headline = (f"⏰ {deadline_days}d left — "
+                             f"due {str(opp.get('responseDeadLine') or '').split('T')[0]}")
 
     return {
         "solicitation": (
@@ -810,6 +859,12 @@ def evaluate(opp):
         "is_expired": is_expired,
         "disposition": disposition,
         "verdict": verdict,
+        "notice_class": notice_class,
+        "short_fuse": short_fuse,
+        "deadline_headline": deadline_headline,
+        "is_sbir": is_sbir,
+        "cycle_program": cycle_program,
+        "respond_recommended": respond_recommended,
         "loe": loe,
         "pp_wall": pp_wall,
         "content_hash": hashlib.sha1(
@@ -1300,6 +1355,17 @@ def _deadline_days(opp):
     except ValueError:
         return None
     return (d - dt.date.today()).days
+
+
+def _next_cycle_window(due_iso):
+    """Infer next year's release/due window for a recurring program."""
+    try:
+        d = dt.date.fromisoformat(str(due_iso)[:10])
+        nxt_due = d.replace(year=d.year + 1)
+    except Exception:
+        return "next cycle ~annually (date TBD)"
+    nxt_rel = nxt_due - dt.timedelta(days=60)
+    return f"~release {nxt_rel.isoformat()}, due {nxt_due.isoformat()}"
 
 
 def _estimate_loe(opp, value_num, notice_type):
@@ -2466,6 +2532,31 @@ def export_html_report(results, path, days, recompetes=None):
         p.append('<p class="empty">No fitting pre-solicitations this run.</p>')
     p.append('</section>')
 
+    # CYCLE CALENDAR — recurring programs (SBIR/STTR): anticipate next release.
+    cycles = {}
+    for r in results:
+        if r.get("cycle_program"):
+            cycles.setdefault(r["cycle_program"], r)
+    p.append('<section><h2>🗓️ Cycle Calendar — Recurring Programs</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'Annual programs (SBIR/STTR) so next year&#39;s release is '
+             'anticipated, not discovered late.</p>')
+    if cycles:
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>Program</th><th>This Cycle (seen)</th>'
+                 '<th>Inferred Next Window</th><th>Solicitation #</th>'
+                 '</tr></thead><tbody>')
+        for prog, r in cycles.items():
+            this_due = str(r.get("response_deadline") or "").split("T")[0] or "n/a"
+            p.append(f"<tr><td>{_html_escape(prog)}</td>"
+                     f"<td>due {_html_escape(this_due)}</td>"
+                     f"<td>{_html_escape(_next_cycle_window(r.get('response_deadline')))}</td>"
+                     f"<td>{_html_escape(r['solicitation'])}</td></tr>")
+        p.append('</tbody></table></div>')
+    else:
+        p.append('<p class="empty">No recurring-program notices this run.</p>')
+    p.append('</section>')
+
     # KILL LOG — auto-screened-out opportunities (deep-screen gates).
     killed = sorted([r for r in results if r["disqualified"]
                      and not r["is_awarded"] and not r["is_expired"]],
@@ -2741,8 +2832,8 @@ _SELFTEST_CASES = [
         "expect_verdict": "NO-BID",
     },
     {
-        "label": "USSOCOM H9242126QE036 — SaaS subscription (license resale — "
-                 "must NOT be killed)",
+        "label": "USSOCOM H9242126QE036 — SaaS resale, 3-day fuse (SHORT-FUSE, "
+                 "scoring still runs, not killed)",
         "opp": {
             "solicitationNumber": "H9242126QE036",
             "noticeId": "st4",
@@ -2755,30 +2846,82 @@ _SELFTEST_CASES = [
             "typeOfSetAsideDescription": "SDVOSB Set-Aside",
             "fullParentPathName": "US Special Operations Command",
             "type": "Combined Synopsis/Solicitation",
+        },
+        "deadline_offset_days": 3,
+        "expect_verdict": "SHORT-FUSE",
+    },
+    {
+        "label": "ED/IES SBIR 91990026R0005 — expired pre-sol (EXPIRED at stage 0, "
+                 "cycle entry)",
+        "opp": {
+            "solicitationNumber": "91990026R0005",
+            "noticeId": "st5",
+            "title": "ED/IES SBIR Direct to Phase II",
+            "description": ("Department of Education Institute of Education "
+                            "Sciences SBIR program. Small Business Innovation "
+                            "Research Direct to Phase II solicitation."),
+            "naicsCode": "541715",
+            "typeOfSetAside": "SBA",
+            "typeOfSetAsideDescription": "Total Small Business",
+            "fullParentPathName": "Department of Education",
+            "type": "Presolicitation",
+        },
+        "deadline_offset_days": -8,
+        "expect_verdict": "EXPIRED",
+        "expect_truthy": ["cycle_program"],
+    },
+    {
+        "label": "Synthetic Sources Sought (NAICS 541611) — WATCH + "
+                 "RESPOND-RECOMMENDED, no bid-queue entry",
+        "opp": {
+            "solicitationNumber": "SS-541611-TEST",
+            "noticeId": "st6",
+            "title": "Sources Sought — Management Consulting Support",
+            "description": ("Sources sought seeking capable small businesses for "
+                            "management and program support consulting."),
+            "naicsCode": "541611",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "General Services Administration",
+            "type": "Sources Sought",
             "responseDeadLine": "2026-12-01",
         },
-        "forbid_verdict": "NO-BID",
+        "expect_verdict": "WATCH",
+        "expect_truthy": ["respond_recommended"],
     },
 ]
 
 
 def run_selftests():
-    """Evaluate the known cases and assert the rules fire (or, for the SaaS
-    case, do NOT fire). Returns 0 on all-pass, 1 otherwise."""
+    """Evaluate the known cases and assert the verdicts (and any required
+    fields) fire. Returns 0 on all-pass, 1 otherwise."""
     ok = True
+    today = dt.date.today()
     print("PRG screen self-tests:\n")
     for case in _SELFTEST_CASES:
-        r = evaluate(case["opp"])
+        opp = dict(case["opp"])
+        if "deadline_offset_days" in case:
+            opp["responseDeadLine"] = (
+                today + dt.timedelta(days=case["deadline_offset_days"])).isoformat()
+        r = evaluate(opp)
         if "expect_verdict" in case:
             passed = (r["verdict"] == case["expect_verdict"])
             want = f"== {case['expect_verdict']}"
         else:
             passed = (r["verdict"] != case["forbid_verdict"])
             want = f"!= {case['forbid_verdict']}"
+        for field in case.get("expect_truthy", []):
+            if not r.get(field):
+                passed = False
+                want += f" & {field}"
         ok = ok and passed
         print(f"  [{'PASS' if passed else 'FAIL'}] {case['label']}")
+        extra = ""
+        if case.get("expect_truthy"):
+            extra = " | " + ", ".join(
+                f"{f}={r.get(f)!r}" for f in case["expect_truthy"])
         print(f"         verdict={r['verdict']} (want {want}), "
-              f"gate={r['kill_gate'] or '-'}, reason={r['kill_reason'] or '-'}")
+              f"gate={r['kill_gate'] or '-'}{extra}")
     print("\nResult:", "ALL PASS ✅" if ok else "SOME FAILED ❌")
     return 0 if ok else 1
 

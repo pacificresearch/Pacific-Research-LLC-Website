@@ -104,6 +104,26 @@ PWS/attachments) and gets a disposition:
 The screen is deliberately strict — an empty PASS list is an acceptable outcome
 (zero false positives beats a padded list).
 
+### Stage 0 — timing & notice-type gating (runs first)
+
+Before any capability scoring, each opportunity is gated by timing and notice
+type, which take precedence over the verdict:
+
+- **EXPIRED** — response deadline already passed; no capability analysis, kept
+  out of every bid list.
+- **SHORT-FUSE** — due within ~5 business days; still scored, but the deadline
+  is surfaced as the headline.
+- **WATCH** — pre-solicitations / Sources Sought / Special Notices / forecasts
+  route to the Watchlist; Sources Sought & RFIs in PRG's lane are flagged
+  **RESPOND-RECOMMENDED** (cheap, and past performance doesn't matter for an RFI).
+- **MARKET-INTEL** — award notices route to Subcontracting/market intel, never
+  the bid queue.
+- **Cycle Calendar** — recurring programs (SBIR/STTR) get an inferred next-cycle
+  window so next year's release is anticipated, not discovered late.
+
+Verdict precedence: EXPIRED → MARKET-INTEL → WATCH → NO-BID → SHORT-FUSE →
+RESEARCH → BID.
+
 ### Go/No-Go verdict (first-contract lens)
 
 PRG is a new SDVOSB with zero corporate past performance, so each surviving
