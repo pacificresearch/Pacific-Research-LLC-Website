@@ -496,6 +496,167 @@ def _agency_bucket_name(*names):
     return ""
 
 
+# ---------------------------------------------------------------------------
+# RESOURCE DIRECTORY — every place a federal contractor should hunt, research,
+# get certified, and get FREE help. Rendered as an HTML section + Excel tab so
+# PRG has one-click access to the whole ecosystem, not just this tool's output.
+# URLs are stable roots; deep OSDBU pages move, so a few point at the department
+# home with a note on what to click.
+# ---------------------------------------------------------------------------
+RESOURCE_DIRECTORY = [
+    # --- Find live opportunities ---
+    ("Find Opportunities", "SAM.gov — Contract Opportunities",
+     "https://sam.gov/content/opportunities",
+     "The system of record. Every federal RFP / RFQ / sources-sought / presol."),
+    ("Find Opportunities", "SAM.gov — saved searches & alerts",
+     "https://sam.gov/content/opportunities",
+     "Save your NAICS/set-aside filters and get daily email alerts (free login)."),
+    ("Find Opportunities", "GSA eBuy",
+     "https://www.ebuy.gsa.gov/",
+     "RFQs issued to GSA Schedule holders — requires a GSA Schedule to see/quote."),
+    ("Find Opportunities", "DLA Internet Bid Board (DIBBS)",
+     "https://www.dibbs.bsm.dla.mil/",
+     "Defense Logistics Agency solicitations for supplies & services."),
+    ("Find Opportunities", "Unison Marketplace",
+     "https://marketplace.unisonglobal.com/",
+     "Government reverse-auction micro-purchases and simplified buys."),
+    ("Find Opportunities", "SBIR / STTR",
+     "https://www.sbir.gov/",
+     "R&D innovation awards set aside for small business; annual agency cycles."),
+    ("Find Opportunities", "Grants.gov",
+     "https://www.grants.gov/",
+     "Federal grants & cooperative agreements (research funding, not contracts)."),
+    ("Find Opportunities", "FedConnect",
+     "https://www.fedconnect.net/",
+     "Some agencies post opportunities & manage awards here in addition to SAM."),
+    ("Find Opportunities", "eCFR / FAR (rules of the game)",
+     "https://www.acquisition.gov/browse/index/far",
+     "The Federal Acquisition Regulation — the rulebook every solicitation runs on."),
+    # --- Research awards, incumbents & competitors ---
+    ("Market Intel", "USAspending.gov — Advanced Search",
+     "https://www.usaspending.gov/search",
+     "Every federal award: incumbents, dollar amounts, and PoP end dates (recompetes)."),
+    ("Market Intel", "USAspending API (free, no key)",
+     "https://api.usaspending.gov/",
+     "The keyless API this tool uses for the Recompete Radar. Build your own queries."),
+    ("Market Intel", "FPDS-NG (Federal Procurement Data System)",
+     "https://www.fpds.gov/",
+     "Raw contract-action data — deep incumbent & agency-spend research."),
+    ("Market Intel", "SAM.gov — Entity Search",
+     "https://sam.gov/search",
+     "Look up any registered contractor: competitors, primes, potential partners."),
+    ("Market Intel", "SBA Dynamic Small Business Search (DSBS)",
+     "https://web.sba.gov/pro-net/search/dsp_dsbs.cfm",
+     "Find teaming partners & competitors by NAICS, certification, and location."),
+    ("Market Intel", "GSA eLibrary",
+     "https://www.gsaelibrary.gsa.gov/",
+     "Who holds which GSA Schedules — find primes to team with or subcontract under."),
+    ("Market Intel", "SBA SubNet",
+     "https://web.sba.gov/subnet/search/index.cfm",
+     "Subcontracting opportunities posted by large prime contractors."),
+    ("Market Intel", "USAspending — Recipient Profiles",
+     "https://www.usaspending.gov/recipient",
+     "Full award history for any company (size up an incumbent before you bid)."),
+    # --- Get & stay eligible (registrations + certifications) ---
+    ("Certify & Register", "SAM.gov — Entity Registration (UEI)",
+     "https://sam.gov/content/entity-registration",
+     "Mandatory: get your UEI and active registration BEFORE any award. Free."),
+    ("Certify & Register", "SBA Certify (8(a), WOSB/EDWOSB, HUBZone)",
+     "https://certify.sba.gov/",
+     "Apply for and manage SBA socioeconomic certifications."),
+    ("Certify & Register", "SBA VetCert (SDVOSB / VOSB)",
+     "https://veterans.certify.sba.gov/",
+     "SDVOSB/VOSB verification — REQUIRED to win VA & federal SDVOSB set-asides."),
+    ("Certify & Register", "SBA HUBZone Map",
+     "https://maps.certify.sba.gov/hubzone/",
+     "Check whether an address qualifies for the HUBZone program."),
+    ("Certify & Register", "SBA Size Standards tool",
+     "https://www.sba.gov/size-standards",
+     "Confirm you qualify as 'small' for each NAICS you bid."),
+    # --- Free help, counseling & teaming ---
+    ("Free Help", "APEX Accelerators (formerly PTAC)",
+     "https://www.apexaccelerators.us/",
+     "FREE 1:1 government-contracting counseling: bid-matching, proposal & pricing help."),
+    ("Free Help", "Veterans Business Outreach Center (VBOC)",
+     "https://www.sba.gov/local-assistance/resource-partners/veterans-business-outreach-center-vboc-program",
+     "SBA veteran-focused business counseling and training."),
+    ("Free Help", "Small Business Development Centers (SBDC)",
+     "https://americassbdc.org/",
+     "Free local business advising, including federal-contracting readiness."),
+    ("Free Help", "SCORE mentoring",
+     "https://www.score.org/",
+     "Free mentors, many with government-contracting experience."),
+    ("Free Help", "SBA — Local Assistance / District Offices",
+     "https://www.sba.gov/local-assistance",
+     "Find your SBA district office & Procurement Center Representative (PCR)."),
+    ("Free Help", "SBA — Federal Contracting guide",
+     "https://www.sba.gov/federal-contracting",
+     "Plain-English overviews of set-asides, joint ventures, and the bid process."),
+    # --- Agency OSDBU / Small-Business offices (the outreach doors) ---
+    ("Agency OSDBU", "VA OSDBU", "https://osdbu.va.gov/",
+     "Veterans Affairs — SDVOSB outreach, VIP verification, events & forecast."),
+    ("Agency OSDBU", "HHS OSDBU", "https://osdbu.hhs.gov/",
+     "Health & Human Services (NIH, CDC, FDA) vendor outreach & forecast."),
+    ("Agency OSDBU", "DoD Office of Small Business Programs", "https://business.defense.gov/",
+     "Department of Defense gateway to all military-service small-business offices."),
+    ("Agency OSDBU", "DTRA — Acquisition & Small Business", "https://www.dtra.mil/",
+     "Defense Threat Reduction Agency acquisition & small-business programs."),
+    ("Agency OSDBU", "Army OSBP", "https://www.sellingtoarmy.army.mil/",
+     "Department of the Army small-business office."),
+    ("Agency OSDBU", "Navy OSBP", "https://www.secnav.navy.mil/smallbusiness/",
+     "Department of the Navy / Marine Corps small-business office."),
+    ("Agency OSDBU", "Air Force Small Business", "https://www.airforcesmallbiz.af.mil/",
+     "Department of the Air Force / Space Force small-business office."),
+    ("Agency OSDBU", "DHS OSDBU", "https://www.dhs.gov/osdbu",
+     "Homeland Security small-business office (CBP, FEMA, TSA, USCG, etc.)."),
+    ("Agency OSDBU", "DOE OSDBU", "https://www.energy.gov/osdbu",
+     "Department of Energy and national labs small-business office."),
+    ("Agency OSDBU", "USDA OSDBU", "https://www.dm.usda.gov/smallbus/",
+     "Department of Agriculture small-business office."),
+    ("Agency OSDBU", "DOI OSDBU", "https://www.doi.gov/osdbu",
+     "Department of the Interior (BLM, NPS, USGS, etc.) small-business office."),
+    ("Agency OSDBU", "Commerce OSDBU", "https://www.commerce.gov/oam",
+     "Department of Commerce (NOAA, Census, NIST) small-business office."),
+    ("Agency OSDBU", "DOT OSDBU", "https://www.transportation.gov/osdbu",
+     "Department of Transportation (FAA, FHWA) small-business office."),
+    ("Agency OSDBU", "DOJ Small Business", "https://www.justice.gov/jmd/small-business",
+     "Department of Justice (FBI, BOP, DEA) small-business office."),
+    ("Agency OSDBU", "State Dept OSDBU", "https://www.state.gov/",
+     "Department of State — search 'OSDBU' for small-business & embassy buys."),
+    ("Agency OSDBU", "Treasury OSDBU", "https://home.treasury.gov/services/small-business-programs",
+     "Department of the Treasury (IRS, Mint) small-business programs."),
+    ("Agency OSDBU", "Education OSDBU", "https://www.ed.gov/",
+     "Department of Education — search 'OSDBU' (IES/SBIR research buys)."),
+    ("Agency OSDBU", "Labor OSDBU", "https://www.dol.gov/agencies/oasam/centers-offices/osdbu",
+     "Department of Labor small-business office."),
+    ("Agency OSDBU", "HUD OSDBU", "https://www.hud.gov/program_offices/osdbu",
+     "Housing & Urban Development small-business office."),
+    ("Agency OSDBU", "EPA Office of Small Business Programs", "https://www.epa.gov/osbp",
+     "Environmental Protection Agency small-business office."),
+    ("Agency OSDBU", "NASA Office of Small Business Programs", "https://www.nasa.gov/osbp/",
+     "National Aeronautics & Space Administration small-business office."),
+    ("Agency OSDBU", "GSA — Small Business", "https://www.gsa.gov/small-business",
+     "General Services Administration OSDBU + Schedules on-ramp."),
+    ("Agency OSDBU", "SSA OSDBU", "https://www.ssa.gov/oag/acq_osdbu.htm",
+     "Social Security Administration small-business office."),
+    ("Agency OSDBU", "NSF Small Business", "https://www.nsf.gov/od/oecr/",
+     "National Science Foundation — research & SBIR/STTR buys."),
+]
+
+_RESOURCE_COLS = [
+    ("Category", "category"),
+    ("Resource", "name"),
+    ("What it's for", "note"),
+    ("URL", "url"),
+]
+
+
+def _resource_rows():
+    """RESOURCE_DIRECTORY tuples -> row dicts for the Excel/HTML renderers."""
+    return [{"category": c, "name": n, "url": u, "note": note}
+            for (c, n, u, note) in RESOURCE_DIRECTORY]
+
+
 # FIX 2 — the only credentials PRG actually holds (satisfy a "must hold" req).
 HELD_CREDENTIALS = ["acrp-cp", "acrp-pm", "sdvosb", "sam registration", "sam.gov"]
 # Contexts where "must hold X" is a product/reseller ASSET, not a personnel
@@ -2188,6 +2349,7 @@ def export_spreadsheet(results, path, recompetes=None):
         ("Recompete Radar", _RECOMPETE_COLS, recompetes or []),
         ("WATCHLIST (prep, future)", _WATCHLIST_COLS, watchlist),
         ("KILL LOG (screened out)", _KILL_COLS, killed),
+        ("Resources (Hunt & Help)", _RESOURCE_COLS, _resource_rows()),
     ]
 
     try:
@@ -2225,6 +2387,7 @@ def export_spreadsheet(results, path, recompetes=None):
         link_col = next((i for i, h in enumerate(headers, 1) if h == "Link"), None)
         sol_col = next((i for i, h in enumerate(headers, 1)
                         if h == "Solicitation #"), None)
+        url_col = next((i for i, h in enumerate(headers, 1) if h == "URL"), None)
         link_font = Font(color="0563C1", underline="single")
         for r in rows:
             ws.append([_cell(r, spec) for _, spec in cols])
@@ -2244,6 +2407,12 @@ def export_spreadsheet(results, path, recompetes=None):
                     c = ws.cell(row=ws.max_row, column=sol_col)
                     c.hyperlink = url
                     c.font = link_font
+            # A literal "URL" column (Resources tab) hyperlinks to its own value.
+            if url_col:
+                c = ws.cell(row=ws.max_row, column=url_col)
+                if _is_http(c.value):
+                    c.hyperlink = c.value
+                    c.font = link_font
         # Column widths + wrapping.
         widths = {
             "Title": 45, "Agency": 26, "Reason / Gap Analysis": 60,
@@ -2254,7 +2423,8 @@ def export_spreadsheet(results, path, recompetes=None):
             "Set-Aside": 14, "Eligible as LLC?": 24, "Personnel (FTE)": 13,
             "Hire New or Take Over?": 34, "Solo-Doable?": 12, "Timeframe": 30,
             "Location": 26, "Intl / CONUS": 13, "Buyer Type": 24,
-            "Solicitation #": 20,
+            "Solicitation #": 20, "Category": 20, "Resource": 42,
+            "What it's for": 66, "URL": 52, "Priority Agency": 16,
         }
         for idx, (h, _) in enumerate(cols, start=1):
             ws.column_dimensions[get_column_letter(idx)].width = widths.get(h, 16)
@@ -2788,6 +2958,40 @@ def export_html_report(results, path, days, recompetes=None):
             f"{portal}</a><br><span class='muted' style='font-size:12px'>"
             f"{_html_escape(a['portal_note'])}</span></td></tr>")
     p.append('</tbody></table></div></section>')
+
+    # Resource Directory — the whole federal-contracting ecosystem, one click away.
+    p.append('<section><h2>📚 Resource Directory — Every Place to Hunt &amp; '
+             'Get Help</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'This tool searches SAM.gov + USASpending for you. These are the '
+             'other places to hunt, research incumbents, get certified, and get '
+             '<b>free</b> expert help. Everything below is a real government or '
+             'SBA-partner resource — no logins sold, no fees.</p>')
+    _cat_order, _by_cat = [], {}
+    for row in _resource_rows():
+        if row["category"] not in _by_cat:
+            _by_cat[row["category"]] = []
+            _cat_order.append(row["category"])
+        _by_cat[row["category"]].append(row)
+    _cat_emoji = {
+        "Find Opportunities": "🔎", "Market Intel": "📊",
+        "Certify & Register": "✅", "Free Help": "🤝", "Agency OSDBU": "🏛️",
+    }
+    for cat in _cat_order:
+        p.append(f'<h3 style="margin:16px 0 6px">{_cat_emoji.get(cat, "•")} '
+                 f'{_html_escape(cat)}</h3>')
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>Resource</th><th>What it\'s for</th><th>Link</th>'
+                 '</tr></thead><tbody>')
+        for row in _by_cat[cat]:
+            u = _html_escape(row["url"])
+            p.append(
+                f"<tr><td><b>{_html_escape(row['name'])}</b></td>"
+                f"<td>{_html_escape(row['note'])}</td>"
+                f'<td><a href="{u}" target="_blank" rel="noopener">{u}</a></td>'
+                "</tr>")
+        p.append('</tbody></table></div>')
+    p.append('</section>')
 
     # Recompete Radar — upcoming rebids (from USASpending.gov).
     p.append('<section><h2>🔭 Recompete Radar — Upcoming Rebids</h2>')

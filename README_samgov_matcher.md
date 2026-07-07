@@ -79,11 +79,12 @@ for open solicitations it is any dollar figure found in the notice text, or
 The console report also prints an estimated total pipeline value across the
 opportunities PRG can pursue.
 
-The workbook has twelve tabs — **Top 10 – Do These First**, **Solo-Friendly
+The workbook has thirteen tabs — **Top 10 – Do These First**, **Solo-Friendly
 (1-Person)**, **Core Opportunities**, **Low-Barrier (Warm Body)**,
 **International (Consulting)**, **VA (OSDBU)**, **HHS (OSDBU)**, **DTRA**,
-**Subcontracting**, **Recompete Radar**, **WATCHLIST (prep, future)**, and
-**KILL LOG (screened out)** — each with filterable, frozen headers.
+**Subcontracting**, **Recompete Radar**, **WATCHLIST (prep, future)**, **KILL
+LOG (screened out)**, and **Resources (Hunt & Help)** — each with filterable,
+frozen headers.
 
 ### Priority-agency focus (VA / HHS / DTRA)
 
@@ -103,6 +104,32 @@ matcher:
 - adds an **🏛️ Priority Agencies — OSDBU Focus** section to the HTML report with
   live/recompete counts and a direct link to each OSDBU / acquisition portal for
   the manual, pre-SAM.gov forecast review those sites are actually for.
+
+### 📚 Resource Directory — every place to hunt & get help
+
+Beyond the two feeds this tool queries, there's a whole ecosystem of federal-
+contracting resources. They're now baked into every run — a **Resources (Hunt &
+Help)** Excel tab and a **📚 Resource Directory** section in the HTML report,
+with 50+ clickable links grouped into five categories:
+
+- **🔎 Find Opportunities** — SAM.gov (+ saved-search alerts), GSA eBuy, DLA
+  DIBBS, Unison Marketplace, SBIR/STTR, Grants.gov, FedConnect, the FAR itself.
+- **📊 Market Intel** — USAspending Advanced Search + its free API, FPDS-NG,
+  SAM.gov entity search, SBA DSBS, GSA eLibrary, SBA SubNet, recipient profiles
+  (research incumbents, competitors, and teaming partners before you bid).
+- **✅ Certify & Register** — SAM.gov UEI registration, SBA Certify (8(a)/WOSB/
+  HUBZone), **SBA VetCert** (the SDVOSB/VOSB verification required to win VA
+  set-asides), the HUBZone map, and the size-standards tool.
+- **🤝 Free Help** — **APEX Accelerators** (free 1:1 government-contracting
+  counseling — the single best resource for a new SDVOSB), VBOC, SBDC, SCORE,
+  SBA district offices/PCRs, and SBA's federal-contracting guide.
+- **🏛️ Agency OSDBU** — small-business office links for ~25 departments and
+  agencies: VA, HHS, DoD (+ Army/Navy/Air Force), DTRA, DHS, DOE, USDA, DOI,
+  Commerce, DOT, DOJ, State, Treasury, Education, Labor, HUD, EPA, NASA, GSA,
+  SSA, NSF.
+
+Links are stable government / SBA-partner URLs; a few OSDBU deep-pages move over
+time, so those point at the department home with a note on what to search.
 
 ### Deep-screen gates (auto-triage)
 
