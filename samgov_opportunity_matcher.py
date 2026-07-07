@@ -1383,15 +1383,21 @@ def _default_output_path():
     """
     home = os.path.expanduser("~")
     profile = os.environ.get("USERPROFILE", home)
+    # Prefer the OneDrive Desktop first: when OneDrive "Known Folder" redirection
+    # is on (very common on Windows), that is the desktop the user actually sees;
+    # the plain %USERPROFILE%\Desktop still physically exists but is hidden.
     candidates = [
-        os.path.join(profile, "Desktop"),
         os.path.join(profile, "OneDrive", "Desktop"),
-        os.path.join(home, "Desktop"),
         os.path.join(home, "OneDrive", "Desktop"),
+        os.path.join(profile, "Desktop"),
+        os.path.join(home, "Desktop"),
     ]
-    for folder in candidates:
-        if os.path.isdir(folder):
-            return os.path.join(folder, "PRG_Contracts.xlsx")
+    existing = [f for f in candidates if os.path.isdir(f)]
+    if existing:
+        # Among existing desktops, pick the one most recently modified — that is
+        # the one the user is actively using.
+        best = max(existing, key=lambda f: os.path.getmtime(f))
+        return os.path.join(best, "PRG_Contracts.xlsx")
     return os.path.join(home, "PRG_Contracts.xlsx")
 
 
