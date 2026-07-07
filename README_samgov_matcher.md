@@ -182,6 +182,30 @@ preference, which is PRG's main structural advantage, so they are scored **down
 (−20)** and flagged. It is deliberately a flag, not a hard kill: a specific
 international buyer may fit PRG's ambitions someday, but none are
 first-contract material, and RFIs from them are never RESPOND-RECOMMENDED.
+**US diplomatic posts overseas** (embassy/consulate buying for in-country
+delivery) are flagged the same way: FAR 19.000(b) means SB set-aside programs
+generally don't apply to acquisitions for use outside the US, so PRG's SDVOSB
+edge doesn't carry — flagged only when the place of performance is foreign, so
+CONUS State Department work is unaffected.
+
+**Commodity supply / distribution kill (Gate 4):** PRG performs professional
+services, not the supply or distribution of goods. A **supply verb**
+("supply and delivery", "furnish and deliver", "procurement of supplies",
+"delivery order for", "brand name or equal") paired with a **product/supply
+classification** — manufacturing (NAICS 31–33) or wholesale (NAICS 42) codes, a
+**65xx PSC** (medical/dental supplies & equipment), or any **numeric
+(Federal-Supply-Classification) PSC** — is killed, unless a dominant analytic
+**service verb** (analyze / coordinate / consult / monitor / research) is
+present. This keeps a clinical notice that merely mentions "supplies" in the
+lane while killing a product buy.
+
+**Classification-code awareness (no "medical keyword alone" false positive):**
+for medical-services / medical-supply classes — **PSC Q** (medical *services*,
+often staffing or O&M), **PSC 65xx** (supplies & equipment), **NAICS 339x**
+(medical-device / supplies manufacturing) — a "medical"-family keyword does
+**not** auto-qualify the notice as in-lane. The *verb* decides: supply / deliver
+/ maintain reads as product/O&M work (out of lane); analyze / coordinate /
+consult reads as PRG's service lane.
 
 **Dedupe:** each opportunity is content-hashed; a checksum match from a prior
 run is annotated "already vetted [date]: [verdict]" (cache at
@@ -190,9 +214,12 @@ run is annotated "already vetted [date]: [verdict]" (cache at
 Run `python samgov_opportunity_matcher.py --selftest` to verify the rules
 against the known cases: VA 36C26026Q0674 (medical-gas credential wall),
 FDA 75F40126R00051 (NCTR O&M CBA/workforce wall), BLM 140L3726Q0100 (Class III
-cultural-resource CRUP + fieldwork), and a GE MAC 5500 ECG PM (OEM
-pass-through) — all NO-BID — and USSOCOM H9242126QE036 (SaaS license resale),
-which must **not** be killed.
+cultural-resource CRUP + fieldwork), a GE MAC 5500 ECG PM (OEM pass-through),
+and State/Embassy-Manila 19RP3826Q0057 (stale pre-sol + overseas post +
+commodity supply + unrestricted, verdict EXPIRED with the commodity kill and
+overseas-post flag both firing underneath) — and USSOCOM H9242126QE036 (SaaS
+license resale) and an NCIA in-lane sources-sought (WATCH, flagged not killed),
+which must **not** be hard-killed.
 
 **Pro features:**
 

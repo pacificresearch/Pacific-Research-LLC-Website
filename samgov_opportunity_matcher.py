@@ -260,6 +260,24 @@ DISQUALIFIER_KEYWORDS = [
     "laundry", "security guard", "guard services", "armed guard",
     "unarmed guard", "tree removal", "fencing", "groundskeeping",
 ]
+# Commodity supply / distribution of goods — PRG performs professional services,
+# not product supply. A "supply verb" paired with a product/supply classification
+# (manufacturing/wholesale NAICS, numeric or 65xx PSC) is a kill; an analytic
+# "service verb" (analyze/coordinate/consult) keeps the notice in PRG's lane.
+# This pair also gates the "medical keyword alone" false positive: for a supply
+# classification, the VERB decides whether a medical topic is in-lane work.
+SUPPLY_VERB_KEYWORDS = [
+    "supply and delivery", "supply and deliver", "furnish and deliver",
+    "delivery of goods", "procurement of supplies", "procurement of medical",
+    "provide and deliver", "delivery order for", "brand name or equal",
+    "supply of test", "supply of medical", "supply of laboratory",
+]
+SERVICE_VERB_KEYWORDS = [
+    "analyze", "analysis", "coordinate", "coordination", "consult",
+    "consulting", "advisory", "monitor", "monitoring", "assessment",
+    "evaluate", "evaluation", "research", "data management", "regulatory",
+    "protocol", "study design", "technical writing", "program support",
+]
 # GATE 3 — coverage killers: embedded/around-the-clock/guaranteed-response or
 # simultaneous multi-site presence a solo performer cannot commit to.
 COVERAGE_KILLER_KEYWORDS = [
@@ -403,6 +421,15 @@ INTERNATIONAL_BUYER_KEYWORDS = [
     "world bank", "international organization", "foreign ministry",
     "ministry of", "embassy of", "european union", "european commission",
     "african union", "pan american health", "paho",
+]
+# US diplomatic posts overseas. FAR 19.000(b): small-business set-aside programs
+# generally do not apply to acquisitions for use OUTSIDE the US, so PRG's SDVOSB
+# edge does not carry at an embassy/consulate buying for in-country delivery.
+# Score DOWN + flag (not a kill) only when paired with a foreign place of
+# performance, so CONUS State Department work is unaffected.
+OVERSEAS_POST_KEYWORDS = [
+    "embassy", "consulate", "consulate general", "diplomatic post",
+    "u.s. mission", "us mission", "overseas post",
 ]
 
 # FIX 2 — the only credentials PRG actually holds (satisfy a "must hold" req).
@@ -677,9 +704,48 @@ def _haystack(opp):
     return " ".join(str(p) for p in parts).lower()
 
 
+def _classification_needs_verb_check(opp):
+    """True when the PSC/NAICS class is one where a 'medical'-type keyword must
+    be corroborated by an analytic verb rather than the topic alone: PSC Q
+    (medical *services* — often staffing/O&M), PSC 65xx (medical/dental supplies
+    & equipment), or NAICS 339x (medical device / supplies manufacturing)."""
+    psc = (opp.get("classificationCode") or "").strip().upper()
+    naics = (opp.get("naicsCode") or "").strip()
+    return psc[:1] == "Q" or psc[:2] == "65" or naics[:3] == "339"
+
+
+def _is_commodity_supply(opp):
+    """True when the notice is the supply/distribution of goods (a product buy),
+    not a professional service. Requires a product/supply classification so a
+    clinical notice that merely mentions 'supplies' is not killed: manufacturing
+    (NAICS 31-33) or wholesale (NAICS 42) codes, a 65xx PSC, or a numeric
+    (Federal Supply Classification = product) PSC — AND a supply verb with no
+    dominant analytic service verb."""
+    text = _haystack(opp)
+    naics = (opp.get("naicsCode") or "").strip()
+    psc = (opp.get("classificationCode") or "").strip().upper()
+    product_code = (naics[:2] in ("31", "32", "33", "42")
+                    or psc[:2] == "65"
+                    or (psc[:1].isdigit()))
+    supply_verb = any(v in text for v in SUPPLY_VERB_KEYWORDS)
+    service_verb = any(v in text for v in SERVICE_VERB_KEYWORDS)
+    return product_code and supply_verb and not service_verb
+
+
 def match_capabilities(opp):
-    """Return (is_match, matched_keywords) for technical-competency scoring."""
+    """Return (is_match, matched_keywords) for technical-competency scoring.
+
+    Classification-code awareness: for medical-services / medical-supply codes
+    (PSC Q, PSC 65xx, NAICS 339x) a 'medical'-family keyword does NOT auto-
+    qualify the notice as in-lane — the verb decides. A supply/deliver verb with
+    no analytic verb means the work is product supply, not PRG's service lane.
+    """
     matched = _keyword_hits(_haystack(opp), CAPABILITY_KEYWORDS)
+    if matched and _classification_needs_verb_check(opp):
+        text = _haystack(opp)
+        if (any(v in text for v in SUPPLY_VERB_KEYWORDS)
+                and not any(v in text for v in SERVICE_VERB_KEYWORDS)):
+            return (False, [])
     return (len(matched) > 0, matched)
 
 
@@ -1070,16 +1136,26 @@ def _buyer_type(opp):
     checked against the notice text.
     """
     agency = (_extract_agency(opp) or "").lower()
-    hit = next((k for k in INTERNATIONAL_BUYER_KEYWORDS if k in agency), None)
+    office = " ".join(str(opp.get(k, "")) for k in
+                      ("organizationName", "fullParentPathName",
+                       "officeAddress")).lower()
+    text = _haystack(opp)
+    hit = next((k for k in INTERNATIONAL_BUYER_KEYWORDS
+                if k in agency or k in office), None)
     if not hit:
         # Text-level check limited to unambiguous international-org signals.
-        text = _haystack(opp)
         strong = ("nato", "ncia", "nspa", "united nations", "unicef", "undp",
                   "unhcr", "unops", "world health organization",
                   "european commission", "african union")
         hit = next((k for k in strong if k in text), None)
     if hit:
         return ("International / non-US buyer", True, hit)
+    # US diplomatic post buying for overseas delivery — no US SB set-aside abroad.
+    _, _, pop_international = _extract_location(opp)
+    post = next((k for k in OVERSEAS_POST_KEYWORDS
+                 if k in office or k in text), None)
+    if post and pop_international:
+        return ("US overseas post (no SB set-aside abroad)", True, post)
     return ("US Federal", False, "")
 
 
@@ -1245,6 +1321,13 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
     bond = _keyword_hits(text, BONDING_KILL_KEYWORDS)
     if bond:
         return _fail("Gate 5 (bonding)", f"bonding required — '{bond[0]}'")
+
+    # GATE 4 — commodity supply / distribution of goods (a product buy, not a
+    # service). Product/supply classification + a supply verb with no analytic
+    # verb → PRG performs no supply/distribution, so kill regardless of set-aside.
+    if _is_commodity_supply(opp):
+        return _fail("Gate 4 (commodity supply)",
+                     "supply/distribution of goods — PRG performs no product supply")
 
     # GATE 4 — scope reality (work outside PRG's solo lane).
     dq = _keyword_hits(text, DISQUALIFIER_KEYWORDS)
@@ -3045,6 +3128,36 @@ _SELFTEST_CASES = [
         "expect_truthy": ["buyer_is_international"],
         "expect_falsy": ["respond_recommended"],
     },
+    {
+        "label": "State/Embassy Manila 19RP3826Q0057 — medical test-kit SUPPLY "
+                 "(stale pre-sol + overseas post + commodity supply + unrestricted)",
+        "opp": {
+            "solicitationNumber": "19RP3826Q0057",
+            "noticeId": "st8",
+            "title": ("Supply and Delivery of Medical Testing Kits — "
+                      "U.S. Embassy Manila"),
+            "description": ("The U.S. Embassy in Manila, Philippines intends to "
+                            "issue a solicitation for the supply and delivery of "
+                            "medical testing kits and diagnostic laboratory "
+                            "supplies. Award will be made on a lowest price "
+                            "technically acceptable (LPTA) basis. Anticipated "
+                            "release date: April 2026."),
+            "naicsCode": "339113",
+            "classificationCode": "6550",
+            "typeOfSetAside": "",
+            "typeOfSetAsideDescription": "",
+            "organizationName": "American Embassy Manila",
+            "fullParentPathName": "STATE, DEPARTMENT OF",
+            "placeOfPerformance": {"country": {"code": "PHL",
+                                               "name": "Philippines"}},
+            "type": "Presolicitation",
+        },
+        "deadline_offset_days": -30,       # April 2026 window already passed
+        "expect_verdict": "EXPIRED",
+        "expect_truthy": ["disqualified", "buyer_is_international"],
+        "expect_falsy": ["tech_match"],
+        "expect_equals": {"setaside": "None"},
+    },
 ]
 
 
@@ -3074,11 +3187,16 @@ def run_selftests():
             if r.get(field):
                 passed = False
                 want += f" & !{field}"
+        for field, val in case.get("expect_equals", {}).items():
+            if r.get(field) != val:
+                passed = False
+                want += f" & {field}=={val!r}"
         ok = ok and passed
         print(f"  [{'PASS' if passed else 'FAIL'}] {case['label']}")
         extra = ""
         report_fields = (case.get("expect_truthy", [])
-                         + case.get("expect_falsy", []))
+                         + case.get("expect_falsy", [])
+                         + list(case.get("expect_equals", {})))
         if report_fields:
             extra = " | " + ", ".join(
                 f"{f}={r.get(f)!r}" for f in report_fields)
