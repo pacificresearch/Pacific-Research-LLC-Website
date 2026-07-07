@@ -114,8 +114,13 @@ type, which take precedence over the verdict:
 - **SHORT-FUSE** — due within ~5 business days; still scored, but the deadline
   is surfaced as the headline.
 - **WATCH** — pre-solicitations / Sources Sought / Special Notices / forecasts
-  route to the Watchlist; Sources Sought & RFIs in PRG's lane are flagged
-  **RESPOND-RECOMMENDED** (cheap, and past performance doesn't matter for an RFI).
+  route to the Watchlist; Sources Sought & RFIs are flagged
+  **RESPOND-RECOMMENDED** *only when the subject sits inside PRG's self-perform
+  lane* (core NAICS or solo-doable) **and** the buyer is US federal. The value of
+  responding is shaping a requirement you'll actually bid and getting on the CO's
+  radar as a credible source — responding outside the lane (warm-body staffing,
+  or a non-US buyer that ignores set-asides) costs hours and signals nothing, so
+  it's suppressed.
 - **MARKET-INTEL** — award notices route to Subcontracting/market intel, never
   the bid queue.
 - **Cycle Calendar** — recurring programs (SBIR/STTR) get an inferred next-cycle
@@ -156,15 +161,38 @@ These are matched **literally** — a BA never satisfies a graduate-degree
 standard, and clinical "site visits" / a clinical "principal investigator" do
 **not** trip the field-science rules.
 
+**OEM pass-through kill (sharpest LOS trap):** brand-named equipment
+maintenance / calibration / repair that must be performed by an "authorized
+service center" or to "manufacturer specification" needs a lab or OEM
+authorization PRG can't self-perform, so it's killed regardless of set-aside or
+dollar size. Product/software resale contexts (SaaS, software license,
+reseller, letter of supply) are exempt — there "OEM authorization" is an asset
+to acquire, not bench labor. Electronic/commercial equipment-repair NAICS
+families (**8112xx / 8113xx**) are also scored **down categorically** (−18)
+because PRG owns no bench, even when the notice text alone doesn't trip the hard
+gate. *Counter-lesson: the steady flow of these SDVOSB set-asides confirms
+small, remote-performable set-asides move through routinely — the kill is about
+this scope, not the channel.*
+
+**Buyer type (score-down, not a kill):** a separate **Buyer Type** field
+classifies the *buyer* (not the place of performance). International /
+non-US-government buyers — NATO/NCIA/NSPA, UN agencies (UNDP/UNICEF/UNHCR/WHO),
+foreign ministries, the EU/AU — recognize no US small-business or SDVOSB
+preference, which is PRG's main structural advantage, so they are scored **down
+(−20)** and flagged. It is deliberately a flag, not a hard kill: a specific
+international buyer may fit PRG's ambitions someday, but none are
+first-contract material, and RFIs from them are never RESPOND-RECOMMENDED.
+
 **Dedupe:** each opportunity is content-hashed; a checksum match from a prior
 run is annotated "already vetted [date]: [verdict]" (cache at
 `~/.prg_screen_cache.json`).
 
 Run `python samgov_opportunity_matcher.py --selftest` to verify the rules
-against four known cases: VA 36C26026Q0674 (medical-gas credential wall),
+against the known cases: VA 36C26026Q0674 (medical-gas credential wall),
 FDA 75F40126R00051 (NCTR O&M CBA/workforce wall), BLM 140L3726Q0100 (Class III
-cultural-resource CRUP + fieldwork) — all NO-BID — and USSOCOM H9242126QE036
-(SaaS license resale), which must **not** be killed.
+cultural-resource CRUP + fieldwork), and a GE MAC 5500 ECG PM (OEM
+pass-through) — all NO-BID — and USSOCOM H9242126QE036 (SaaS license resale),
+which must **not** be killed.
 
 **Pro features:**
 

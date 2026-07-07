@@ -372,6 +372,39 @@ SPECIALTY_FIELD_KILL = [
 _PI_FIELD_CONTEXT = ["archaeolog", "anthropolog", "cultural resource",
                      "historic preservation", "paleontolog"]
 
+# Pass-through / OEM-specific maintenance trap — the sharpest LOS trap: brand-
+# named equipment maintenance/calibration/repair to manufacturer spec needs a
+# lab or manufacturer authorization PRG cannot self-perform. Hard kill
+# regardless of set-aside or dollar size.
+OEM_PASSTHROUGH_KILL = [
+    "authorized service center", "authorized service provider",
+    "designated service center", "factory authorized", "factory-authorized",
+    "oem authorized", "manufacturer authorized service", "manufacturer's authorized",
+    "authorized repair facility", "original equipment manufacturer service",
+]
+_OEM_WORK = ["maintenance", "repair", "calibration", "preventive maintenance",
+             "overhaul", "refurbish"]
+_OEM_SPEC = ["manufacturer specification", "manufacturer's specification",
+             "oem specification", "factory specification", "per oem", "per the oem"]
+# Product/software resale contexts that must NOT trip the OEM-maintenance kill.
+OEM_EXEMPT_CONTEXT = ["saas", "software license", "subscription", "reseller",
+                      "letter of supply", "software as a service"]
+# Equipment-repair NAICS families (PRG owns no bench) — score down categorically.
+EQUIP_REPAIR_NAICS_PREFIXES = ("8112", "8113")
+
+# International / non-US-government buyers. None recognize US small-business or
+# SDVOSB set-asides — PRG's main structural advantage evaporates — so score DOWN
+# and flag (never first-contract material). Not a hard kill: a specific one may
+# matter to PRG's international ambitions someday.
+INTERNATIONAL_BUYER_KEYWORDS = [
+    "nato", "ncia", "nato communications", "nato support", "nspa",
+    "shape", "allied command", "united nations", "u.n. ", "unicef", "undp",
+    "unhcr", "unops", "unesco", "world health organization",
+    "world bank", "international organization", "foreign ministry",
+    "ministry of", "embassy of", "european union", "european commission",
+    "african union", "pan american health", "paho",
+]
+
 # FIX 2 — the only credentials PRG actually holds (satisfy a "must hold" req).
 HELD_CREDENTIALS = ["acrp-cp", "acrp-pm", "sdvosb", "sam registration", "sam.gov"]
 # Contexts where "must hold X" is a product/reseller ASSET, not a personnel
@@ -793,6 +826,32 @@ def evaluate(opp):
         if win_score >= 68 and win_band != "Green":
             win_band, win_emoji, win_note = "Green", "🟢", "Best bet — pursue"
 
+    # Categorical score-down: electronic/commercial equipment repair & maintenance
+    # (NAICS 8112xx / 8113xx). PRG owns no bench, so these are structurally weak
+    # even when the notice text alone doesn't trip a hard OEM gate.
+    if str(naics).startswith(EQUIP_REPAIR_NAICS_PREFIXES):
+        win_score = max(0, win_score - 18)
+        soft_flags = list(soft_flags) + [
+            "equipment-repair NAICS (8112/8113) — PRG owns no bench"]
+        if win_score < 68 and win_band == "Green":
+            win_band, win_emoji, win_note = "Yellow", "🟡", "On the fence — verify scope"
+        if win_score < 45 and win_band == "Yellow":
+            win_band, win_emoji, win_note = "Red", "🔴", "Weak fit — likely NO-BID"
+
+    # Buyer type: international / non-US-government buyers recognize no US small-
+    # business or SDVOSB preference, so PRG's structural edge disappears. Score
+    # DOWN and flag — never a hard kill (a specific one may fit PRG's
+    # international ambitions later, but none are first-contract material).
+    buyer_type, buyer_is_international, buyer_hit = _buyer_type(opp)
+    if buyer_is_international and not disqualified:
+        win_score = max(0, win_score - 20)
+        soft_flags = list(soft_flags) + [
+            f"international/non-US buyer ({buyer_hit}) — no SDVOSB preference"]
+        if win_score < 68 and win_band == "Green":
+            win_band, win_emoji, win_note = "Yellow", "🟡", "On the fence — no US set-aside edge"
+        if win_score < 45 and win_band == "Yellow":
+            win_band, win_emoji, win_note = "Red", "🔴", "Weak fit — non-US buyer"
+
     # --- STAGE 0: timing + notice-type gating (takes precedence over scoring) ---
     notice_class = _classify_notice(notice_type)
     short_fuse = (deadline_days is not None
@@ -801,9 +860,17 @@ def evaluate(opp):
     is_sbir = ("sbir" in text_l or "sttr" in text_l
                or "small business innovation research" in text_l)
     cycle_program = (f"{_extract_agency(opp)} SBIR/STTR" if is_sbir else "")
+    # RESPOND-RECOMMENDED only when the RFI/sources-sought subject sits inside
+    # PRG's self-perform lane: the whole value of responding is shaping a
+    # requirement you'll actually bid and getting on the CO's radar as a credible
+    # source. Responding outside the lane (e.g. warm-body staffing PRG can't self-
+    # deliver, or a non-US buyer that ignores set-asides) costs hours and signals
+    # nothing — worse than silence.
     respond_recommended = (
         notice_class in ("SOURCES_SOUGHT", "SPECIAL", "RFI")
-        and tier in ("primary", "low_barrier") and not disqualified)
+        and (tier == "primary" or is_solo)
+        and not disqualified
+        and not buyer_is_international)
 
     # Verdict precedence: timing → notice-type → kills → urgency → fit.
     is_watch = notice_class in WATCH_NOTICE_CLASSES
@@ -890,6 +957,8 @@ def evaluate(opp):
         "location": location_display,
         "location_type": location_type,
         "is_international": is_international,
+        "buyer_type": buyer_type,
+        "buyer_is_international": buyer_is_international,
         "staffing_type": staffing,
         "timeframe": timeframe,
         "fit": fit,
@@ -988,6 +1057,30 @@ def _extract_agency(opp):
             # fullParentPathName is a dotted hierarchy; take the top department.
             return _clean(str(val).split(".")[0], max_len=40)
     return "N/A"
+
+
+def _buyer_type(opp):
+    """Classify the BUYER (not the place of performance). Returns
+    (label, is_international, matched_keyword).
+
+    A non-US / international-organization buyer (NATO/NCIA, UN agencies, foreign
+    ministries) does not recognize US small-business / SDVOSB preferences, so
+    PRG's structural edge disappears. Detected from the agency/department name
+    first (strong signal); a short list of unambiguous org acronyms is also
+    checked against the notice text.
+    """
+    agency = (_extract_agency(opp) or "").lower()
+    hit = next((k for k in INTERNATIONAL_BUYER_KEYWORDS if k in agency), None)
+    if not hit:
+        # Text-level check limited to unambiguous international-org signals.
+        text = _haystack(opp)
+        strong = ("nato", "ncia", "nspa", "united nations", "unicef", "undp",
+                  "unhcr", "unops", "world health organization",
+                  "european commission", "african union")
+        hit = next((k for k in strong if k in text), None)
+    if hit:
+        return ("International / non-US buyer", True, hit)
+    return ("US Federal", False, "")
 
 
 def _extract_awardee(opp):
@@ -1118,6 +1211,20 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
     if "principal investigator" in text and any(c in text for c in _PI_FIELD_CONTEXT):
         return _fail("Gate 2 (specialty PI)",
                      "requires a field-science principal investigator PRG lacks")
+
+    # PASS-THROUGH / OEM-SPECIFIC MAINTENANCE — the sharpest LOS trap. Brand-
+    # named equipment maintenance/calibration/repair to manufacturer spec needs a
+    # lab or OEM authorization PRG can't self-perform → kill regardless of set-
+    # aside or dollar size. Exempt product/software resale (SaaS/license/reseller)
+    # where "OEM authorization" is an ASSET to acquire, not bench labor to perform.
+    if not any(x in text for x in OEM_EXEMPT_CONTEXT):
+        oem = _keyword_hits(text, OEM_PASSTHROUGH_KILL)
+        if oem:
+            return _fail("Gate 2 (OEM pass-through)",
+                         f"OEM-authorized equipment service PRG can't self-perform — '{oem[0]}'")
+        if any(w in text for w in _OEM_WORK) and any(s in text for s in _OEM_SPEC):
+            return _fail("Gate 2 (OEM pass-through)",
+                         "brand-specific equipment maintenance to manufacturer spec — no bench")
 
     # FIX 2 — generic personnel-credential requirement (catches future variants).
     # FIX 3 — a hard kill regardless of how fast the permit itself processes; the
@@ -1760,6 +1867,7 @@ _RICH_COLS = [
     ("Timeframe", "timeframe"),
     ("Location", "location"),
     ("Intl / CONUS", "location_type"),
+    ("Buyer Type", "buyer_type"),
     ("NAICS", "naics"),
     ("Solicitation #", "solicitation"),
     ("Link", "link"),
@@ -1971,7 +2079,8 @@ def export_spreadsheet(results, path, recompetes=None):
             "Go / No-Go": 12, "Est. LOE": 28, "Flags": 44,
             "Set-Aside": 14, "Eligible as LLC?": 24, "Personnel (FTE)": 13,
             "Hire New or Take Over?": 34, "Solo-Doable?": 12, "Timeframe": 30,
-            "Location": 26, "Intl / CONUS": 13, "Solicitation #": 20,
+            "Location": 26, "Intl / CONUS": 13, "Buyer Type": 24,
+            "Solicitation #": 20,
         }
         for idx, (h, _) in enumerate(cols, start=1):
             ws.column_dimensions[get_column_letter(idx)].width = widths.get(h, 16)
@@ -2410,6 +2519,12 @@ def export_html_report(results, path, days, recompetes=None):
         scope = r["naics_desc"] or "professional services"
         p.append(f'<p><b>Scope:</b> {_html_escape(r["title"])} — '
                  f'{_html_escape(r["agency"])} ({_html_escape(scope)}).</p>')
+        if r.get("buyer_is_international"):
+            p.append('<p><b>Buyer:</b> <span class="muted">'
+                     + _html_escape(r["buyer_type"])
+                     + ' — recognizes no US SDVOSB / small-business preference, '
+                     'so PRG\'s structural edge does not apply. Not first-contract '
+                     'material.</span></p>')
         # Personnel roster
         if r["poc"]:
             roster = []
@@ -2851,6 +2966,26 @@ _SELFTEST_CASES = [
         "expect_verdict": "SHORT-FUSE",
     },
     {
+        "label": "GE MAC 5500 ECG PM — OEM pass-through (brand equipment + "
+                 "manufacturer spec, killed regardless of SDVOSB set-aside)",
+        "opp": {
+            "solicitationNumber": "OEM-ECG-TEST",
+            "noticeId": "st4b",
+            "title": "GE MAC 5500 ECG Preventive Maintenance and Calibration",
+            "description": ("Contractor shall provide preventive maintenance and "
+                            "calibration of GE MAC 5500 ECG units. All work shall "
+                            "be performed by an authorized service center in "
+                            "accordance with the manufacturer specification."),
+            "naicsCode": "811210",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Veterans Affairs",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+    },
+    {
         "label": "ED/IES SBIR 91990026R0005 — expired pre-sol (EXPIRED at stage 0, "
                  "cycle entry)",
         "opp": {
@@ -2889,6 +3024,27 @@ _SELFTEST_CASES = [
         "expect_verdict": "WATCH",
         "expect_truthy": ["respond_recommended"],
     },
+    {
+        "label": "NCIA Sources Sought (in-lane consulting, international buyer) — "
+                 "WATCH but NOT respond-recommended, scored down (flag not kill)",
+        "opp": {
+            "solicitationNumber": "NCIA-SS-TEST",
+            "noticeId": "st7",
+            "title": "Sources Sought — Program Support Consulting",
+            "description": ("NATO Communications and Information Agency (NCIA) "
+                            "seeks capable firms for management and program "
+                            "support consulting."),
+            "naicsCode": "541611",
+            "typeOfSetAside": "",
+            "typeOfSetAsideDescription": "",
+            "fullParentPathName": "NATO Communications and Information Agency",
+            "type": "Sources Sought",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "WATCH",
+        "expect_truthy": ["buyer_is_international"],
+        "expect_falsy": ["respond_recommended"],
+    },
 ]
 
 
@@ -2914,12 +3070,18 @@ def run_selftests():
             if not r.get(field):
                 passed = False
                 want += f" & {field}"
+        for field in case.get("expect_falsy", []):
+            if r.get(field):
+                passed = False
+                want += f" & !{field}"
         ok = ok and passed
         print(f"  [{'PASS' if passed else 'FAIL'}] {case['label']}")
         extra = ""
-        if case.get("expect_truthy"):
+        report_fields = (case.get("expect_truthy", [])
+                         + case.get("expect_falsy", []))
+        if report_fields:
             extra = " | " + ", ".join(
-                f"{f}={r.get(f)!r}" for f in case["expect_truthy"])
+                f"{f}={r.get(f)!r}" for f in report_fields)
         print(f"         verdict={r['verdict']} (want {want}), "
               f"gate={r['kill_gate'] or '-'}{extra}")
     print("\nResult:", "ALL PASS ✅" if ok else "SOME FAILED ❌")
