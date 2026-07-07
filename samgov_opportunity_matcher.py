@@ -1343,7 +1343,18 @@ def export_spreadsheet(results, path):
 
     if not path.lower().endswith(".xlsx"):
         path = path + ".xlsx"
-    wb.save(path)
+    try:
+        wb.save(path)
+    except PermissionError:
+        # File is open in Excel (locked). Save under a timestamped name instead
+        # so a long scan is never lost.
+        alt = _timestamped_alt(path)
+        wb.save(alt)
+        sys.stderr.write(
+            f"NOTE: '{os.path.basename(path)}' was open/locked — saved as "
+            f"'{os.path.basename(alt)}' instead.\n"
+        )
+        return alt
     return path
 
 
@@ -1388,6 +1399,13 @@ def _desktop_path(filename):
     """Return `filename` on the user's Desktop (or home dir fallback)."""
     base = _default_output_path()
     return os.path.join(os.path.dirname(base), filename)
+
+
+def _timestamped_alt(path):
+    """Insert a HH-MM-SS stamp before the extension, e.g. for locked files."""
+    root, ext = os.path.splitext(path)
+    stamp = dt.datetime.now().strftime("%H-%M-%S")
+    return f"{root}_{stamp}{ext}"
 
 
 # ---------------------------------------------------------------------------
@@ -1667,8 +1685,19 @@ def export_html_report(results, path, days):
 
     if not path.lower().endswith(".html"):
         path += ".html"
-    with open(path, "w", encoding="utf-8") as fh:
-        fh.write("".join(p))
+    html = "".join(p)
+    try:
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(html)
+    except PermissionError:
+        alt = _timestamped_alt(path)
+        with open(alt, "w", encoding="utf-8") as fh:
+            fh.write(html)
+        sys.stderr.write(
+            f"NOTE: '{os.path.basename(path)}' was open/locked — saved as "
+            f"'{os.path.basename(alt)}' instead.\n"
+        )
+        return alt
     return path
 
 
@@ -1831,9 +1860,15 @@ def main(argv=None):
 
     saved = []
     if not args.no_excel:
-        saved.append(export_spreadsheet(results, xlsx_path))
+        try:
+            saved.append(export_spreadsheet(results, xlsx_path))
+        except Exception as exc:  # never let one save abort the other
+            sys.stderr.write(f"WARNING: could not save spreadsheet: {exc}\n")
     if not args.no_report:
-        saved.append(export_html_report(results, report_path, args.days))
+        try:
+            saved.append(export_html_report(results, report_path, args.days))
+        except Exception as exc:
+            sys.stderr.write(f"WARNING: could not save HTML report: {exc}\n")
 
     if saved:
         sys.stderr.write(
