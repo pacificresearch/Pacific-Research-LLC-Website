@@ -472,6 +472,7 @@ def evaluate(opp):
     win_score, win_band, win_emoji, win_note = _win_assessment(
         setaside_label, setaside_eligible, is_sdvosb, tier,
         tech_match, matched_kw, is_solo, fte, value_num, incumbent,
+        _deadline_days(opp),
     )
 
     return {
@@ -877,72 +878,83 @@ def _fit_label(tier, tech_match, matched_kw):
 
 
 def _win_assessment(setaside_label, setaside_eligible, is_sdvosb, tier,
-                    tech_match, matched_kw, is_solo, fte, value_num, incumbent):
-    """Composite win-likelihood score (0-100) with a RAG band.
+                    tech_match, matched_kw, is_solo, fte, value_num, incumbent,
+                    deadline_days=None):
+    """Composite win score (0-100) with a three-band verdict:
 
-    Blends: can PRG even bid (set-aside), capability fit, how executable it is
-    for a small/solo shop, value sanity, and incumbent headwind. Heuristic —
-    a planning aid, not a guarantee.
+      GREEN  = genuine best bet — pursue.
+      YELLOW = on the fence — worth a look, not a slam dunk.
+      RED    = do not pursue (ineligible, deadline passed, or poor odds).
+
+    Tuned so a clean SDVOSB, solo-doable, eligible opportunity clears Green
+    even without a clinical/biomedical keyword match — because for a small
+    solo shop those ARE the best first bets. Heuristic, not a guarantee.
     """
-    # Hard gate: if PRG can't bid, it's Red regardless of everything else.
+    # Hard gate: can't bid -> Red.
     if not setaside_eligible:
-        return (12, "Red", "🔴", "Ineligible — set-aside excludes PRG")
+        return (10, "Red", "🔴", "Do not pursue — set-aside excludes PRG")
+    # Deadline already passed -> Red.
+    if deadline_days is not None and deadline_days < 0:
+        return (15, "Red", "🔴", "Do not pursue — response deadline has passed")
 
     score = 0
-    # 1. Set-aside advantage (less competition in PRG's lane) — up to 35
+    # 1. Set-aside advantage (less competition in PRG's lane).
     if is_sdvosb:
-        score += 35
+        score += 40
     elif setaside_label == "VOSB":
-        score += 28
+        score += 32
     elif setaside_label == "Total SB":
-        score += 22
+        score += 28
     elif setaside_label == "None":
-        score += 10          # unrestricted = open competition, harder
+        score += 18          # unrestricted = open competition, harder
     else:
-        score += 14
+        score += 26
 
-    # 2. Capability fit — up to 30
-    score += min(len(matched_kw) * 5, 22)
-    if tier == "primary":
-        score += 8
-    elif tier == "low_barrier":
-        score += 4
-
-    # 3. Executability for a small/solo shop — up to 25
+    # 2. Executability for a solo shop (heaviest lever for PRG right now).
     if is_solo:
         score += 25
     elif fte is None:
         score += 12
-    elif fte <= 3:
-        score += 16
+    elif fte <= 2:
+        score += 18
     elif fte <= 10:
         score += 8
     else:
-        score += 3          # big team is hard for a new small co
+        score += 2           # big team is hard for a new solo co
 
-    # 4. Value sanity — up to 10
-    if value_num is None:
-        score += 5
-    elif value_num <= SIMPLIFIED_ACQ_THRESHOLD:
+    # 3. Capability fit (a bonus, not a gate — adjacent admin work still counts).
+    if tier == "primary" and len(matched_kw) >= 3:
+        score += 15
+    elif tech_match:
         score += 10
-    elif value_num <= 2_000_000:
+    elif tier == "low_barrier":
         score += 6
-    elif value_num > 10_000_000:
+    else:
         score += 2
 
-    # 5. Incumbent headwind
+    # 4. Value sanity (smaller = more winnable for a first contract).
+    if value_num is None:
+        score += 10
+    elif value_num <= SIMPLIFIED_ACQ_THRESHOLD:
+        score += 12
+    elif value_num <= 2_000_000:
+        score += 8
+    elif value_num <= 10_000_000:
+        score += 4
+    else:
+        score += 2
+
+    # 5. Incumbent headwind.
     if incumbent:
-        score -= 12
+        score -= 10
 
     score = max(0, min(100, score))
-    if score >= 80:
-        band, emoji, note = "Green", "🟢", "Strong — pursue"
-    elif score >= 60:
-        band, emoji, note = "Yellow", "🟡", "Good — worth pursuing"
-    elif score >= 40:
-        band, emoji, note = "Orange", "🟠", "Stretch — needs partner/effort"
+    if score >= 68:
+        band, emoji, note = "Green", "🟢", "Best bet — pursue"
+    elif score >= 45:
+        band, emoji, note = "Yellow", "🟡", "On the fence — worth a look"
     else:
-        band, emoji, note = "Red", "🔴", "Low odds — likely skip"
+        band, emoji, note = "Red", "🔴", "Do not pursue — low odds"
     return (score, band, emoji, note)
 
 
@@ -1301,7 +1313,6 @@ def export_spreadsheet(results, path):
     band_fill = {
         "Green": PatternFill("solid", fgColor="C6E7D0"),
         "Yellow": PatternFill("solid", fgColor="FBEBB0"),
-        "Orange": PatternFill("solid", fgColor="F6D3A6"),
         "Red": PatternFill("solid", fgColor="F3C2BC"),
     }
 
@@ -1470,8 +1481,7 @@ def _svg_hbars(items, value_fmt, default_color="#1E3A5F", width=680):
     return "".join(out)
 
 
-_RAG_HEX = {"Green": "#2E7D4F", "Yellow": "#D9A62A",
-            "Orange": "#DB7A2B", "Red": "#C0392B"}
+_RAG_HEX = {"Green": "#2E7D4F", "Yellow": "#D9A62A", "Red": "#C0392B"}
 
 
 def _key_findings_html(ranked, eligible):
@@ -1565,7 +1575,7 @@ def export_html_report(results, path, days):
     chart_agency = [(a, v) for a, v in agency_value.most_common(8)]
     rag_counts = Counter(r["win_band"] for r in eligible)
     chart_rag = [(b, rag_counts.get(b, 0), _RAG_HEX[b])
-                 for b in ("Green", "Yellow", "Orange", "Red")]
+                 for b in ("Green", "Yellow", "Red")]
 
     kpis = [
         ("Total Pipeline Value", _format_currency(total_value) if total_value else "N/A",

@@ -85,12 +85,14 @@ and large dollar values.
 
 Each row is a **decision dashboard** ordered best-bet first, with:
 
-- **Win Score (0–100)** and a **RAG rating** — 🟢 Green (80+, pursue),
-  🟡 Yellow (60–79, good), 🟠 Orange (40–59, stretch), 🔴 Red (<40, likely
-  skip / ineligible). The Win Score and Rating cells are color-coded in Excel.
-  The score blends set-aside advantage, capability fit, executability for a
-  small/solo shop, value sanity, and incumbent headwind. It is a planning
-  heuristic, not a guarantee.
+- **Win Score (0–100)** and a three-band **rating** — 🟢 Green (68+, genuine
+  best bet — pursue), 🟡 Yellow (45–67, on the fence — worth a look), 🔴 Red
+  (<45, or ineligible, or the deadline has passed — do not pursue). The Win
+  Score and Rating cells are color-coded in Excel. The score is tuned so a
+  clean SDVOSB, solo-doable, eligible opportunity reaches Green even without a
+  clinical/biomedical keyword match, and blends set-aside advantage, solo
+  executability, capability fit, value sanity, and incumbent headwind. It is a
+  planning heuristic, not a guarantee.
 - **Fit for PRG**, **Set-Aside**, **Eligible as LLC?**, **Est. Value**,
   **Personnel (FTE)**, **Hire New or Take Over?** (incumbent detection),
   **Solo-Doable?**, **Timeframe**, **Location**, and **Intl / CONUS** (filter
