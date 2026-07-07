@@ -49,11 +49,14 @@ python3 samgov_opportunity_matcher.py --api-key SAM-…  # override the API key
 
 ### Excel / CSV output
 
-By **default** the script saves an Excel workbook named **`PRG_Contracts.xlsx`
-to your Desktop** every time it runs — no extra flags needed:
+By **default** the script saves an Excel workbook named
+**`PRG_Contracts_<search-date>.xlsx`** (e.g. `PRG_Contracts_2026-07-07.xlsx`)
+to your Desktop every time it runs — no extra flags needed. The date is the day
+the search ran, so each run is its own dated snapshot instead of overwriting the
+last one:
 
 ```bash
-python3 samgov_opportunity_matcher.py --days 90      # -> Desktop/PRG_Contracts.xlsx
+python3 samgov_opportunity_matcher.py --days 90   # -> Desktop/PRG_Contracts_<date>.xlsx
 ```
 
 Overrides:
@@ -278,9 +281,10 @@ python3 samgov_opportunity_matcher.py
 
 ### Executive HTML report
 
-By default the script also writes **`PRG_Executive_Report.html`** to your
-Desktop — a self-contained, browser-openable executive dashboard (no internet
-or libraries needed). It contains:
+By default the script also writes **`PRG_Executive_Report_<search-date>.html`**
+(e.g. `PRG_Executive_Report_2026-07-07.html`) to your Desktop — a
+self-contained, browser-openable executive dashboard (no internet or libraries
+needed). It contains:
 
 - **KPI cards** — total pipeline value, eligible opportunities, solo-friendly
   count, SDVOSB set-asides, and top agency.

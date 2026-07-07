@@ -3230,13 +3230,15 @@ def parse_args(argv):
                         help="Override the SAM.gov API key.")
     parser.add_argument("--excel", default=None, metavar="FILE",
                         help="Path for the Excel workbook. By default it is "
-                             "saved as PRG_Contracts.xlsx on your Desktop. "
-                             "Falls back to CSV files if openpyxl is missing.")
+                             "saved as PRG_Contracts_YYYY-MM-DD.xlsx (the search "
+                             "date) on your Desktop. Falls back to CSV files if "
+                             "openpyxl is missing.")
     parser.add_argument("--no-excel", action="store_true",
                         help="Skip writing the spreadsheet (console output only).")
     parser.add_argument("--report", default=None, metavar="FILE",
                         help="Path for the executive HTML report. By default it "
-                             "is saved as PRG_Executive_Report.html on your Desktop.")
+                             "is saved as PRG_Executive_Report_YYYY-MM-DD.html "
+                             "(the search date) on your Desktop.")
     parser.add_argument("--no-report", action="store_true",
                         help="Skip writing the executive HTML report.")
     parser.add_argument("--outdir", default=None, metavar="FOLDER",
@@ -3342,8 +3344,12 @@ def main(argv=None):
         xlsx_path = os.path.join(args.outdir, f"PRG_Contracts_{stamp}.xlsx")
         report_path = os.path.join(args.outdir, f"PRG_Executive_Report_{stamp}.html")
     else:
-        xlsx_path = args.excel or _default_output_path()
-        report_path = args.report or _desktop_path("PRG_Executive_Report.html")
+        # Default Desktop files carry the search date so each run is its own
+        # dated snapshot (e.g. PRG_Contracts_2026-07-07.xlsx) instead of
+        # overwriting the last one. An explicit --excel/--report still wins.
+        xlsx_path = args.excel or _desktop_path(f"PRG_Contracts_{stamp}.xlsx")
+        report_path = args.report or _desktop_path(
+            f"PRG_Executive_Report_{stamp}.html")
 
     saved = []
     if not args.no_excel:
