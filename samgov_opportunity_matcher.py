@@ -238,6 +238,61 @@ TARGET_PSC = OrderedDict([
     ("AN11", "R&D — Health/Medical (applied research)"),
 ])
 
+# --- Deep-screen gates (PRG capability baseline: solo clinical-research pro,
+# no employees, no trade crew, no equipment/factory certs) --------------------
+# GATE 4 — scope reality: work PRG's sole performer CANNOT self-deliver. A hit
+# is a hard FAIL (killed), not a score-down.
+DISQUALIFIER_KEYWORDS = [
+    "construction", "renovation", "demolition", "build-out", "new construction",
+    "janitorial", "custodial", "housekeeping", "grounds maintenance",
+    "landscaping", "pest control", "snow removal", "facility maintenance",
+    "facilities maintenance", "hvac", "plumbing", "electrical work",
+    "electrician", "welding", "carpentry", "roofing", "painting services",
+    "masonry", "boiler", "elevator", "generator maintenance", "fire alarm",
+    "fire suppression", "equipment maintenance", "equipment repair",
+    "preventive maintenance", "calibration services", "install and maintain",
+    "installation and maintenance", "logistics", "distribution", "warehouse",
+    "supply chain", "freight", "courier", "fleet", "food service", "cafeteria",
+    "laundry", "security guard", "guard services", "armed guard",
+    "unarmed guard", "tree removal", "fencing", "groundskeeping",
+]
+# GATE 3 — coverage killers: embedded/around-the-clock/guaranteed-response or
+# simultaneous multi-site presence a solo performer cannot commit to.
+COVERAGE_KILLER_KEYWORDS = [
+    "24/7", "24x7", "24 x 7", "around the clock", "on-call", "on call",
+    "emergency response", "guaranteed response", "response time",
+    "embedded", "on-site daily", "daily on-site", "full-time on-site",
+    "weekly on-site", "shift work", "rotating shift", "multiple simultaneous",
+    "simultaneous locations", "staff on site at all times",
+]
+# GATE 0.5 — structural eligibility: assets/relationships the offeror must hold
+# TODAY (not capability). A hit is a hard FAIL (can't be built before the due date).
+STRUCTURAL_FAIL_KEYWORDS = [
+    "facility clearance required", "facility security clearance",
+    "must possess a facility", "requires a facility security clearance",
+    "active secret clearance", "top secret clearance required",
+    "must hold an active security clearance", "ts/sci",
+    "gsa schedule holders", "schedule holders only", "must hold a gsa",
+    "must have an active gsa", "gsa mas required", "idiq holders only",
+    "idiq holder", "bpa holders", "basic ordering agreement holders",
+    "prior phase i", "completed phase i", "phase i award is required",
+    "must be a prior phase", "phase ii only", "successful phase i",
+    "must own", "proprietary product", "existing prototype",
+    "originated at a university", "university-originated",
+    "must have an existing", "commercially available product must",
+]
+# Notice types that are NOT a bid yet → route to the WATCHLIST (prep, don't bid).
+FUTURE_NOTICE_MARKERS = ("presolicitation", "sources sought", "special notice",
+                         "forecast", "intent to")
+
+# Soft signals: score down / flag, never fail on their own.
+BONDING_KEYWORDS = ["bid bond", "performance bond", "payment bond", "bonding"]
+INCUMBENT_SOFT_KEYWORDS = ["incumbent", "recompete", "currently being performed",
+                           "current contractor"]
+
+# NAICS that are catch-all codes — flag PASS items as "verify scope in PWS".
+CATCHALL_NAICS = {"541990", "561499", "541618"}
+
 # Notice types that represent a completed award (a prime now exists to sub under).
 AWARD_NOTICE_MARKERS = ("award",)
 
@@ -606,6 +661,10 @@ def evaluate(opp):
     # Richer decision fields.
     fte = _estimate_fte(_haystack(opp))
     personnel = str(fte) if fte else "Not stated"
+    disposition, kill_gate, kill_reason, soft_flags, needs_scope_check = \
+        screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type)
+    disqualified = disposition == "FAIL"
+    is_future = disposition == "FUTURE"
     location_display, country_code, is_international = _extract_location(opp)
     location_type = "International" if is_international else "CONUS / US"
     staffing = _staffing_type(opp)
@@ -648,6 +707,15 @@ def evaluate(opp):
         "is_subcontracting": is_sub,
         "is_awarded": is_awarded,
         "is_expired": is_expired,
+        "disposition": disposition,
+        "disqualified": disqualified,
+        "is_future": is_future,
+        "kill_gate": kill_gate,
+        "kill_reason": kill_reason,
+        "future_reason": kill_reason if is_future else "",
+        "soft_flags": soft_flags,
+        "soft_flags_display": "; ".join(soft_flags) if soft_flags else "",
+        "needs_scope_check": needs_scope_check,
         "notice_type": notice_type or "N/A",
         "sub_angle": sub_angle,
         "is_solo": is_solo,
@@ -849,6 +917,67 @@ def _extract_value(opp):
         return (f"~{_format_currency(amt)} (from notice text)", amt)
 
     return ("Not stated", None)
+
+
+def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
+    """Keyword-level pass of PRG's deep-screen gates (a first-pass triage — the
+    definitive screen still requires reading the PWS/attachments).
+
+    Returns (disposition, gate, reason, soft_flags, needs_scope_check) where
+    disposition is one of PASS / FAIL / FUTURE. Gates apply in order; the first
+    failure stops and is recorded.
+    """
+    text = _haystack(opp)
+    nt = (notice_type or "").lower()
+
+    # GATE 0.5 — structural eligibility (must hold an asset/vehicle today).
+    st = _keyword_hits(text, STRUCTURAL_FAIL_KEYWORDS)
+    if st:
+        return ("FAIL", "Gate 0.5 (structural)",
+                f"requires an asset/vehicle PRG lacks — '{st[0]}'", [], False)
+
+    # GATE 4 — scope reality (work outside PRG's solo lane).
+    dq = _keyword_hits(text, DISQUALIFIER_KEYWORDS)
+    if dq:
+        return ("FAIL", "Gate 4 (scope)",
+                f"scope outside PRG's solo lane — '{dq[0]}'", [], False)
+
+    # GATE 3 — coverage model (embedded / 24-7 / guaranteed response).
+    cov = _keyword_hits(text, COVERAGE_KILLER_KEYWORDS)
+    if cov:
+        return ("FAIL", "Gate 3 (coverage)",
+                f"requires coverage PRG can't commit solo — '{cov[0]}'",
+                [], False)
+
+    # GATE 1 — self-performance: a sole performer can't field a team.
+    if fte is not None and fte >= 3:
+        return ("FAIL", "Gate 1 (self-perform)",
+                f"~{fte} FTE — needs a team; can't self-perform 50%", [], False)
+
+    # Soft signals — score down / flag, never fail on their own.
+    soft = []
+    if fte == 2:
+        soft.append("~2 FTE — would need a teaming partner")
+    if deadline_days is not None and 0 <= deadline_days < 5:
+        soft.append(f"only {deadline_days}d left — very tight")
+    elif deadline_days is not None and 0 <= deadline_days < 10:
+        soft.append(f"only {deadline_days}d to respond")
+    if _keyword_hits(text, BONDING_KEYWORDS):
+        soft.append("bonding/insurance required")
+    if _keyword_hits(text, INCUMBENT_SOFT_KEYWORDS):
+        soft.append("incumbent present")
+    if setaside_label == "None":
+        soft.append("open competition — no SDVOSB preference")
+    needs_scope_check = naics in CATCHALL_NAICS
+
+    # GATE 0 — disposition: market-research notices aren't biddable yet →
+    # route to the WATCHLIST (prep for the eventual RFP), don't PASS or kill.
+    if any(k in nt for k in FUTURE_NOTICE_MARKERS):
+        return ("FUTURE", "Gate 0 (timing)",
+                "market research / pre-solicitation — prep for the eventual RFP",
+                soft, needs_scope_check)
+
+    return ("PASS", "", "", soft, needs_scope_check)
 
 
 def _estimate_fte(text):
@@ -1153,7 +1282,8 @@ def render_report(results):
     lines.append("")
 
     # Award notices (already won) only belong in the subcontracting view.
-    prime = [r for r in results if not r["is_awarded"] and not r["is_expired"]]
+    prime = [r for r in results if not r["is_awarded"] and not r["is_expired"]
+             and not r["disqualified"] and not r["is_future"]]
     primary = [r for r in prime if r["naics_tier"] == "primary"]
     low_barrier = [r for r in prime if r["naics_tier"] == "low_barrier"]
     subcontract = [r for r in results if r["is_subcontracting"]]
@@ -1423,7 +1553,8 @@ def _split_sections(results):
     Award notices (already-won contracts) are excluded from every
     pursue-as-prime group and appear only under Subcontracting.
     """
-    prime = [r for r in results if not r["is_awarded"] and not r["is_expired"]]
+    prime = [r for r in results if not r["is_awarded"] and not r["is_expired"]
+             and not r["disqualified"] and not r["is_future"]]
     primary = [r for r in prime if r["naics_tier"] == "primary"]
     low_barrier = sorted(
         [r for r in prime
@@ -1470,11 +1601,37 @@ _TOP10_COLS = [
 ]
 
 
+_KILL_COLS = [
+    ("Failed Gate", "kill_gate"),
+    ("Why Killed", "kill_reason"),
+    ("Title", "title"),
+    ("Agency", "agency"),
+    ("NAICS", "naics"),
+    ("Set-Aside", "setaside"),
+    ("Solicitation #", "solicitation"),
+    ("Link", "link"),
+]
+
+_WATCHLIST_COLS = [
+    ("Notice Type", "notice_type"),
+    ("Why (prep, don't bid yet)", "future_reason"),
+    ("Title", "title"),
+    ("Agency", "agency"),
+    ("NAICS", "naics"),
+    ("Set-Aside", "setaside"),
+    ("Fit for PRG", "fit"),
+    ("Respond By", "response_deadline"),
+    ("Solicitation #", "solicitation"),
+    ("Link", "link"),
+]
+
+
 def _top10(results):
     """The single best-bet shortlist: highest-scoring eligible, pursuable
     opportunities (not awarded, not expired), ranked, capped at 10."""
     pool = [r for r in results if r["raw_setaside_eligible"]
-            and not r["is_awarded"] and not r["is_expired"]]
+            and not r["is_awarded"] and not r["is_expired"]
+            and not r["disqualified"] and not r["is_future"]]
     pool.sort(key=lambda r: r["win_score"], reverse=True)
     # Return shallow copies with a rank, so we don't mutate the shared results.
     top = []
@@ -1490,6 +1647,11 @@ def export_spreadsheet(results, path, recompetes=None):
     otherwise fall back to a set of CSV files. Returns the path actually written.
     """
     primary, low_barrier, subs, solo, international = _split_sections(results)
+    killed = sorted([r for r in results if r["disqualified"]
+                     and not r["is_awarded"] and not r["is_expired"]],
+                    key=lambda r: r["kill_gate"])
+    watchlist = sorted([r for r in results if r["is_future"]],
+                       key=lambda r: r["win_score"], reverse=True)
     sheets = [
         ("Top 10 - Do These First", _TOP10_COLS, _top10(results)),
         ("Solo-Friendly (1-Person)", _SOLO_COLS, solo),
@@ -1498,6 +1660,8 @@ def export_spreadsheet(results, path, recompetes=None):
         ("International (Consulting)", _CORE_COLS, international),
         ("Subcontracting", _SUB_COLS, subs),
         ("Recompete Radar", _RECOMPETE_COLS, recompetes or []),
+        ("WATCHLIST (prep, future)", _WATCHLIST_COLS, watchlist),
+        ("KILL LOG (screened out)", _KILL_COLS, killed),
     ]
 
     try:
@@ -1779,9 +1943,14 @@ def export_html_report(results, path, days, recompetes=None):
     # Pursue-as-prime view: eligible AND not already awarded (awarded ones live
     # in the Subcontracting category only).
     eligible = [r for r in results if r["raw_setaside_eligible"]
-                and not r["is_awarded"] and not r["is_expired"]]
+                and not r["is_awarded"] and not r["is_expired"]
+                and not r["disqualified"] and not r["is_future"]]
     ranked = sorted(eligible, key=lambda r: r["win_score"], reverse=True)
     top10 = ranked[:10]
+    killed = [r for r in results if r["disqualified"]
+                     and not r["is_awarded"] and not r["is_expired"]]
+    watchlist = sorted([r for r in results if r["is_future"]],
+                       key=lambda r: r["win_score"], reverse=True)
 
     # --- KPIs ---
     total_value = sum(r["value_num"] for r in eligible if r["value_num"])
@@ -2048,6 +2217,71 @@ def export_html_report(results, path, days, recompetes=None):
     else:
         p.append('<p class="empty">No expiring contracts found (or USASpending '
                  'was unreachable this run). Widen --recompete-months and retry.</p>')
+    p.append('</section>')
+
+    # WATCHLIST — FUTURE items (pre-sols / sources sought that fit): prep, don't bid.
+    p.append('<section><h2>👀 Watchlist — Prep, Don’t Bid Yet</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'Pre-solicitations and Sources Sought that fit PRG — not biddable '
+             'now, but respond to shape the requirement and be ready when the '
+             'RFP drops.</p>')
+    if watchlist:
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>Notice Type</th><th>Title</th><th>Agency</th><th>NAICS</th>'
+                 '<th>Set-Aside</th><th>Fit</th><th>Respond By</th>'
+                 '<th>Solicitation #</th></tr></thead><tbody>')
+        for r in watchlist[:100]:
+            sol = _html_escape(r["solicitation"])
+            if _is_http(r["link"]):
+                sol = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
+                       f'rel="noopener">{sol}</a>')
+            p.append(f"<tr><td>{_html_escape(r['notice_type'])}</td>"
+                     f"<td>{_html_escape(_clean(r['title'], 55))}</td>"
+                     f"<td>{_html_escape(r['agency'])}</td>"
+                     f"<td>{_html_escape(r['naics'])}</td>"
+                     f"<td>{_html_escape(r['setaside'])}</td>"
+                     f"<td>{_html_escape(r['fit'])}</td>"
+                     f"<td>{str(r['response_deadline']).split('T')[0]}</td>"
+                     f"<td>{sol}</td></tr>")
+        p.append('</tbody></table></div>')
+    else:
+        p.append('<p class="empty">No fitting pre-solicitations this run.</p>')
+    p.append('</section>')
+
+    # KILL LOG — auto-screened-out opportunities (deep-screen gates).
+    killed = sorted([r for r in results if r["disqualified"]
+                     and not r["is_awarded"] and not r["is_expired"]],
+                    key=lambda r: r["kill_gate"])
+    p.append('<section><h2>🛑 Kill Log — Auto-Screened Out</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'Opportunities removed from the lists above by the deep-screen '
+             "gates (self-performance, coverage, scope). This is a "
+             '<b>keyword-level first pass</b> — the definitive screen still '
+             'requires reading each notice’s PWS/attachments. Shown so the '
+             'screen can be audited.</p>')
+    if killed:
+        p.append(f'<p style="font-size:13px;margin:0 0 10px"><b>{len(killed)}</b> '
+                 'screened out.</p>')
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>Failed Gate</th><th>Why</th><th>Title</th><th>Agency</th>'
+                 '<th>NAICS</th><th>Solicitation #</th></tr></thead><tbody>')
+        for r in killed[:150]:
+            sol = _html_escape(r["solicitation"])
+            if _is_http(r["link"]):
+                sol = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
+                       f'rel="noopener">{sol}</a>')
+            p.append(f"<tr><td>{_html_escape(r['kill_gate'])}</td>"
+                     f"<td>{_html_escape(r['kill_reason'])}</td>"
+                     f"<td>{_html_escape(_clean(r['title'], 55))}</td>"
+                     f"<td>{_html_escape(r['agency'])}</td>"
+                     f"<td>{_html_escape(r['naics'])}</td><td>{sol}</td></tr>")
+        p.append('</tbody></table></div>')
+        if len(killed) > 150:
+            p.append(f'<p class="muted" style="font-size:12px">…and '
+                     f'{len(killed) - 150} more (full list in the Excel KILL LOG '
+                     'tab).</p>')
+    else:
+        p.append('<p class="empty">Nothing auto-screened-out this run.</p>')
     p.append('</section>')
 
     # Pipeline insights

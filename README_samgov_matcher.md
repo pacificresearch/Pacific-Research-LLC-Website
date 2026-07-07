@@ -76,10 +76,33 @@ for open solicitations it is any dollar figure found in the notice text, or
 The console report also prints an estimated total pipeline value across the
 opportunities PRG can pursue.
 
-The workbook has seven tabs — **Top 10 – Do These First**, **Solo-Friendly
+The workbook has nine tabs — **Top 10 – Do These First**, **Solo-Friendly
 (1-Person)**, **Core Opportunities**, **Low-Barrier (Warm Body)**,
-**International (Consulting)**, **Subcontracting**, and **Recompete Radar** —
-each with filterable, frozen headers.
+**International (Consulting)**, **Subcontracting**, **Recompete Radar**,
+**WATCHLIST (prep, future)**, and **KILL LOG (screened out)** — each with
+filterable, frozen headers.
+
+### Deep-screen gates (auto-triage)
+
+Every opportunity is run through PRG's deep-screen gates (a **keyword-level
+first pass** — the definitive screen still requires reading each notice's
+PWS/attachments) and gets a disposition:
+
+- **PASS** → appears in the pursue lists above.
+- **FAIL** → removed and logged in the **KILL LOG** with the failed gate and
+  reason: Gate 0.5 structural (needs a clearance / GSA schedule / IDIQ / BPA /
+  prior Phase-I award), Gate 4 scope (construction, janitorial, equipment
+  maintenance, logistics, guards, trade labor), Gate 3 coverage (24/7, on-call,
+  guaranteed response, embedded/daily on-site), Gate 1 self-performance (≥3
+  FTE — needs a team).
+- **FUTURE** → pre-solicitations and Sources Sought that fit PRG go to the
+  **WATCHLIST** (prep and shape the requirement; not biddable yet).
+- **Soft signals** (score down, never auto-fail): ~2 FTE, <10 days to respond,
+  bonding/insurance, incumbent present, open competition (no SDVOSB
+  preference), and NAICS catch-all codes flagged "verify scope".
+
+The screen is deliberately strict — an empty PASS list is an acceptable outcome
+(zero false positives beats a padded list).
 
 **Pro features:**
 
