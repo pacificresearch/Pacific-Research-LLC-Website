@@ -39,6 +39,7 @@ import os
 import re
 import sys
 import textwrap
+import time
 from collections import Counter, OrderedDict
 
 try:
@@ -249,6 +250,29 @@ USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 # 2. API QUERY CONSTRUCTION
 # ---------------------------------------------------------------------------
 
+# Run-level flags surfaced to the user at the end (e.g. partial results).
+_RUN_STATE = {"rate_limited": False}
+
+
+def _is_http(url):
+    """True only for http(s) URLs — guards against javascript:/data: in hrefs."""
+    return bool(url) and str(url).lower().startswith(("http://", "https://"))
+
+
+def _http_retry(fn, *args, **kwargs):
+    """Call requests.get/post with up to 3 tries and exponential backoff on
+    transient connection/timeout errors (not on HTTP status errors)."""
+    delay = 1.0
+    for attempt in range(3):
+        try:
+            return fn(*args, **kwargs)
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout):
+            if attempt == 2:
+                raise
+            time.sleep(delay)
+            delay *= 2
+
 def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
                         code_param="ncode"):
     """Query the SAM.gov Opportunities API for a single NAICS or PSC code.
@@ -273,11 +297,12 @@ def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
     collected = []
     try:
         while True:
-            resp = requests.get(API_URL, params=params, timeout=30)
+            resp = _http_retry(requests.get, API_URL, params=params, timeout=30)
             if resp.status_code == 429:
+                _RUN_STATE["rate_limited"] = True
                 sys.stderr.write(
                     "WARNING: Rate limited by SAM.gov (HTTP 429). "
-                    "Try again later or reduce --limit.\n"
+                    "Results are PARTIAL. Try again later or reduce --limit.\n"
                 )
                 break
             resp.raise_for_status()
@@ -307,7 +332,7 @@ def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
     return collected
 
 
-def fetch_recompetes(naics_codes, months_ahead=18, limit=100):
+def fetch_recompetes(naics_codes, months_ahead=18, max_pages=10):
     """Recompete Radar: find existing federal contracts under PRG's NAICS codes
     whose period of performance ends within `months_ahead` months — i.e. the
     upcoming rebids to position for early. Uses the keyless USASpending.gov API.
@@ -317,54 +342,68 @@ def fetch_recompetes(naics_codes, months_ahead=18, limit=100):
     """
     today = dt.date.today()
     horizon = today + dt.timedelta(days=int(months_ahead * 30.4))
-    body = {
+    # Sort by period-of-performance end date ASCENDING and page through, keeping
+    # only contracts whose end date lands in [today, horizon]. Because results
+    # are ascending, we can stop as soon as we pass the horizon. Restricting the
+    # action-date window to the last ~3 years keeps the already-expired prefix
+    # small. (Requesting only well-known field names avoids a 422 that would
+    # zero out the whole feature.)
+    base = {
         "filters": {
-            "award_type_codes": ["A", "B", "C", "D"],   # definitive contracts + IDVs
+            "award_type_codes": ["A", "B", "C", "D"],   # definitive contracts
             "naics_codes": list(naics_codes),
             "time_period": [{
-                "start_date": (today - dt.timedelta(days=365 * 6)).isoformat(),
+                "start_date": (today - dt.timedelta(days=365 * 3)).isoformat(),
                 "end_date": today.isoformat(),
             }],
         },
         "fields": [
             "Award ID", "Recipient Name", "Award Amount",
-            "Period of Performance Current End Date",
-            "Awarding Agency", "Awarding Sub Agency", "NAICS",
+            "Period of Performance Current End Date", "Awarding Agency",
         ],
-        "sort": "Award Amount",
-        "order": "desc",
-        "limit": min(limit, 100),
-        "page": 1,
+        "sort": "Period of Performance Current End Date",
+        "order": "asc",
+        "limit": 100,
     }
     out = []
     try:
-        resp = requests.post(USASPENDING_URL, json=body, timeout=45)
-        resp.raise_for_status()
-        for a in (resp.json().get("results") or []):
-            end_raw = a.get("Period of Performance Current End Date") or ""
-            try:
-                end = dt.date.fromisoformat(str(end_raw)[:10])
-            except ValueError:
-                continue
-            if not (today <= end <= horizon):
-                continue          # keep only contracts expiring in the window
-            months_left = round((end - today).days / 30.4, 1)
-            amt = a.get("Award Amount")
-            try:
-                amt = float(amt) if amt not in (None, "") else None
-            except (TypeError, ValueError):
-                amt = None
-            out.append({
-                "award_id": a.get("Award ID") or "N/A",
-                "recipient": a.get("Recipient Name") or "N/A",
-                "amount": amt,
-                "amount_display": _format_currency(amt) if amt else "Not stated",
-                "end_date": end.isoformat(),
-                "months_left": months_left,
-                "agency": a.get("Awarding Agency") or a.get("Awarding Sub Agency")
-                          or "N/A",
-                "naics": a.get("NAICS") or a.get("naics") or "N/A",
-            })
+        for page in range(1, max_pages + 1):
+            body = dict(base, page=page)
+            resp = _http_retry(requests.post, USASPENDING_URL, json=body, timeout=45)
+            resp.raise_for_status()
+            results = resp.json().get("results") or []
+            if not results:
+                break
+            passed_horizon = False
+            for a in results:
+                end_raw = (a.get("Period of Performance Current End Date")
+                           or a.get("End Date") or "")
+                try:
+                    end = dt.date.fromisoformat(str(end_raw)[:10])
+                except ValueError:
+                    continue
+                if end < today:
+                    continue          # already expired — skip
+                if end > horizon:
+                    passed_horizon = True
+                    break             # ascending: everything after is further out
+                amt = a.get("Award Amount")
+                try:
+                    amt = float(amt) if amt not in (None, "") else None
+                except (TypeError, ValueError):
+                    amt = None
+                out.append({
+                    "award_id": a.get("Award ID") or "N/A",
+                    "recipient": a.get("Recipient Name") or "N/A",
+                    "amount": amt,
+                    "amount_display": _format_currency(amt) if amt else "Not stated",
+                    "end_date": end.isoformat(),
+                    "months_left": round((end - today).days / 30.4, 1),
+                    "agency": a.get("Awarding Agency") or "N/A",
+                    "naics": a.get("NAICS") or "—",
+                })
+            if passed_horizon or len(results) < 100:
+                break
     except requests.exceptions.RequestException as exc:
         sys.stderr.write(f"WARNING: Recompete Radar (USASpending) unavailable: {exc}\n")
     except ValueError as exc:
@@ -508,8 +547,8 @@ def evaluate(opp):
     is_awarded = ("award" in (notice_type or "").lower()) or bool(
         (isinstance(award, dict) and (award.get("awardee") or award.get("amount")))
     )
-    _dd = _deadline_days(opp)
-    is_expired = _dd is not None and _dd < 0
+    deadline_days = _deadline_days(opp)   # computed once, reused below
+    is_expired = deadline_days is not None and deadline_days < 0
 
     # Prime eligibility for the CORE table = allowed to bid AND technically relevant.
     eligible = setaside_eligible and tech_match
@@ -571,7 +610,7 @@ def evaluate(opp):
     win_score, win_band, win_emoji, win_note = _win_assessment(
         setaside_label, setaside_eligible, is_sdvosb, tier,
         tech_match, matched_kw, is_solo, fte, value_num, incumbent,
-        _deadline_days(opp),
+        deadline_days,
     )
 
     return {
@@ -621,7 +660,7 @@ def evaluate(opp):
         "poc": _extract_poc(opp),
         "psc": (opp.get("classificationCode") or "").strip(),
         "posted": (opp.get("postedDate") or "").split("T")[0],
-        "deadline_days": _deadline_days(opp),
+        "deadline_days": deadline_days,
         "naics_desc": TARGET_NAICS.get(naics) or LOW_BARRIER_NAICS.get(naics) or "",
         "score": score,
         "lb_score": lb_score,
@@ -1428,9 +1467,12 @@ def _top10(results):
     pool = [r for r in results if r["raw_setaside_eligible"]
             and not r["is_awarded"] and not r["is_expired"]]
     pool.sort(key=lambda r: r["win_score"], reverse=True)
-    top = pool[:10]
-    for i, r in enumerate(top, 1):
-        r["rank"] = i
+    # Return shallow copies with a rank, so we don't mutate the shared results.
+    top = []
+    for i, r in enumerate(pool[:10], 1):
+        row = dict(r)
+        row["rank"] = i
+        top.append(row)
     return top
 
 
@@ -1493,7 +1535,7 @@ def export_spreadsheet(results, path, recompetes=None):
                     ws.cell(row=ws.max_row, column=ci).fill = fill
             # Make the SAM.gov notice clickable from the Link and Solicitation cells.
             url = r.get("link")
-            if url:
+            if _is_http(url):
                 if link_col:
                     c = ws.cell(row=ws.max_row, column=link_col)
                     c.value = "Open in SAM.gov"
@@ -1814,7 +1856,7 @@ def export_html_report(results, path, days, recompetes=None):
             chip = (f'<span class="chip" style="background:'
                     f'{_RAG_HEX[r["win_band"]]}">{r["win_band"]}</span>')
             title = _html_escape(_clean(r["title"], 60))
-            if r["link"]:
+            if _is_http(r["link"]):
                 title = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
                          f'rel="noopener">{title}</a>')
             dl = str(r["response_deadline"]).split("T")[0]
@@ -1869,7 +1911,7 @@ def export_html_report(results, path, days, recompetes=None):
             deadline = f'{deadline} · {dd}d 🟠'
         naics_psc = r["naics"] + (f" / {r['psc']}" if r["psc"] else "")
         sol = _html_escape(r["solicitation"])
-        if r["link"]:
+        if _is_http(r["link"]):
             sol = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
                    f'rel="noopener">{sol}</a>')
         searchtext = _html_escape(
@@ -1930,7 +1972,7 @@ def export_html_report(results, path, days, recompetes=None):
             risks.append("incumbent present — differentiate to unseat")
         p.append('<p><b>Risk / Action:</b> ' + "; ".join(_html_escape(x) for x in risks)
                  + '.</p>')
-        if r["link"]:
+        if _is_http(r["link"]):
             p.append(f'<p><a href="{_html_escape(r["link"])}" target="_blank" '
                      f'rel="noopener">View full notice on SAM.gov →</a></p>')
         p.append('</div>')
@@ -1954,7 +1996,7 @@ def export_html_report(results, path, days, recompetes=None):
             chip = (f'<span class="chip" style="background:'
                     f'{_RAG_HEX[r["win_band"]]}">{r["win_band"]}</span>')
             sol = _html_escape(r["solicitation"])
-            if r["link"]:
+            if _is_http(r["link"]):
                 sol = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
                        f'rel="noopener">{sol}</a>')
             p.append("<tr>"
@@ -2307,6 +2349,13 @@ def main(argv=None):
                                             recompetes))
         except Exception as exc:
             sys.stderr.write(f"WARNING: could not save HTML report: {exc}\n")
+
+    if _RUN_STATE["rate_limited"]:
+        sys.stderr.write(
+            "\n*** NOTE: SAM.gov rate-limited this run — the results are "
+            "PARTIAL. Re-run later (or with a lower --limit) for full coverage. "
+            "A daily quota applies to each API key. ***\n"
+        )
 
     if saved:
         sys.stderr.write(
