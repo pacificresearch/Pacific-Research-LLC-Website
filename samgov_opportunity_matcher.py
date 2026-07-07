@@ -1318,12 +1318,28 @@ def export_spreadsheet(results, path):
         rows = sorted(rows, key=lambda r: r.get("win_score", 0), reverse=True)
         rag_cols = [i for i, h in enumerate(headers, start=1)
                     if h in ("Win Score", "Rating")]
+        link_col = next((i for i, h in enumerate(headers, 1) if h == "Link"), None)
+        sol_col = next((i for i, h in enumerate(headers, 1)
+                        if h == "Solicitation #"), None)
+        link_font = Font(color="0563C1", underline="single")
         for r in rows:
             ws.append([_cell(r, spec) for _, spec in cols])
             fill = band_fill.get(r.get("win_band"))
             if fill:
                 for ci in rag_cols:
                     ws.cell(row=ws.max_row, column=ci).fill = fill
+            # Make the SAM.gov notice clickable from the Link and Solicitation cells.
+            url = r.get("link")
+            if url:
+                if link_col:
+                    c = ws.cell(row=ws.max_row, column=link_col)
+                    c.value = "Open in SAM.gov"
+                    c.hyperlink = url
+                    c.font = link_font
+                if sol_col:
+                    c = ws.cell(row=ws.max_row, column=sol_col)
+                    c.hyperlink = url
+                    c.font = link_font
         # Column widths + wrapping.
         widths = {
             "Title": 45, "Agency": 26, "Reason / Gap Analysis": 60,
@@ -1610,9 +1626,13 @@ def export_html_report(results, path, days):
         elif dd is not None and 0 <= dd <= 14:
             deadline = f'{deadline} · {dd}d 🟠'
         naics_psc = r["naics"] + (f" / {r['psc']}" if r["psc"] else "")
+        sol = _html_escape(r["solicitation"])
+        if r["link"]:
+            sol = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
+                   f'rel="noopener">{sol}</a>')
         p.append("<tr>"
                  f"<td>{chip}</td><td class='num'>{r['win_score']}</td>"
-                 f"<td>{_html_escape(r['solicitation'])}</td>"
+                 f"<td>{sol}</td>"
                  f"<td>{_html_escape(r['agency'])}</td>"
                  f"<td class='num'>{_html_escape(r['value_display'])}</td>"
                  f"<td>{_html_escape(r['setaside'])}</td>"
@@ -1661,6 +1681,9 @@ def export_html_report(results, path, days):
             risks.append("incumbent present — differentiate to unseat")
         p.append('<p><b>Risk / Action:</b> ' + "; ".join(_html_escape(x) for x in risks)
                  + '.</p>')
+        if r["link"]:
+            p.append(f'<p><a href="{_html_escape(r["link"])}" target="_blank" '
+                     f'rel="noopener">View full notice on SAM.gov →</a></p>')
         p.append('</div>')
     if not ranked:
         p.append('<p class="empty">Nothing to deep-dive this run.</p>')
@@ -1754,6 +1777,8 @@ padding:14px 18px;margin-bottom:12px}
 .dive-h{margin-bottom:6px;font-size:15px}
 .dive p{margin:4px 0;font-size:13px}
 .muted{color:var(--muted)}
+a{color:#1E5F9E;font-weight:600;text-decoration:none}
+a:hover{text-decoration:underline}
 .urgent{color:#C0392B}
 .findings{background:#FBF6EC;border:1px solid var(--accent);border-radius:12px;
 padding:8px 20px 16px;margin:8px 0 26px}
