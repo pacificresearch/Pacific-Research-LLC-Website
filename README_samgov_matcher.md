@@ -104,6 +104,29 @@ PWS/attachments) and gets a disposition:
 The screen is deliberately strict — an empty PASS list is an acceptable outcome
 (zero false positives beats a padded list).
 
+### Go/No-Go verdict (first-contract lens)
+
+PRG is a new SDVOSB with zero corporate past performance, so each surviving
+opportunity also gets a **verdict**:
+
+- **BID** — winnable as a first contract; the founder's individual credentials
+  are the technical capability.
+- **RESEARCH** — pre-sol/Sources Sought, or a corporate past-performance wall
+  against a likely incumbent, or an open competition with a weak edge.
+- **NO-BID** — failed a gate (logged in the KILL LOG).
+
+Additional first-contract kill rules: **Gate 2** trade/professional credentials
+the founder doesn't hold (ASSE/medical-gas, licensed electrician/plumber/HVAC,
+PE stamp, medical licensure, CDL); **Gate 1 workforce** CBA / Service Contract
+Act wage determinations / phase-in / right-of-first-refusal (incumbent-workforce
+takeover); **Gate 5** bonding. Score-up signals (LPTA/price-dominant, remote,
+neutral past-performance rating) lift winnable small buys. Each row also shows
+an **estimated level of effort** to propose.
+
+Run `python samgov_opportunity_matcher.py --selftest` to verify the NO-BID
+rules fire against two known cases (VA 36C26026Q0674 medical-gas credential
+wall; FDA 75F40126R00051 NCTR O&M CBA/workforce wall).
+
 **Pro features:**
 
 - **Top 10 – Do These First** — the single highest-scoring, still-open,

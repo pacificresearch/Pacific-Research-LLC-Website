@@ -90,6 +90,8 @@ CORE_CAPABILITIES = [
 TARGET_NAICS = OrderedDict(
     [
         ("541715", "R&D in the Physical, Engineering, and Life Sciences"),
+        ("541714", "R&D in Biotechnology (except Nanobiotechnology)"),
+        ("541690", "Other Scientific & Technical Consulting Services"),
         ("541611", "Administrative & General Management Consulting"),
         ("541990", "All Other Professional, Scientific & Technical Services"),
         ("811210", "Electronic & Precision Equipment Repair & Maintenance"),
@@ -284,6 +286,41 @@ STRUCTURAL_FAIL_KEYWORDS = [
 # Notice types that are NOT a bid yet → route to the WATCHLIST (prep, don't bid).
 FUTURE_NOTICE_MARKERS = ("presolicitation", "sources sought", "special notice",
                          "forecast", "intent to")
+
+# GATE 2 — professional/trade credentials the solo founder does NOT hold.
+CREDENTIAL_BLOCKLIST = [
+    "asse", "medical gas", "licensed electrician", "master electrician",
+    "journeyman", "licensed plumber", "hvac certification", "epa 608",
+    "professional engineer", "p.e. stamp", "pe stamp", "registered architect",
+    "commercial driver", "cdl", "state medical license", "rn license",
+    "registered nurse license", "physician license", "pharmacist license",
+    "boiler operator", "certified industrial hygienist", "asbestos",
+    "lead abatement", "stationary engineer", "nfpa 99",
+]
+# GATE 1 — workforce / CBA signals: incumbent-workforce takeover PRG can't staff.
+WORKFORCE_KILL_KEYWORDS = [
+    "collective bargaining", "wage determination", "service contract act",
+    "phase-in", "phase in period", "phase-out", "phaseout",
+    "right of first refusal", "incumbent workforce", "successor contractor",
+    "e.o. 14055", "eo 14055", "seniority list",
+]
+# GATE 5 — bonding / capital requirements beyond a laptop.
+BONDING_KILL_KEYWORDS = [
+    "bid bond", "performance bond", "payment bond", "bid guarantee",
+    "irrevocable letter of credit", "bonding requirement",
+]
+# Score-UP signals — first-contract-winnable (LPTA, remote, neutral PP rating).
+SCORE_UP_KEYWORDS = [
+    "lowest price technically acceptable", "lpta", "price will be the primary",
+    "remote", "telework", "hybrid", "virtual", "neither favorably nor unfavorably",
+    "neutral rating", "no minimum past performance",
+]
+# Past-performance wall — corporate-level PP requirements a first-timer can't meet.
+PAST_PERF_WALL_KEYWORDS = [
+    "cpars", "past performance questionnaire", "similar in size, scope",
+    "similar size and scope", "recent and relevant past performance",
+    "corporate experience", "minimum of three references",
+]
 
 # Soft signals: score down / flag, never fail on their own.
 BONDING_KEYWORDS = ["bid bond", "performance bond", "payment bond", "bonding"]
@@ -661,8 +698,9 @@ def evaluate(opp):
     # Richer decision fields.
     fte = _estimate_fte(_haystack(opp))
     personnel = str(fte) if fte else "Not stated"
-    disposition, kill_gate, kill_reason, soft_flags, needs_scope_check = \
-        screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type)
+    (disposition, kill_gate, kill_reason, soft_flags, needs_scope_check,
+     score_up_bonus, pp_wall) = screen_gates(
+        opp, fte, deadline_days, naics, setaside_label, notice_type)
     disqualified = disposition == "FAIL"
     is_future = disposition == "FUTURE"
     location_display, country_code, is_international = _extract_location(opp)
@@ -680,6 +718,24 @@ def evaluate(opp):
         tech_match, matched_kw, is_solo, fte, value_num, incumbent,
         deadline_days,
     )
+    # Apply first-contract-winnable score-up signals (LPTA, remote, neutral PP).
+    if not disqualified and score_up_bonus:
+        win_score = min(100, win_score + score_up_bonus)
+        if win_score >= 68 and win_band != "Green":
+            win_band, win_emoji, win_note = "Green", "🟢", "Best bet — pursue"
+
+    # Go/No-Go verdict for a zero-past-performance first-time offeror.
+    if disqualified:
+        verdict = "NO-BID"
+    elif is_future:
+        verdict = "RESEARCH"
+    elif pp_wall and incumbent:
+        verdict = "RESEARCH"          # PP wall + incumbent = long odds first time
+    elif setaside_label == "None" and win_score < 55:
+        verdict = "RESEARCH"          # open competition, weak edge
+    else:
+        verdict = "BID"
+    loe = _estimate_loe(opp, value_num, notice_type)
 
     return {
         "solicitation": (
@@ -708,6 +764,9 @@ def evaluate(opp):
         "is_awarded": is_awarded,
         "is_expired": is_expired,
         "disposition": disposition,
+        "verdict": verdict,
+        "loe": loe,
+        "pp_wall": pp_wall,
         "disqualified": disqualified,
         "is_future": is_future,
         "kill_gate": kill_gate,
@@ -930,29 +989,47 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
     text = _haystack(opp)
     nt = (notice_type or "").lower()
 
+    def _fail(gate, reason):
+        return ("FAIL", gate, reason, [], False, 0, False)
+
     # GATE 0.5 — structural eligibility (must hold an asset/vehicle today).
     st = _keyword_hits(text, STRUCTURAL_FAIL_KEYWORDS)
     if st:
-        return ("FAIL", "Gate 0.5 (structural)",
-                f"requires an asset/vehicle PRG lacks — '{st[0]}'", [], False)
+        return _fail("Gate 0.5 (structural)",
+                     f"requires an asset/vehicle PRG lacks — '{st[0]}'")
+
+    # GATE 2 — professional/trade credential the founder does not hold.
+    cred = _keyword_hits(text, CREDENTIAL_BLOCKLIST)
+    if cred:
+        return _fail("Gate 2 (credential)",
+                     f"requires a credential PRG lacks — '{cred[0]}'")
+
+    # GATE 1 — workforce / CBA takeover a solo shop can't staff.
+    wf = _keyword_hits(text, WORKFORCE_KILL_KEYWORDS)
+    if wf:
+        return _fail("Gate 1 (workforce/CBA)",
+                     f"incumbent-workforce / CBA signal — '{wf[0]}'")
+
+    # GATE 5 — bonding / capital beyond a laptop.
+    bond = _keyword_hits(text, BONDING_KILL_KEYWORDS)
+    if bond:
+        return _fail("Gate 5 (bonding)", f"bonding required — '{bond[0]}'")
 
     # GATE 4 — scope reality (work outside PRG's solo lane).
     dq = _keyword_hits(text, DISQUALIFIER_KEYWORDS)
     if dq:
-        return ("FAIL", "Gate 4 (scope)",
-                f"scope outside PRG's solo lane — '{dq[0]}'", [], False)
+        return _fail("Gate 4 (scope)", f"scope outside PRG's solo lane — '{dq[0]}'")
 
     # GATE 3 — coverage model (embedded / 24-7 / guaranteed response).
     cov = _keyword_hits(text, COVERAGE_KILLER_KEYWORDS)
     if cov:
-        return ("FAIL", "Gate 3 (coverage)",
-                f"requires coverage PRG can't commit solo — '{cov[0]}'",
-                [], False)
+        return _fail("Gate 3 (coverage)",
+                     f"requires coverage PRG can't commit solo — '{cov[0]}'")
 
     # GATE 1 — self-performance: a sole performer can't field a team.
     if fte is not None and fte >= 3:
-        return ("FAIL", "Gate 1 (self-perform)",
-                f"~{fte} FTE — needs a team; can't self-perform 50%", [], False)
+        return _fail("Gate 1 (self-perform)",
+                     f"~{fte} FTE — needs a team; can't self-perform 50%")
 
     # Soft signals — score down / flag, never fail on their own.
     soft = []
@@ -962,12 +1039,24 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
         soft.append(f"only {deadline_days}d left — very tight")
     elif deadline_days is not None and 0 <= deadline_days < 10:
         soft.append(f"only {deadline_days}d to respond")
-    if _keyword_hits(text, BONDING_KEYWORDS):
-        soft.append("bonding/insurance required")
     if _keyword_hits(text, INCUMBENT_SOFT_KEYWORDS):
         soft.append("incumbent present")
     if setaside_label == "None":
         soft.append("open competition — no SDVOSB preference")
+
+    # Past-performance wall — a first-timer with zero CPARS record can't clear
+    # a corporate-PP evaluation, especially against an incumbent → RESEARCH.
+    pp_hits = _keyword_hits(text, PAST_PERF_WALL_KEYWORDS)
+    pp_wall = bool(pp_hits)
+    if pp_wall:
+        soft.append(f"past-performance wall ({pp_hits[0]}) — first-timer risk")
+
+    # Score-up: first-contract-winnable signals (LPTA, remote, neutral PP).
+    up = _keyword_hits(text, SCORE_UP_KEYWORDS)
+    score_up_bonus = min(len(up) * 4, 12)
+    if up:
+        soft.append(f"first-win signals ({', '.join(up[:2])})")
+
     needs_scope_check = naics in CATCHALL_NAICS
 
     # GATE 0 — disposition: market-research notices aren't biddable yet →
@@ -975,9 +1064,9 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
     if any(k in nt for k in FUTURE_NOTICE_MARKERS):
         return ("FUTURE", "Gate 0 (timing)",
                 "market research / pre-solicitation — prep for the eventual RFP",
-                soft, needs_scope_check)
+                soft, needs_scope_check, score_up_bonus, pp_wall)
 
-    return ("PASS", "", "", soft, needs_scope_check)
+    return ("PASS", "", "", soft, needs_scope_check, score_up_bonus, pp_wall)
 
 
 def _estimate_fte(text):
@@ -1142,6 +1231,23 @@ def _deadline_days(opp):
     except ValueError:
         return None
     return (d - dt.date.today()).days
+
+
+def _estimate_loe(opp, value_num, notice_type):
+    """Rough level-of-effort to propose, for triage/pricing."""
+    text = _haystack(opp)
+    nt = (notice_type or "").lower()
+    if any(k in nt for k in ("sources sought", "presolicitation", "special notice")):
+        return "Low — capability statement"
+    heavy = any(k in text for k in (
+        "technical volume", "past performance volume", "oral presentation",
+        "page limit", "volume i", "factor 1", "written narrative"))
+    if heavy or (value_num and value_num > 1_000_000):
+        return "High — multi-volume proposal"
+    if ("request for quot" in text or "rfq" in nt or "quotation" in text
+            or (value_num and value_num <= SIMPLIFIED_ACQ_THRESHOLD)):
+        return "Low–Medium — quote / short response"
+    return "Medium — standard proposal"
 
 
 def _fit_label(tier, tech_match, matched_kw):
@@ -1503,9 +1609,10 @@ def _render_recommendation(lines, i, r):
 # Column layouts for each worksheet: (header, result-key-or-callable).
 # Full decision-dashboard columns, ordered for go/no-go review.
 _RICH_COLS = [
+    ("Go / No-Go", "verdict"),
     ("Win Score", "win_score"),
     ("Rating", lambda r: f"{r['win_emoji']} {r['win_band']}"),
-    ("Verdict", "win_note"),
+    ("Est. LOE", "loe"),
     ("Title", "title"),
     ("Agency", "agency"),
     ("Fit for PRG", "fit"),
@@ -1588,13 +1695,15 @@ _RECOMPETE_COLS = [
 
 _TOP10_COLS = [
     ("Rank", "rank"),
+    ("Go / No-Go", "verdict"),
     ("Win Score", "win_score"),
-    ("Rating", lambda r: f"{r['win_emoji']} {r['win_band']}"),
+    ("Est. LOE", "loe"),
     ("Title", "title"),
     ("Agency", "agency"),
     ("Set-Aside", "setaside"),
     ("Est. Value", "value_display"),
     ("Solo?", lambda r: "Yes" if r["is_solo"] else "No"),
+    ("Flags", "soft_flags_display"),
     ("Respond By", "response_deadline"),
     ("Solicitation #", "solicitation"),
     ("Link", "link"),
@@ -1724,6 +1833,7 @@ def export_spreadsheet(results, path, recompetes=None):
             "Why It's Winnable": 50, "Subcontracting Angle": 50, "Link": 32,
             "Est. Value (Revenue)": 20, "Why One-Person Doable": 55,
             "Win Score": 10, "Rating": 12, "Verdict": 26, "Fit for PRG": 14,
+            "Go / No-Go": 12, "Est. LOE": 28, "Flags": 44,
             "Set-Aside": 14, "Eligible as LLC?": 24, "Personnel (FTE)": 13,
             "Hire New or Take Over?": 34, "Solo-Doable?": 12, "Timeframe": 30,
             "Location": 26, "Intl / CONUS": 13, "Solicitation #": 20,
@@ -2453,6 +2563,71 @@ _REPORT_JS = r"""
 
 
 # ---------------------------------------------------------------------------
+# SELF-TESTS — verify the kill rules fire on two known NO-BID solicitations.
+# (Representative payloads: the SAM.gov description/attachments aren't fetched
+# here, so these mirror the disqualifying language each notice is known for.)
+# ---------------------------------------------------------------------------
+
+_SELFTEST_CASES = [
+    {
+        "label": "VA 36C26026Q0674 — medical gas (ASSE credential wall + LOS)",
+        "opp": {
+            "solicitationNumber": "36C26026Q0674",
+            "noticeId": "st1",
+            "title": "Medical Gas System Inspection, Testing and Certification",
+            "description": ("Contractor shall provide medical gas system testing "
+                            "and certification. Personnel must hold ASSE 6030 and "
+                            "ASSE 6040 medical gas certification per NFPA 99."),
+            "naicsCode": "811210",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Veterans Affairs",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+    },
+    {
+        "label": "FDA 75F40126R00051 — NCTR O&M (CBA + workforce + PP wall)",
+        "opp": {
+            "solicitationNumber": "75F40126R00051",
+            "noticeId": "st2",
+            "title": "NCTR Operations and Maintenance Services",
+            "description": ("Operations and maintenance of facilities. A collective "
+                            "bargaining agreement applies and Service Contract Act "
+                            "wage determinations are incorporated. Offerors must "
+                            "provide a phase-in plan and demonstrate recent and "
+                            "relevant past performance of similar size and scope; "
+                            "CPARS will be evaluated."),
+            "naicsCode": "561210",
+            "typeOfSetAside": "SBA",
+            "typeOfSetAsideDescription": "Total Small Business",
+            "fullParentPathName": "Department of Health and Human Services",
+            "type": "Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+    },
+]
+
+
+def run_selftests():
+    """Evaluate the known NO-BID cases and assert the rules fire. Returns 0 on
+    all-pass, 1 otherwise; prints a short report."""
+    ok = True
+    print("PRG screen self-tests (known NO-BID cases):\n")
+    for case in _SELFTEST_CASES:
+        r = evaluate(case["opp"])
+        passed = (r["verdict"] == case["expect_verdict"])
+        ok = ok and passed
+        print(f"  [{'PASS' if passed else 'FAIL'}] {case['label']}")
+        print(f"         verdict={r['verdict']} (expected {case['expect_verdict']}), "
+              f"gate={r['kill_gate'] or '-'}, reason={r['kill_reason'] or '-'}")
+    print("\nResult:", "ALL PASS ✅" if ok else "SOME FAILED ❌")
+    return 0 if ok else 1
+
+
+# ---------------------------------------------------------------------------
 # MAIN
 # ---------------------------------------------------------------------------
 
@@ -2498,11 +2673,17 @@ def parse_args(argv):
     parser.add_argument("--recompete-months", type=int, default=18, metavar="N",
                         help="Recompete horizon: contracts expiring within N "
                              "months (default: 18).")
+    parser.add_argument("--selftest", action="store_true",
+                        help="Run the built-in NO-BID rule self-tests and exit.")
     return parser.parse_args(argv)
 
 
 def main(argv=None):
     args = parse_args(argv if argv is not None else sys.argv[1:])
+
+    if args.selftest:
+        return run_selftests()
+
     api_key = args.api_key or API_KEY
 
     if not api_key or api_key.startswith("SAM-") is False:
