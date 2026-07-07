@@ -1267,7 +1267,7 @@ def _cell(row, spec):
 
 
 def _split_sections(results):
-    """Return the (core, low_barrier, subcontracting, solo) row groups."""
+    """Return the (core, low_barrier, subcontracting, solo, international) groups."""
     primary = [r for r in results if r["naics_tier"] == "primary"]
     low_barrier = sorted(
         [r for r in results
@@ -1282,18 +1282,23 @@ def _split_sections(results):
         [r for r in results if r["is_solo"]],
         key=lambda r: r["solo_score"], reverse=True,
     )
-    return primary, low_barrier, subs, solo
+    international = sorted(
+        [r for r in results if r["is_international"]],
+        key=lambda r: r["win_score"], reverse=True,
+    )
+    return primary, low_barrier, subs, solo, international
 
 
 def export_spreadsheet(results, path):
     """Write results to an Excel workbook (.xlsx) if openpyxl is available,
     otherwise fall back to a set of CSV files. Returns the path actually written.
     """
-    primary, low_barrier, subs, solo = _split_sections(results)
+    primary, low_barrier, subs, solo, international = _split_sections(results)
     sheets = [
         ("Solo-Friendly (1-Person)", _SOLO_COLS, solo),
         ("Core Opportunities", _CORE_COLS, primary),
         ("Low-Barrier (Warm Body)", _LOWBAR_COLS, low_barrier),
+        ("International (Consulting)", _CORE_COLS, international),
         ("Subcontracting", _SUB_COLS, subs),
     ]
 
@@ -1577,13 +1582,16 @@ def export_html_report(results, path, days):
     chart_rag = [(b, rag_counts.get(b, 0), _RAG_HEX[b])
                  for b in ("Green", "Yellow", "Red")]
 
+    n_intl = sum(1 for r in eligible if r["is_international"])
+    n_green = sum(1 for r in eligible if r["win_band"] == "Green")
     kpis = [
         ("Total Pipeline Value", _format_currency(total_value) if total_value else "N/A",
          "sum of published values"),
         ("Eligible Opportunities", str(n_active), "PRG can bid"),
+        ("Best Bets (Green)", str(n_green), "pursue first"),
         ("Solo-Friendly", str(n_solo), "one-person doable"),
         ("SDVOSB Set-Asides", str(n_sdvosb), "your direct lane"),
-        ("Top Agency", _clean(top_agency, 22), f"{top_agency_n} opportunities"),
+        ("International", str(n_intl), "overseas consulting"),
     ]
 
     # --- Assemble HTML ---
@@ -1699,6 +1707,39 @@ def export_html_report(results, path, days):
         p.append('<p class="empty">Nothing to deep-dive this run.</p>')
     p.append('</section>')
 
+    # International opportunities — its own category (overseas consulting).
+    intl = sorted([r for r in eligible if r["is_international"]],
+                  key=lambda r: r["win_score"], reverse=True)
+    p.append('<section><h2>🌍 International Opportunities (Overseas Consulting)</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'Eligible opportunities with an overseas place of performance — '
+             'kept as a separate category from domestic (CONUS) work.</p>')
+    if intl:
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>Rating</th><th>Win</th><th>Solicitation #</th><th>Agency</th>'
+                 '<th>Location</th><th>Est. Value</th><th>Set-Aside</th>'
+                 '<th>Solo</th><th>Respond By</th></tr></thead><tbody>')
+        for r in intl:
+            chip = (f'<span class="chip" style="background:'
+                    f'{_RAG_HEX[r["win_band"]]}">{r["win_band"]}</span>')
+            sol = _html_escape(r["solicitation"])
+            if r["link"]:
+                sol = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
+                       f'rel="noopener">{sol}</a>')
+            p.append("<tr>"
+                     f"<td>{chip}</td><td class='num'>{r['win_score']}</td>"
+                     f"<td>{sol}</td><td>{_html_escape(r['agency'])}</td>"
+                     f"<td>{_html_escape(r['location'])}</td>"
+                     f"<td class='num'>{_html_escape(r['value_display'])}</td>"
+                     f"<td>{_html_escape(r['setaside'])}</td>"
+                     f"<td>{'Yes' if r['is_solo'] else '—'}</td>"
+                     f"<td>{str(r['response_deadline']).split('T')[0]}</td></tr>")
+        p.append('</tbody></table></div>')
+    else:
+        p.append('<p class="empty">No eligible international opportunities in '
+                 'this window — most notices are domestic (CONUS).</p>')
+    p.append('</section>')
+
     # Pipeline insights
     p.append('<section><h2>Growth &amp; Pipeline Insights</h2><div class="card">')
     if agency_counts:
@@ -1759,8 +1800,9 @@ margin:0 0 8px;letter-spacing:-.01em}
 h2{font-family:Georgia,serif;font-size:21px;margin:34px 0 12px;
 border-bottom:1px solid var(--line);padding-bottom:6px}
 h3{font-size:14px;margin:0 0 10px;color:var(--ink)}
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:26px}
-@media(max-width:820px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:26px}
+@media(max-width:820px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:520px){.kpis{grid-template-columns:repeat(2,1fr)}}
 .kpi{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--primary);
 border-radius:10px;padding:14px 16px}
 .kpi-v{font-family:Georgia,serif;font-size:24px;font-weight:700;color:var(--primary);

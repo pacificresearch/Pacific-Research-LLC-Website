@@ -76,9 +76,12 @@ for open solicitations it is any dollar figure found in the notice text, or
 The console report also prints an estimated total pipeline value across the
 opportunities PRG can pursue.
 
-The workbook has four tabs — **Solo-Friendly (1-Person)**, **Core
-Opportunities**, **Low-Barrier (Warm Body)**, and **Subcontracting** — each
-with filterable, frozen headers. The **Solo-Friendly** tab flags small-scale
+The workbook has five tabs — **Solo-Friendly (1-Person)**, **Core
+Opportunities**, **Low-Barrier (Warm Body)**, **International (Consulting)**,
+and **Subcontracting** — each with filterable, frozen headers. The
+**International** tab is a dedicated category for opportunities with an overseas
+place of performance (separate from domestic/CONUS work), and the executive
+report has a matching 🌍 International section and KPI. The **Solo-Friendly** tab flags small-scale
 knowledge work (research, analysis, writing, data, reviews) that one person
 could realistically deliver, scored down for crew/physical/large-team signals
 and large dollar values.
