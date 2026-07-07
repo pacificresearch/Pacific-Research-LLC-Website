@@ -411,6 +411,12 @@ def evaluate(opp):
     is_sub, notice_type, sub_angle = classify_subcontracting(
         opp, setaside_label, tier, tech_match
     )
+    # Award notices are already-won contracts — biddable only as a subcontractor,
+    # never as prime. Detect them so they stay OUT of the pursue-as-prime lists.
+    award = opp.get("award") or {}
+    is_awarded = ("award" in (notice_type or "").lower()) or bool(
+        (isinstance(award, dict) and (award.get("awardee") or award.get("amount")))
+    )
 
     # Prime eligibility for the CORE table = allowed to bid AND technically relevant.
     eligible = setaside_eligible and tech_match
@@ -499,6 +505,7 @@ def evaluate(opp):
         "tech_match": tech_match,
         "lb_match": lb_match,
         "is_subcontracting": is_sub,
+        "is_awarded": is_awarded,
         "notice_type": notice_type or "N/A",
         "sub_angle": sub_angle,
         "is_solo": is_solo,
@@ -1003,10 +1010,12 @@ def render_report(results):
     )
     lines.append("")
 
-    primary = [r for r in results if r["naics_tier"] == "primary"]
-    low_barrier = [r for r in results if r["naics_tier"] == "low_barrier"]
+    # Award notices (already won) only belong in the subcontracting view.
+    prime = [r for r in results if not r["is_awarded"]]
+    primary = [r for r in prime if r["naics_tier"] == "primary"]
+    low_barrier = [r for r in prime if r["naics_tier"] == "low_barrier"]
     subcontract = [r for r in results if r["is_subcontracting"]]
-    solo = sorted([r for r in results if r["is_solo"]],
+    solo = sorted([r for r in prime if r["is_solo"]],
                   key=lambda r: r["solo_score"], reverse=True)
 
     # --- Section 1: complete list (core-target NAICS) --------------------
@@ -1267,10 +1276,15 @@ def _cell(row, spec):
 
 
 def _split_sections(results):
-    """Return the (core, low_barrier, subcontracting, solo, international) groups."""
-    primary = [r for r in results if r["naics_tier"] == "primary"]
+    """Return the (core, low_barrier, subcontracting, solo, international) groups.
+
+    Award notices (already-won contracts) are excluded from every
+    pursue-as-prime group and appear only under Subcontracting.
+    """
+    prime = [r for r in results if not r["is_awarded"]]
+    primary = [r for r in prime if r["naics_tier"] == "primary"]
     low_barrier = sorted(
-        [r for r in results
+        [r for r in prime
          if r["naics_tier"] == "low_barrier" and r["low_barrier_eligible"]],
         key=lambda r: r["lb_score"], reverse=True,
     )
@@ -1279,11 +1293,11 @@ def _split_sections(results):
         key=lambda r: r["score"], reverse=True,
     )
     solo = sorted(
-        [r for r in results if r["is_solo"]],
+        [r for r in prime if r["is_solo"]],
         key=lambda r: r["solo_score"], reverse=True,
     )
     international = sorted(
-        [r for r in results if r["is_international"]],
+        [r for r in prime if r["is_international"]],
         key=lambda r: r["win_score"], reverse=True,
     )
     return primary, low_barrier, subs, solo, international
@@ -1577,7 +1591,10 @@ def _key_findings_html(ranked, eligible):
 
 def export_html_report(results, path, days):
     """Write a self-contained executive HTML report of the opportunity pipeline."""
-    eligible = [r for r in results if r["raw_setaside_eligible"]]
+    # Pursue-as-prime view: eligible AND not already awarded (awarded ones live
+    # in the Subcontracting category only).
+    eligible = [r for r in results
+                if r["raw_setaside_eligible"] and not r["is_awarded"]]
     ranked = sorted(eligible, key=lambda r: r["win_score"], reverse=True)
 
     # --- KPIs ---
