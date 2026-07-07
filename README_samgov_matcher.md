@@ -123,9 +123,28 @@ takeover); **Gate 5** bonding. Score-up signals (LPTA/price-dominant, remote,
 neutral past-performance rating) lift winnable small buys. Each row also shows
 an **estimated level of effort** to propose.
 
-Run `python samgov_opportunity_matcher.py --selftest` to verify the NO-BID
-rules fire against two known cases (VA 36C26026Q0674 medical-gas credential
-wall; FDA 75F40126R00051 NCTR O&M CBA/workforce wall).
+**Specialty-field / permit kills:** cultural-resource & archaeology work
+(BLM Cultural Resource Use Permit, Secretary-of-the-Interior qualification
+standards, Section 106/SHPO/NHPA, Class I/II/III inventory) and environmental
+fieldwork (qualified biologist, ESA Section 7, wetland delineation, certified
+arborist/forester) are auto-killed, as are physical field-crew signals
+(pedestrian survey, transects, field crew, high-clearance vehicle). A generic
+"offeror shall hold a current <permit/license/certification>" detector catches
+future credential variants, unless the credential is one PRG actually holds or
+the context is a product/reseller asset (SaaS/license resale is not killed).
+These are matched **literally** — a BA never satisfies a graduate-degree
+standard, and clinical "site visits" / a clinical "principal investigator" do
+**not** trip the field-science rules.
+
+**Dedupe:** each opportunity is content-hashed; a checksum match from a prior
+run is annotated "already vetted [date]: [verdict]" (cache at
+`~/.prg_screen_cache.json`).
+
+Run `python samgov_opportunity_matcher.py --selftest` to verify the rules
+against four known cases: VA 36C26026Q0674 (medical-gas credential wall),
+FDA 75F40126R00051 (NCTR O&M CBA/workforce wall), BLM 140L3726Q0100 (Class III
+cultural-resource CRUP + fieldwork) — all NO-BID — and USSOCOM H9242126QE036
+(SaaS license resale), which must **not** be killed.
 
 **Pro features:**
 

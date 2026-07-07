@@ -35,6 +35,8 @@ Notes:
 
 import argparse
 import datetime as dt
+import hashlib
+import json
 import os
 import re
 import sys
@@ -321,6 +323,49 @@ PAST_PERF_WALL_KEYWORDS = [
     "similar size and scope", "recent and relevant past performance",
     "corporate experience", "minimum of three references",
 ]
+
+# FIX 1/5 — specialty field-science / permit work PRG's solo clinical founder
+# cannot do: cultural-resource/archaeology & environmental fieldwork requiring
+# agency permits, Secretary-of-the-Interior professional qualification standards,
+# or sustained on-site field crews. (Phrases chosen to NOT collide with clinical
+# research: e.g. clinical "site visits" and a clinical "principal investigator"
+# must not trip this.)
+SPECIALTY_FIELD_KILL = [
+    "cultural resource", "cultural resources", "class iii inventory",
+    "class ii inventory", "class i inventory", "cultural resource use permit",
+    "crup", "secretary of the interior", "secretary of interior", "soi-qualified",
+    "36 cfr 61", "shpo", "state historic preservation", "section 106", "nhpa",
+    "arpa permit", "archaeolog", "paleontolog", "field school",
+    "historic preservation", "qualified biologist", "esa section 7",
+    "endangered species act", "wetland delineation", "certified arborist",
+    "certified forester", "habitat survey", "botanical survey", "avian survey",
+    "threatened and endangered species", "biological survey",
+    # Fix 5 — unambiguous physical field-crew signals (never used in clinical work)
+    "pedestrian survey", "transect", "field crew", "high-clearance vehicle",
+]
+# "Principal investigator" only disqualifies in a field-science context — it is
+# normal (and core) in clinical research, so require an archaeology/cultural cue.
+_PI_FIELD_CONTEXT = ["archaeolog", "anthropolog", "cultural resource",
+                     "historic preservation", "paleontolog"]
+
+# FIX 2 — the only credentials PRG actually holds (satisfy a "must hold" req).
+HELD_CREDENTIALS = ["acrp-cp", "acrp-pm", "sdvosb", "sam registration", "sam.gov"]
+# Contexts where "must hold X" is a product/reseller ASSET, not a personnel
+# credential — do NOT kill (e.g. SaaS / software-license resale).
+CREDENTIAL_EXEMPT_CONTEXT = [
+    "reseller", "letter of supply", "oem authorization", "authorized distributor",
+    "value added reseller", "software license", "saas", "subscription",
+    "business license", "insurance", "manufacturer authorization",
+]
+# FIX 2 — generic "shall/must hold/possess a <permit|license|certification|
+# registration> …" detector, so we stop playing blocklist whack-a-mole.
+_CRED_REQUIRE_RE = re.compile(
+    r"\b(shall|must|will)\b[^.\n]{0,60}?\b(hold|possess|maintain|have)\b"
+    r"[^.\n]{0,70}?\b(permit|licens\w*|certification|registration|credential|"
+    r"accreditation)\b", re.IGNORECASE)
+
+# FIX 6 — content-hash cache so identical packages short-circuit as "already vetted".
+CACHE_PATH = os.path.join(os.path.expanduser("~"), ".prg_screen_cache.json")
 
 # Soft signals: score down / flag, never fail on their own.
 BONDING_KEYWORDS = ["bid bond", "performance bond", "payment bond", "bonding"]
@@ -767,6 +812,11 @@ def evaluate(opp):
         "verdict": verdict,
         "loe": loe,
         "pp_wall": pp_wall,
+        "content_hash": hashlib.sha1(
+            (str(opp.get("solicitationNumber")) + str(opp.get("title"))
+             + str(opp.get("description"))).encode("utf-8", "ignore")
+        ).hexdigest()[:16],
+        "previously_vetted": "",
         "disqualified": disqualified,
         "is_future": is_future,
         "kill_gate": kill_gate,
@@ -1003,6 +1053,25 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
     if cred:
         return _fail("Gate 2 (credential)",
                      f"requires a credential PRG lacks — '{cred[0]}'")
+
+    # FIX 1/5 — specialty field-science / permit work (cultural, environmental,
+    # field-crew). Degree/experience adjacency never satisfies these (FIX 4).
+    sf = _keyword_hits(text, SPECIALTY_FIELD_KILL)
+    if sf:
+        return _fail("Gate 2 (specialty permit/field)",
+                     f"specialty field-science / permit work — '{sf[0]}'")
+    if "principal investigator" in text and any(c in text for c in _PI_FIELD_CONTEXT):
+        return _fail("Gate 2 (specialty PI)",
+                     "requires a field-science principal investigator PRG lacks")
+
+    # FIX 2 — generic personnel-credential requirement (catches future variants).
+    # FIX 3 — a hard kill regardless of how fast the permit itself processes; the
+    # scarce resource is the qualified person, not the paperwork.
+    if (_CRED_REQUIRE_RE.search(text)
+            and not any(x in text for x in CREDENTIAL_EXEMPT_CONTEXT)
+            and not any(h in text for h in HELD_CREDENTIALS)):
+        return _fail("Gate 2 (credential req)",
+                     "notice requires a permit/license PRG does not hold")
 
     # GATE 1 — workforce / CBA takeover a solo shop can't staff.
     wf = _keyword_hits(text, WORKFORCE_KILL_KEYWORDS)
@@ -1931,6 +2000,45 @@ def _desktop_path(filename):
     return os.path.join(os.path.dirname(base), filename)
 
 
+def _load_vet_cache():
+    """FIX 6 — load the content-hash vetting cache (empty on any failure)."""
+    try:
+        with open(CACHE_PATH, encoding="utf-8") as fh:
+            return json.load(fh)
+    except Exception:
+        return {}
+
+
+def _save_vet_cache(cache):
+    try:
+        with open(CACHE_PATH, "w", encoding="utf-8") as fh:
+            json.dump(cache, fh)
+    except Exception:
+        pass
+
+
+def apply_vet_cache(results):
+    """FIX 6 — annotate opportunities whose content hash matches a prior run as
+    'already vetted [date]: [verdict]', and update the cache. Returns how many
+    were previously vetted."""
+    cache = _load_vet_cache()
+    today_iso = dt.date.today().isoformat()
+    seen_before = 0
+    for r in results:
+        h = r.get("content_hash")
+        if not h:
+            continue
+        prior = cache.get(h)
+        if prior and prior.get("verdict") == r["verdict"]:
+            r["previously_vetted"] = (
+                f"already vetted {prior.get('date')}: {prior.get('verdict')}")
+            seen_before += 1
+        cache[h] = {"date": today_iso, "verdict": r["verdict"],
+                    "sol": r["solicitation"]}
+    _save_vet_cache(cache)
+    return seen_before
+
+
 def _timestamped_alt(path):
     """Insert a HH-MM-SS stamp before the extension, e.g. for locked files."""
     root, ext = os.path.splitext(path)
@@ -2608,20 +2716,68 @@ _SELFTEST_CASES = [
         },
         "expect_verdict": "NO-BID",
     },
+    {
+        "label": "BLM 140L3726Q0100 — Class III Cultural Resource Inventory "
+                 "(CRUP + SOI standards + fieldwork)",
+        "opp": {
+            "solicitationNumber": "140L3726Q0100",
+            "noticeId": "st3",
+            "title": ("Class III Cultural Resource Inventory, Uncompahgre "
+                      "Field Office"),
+            "description": ("Contractor shall conduct a Class III pedestrian "
+                            "cultural resource inventory. The contractor must "
+                            "hold a current BLM Cultural Resource Use Permit and "
+                            "all supervisory personnel must meet the Secretary of "
+                            "the Interior's Professional Qualification Standards "
+                            "in archaeology. Fieldwork includes pedestrian survey "
+                            "along transects with a high-clearance vehicle."),
+            "naicsCode": "541620",
+            "typeOfSetAside": "SBA",
+            "typeOfSetAsideDescription": "Total Small Business",
+            "fullParentPathName": "Department of the Interior",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+    },
+    {
+        "label": "USSOCOM H9242126QE036 — SaaS subscription (license resale — "
+                 "must NOT be killed)",
+        "opp": {
+            "solicitationNumber": "H9242126QE036",
+            "noticeId": "st4",
+            "title": "Software as a Service (SaaS) Subscription Licenses",
+            "description": ("Procurement of commercial SaaS subscription "
+                            "licenses. The offeror may be required to provide an "
+                            "authorized reseller letter of supply from the OEM."),
+            "naicsCode": "513210",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "US Special Operations Command",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "forbid_verdict": "NO-BID",
+    },
 ]
 
 
 def run_selftests():
-    """Evaluate the known NO-BID cases and assert the rules fire. Returns 0 on
-    all-pass, 1 otherwise; prints a short report."""
+    """Evaluate the known cases and assert the rules fire (or, for the SaaS
+    case, do NOT fire). Returns 0 on all-pass, 1 otherwise."""
     ok = True
-    print("PRG screen self-tests (known NO-BID cases):\n")
+    print("PRG screen self-tests:\n")
     for case in _SELFTEST_CASES:
         r = evaluate(case["opp"])
-        passed = (r["verdict"] == case["expect_verdict"])
+        if "expect_verdict" in case:
+            passed = (r["verdict"] == case["expect_verdict"])
+            want = f"== {case['expect_verdict']}"
+        else:
+            passed = (r["verdict"] != case["forbid_verdict"])
+            want = f"!= {case['forbid_verdict']}"
         ok = ok and passed
         print(f"  [{'PASS' if passed else 'FAIL'}] {case['label']}")
-        print(f"         verdict={r['verdict']} (expected {case['expect_verdict']}), "
+        print(f"         verdict={r['verdict']} (want {want}), "
               f"gate={r['kill_gate'] or '-'}, reason={r['kill_reason'] or '-'}")
     print("\nResult:", "ALL PASS ✅" if ok else "SOME FAILED ❌")
     return 0 if ok else 1
@@ -2740,6 +2896,11 @@ def main(argv=None):
 
     # Evaluate every opportunity.
     results = [evaluate(opp) for opp in all_opps]
+
+    # FIX 6 — short-circuit anything already vetted this week (checksum match).
+    seen_before = apply_vet_cache(results)
+    if seen_before:
+        sys.stderr.write(f"  ({seen_before} already vetted in a prior run)\n")
 
     # Sort: eligible first, then by score, then SDVOSB set-asides on top.
     results.sort(
