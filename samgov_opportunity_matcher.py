@@ -359,7 +359,8 @@ def fetch_recompetes(naics_codes, months_ahead=18, max_pages=10):
         },
         "fields": [
             "Award ID", "Recipient Name", "Award Amount",
-            "Period of Performance Current End Date", "Awarding Agency",
+            "Period of Performance Current End Date",
+            "Awarding Agency", "Awarding Sub Agency", "NAICS",
         ],
         "sort": "Period of Performance Current End Date",
         "order": "asc",
@@ -392,6 +393,13 @@ def fetch_recompetes(naics_codes, months_ahead=18, max_pages=10):
                     amt = float(amt) if amt not in (None, "") else None
                 except (TypeError, ValueError):
                     amt = None
+                # USASpending may return NAICS as a string or a
+                # {"code": ..., "description": ...} dict — normalize to the code.
+                naics_raw = a.get("NAICS")
+                if isinstance(naics_raw, dict):
+                    naics_val = naics_raw.get("code") or "—"
+                else:
+                    naics_val = naics_raw or "—"
                 out.append({
                     "award_id": a.get("Award ID") or "N/A",
                     "recipient": a.get("Recipient Name") or "N/A",
@@ -399,8 +407,9 @@ def fetch_recompetes(naics_codes, months_ahead=18, max_pages=10):
                     "amount_display": _format_currency(amt) if amt else "Not stated",
                     "end_date": end.isoformat(),
                     "months_left": round((end - today).days / 30.4, 1),
-                    "agency": a.get("Awarding Agency") or "N/A",
-                    "naics": a.get("NAICS") or "—",
+                    "agency": a.get("Awarding Agency")
+                              or a.get("Awarding Sub Agency") or "N/A",
+                    "naics": naics_val,
                 })
             if passed_horizon or len(results) < 100:
                 break
