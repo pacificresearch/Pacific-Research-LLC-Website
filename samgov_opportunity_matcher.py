@@ -776,6 +776,15 @@ _INTL_SRC_COLS = [
     ("What it covers / fit for PRG", "note"),
     ("URL", "url"),
 ]
+_RELIEFWEB_COLS = [
+    ("Title", "title"),
+    ("Organization", "org"),
+    ("Country", "country"),
+    ("Category", "category"),
+    ("Experience", "experience"),
+    ("Closes", "closing"),
+    ("URL", "link"),
+]
 
 
 # FIX 2 — the only credentials PRG actually holds (satisfy a "must hold" req).
@@ -1005,6 +1014,7 @@ def fetch_recompetes(naics_codes, months_ahead=18, max_pages=10, agency=None):
 # --- Other opportunity banks with FREE, keyless APIs -------------------------
 GRANTS_URL = "https://api.grants.gov/v1/api/search2"
 SBIR_URL = "https://api.www.sbir.gov/public/api/solicitations"
+RELIEFWEB_URL = "https://api.reliefweb.int/v1/jobs"
 
 # Keywords for the Grants.gov pull — PRG's research / health / global-health lane.
 GRANTS_KEYWORDS = [
@@ -1091,6 +1101,59 @@ def fetch_sbir(rows=200):
         sys.stderr.write(f"WARNING: SBIR.gov unavailable: {exc}\n")
     except ValueError as exc:
         sys.stderr.write(f"WARNING: SBIR.gov JSON decode failed: {exc}\n")
+    return out
+
+
+def fetch_reliefweb(rows=100):
+    """Pull short-term international consultancies / jobs from the keyless
+    ReliefWeb API (api.reliefweb.int) — UN & humanitarian postings, filtered to
+    PRG's clinical/health/research lane. One of the few international banks with
+    an open API. Returns [] on any error."""
+    out = []
+    body = {
+        "limit": rows,
+        "profile": "list",
+        "fields": {"include": ["title", "source", "country", "date.closing",
+                               "url", "url_alias", "career_categories",
+                               "experience", "type"]},
+        "query": {"value": ("health OR clinical OR research OR consultant OR "
+                            "medical OR epidemiolog OR \"data management\" OR "
+                            "monitoring OR evaluation"),
+                  "operator": "OR"},
+        "sort": ["date.created:desc"],
+    }
+    try:
+        resp = _http_retry(requests.post, RELIEFWEB_URL,
+                           params={"appname": "prg-opportunity-matcher"},
+                           json=body, timeout=45)
+        resp.raise_for_status()
+        for item in (resp.json() or {}).get("data") or []:
+            f = item.get("fields") or {}
+            src = f.get("source") or []
+            srcs = ", ".join(s.get("name", "") for s in src if isinstance(s, dict))
+            ctry = f.get("country") or []
+            ctrys = ", ".join(c.get("name", "") for c in ctry if isinstance(c, dict))
+            cats = f.get("career_categories") or []
+            cat = ", ".join(c.get("name", "") for c in cats if isinstance(c, dict))
+            exp = f.get("experience") or []
+            if isinstance(exp, list):
+                exp = ", ".join(e.get("name", "") if isinstance(e, dict) else str(e)
+                                for e in exp)
+            closing = (f.get("date") or {}).get("closing") or ""
+            out.append({
+                "title": _clean(f.get("title") or "Untitled", 80),
+                "org": _clean(srcs or "N/A", 40),
+                "country": _clean(ctrys or "—", 30),
+                "category": _clean(cat, 30),
+                "experience": _clean(str(exp), 20),
+                "closing": str(closing)[:10],
+                "link": f.get("url_alias") or f.get("url")
+                        or "https://reliefweb.int/jobs",
+            })
+    except requests.exceptions.RequestException as exc:
+        sys.stderr.write(f"WARNING: ReliefWeb unavailable: {exc}\n")
+    except ValueError as exc:
+        sys.stderr.write(f"WARNING: ReliefWeb JSON decode failed: {exc}\n")
     return out
 
 
@@ -2884,7 +2947,8 @@ def _top10(results):
     return top
 
 
-def export_spreadsheet(results, path, recompetes=None, grants=None, sbir=None):
+def export_spreadsheet(results, path, recompetes=None, grants=None, sbir=None,
+                       reliefweb=None):
     """Write results to an Excel workbook (.xlsx) if openpyxl is available,
     otherwise fall back to a set of CSV files. Returns the path actually written.
     """
@@ -2924,6 +2988,7 @@ def export_spreadsheet(results, path, recompetes=None, grants=None, sbir=None):
         ("NAICS Gap - Add to SAM", _NAICS_GAP_COLS, _naics_gap_rows(results)),
         ("Grants.gov (Assistance $)", _GRANTS_COLS, grants or []),
         ("SBIR-STTR (Open R&D)", _SBIR_COLS, sbir or []),
+        ("ReliefWeb (Intl Gigs)", _RELIEFWEB_COLS, reliefweb or []),
         ("International Sources", _INTL_SRC_COLS, _intl_source_rows()),
         ("KILL LOG (screened out)", _KILL_COLS, killed),
         ("Resources (Hunt & Help)", _RESOURCE_COLS, _resource_rows()),
@@ -3014,7 +3079,7 @@ def export_spreadsheet(results, path, recompetes=None, grants=None, sbir=None):
             "Opportunity #": 22, "ALN / CFDA": 16, "Opens": 14, "Closes": 14,
             "Solicitation": 46, "Program": 14, "Branch": 22, "Topics": 12,
             "Source (register here)": 40, "What it covers / fit for PRG": 70,
-            "Status": 14,
+            "Status": 14, "Organization": 34, "Country": 22, "Experience": 16,
         }
         for idx, (h, _) in enumerate(cols, start=1):
             ws.column_dimensions[get_column_letter(idx)].width = widths.get(h, 16)
@@ -3265,11 +3330,12 @@ def _key_findings_html(ranked, eligible):
 
 
 def export_html_report(results, path, days, recompetes=None, grants=None,
-                       sbir=None):
+                       sbir=None, reliefweb=None):
     """Write a self-contained executive HTML report of the opportunity pipeline."""
     recompetes = recompetes or []
     grants = grants or []
     sbir = sbir or []
+    reliefweb = reliefweb or []
     # Pursue-as-prime view: eligible AND not already awarded (awarded ones live
     # in the Subcontracting category only).
     eligible = [r for r in results if r["raw_setaside_eligible"]
@@ -3856,6 +3922,32 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
                  'run.</p>')
     p.append('</section>')
 
+    # ReliefWeb — live international short-term consultancies (free API).
+    p.append('<section><h2>🌍 ReliefWeb — Live International Consultancies</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'UN &amp; humanitarian short-term postings pulled live from the '
+             'keyless ReliefWeb API, filtered to PRG\'s clinical/health/research '
+             'lane — the one international bank that <b>does</b> have an open API.'
+             '</p>')
+    if reliefweb:
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>Title</th><th>Organization</th><th>Country</th>'
+                 '<th>Category</th><th>Closes</th></tr></thead><tbody>')
+        for j in reliefweb[:100]:
+            t = _html_escape(_clean(j["title"], 60))
+            if _is_http(j["link"]):
+                t = (f'<a href="{_html_escape(j["link"])}" target="_blank" '
+                     f'rel="noopener">{t}</a>')
+            p.append(f"<tr><td>{t}</td><td>{_html_escape(j['org'])}</td>"
+                     f"<td>{_html_escape(j['country'])}</td>"
+                     f"<td>{_html_escape(j['category'])}</td>"
+                     f"<td>{_html_escape(j['closing'])}</td></tr>")
+        p.append('</tbody></table></div>')
+    else:
+        p.append('<p class="empty">No ReliefWeb postings pulled this run '
+                 '(unreachable, or run without --no-reliefweb).</p>')
+    p.append('</section>')
+
     # International opportunity sources — where the short-term global gigs live.
     p.append('<section><h2>🌐 International Sources — Where the Short-Term Gigs '
              'Live</h2>')
@@ -4425,6 +4517,8 @@ def parse_args(argv):
                         help="Skip the Grants.gov assistance-opportunity pull.")
     parser.add_argument("--no-sbir", action="store_true",
                         help="Skip the SBIR.gov open-solicitation pull.")
+    parser.add_argument("--no-reliefweb", action="store_true",
+                        help="Skip the ReliefWeb international-consultancy pull.")
     parser.add_argument("--recompete-months", type=int, default=18, metavar="N",
                         help="Recompete horizon: contracts expiring within N "
                              "months (default: 18).")
@@ -4540,6 +4634,11 @@ def main(argv=None):
         sys.stderr.write("  SBIR.gov: querying open R&D solicitations...\n")
         sbir = fetch_sbir()
         sys.stderr.write(f"    {len(sbir)} open SBIR/STTR solicitation(s)\n")
+    reliefweb = []
+    if not args.no_reliefweb:
+        sys.stderr.write("  ReliefWeb: querying international consultancies...\n")
+        reliefweb = fetch_reliefweb()
+        sys.stderr.write(f"    {len(reliefweb)} international posting(s)\n")
 
     # Evaluate every opportunity.
     results = [evaluate(opp) for opp in all_opps]
@@ -4577,13 +4676,13 @@ def main(argv=None):
     if not args.no_excel:
         try:
             saved.append(export_spreadsheet(results, xlsx_path, recompetes,
-                                            grants, sbir))
+                                            grants, sbir, reliefweb))
         except Exception as exc:  # never let one save abort the other
             sys.stderr.write(f"WARNING: could not save spreadsheet: {exc}\n")
     if not args.no_report:
         try:
             saved.append(export_html_report(results, report_path, args.days,
-                                            recompetes, grants, sbir))
+                                            recompetes, grants, sbir, reliefweb))
         except Exception as exc:
             sys.stderr.write(f"WARNING: could not save HTML report: {exc}\n")
 

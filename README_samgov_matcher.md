@@ -28,6 +28,10 @@ other federal banks that have **free, keyless APIs**, each on its own tab:
   and assistance awards that never touch SAM.gov.
 - **SBIR-STTR (Open R&D)** — open small-business R&D innovation solicitations
   from SBIR.gov, squarely in PRG's research lane.
+- **ReliefWeb (Intl Gigs)** — UN & humanitarian **short-term international
+  consultancies** from the keyless ReliefWeb API, filtered to PRG's
+  clinical/health/research lane — the one international bank that *does* have an
+  open API (skip with `--no-reliefweb`).
 
 For **short-term international consultancies** — which are scattered across
 login-only portals with no open API — there's a curated **International Sources**
