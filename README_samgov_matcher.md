@@ -79,12 +79,35 @@ for open solicitations it is any dollar figure found in the notice text, or
 The console report also prints an estimated total pipeline value across the
 opportunities PRG can pursue.
 
-The workbook has fourteen tabs — **Top 10 – Do These First**, **Solo-Friendly
-(1-Person)**, **Core Opportunities**, **Low-Barrier (Warm Body)**,
-**International (Consulting)**, **VA (OSDBU)**, **HHS (OSDBU)**, **DTRA**,
-**Subcontracting**, **Recompete Radar**, **WATCH-TEMPLATE (hire-to-win)**,
-**WATCHLIST (prep, future)**, **KILL LOG (screened out)**, and **Resources (Hunt
-& Help)** — each with filterable, frozen headers.
+The workbook opens on a **Summary** tab (run totals, verdict mix, and a
+kill-reason breakdown — the "what did this run find" view) and then has sixteen
+tabs total: **Summary**, **Top 10 – Do These First**, **Solo-Friendly
+(1-Person)**, **Vibe-Code (Web-Software)**, **Core Opportunities**, **Low-Barrier
+(Warm Body)**, **International (Consulting)**, **VA (OSDBU)**, **HHS (OSDBU)**,
+**DTRA**, **Subcontracting**, **Recompete Radar**, **WATCH-TEMPLATE
+(hire-to-win)**, **WATCHLIST (prep, future)**, **KILL LOG (screened out)**, and
+**Resources (Hunt & Help)** — each with filterable, frozen headers.
+
+### Actionable per-row columns (turn a match into a next step)
+
+Every decision row now carries the columns that answer *"so what do I do?"*:
+**Fastest Paid Route** (bid now / respond to shape / team as sub / line up a
+partner), **Services to Pitch** (concrete PRG offerings matched to the notice),
+**Gaps to Close (before award)** (E&O insurance, corporate CPARS, a contingent
+credential), **Min Qualifications** (the standing baseline to submit any bid),
+**Founder PP Usable?**, and the **POC (from notice)** with name/email/phone plus
+the raw **Notice ID**.
+
+### 🧑‍💻 Vibe-Code lane (web & software you can ship solo + AI)
+
+A dedicated search (NAICS **541511 / 541512 / 541513 / 541430 / 518210**) plus a
+keyword pass surfaces light web/software builds one person + AI can deliver:
+websites, landing pages, small web apps, forms, dashboards, CMS/WordPress, and
+**Section 508 / accessibility remediation**. It gets its own **Vibe-Code
+(Web-Software)** Excel tab and 🧑‍💻 HTML section, headed with PRG's delivery
+stack — **Screendot** (CO-facing intros, capability & landing sites) and
+**Digipop** (app builds). Anything needing an ATO, a full security package, or an
+embedded dev team is out of this lane.
 
 ### Priority-agency focus (VA / HHS / DTRA)
 

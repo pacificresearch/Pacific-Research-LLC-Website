@@ -128,10 +128,49 @@ LOW_BARRIER_NAICS = OrderedDict(
     ]
 )
 
-# Every NAICS we actually query the API for (primary first, then low-barrier).
+# Tier 3 — VIBE-CODE / light web & software NAICS. Simple builds a solo founder
+# + AI can ship without a dev team: static sites, landing pages, small web apps,
+# forms, dashboards, CMS/WordPress, and Section 508 / accessibility remediation.
+# PRG delivers via its no-/low-code stack (Screendot for CO-facing intros &
+# capability/landing sites; Digipop for app builds).
+VIBECODE_NAICS = OrderedDict(
+    [
+        ("541511", "Custom Computer Programming Services"),
+        ("541512", "Computer Systems Design Services"),
+        ("541513", "Computer Facilities Management Services"),
+        ("541430", "Graphic Design Services (web/UI)"),
+        ("518210", "Data Processing, Hosting & Related Services"),
+        # 541519 (Other Computer Related) is already queried under low-barrier.
+    ]
+)
+
+# Every NAICS we actually query the API for (primary, low-barrier, vibe-code).
 ALL_QUERY_NAICS = OrderedDict()
 ALL_QUERY_NAICS.update(TARGET_NAICS)
 ALL_QUERY_NAICS.update(LOW_BARRIER_NAICS)
+ALL_QUERY_NAICS.update(VIBECODE_NAICS)
+
+# Vibe-code fit signals: light web/software work one person + AI can deliver.
+VIBECODE_KEYWORDS = [
+    "website", "web site", "web design", "web development", "web application",
+    "web app", "landing page", "static site", "static website", "microsite",
+    "content management", "wordpress", "drupal", "joomla", "cms",
+    "front-end", "front end", "user interface", "ui/ux", "ux/ui",
+    "responsive design", "web portal", "portal", "dashboard",
+    "data visualization", "web form", "online form", "intake form",
+    "section 508", "508 compliance", "508 remediation", "accessibility",
+    "wcag", "prototype", "mvp", "minimum viable product", "single page",
+    "html", "css", "javascript", "no-code", "low-code", "web-based tool",
+    "web based application", "simple database", "site redesign", "web hosting",
+    "landing pages", "digital form", "e-form", "online portal",
+]
+# What PRG uses to build & deliver these (surfaced in the report tab header).
+VIBECODE_DELIVERY_NOTE = (
+    "Delivery stack — Screendot (CO-facing intros, capability & landing sites) "
+    "and Digipop (app builds). Scope every bid to what one person + AI can ship: "
+    "static/landing sites, small web apps, forms, dashboards, CMS/WordPress, and "
+    "Section 508 / accessibility remediation. Anything needing an ATO, a security "
+    "package, or an embedded dev team is out of this lane.")
 
 # Keywords that signal a technical-competency match. Kept lowercase for
 # case-insensitive substring matching against title + description.
@@ -1033,6 +1072,14 @@ def match_low_barrier(opp):
     return (len(matched) > 0, matched)
 
 
+def match_vibecode(opp):
+    """Return (is_match, matched_keywords) for light web/software builds a solo
+    founder + AI can ship (websites, landing pages, small web apps, forms,
+    dashboards, CMS, 508 remediation)."""
+    matched = _keyword_hits(_haystack(opp), VIBECODE_KEYWORDS)
+    return (len(matched) > 0, matched)
+
+
 def classify_subcontracting(opp, setaside_label, tier, tech_match):
     """Decide whether an opportunity is a realistic subcontracting/teaming target.
 
@@ -1080,6 +1127,7 @@ def evaluate(opp):
     setaside_label, setaside_eligible, is_sdvosb = classify_setaside(opp)
     tech_match, matched_kw = match_capabilities(opp)
     lb_match, lb_kw = match_low_barrier(opp)
+    vibe_match, vibe_kw = match_vibecode(opp)
 
     naics = (opp.get("naicsCode") or "").strip()
     tier = naics_tier(naics)
@@ -1246,6 +1294,20 @@ def evaluate(opp):
     is_future = is_watch and not is_expired and not is_awarded
     # WATCH-TEMPLATE items go to their own hire-to-win bucket (not a bid, not a kill).
     watch_template = is_watch_template and not is_expired and not is_awarded
+    # Vibe-code lane: pursuable light web/software builds PRG can ship solo + AI.
+    is_vibecode = (vibe_match and setaside_eligible and not disqualified
+                   and not is_awarded and not is_expired and not is_future
+                   and not watch_template)
+    # Actionable per-row fields (min qualifications, gaps, services, paid route).
+    readiness = _bid_readiness(
+        tier, matched_kw, vibe_kw, lb_kw, setaside_label, is_sdvosb, pp_wall,
+        credential_needed, verdict, notice_class, is_sub, is_vibecode)
+    poc_list = _extract_poc(opp)
+    poc_display = ""
+    if poc_list:
+        c = poc_list[0]
+        poc_display = " / ".join(b for b in (c.get("name"), c.get("email"),
+                                             c.get("phone")) if b)
     loe = _estimate_loe(opp, value_num, notice_type)
     deadline_headline = ""
     if verdict == "SHORT-FUSE":
@@ -1272,6 +1334,16 @@ def evaluate(opp):
         "lb_reason": lb_reason,
         "matched_keywords": matched_kw,
         "lb_keywords": lb_kw,
+        "is_vibecode": is_vibecode,
+        "vibe_keywords": vibe_kw,
+        "vibe_kw_display": ", ".join(vibe_kw[:4]) if vibe_kw else "",
+        "notice_id": opp.get("noticeId") or "",
+        "poc_display": poc_display,
+        "min_qualifications": readiness["min_qualifications"],
+        "gaps_to_close": readiness["gaps_to_close"],
+        "services_to_pitch": readiness["services_to_pitch"],
+        "fastest_paid_route": readiness["fastest_paid_route"],
+        "founder_pp_usable": readiness["founder_pp_usable"],
         "is_sdvosb": is_sdvosb,
         "naics_targeted": naics_targeted,
         "tech_match": tech_match,
@@ -1393,6 +1465,83 @@ def _build_low_barrier_reason(setaside_eligible, setaside_label, is_sdvosb, tier
     if tech_match:
         bits.append(f"bonus capability overlap ({matched_kw[0]})")
     return "Warm-body play: " + "; ".join(bits) + "."
+
+
+# PRG's standing minimum to credibly submit any bid (assets it can have in hand
+# before award). Opportunity-specific items get appended per row.
+PRG_MIN_QUALIFICATIONS = (
+    "Founder résumé + capability statement; active SAM.gov registration + SDVOSB "
+    "self-cert; E&O/GL insurance bound before award")
+
+
+def _bid_readiness(tier, matched_kw, vibe_kw, lb_kw, setaside_label, is_sdvosb,
+                   pp_wall, credential_needed, verdict, notice_class, is_sub,
+                   is_vibecode):
+    """Derive the actionable per-row fields (min qualifications, gaps to close,
+    services to pitch, fastest paid route, founder past-performance usability) —
+    the columns that turn a match into a next step."""
+    # Services to pitch — concrete offerings, chosen by what the notice matched.
+    services = []
+    if is_vibecode or vibe_kw:
+        services.append("website / landing page / web app, Section 508 remediation, "
+                        "dashboards (Screendot + Digipop)")
+    if any(k in matched_kw for k in (
+            "clinical research", "clinical trial", "clinical trials", "protocol",
+            "regulatory compliance", "gcp", "monitoring", "patient recruitment")):
+        services.append("clinical research coordination, monitoring & regulatory/"
+                        "protocol support")
+    if any(k in matched_kw for k in (
+            "data management", "data analytics", "redcap", "edc", "ctms",
+            "database", "medidata")):
+        services.append("data management & analysis (REDCap/EDC), reporting dashboards")
+    if not services:
+        if tier == "low_barrier" or lb_kw:
+            services.append("qualified-personnel staffing + administrative / program "
+                            "support")
+        else:
+            services.append("scientific & technical writing, program/project support, "
+                            "research & analysis")
+    services_to_pitch = "; ".join(services[:3])
+
+    # Gaps PRG must close to bid credibly.
+    gaps = ["E&O/GL insurance (bind before award)"]
+    if pp_wall:
+        gaps.append("corporate CPARS — cite founder's individual past performance or team")
+    if credential_needed:
+        gaps.append(f"{credential_needed} (contingent, on-award hire)")
+    if setaside_label == "None":
+        gaps.append("no set-aside edge — differentiate on price/approach")
+    gaps_to_close = "; ".join(gaps)
+
+    # Fastest route to getting paid.
+    if is_sub or verdict == "MARKET-INTEL":
+        fastest = "Team as subcontractor under the prime"
+    elif verdict == "WATCH-TEMPLATE":
+        fastest = "Line up the credentialed partner, then bid"
+    elif verdict in ("WATCH", "FUTURE") or notice_class in (
+            "SOURCES_SOUGHT", "RFI", "PRESOL", "SPECIAL", "FORECAST"):
+        fastest = "Respond to shape the requirement; bid at RFP"
+    elif verdict == "RESEARCH":
+        fastest = "Research incumbent/scope, then bid"
+    elif verdict in ("BID", "SHORT-FUSE"):
+        fastest = "Bid / quote now"
+    else:
+        fastest = "Assess, then bid"
+
+    founder_pp = ("Individual experience only — no corporate CPARS yet; team or cite "
+                  "founder PP" if pp_wall else "Yes — as founder's individual experience")
+
+    min_quals = PRG_MIN_QUALIFICATIONS
+    if credential_needed:
+        min_quals += f"; plus a {credential_needed}"
+
+    return {
+        "min_qualifications": min_quals,
+        "gaps_to_close": gaps_to_close,
+        "services_to_pitch": services_to_pitch,
+        "fastest_paid_route": fastest,
+        "founder_pp_usable": founder_pp,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -2267,7 +2416,14 @@ _RICH_COLS = [
     ("Location", "location"),
     ("Intl / CONUS", "location_type"),
     ("Buyer Type", "buyer_type"),
+    ("Fastest Paid Route", "fastest_paid_route"),
+    ("Services to Pitch", "services_to_pitch"),
+    ("Gaps to Close (before award)", "gaps_to_close"),
+    ("Min Qualifications", "min_qualifications"),
+    ("Founder PP Usable?", "founder_pp_usable"),
+    ("POC (from notice)", "poc_display"),
     ("NAICS", "naics"),
+    ("Notice ID", "notice_id"),
     ("Solicitation #", "solicitation"),
     ("Link", "link"),
 ]
@@ -2287,6 +2443,26 @@ _SUB_COLS = [
     ("Link", "link"),
 ]
 _SOLO_COLS = _RICH_COLS + [("Why One-Person Doable", "solo_reason")]
+
+# Vibe-code (light web/software) tab — the "what to build" columns up front.
+_VIBECODE_COLS = [
+    ("Win Score", "win_score"),
+    ("Rating", lambda r: f"{r['win_emoji']} {r['win_band']}"),
+    ("Go / No-Go", "verdict"),
+    ("Title", "title"),
+    ("Agency", "agency"),
+    ("What to Build (matched)", "vibe_kw_display"),
+    ("Services to Pitch", "services_to_pitch"),
+    ("Set-Aside", "setaside"),
+    ("Est. Value (Revenue)", "value_display"),
+    ("Est. LOE", "loe"),
+    ("Respond By", "response_deadline"),
+    ("Gaps to Close (before award)", "gaps_to_close"),
+    ("POC (from notice)", "poc_display"),
+    ("NAICS", "naics"),
+    ("Solicitation #", "solicitation"),
+    ("Link", "link"),
+]
 
 
 def _cell(row, spec):
@@ -2393,6 +2569,70 @@ _TEMPLATE_COLS = [
 ]
 
 
+_SUMMARY_COLS = [
+    ("Metric", "metric"),
+    ("Value", "value"),
+    ("Detail", "detail"),
+]
+
+
+def _summary_rows(results, recompetes=None):
+    """A one-glance Summary tab: run totals, verdict mix, and kill-reason
+    breakdown — so the workbook opens on 'what did this run find' before the
+    1,000-row tabs."""
+    recompetes = recompetes or []
+    from collections import Counter
+    verdicts = Counter(r["verdict"] for r in results)
+    kills = Counter(r["kill_gate"] for r in results if r["disqualified"])
+    primary, low_barrier, subs, solo, international = _split_sections(results)
+    rows = [
+        {"metric": "Official source", "value": "SAM.gov Opportunities API + "
+         "USASpending.gov", "detail": "live federal opportunities & awards"},
+        {"metric": "Opportunities reviewed (after dedupe)", "value": len(results),
+         "detail": "unique notices screened this run"},
+        {"metric": "BID (pursue as prime)", "value": verdicts.get("BID", 0),
+         "detail": "eligible + in-lane + winnable now"},
+        {"metric": "SHORT-FUSE", "value": verdicts.get("SHORT-FUSE", 0),
+         "detail": "due within ~5 business days"},
+        {"metric": "RESEARCH", "value": verdicts.get("RESEARCH", 0),
+         "detail": "winnable but needs prep / weak edge"},
+        {"metric": "WATCH-TEMPLATE (hire-to-win)",
+         "value": sum(1 for r in results if r.get("watch_template")),
+         "detail": "individual credential — line up a contingent partner"},
+        {"metric": "WATCH (shape the RFP)",
+         "value": sum(1 for r in results if r["is_future"]),
+         "detail": "pre-sol / sources sought — respond to shape"},
+        {"metric": "NO-BID (screened out)", "value": verdicts.get("NO-BID", 0),
+         "detail": "auto-killed — see KILL LOG"},
+        {"metric": "EXPIRED / MARKET-INTEL",
+         "value": verdicts.get("EXPIRED", 0) + verdicts.get("MARKET-INTEL", 0),
+         "detail": "past deadline or already awarded"},
+        {"metric": "—", "value": "—", "detail": "— lane counts —"},
+        {"metric": "Top 10 shortlist", "value": len(_top10(results)),
+         "detail": "do these first"},
+        {"metric": "Solo-friendly (1-person)", "value": len(solo),
+         "detail": "one person + AI can deliver"},
+        {"metric": "Vibe-code (web/software)",
+         "value": sum(1 for r in results if r.get("is_vibecode")),
+         "detail": "Screendot + Digipop builds"},
+        {"metric": "Core opportunities", "value": len(primary),
+         "detail": "clinical/research in-lane"},
+        {"metric": "Low-barrier (warm body)", "value": len(low_barrier),
+         "detail": "win with qualified personnel"},
+        {"metric": "International (consulting)", "value": len(international),
+         "detail": "overseas — flagged, no US SB edge"},
+        {"metric": "Subcontracting / teaming", "value": len(subs),
+         "detail": "team under a prime"},
+        {"metric": "Recompete Radar", "value": len(recompetes),
+         "detail": "incumbents + upcoming rebids"},
+    ]
+    if kills:
+        rows.append({"metric": "—", "value": "—", "detail": "— why killed —"})
+        for gate, n in kills.most_common():
+            rows.append({"metric": gate, "value": n, "detail": "auto-screened kills"})
+    return rows
+
+
 def _top10(results):
     """The single best-bet shortlist: highest-scoring eligible, pursuable
     opportunities (not awarded, not expired), ranked, capped at 10."""
@@ -2420,9 +2660,13 @@ def export_spreadsheet(results, path, recompetes=None):
                     key=lambda r: r["kill_gate"])
     watchlist = sorted([r for r in results if r["is_future"]],
                        key=lambda r: r["win_score"], reverse=True)
+    vibecode = sorted([r for r in results if r.get("is_vibecode")],
+                      key=lambda r: r["win_score"], reverse=True)
     sheets = [
+        ("Summary", _SUMMARY_COLS, _summary_rows(results, recompetes)),
         ("Top 10 - Do These First", _TOP10_COLS, _top10(results)),
         ("Solo-Friendly (1-Person)", _SOLO_COLS, solo),
+        ("Vibe-Code (Web-Software)", _VIBECODE_COLS, vibecode),
         ("Core Opportunities", _CORE_COLS, primary),
         ("Low-Barrier (Warm Body)", _LOWBAR_COLS, low_barrier),
         ("International (Consulting)", _CORE_COLS, international),
@@ -2521,6 +2765,11 @@ def export_spreadsheet(results, path, recompetes=None):
             "Solicitation #": 20, "Category": 20, "Resource": 42,
             "What it's for": 66, "URL": 52, "Priority Agency": 16,
             "Credential Needed": 30, "ACTION": 62, "Respond By": 20,
+            "Fastest Paid Route": 26, "Services to Pitch": 52,
+            "Gaps to Close (before award)": 46, "Min Qualifications": 52,
+            "Founder PP Usable?": 30, "POC (from notice)": 34,
+            "Notice ID": 30, "What to Build (matched)": 34,
+            "Metric": 34, "Value": 12, "Detail": 44,
         }
         for idx, (h, _) in enumerate(cols, start=1):
             ws.column_dimensions[get_column_letter(idx)].width = widths.get(h, 16)
@@ -3029,6 +3278,40 @@ def export_html_report(results, path, days, recompetes=None):
     else:
         p.append('<p class="empty">No eligible international opportunities in '
                  'this window — most notices are domestic (CONUS).</p>')
+    p.append('</section>')
+
+    # Vibe-code lane: light web/software builds PRG can ship solo + AI.
+    vibecode = sorted([r for r in results if r.get("is_vibecode")],
+                      key=lambda r: r["win_score"], reverse=True)
+    p.append('<section><h2>🧑‍💻 Vibe-Code — Web &amp; Software (Solo + AI)'
+             '</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             + _html_escape(VIBECODE_DELIVERY_NOTE) + '</p>')
+    if vibecode:
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>Rating</th><th>Win</th><th>Title</th><th>Agency</th>'
+                 '<th>What to Build</th><th>Est. Value</th><th>Set-Aside</th>'
+                 '<th>Respond By</th><th>Solicitation #</th></tr></thead><tbody>')
+        for r in vibecode[:100]:
+            chip = (f'<span class="chip" style="background:'
+                    f'{_RAG_HEX[r["win_band"]]}">{r["win_band"]}</span>')
+            sol = _html_escape(r["solicitation"])
+            if _is_http(r["link"]):
+                sol = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
+                       f'rel="noopener">{sol}</a>')
+            p.append("<tr>"
+                     f"<td>{chip}</td><td class='num'>{r['win_score']}</td>"
+                     f"<td>{_html_escape(_clean(r['title'], 55))}</td>"
+                     f"<td>{_html_escape(r['agency'])}</td>"
+                     f"<td>{_html_escape(r['vibe_kw_display'])}</td>"
+                     f"<td class='num'>{_html_escape(r['value_display'])}</td>"
+                     f"<td>{_html_escape(r['setaside'])}</td>"
+                     f"<td>{str(r['response_deadline']).split('T')[0]}</td>"
+                     f"<td>{sol}</td></tr>")
+        p.append('</tbody></table></div>')
+    else:
+        p.append('<p class="empty">No web/software builds matched this window. '
+                 'These are seasonal — re-run with a wider --days window.</p>')
     p.append('</section>')
 
     # Priority-agency focus (VA / HHS / DTRA): OSDBU portals + live counts.
