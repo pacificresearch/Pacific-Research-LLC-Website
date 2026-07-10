@@ -742,6 +742,42 @@ def _resource_rows():
             for (c, n, u, note) in RESOURCE_DIRECTORY]
 
 
+def _intl_source_rows():
+    """INTERNATIONAL_SOURCES tuples -> row dicts."""
+    return [{"category": c, "name": n, "url": u, "note": note}
+            for (c, n, u, note) in INTERNATIONAL_SOURCES]
+
+
+# Columns for the other-data-bank tabs (grants, SBIR, international directory).
+_GRANTS_COLS = [
+    ("Title", "title"),
+    ("Agency", "agency"),
+    ("Opportunity #", "number"),
+    ("Status", "status"),
+    ("Opens", "open_date"),
+    ("Closes", "close_date"),
+    ("ALN / CFDA", "aln"),
+    ("URL", "link"),
+]
+_SBIR_COLS = [
+    ("Solicitation", "title"),
+    ("Program", "program"),
+    ("Agency", "agency"),
+    ("Branch", "branch"),
+    ("Solicitation #", "number"),
+    ("Opens", "open_date"),
+    ("Closes", "close_date"),
+    ("Topics", "topics"),
+    ("URL", "link"),
+]
+_INTL_SRC_COLS = [
+    ("Category", "category"),
+    ("Source (register here)", "name"),
+    ("What it covers / fit for PRG", "note"),
+    ("URL", "url"),
+]
+
+
 # FIX 2 — the only credentials PRG actually holds (satisfy a "must hold" req).
 HELD_CREDENTIALS = ["acrp-cp", "acrp-pm", "sdvosb", "sam registration", "sam.gov"]
 # Contexts where "must hold X" is a product/reseller ASSET, not a personnel
@@ -964,6 +1000,154 @@ def fetch_recompetes(naics_codes, months_ahead=18, max_pages=10, agency=None):
         sys.stderr.write(f"WARNING: Recompete Radar JSON decode failed: {exc}\n")
     out.sort(key=lambda r: r["end_date"])
     return out
+
+
+# --- Other opportunity banks with FREE, keyless APIs -------------------------
+GRANTS_URL = "https://api.grants.gov/v1/api/search2"
+SBIR_URL = "https://api.www.sbir.gov/public/api/solicitations"
+
+# Keywords for the Grants.gov pull — PRG's research / health / global-health lane.
+GRANTS_KEYWORDS = [
+    "clinical", "health", "global health", "research", "biomedical",
+    "public health", "medical", "veteran", "emergency", "surveillance",
+    "health security", "data", "evaluation",
+]
+
+
+def fetch_grants(keywords=None, max_pages=6, rows=100):
+    """Pull open federal GRANT / cooperative-agreement opportunities from the
+    keyless Grants.gov Search2 API (where State Dept global-health APS and other
+    assistance awards live — these never touch SAM.gov). Grants are a different
+    instrument than contracts, so they get their own tab; returns [] on any
+    error so the rest of the run is unaffected."""
+    kw = " ".join(keywords or GRANTS_KEYWORDS[:3])
+    out, seen = [], set()
+    try:
+        for page in range(max_pages):
+            body = {"keyword": kw, "oppStatuses": "forecasted|posted",
+                    "rows": rows, "startRecordNum": page * rows}
+            resp = _http_retry(requests.post, GRANTS_URL, json=body, timeout=45)
+            resp.raise_for_status()
+            data = (resp.json() or {}).get("data") or {}
+            hits = data.get("oppHits") or []
+            if not hits:
+                break
+            for h in hits:
+                oid = str(h.get("id") or h.get("number") or "")
+                if oid in seen:
+                    continue
+                seen.add(oid)
+                aln = h.get("alnist") or h.get("cfdaList") or []
+                out.append({
+                    "number": h.get("number") or "N/A",
+                    "title": _clean(h.get("title") or "Untitled", 80),
+                    "agency": _clean(h.get("agency") or h.get("agencyCode") or "N/A", 40),
+                    "open_date": h.get("openDate") or "",
+                    "close_date": h.get("closeDate") or "",
+                    "status": h.get("oppStatus") or "",
+                    "aln": ", ".join(aln) if isinstance(aln, list) else str(aln),
+                    "link": (f"https://grants.gov/search-results-detail/{oid}"
+                             if oid else "https://grants.gov/search-grants"),
+                })
+            if len(hits) < rows:
+                break
+    except requests.exceptions.RequestException as exc:
+        sys.stderr.write(f"WARNING: Grants.gov unavailable: {exc}\n")
+    except ValueError as exc:
+        sys.stderr.write(f"WARNING: Grants.gov JSON decode failed: {exc}\n")
+    return out
+
+
+def fetch_sbir(rows=200):
+    """Pull OPEN SBIR/STTR solicitations from the keyless SBIR.gov API — the R&D
+    innovation awards set aside for small business, squarely in PRG's research
+    lane. Returns [] on any error."""
+    out = []
+    try:
+        resp = _http_retry(requests.get, SBIR_URL,
+                           params={"open": 1, "rows": rows}, timeout=45)
+        resp.raise_for_status()
+        payload = resp.json()
+        items = payload if isinstance(payload, list) else (payload.get("data") or [])
+        for s in items:
+            if not isinstance(s, dict):
+                continue
+            topics = s.get("solicitation_topics") or []
+            out.append({
+                "title": _clean(s.get("solicitation_title") or "Untitled", 80),
+                "number": s.get("solicitation_number") or "N/A",
+                "program": s.get("program") or "SBIR/STTR",
+                "agency": _clean(s.get("agency") or "N/A", 40),
+                "branch": _clean(s.get("branch") or "", 30),
+                "open_date": s.get("open_date") or "",
+                "close_date": s.get("close_date") or "",
+                "topics": (str(len(topics)) + " topic(s)"
+                           if isinstance(topics, list) else ""),
+                "link": (s.get("sbir_solicitation_link")
+                         or s.get("solicitation_agency_url")
+                         or "https://www.sbir.gov/solicitations"),
+            })
+    except requests.exceptions.RequestException as exc:
+        sys.stderr.write(f"WARNING: SBIR.gov unavailable: {exc}\n")
+    except ValueError as exc:
+        sys.stderr.write(f"WARNING: SBIR.gov JSON decode failed: {exc}\n")
+    return out
+
+
+# --- International opportunity SOURCES (no clean public API → curated links) --
+# Short-term international consultancies live on portals that don't talk to each
+# other and mostly require a login, so they can't be live-pulled — but knowing
+# WHERE to register is the whole game. Fit-notes are tuned to PRG's founder:
+# ACRP clinical creds, Spanish, veteran + evacuation-ops background.
+INTERNATIONAL_SOURCES = [
+    ("UN system", "UNGM — UN Global Marketplace", "https://www.ungm.org/",
+     "ONE registration covers UNDP, UNOPS, WHO, UNICEF, IOM. Short-term individual "
+     "consultancies post constantly. WHO consultant rosters fit ACRP clinical "
+     "creds; IOM/UNOPS fit evacuation-ops. **Register this week.**"),
+    ("UN system", "WHO — Careers / Consultant rosters",
+     "https://www.who.int/careers", "Consultancies & expert rosters — direct fit "
+     "for clinical-research credentials."),
+    ("UN system", "ReliefWeb — Jobs & Tenders", "https://reliefweb.int/jobs",
+     "Humanitarian short-term assignments and consultancies across UN/NGOs "
+     "(searchable; has a public API for the technically inclined)."),
+    ("Development banks", "World Bank — eConsultant2",
+     "https://wbgeconsult2.worldbank.org/", "Individual consultant contracts, "
+     "often 20–60 day assignments."),
+    ("Development banks", "Asian Development Bank — CMS",
+     "https://cms.adb.org/", "ADB Consultant Management System — individual "
+     "consultant assignments across Asia-Pacific."),
+    ("Development banks", "Inter-American Development Bank (IDB)",
+     "https://www.iadb.org/en/how-we-can-work-together/consultants",
+     "Latin America / Caribbean consulting — **Spanish fluency is an edge here.**"),
+    ("Aggregators", "Devex", "https://www.devex.com/",
+     "The aggregator for the whole development sector: tenders, STTA gigs, "
+     "consultant calls. Membership optional — wait until roster flow proves out."),
+    ("Aggregators", "DevelopmentAid", "https://www.developmentaid.org/",
+     "Cheaper Devex alternative — tenders, grants, and consultant opportunities."),
+    ("Implementing partners", "Chemonics", "https://www.chemonics.com/careers/",
+     "Holds big State/foreign-assistance contracts; staffs surge work from a "
+     "consultant database. **Register once, get called.**"),
+    ("Implementing partners", "DAI", "https://www.dai.com/careers",
+     "Global development prime — consultant & short-term technical rosters."),
+    ("Implementing partners", "Tetra Tech (International Development)",
+     "https://www.tetratech.com/careers/", "Prime on health/dev contracts — "
+     "surge staffing from rosters."),
+    ("Implementing partners", "Abt Global", "https://www.abtglobal.com/careers",
+     "Health-systems & research prime — consultant database."),
+    ("Implementing partners", "FHI 360", "https://www.fhi360.org/careers/",
+     "Global health implementer — clinical/research short-term assignments."),
+    ("Implementing partners", "Palladium", "https://thepalladiumgroup.com/careers",
+     "Health & data-for-development prime — consultant roster."),
+    ("Implementing partners", "RTI International", "https://www.rti.org/careers",
+     "Research institute + global health prime — STTA and consultancies."),
+    ("Implementing partners", "Jhpiego (Johns Hopkins)", "https://www.jhpiego.org/careers/",
+     "Global clinical/health implementer — direct fit for ACRP credentials."),
+    ("Implementing partners", "MSH — Management Sciences for Health",
+     "https://msh.org/careers/", "Health-systems strengthening — consultant calls."),
+    ("US assistance", "Grants.gov (also pulled live in this report)",
+     "https://grants.gov/search-grants",
+     "State Dept global-health APS + assistance awards that never touch SAM.gov."),
+]
 
 
 # ---------------------------------------------------------------------------
@@ -2700,7 +2884,7 @@ def _top10(results):
     return top
 
 
-def export_spreadsheet(results, path, recompetes=None):
+def export_spreadsheet(results, path, recompetes=None, grants=None, sbir=None):
     """Write results to an Excel workbook (.xlsx) if openpyxl is available,
     otherwise fall back to a set of CSV files. Returns the path actually written.
     """
@@ -2738,6 +2922,9 @@ def export_spreadsheet(results, path, recompetes=None):
         ("WATCH-TEMPLATE (hire-to-win)", _TEMPLATE_COLS, template_rows),
         ("WATCHLIST (prep, future)", _WATCHLIST_COLS, watchlist),
         ("NAICS Gap - Add to SAM", _NAICS_GAP_COLS, _naics_gap_rows(results)),
+        ("Grants.gov (Assistance $)", _GRANTS_COLS, grants or []),
+        ("SBIR-STTR (Open R&D)", _SBIR_COLS, sbir or []),
+        ("International Sources", _INTL_SRC_COLS, _intl_source_rows()),
         ("KILL LOG (screened out)", _KILL_COLS, killed),
         ("Resources (Hunt & Help)", _RESOURCE_COLS, _resource_rows()),
     ]
@@ -2824,6 +3011,10 @@ def export_spreadsheet(results, path, recompetes=None):
             "NAICS (not in PRG profile)": 24, "# Winnable Opportunities": 22,
             "Best Win Score": 14, "Top Set-Aside": 22, "Example Opportunity": 46,
             "Example Agency": 28, "Recommendation": 54,
+            "Opportunity #": 22, "ALN / CFDA": 16, "Opens": 14, "Closes": 14,
+            "Solicitation": 46, "Program": 14, "Branch": 22, "Topics": 12,
+            "Source (register here)": 40, "What it covers / fit for PRG": 70,
+            "Status": 14,
         }
         for idx, (h, _) in enumerate(cols, start=1):
             ws.column_dimensions[get_column_letter(idx)].width = widths.get(h, 16)
@@ -3073,9 +3264,12 @@ def _key_findings_html(ranked, eligible):
             f'in Mind</h2>{rows}</section>')
 
 
-def export_html_report(results, path, days, recompetes=None):
+def export_html_report(results, path, days, recompetes=None, grants=None,
+                       sbir=None):
     """Write a self-contained executive HTML report of the opportunity pipeline."""
     recompetes = recompetes or []
+    grants = grants or []
+    sbir = sbir or []
     # Pursue-as-prime view: eligible AND not already awarded (awarded ones live
     # in the Subcontracting category only).
     eligible = [r for r in results if r["raw_setaside_eligible"]
@@ -3608,6 +3802,89 @@ def export_html_report(results, path, days, recompetes=None):
     else:
         p.append('<p class="empty">No out-of-profile NAICS with winnable work '
                  'this run (or run without --narrow to cast the wide net).</p>')
+    p.append('</section>')
+
+    # Other federal opportunity banks with free APIs — Grants.gov + SBIR/STTR.
+    p.append('<section><h2>💰 Grants.gov — Assistance &amp; Global-Health Awards'
+             '</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'Federal <b>grants &amp; cooperative agreements</b> (a different '
+             'instrument than contracts) pulled live from the keyless Grants.gov '
+             'API — including State Dept global-health APS and assistance awards '
+             'that never touch SAM.gov.</p>')
+    if grants:
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>Title</th><th>Agency</th><th>Status</th><th>Closes</th>'
+                 '<th>ALN</th><th>Opportunity #</th></tr></thead><tbody>')
+        for g in grants[:100]:
+            t = _html_escape(_clean(g["title"], 60))
+            if _is_http(g["link"]):
+                t = (f'<a href="{_html_escape(g["link"])}" target="_blank" '
+                     f'rel="noopener">{t}</a>')
+            p.append(f"<tr><td>{t}</td><td>{_html_escape(g['agency'])}</td>"
+                     f"<td>{_html_escape(g['status'])}</td>"
+                     f"<td>{_html_escape(g['close_date'])}</td>"
+                     f"<td>{_html_escape(g['aln'])}</td>"
+                     f"<td>{_html_escape(g['number'])}</td></tr>")
+        p.append('</tbody></table></div>')
+    else:
+        p.append('<p class="empty">No grants pulled this run (Grants.gov '
+                 'unreachable, or run without --no-grants).</p>')
+    p.append('</section>')
+
+    p.append('<section><h2>🔬 SBIR / STTR — Open R&amp;D Solicitations</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'Open small-business R&amp;D innovation solicitations from the '
+             'keyless SBIR.gov API — annual agency cycles, squarely in PRG\'s '
+             'research lane.</p>')
+    if sbir:
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>Solicitation</th><th>Program</th><th>Agency</th>'
+                 '<th>Closes</th><th>Topics</th></tr></thead><tbody>')
+        for s in sbir[:100]:
+            t = _html_escape(_clean(s["title"], 60))
+            if _is_http(s["link"]):
+                t = (f'<a href="{_html_escape(s["link"])}" target="_blank" '
+                     f'rel="noopener">{t}</a>')
+            p.append(f"<tr><td>{t}</td><td>{_html_escape(s['program'])}</td>"
+                     f"<td>{_html_escape(s['agency'])}</td>"
+                     f"<td>{_html_escape(s['close_date'])}</td>"
+                     f"<td>{_html_escape(s['topics'])}</td></tr>")
+        p.append('</tbody></table></div>')
+    else:
+        p.append('<p class="empty">No open SBIR/STTR solicitations pulled this '
+                 'run.</p>')
+    p.append('</section>')
+
+    # International opportunity sources — where the short-term global gigs live.
+    p.append('<section><h2>🌐 International Sources — Where the Short-Term Gigs '
+             'Live</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'Short-term international consultancies are scattered across portals '
+             'that don\'t talk to each other and mostly need a login (no open API '
+             'to pull) — so this is a <b>register-here directory</b>. Fit-notes '
+             'are tuned to PRG\'s founder (ACRP clinical creds, Spanish, veteran + '
+             'evacuation-ops). <b>Best first move: register on UNGM + 2–3 '
+             'implementing-partner rosters this week — it costs nothing.</b></p>')
+    _isrc_by_cat, _isrc_order = {}, []
+    for row in _intl_source_rows():
+        if row["category"] not in _isrc_by_cat:
+            _isrc_by_cat[row["category"]] = []
+            _isrc_order.append(row["category"])
+        _isrc_by_cat[row["category"]].append(row)
+    for cat in _isrc_order:
+        p.append(f'<h3 style="margin:16px 0 6px">{_html_escape(cat)}</h3>')
+        p.append('<div class="scroll"><table><thead><tr><th>Source</th>'
+                 '<th>What it covers / fit for PRG</th><th>Register</th>'
+                 '</tr></thead><tbody>')
+        for row in _isrc_by_cat[cat]:
+            u = _html_escape(row["url"])
+            note = _html_escape(row["note"]).replace("**", "")
+            p.append(f"<tr><td><b>{_html_escape(row['name'])}</b></td>"
+                     f"<td>{note}</td>"
+                     f'<td><a href="{u}" target="_blank" rel="noopener">{u}</a>'
+                     "</td></tr>")
+        p.append('</tbody></table></div>')
     p.append('</section>')
 
     # Pipeline insights
@@ -4144,6 +4421,10 @@ def parse_args(argv):
                              "profile-only run.")
     parser.add_argument("--no-recompetes", action="store_true",
                         help="Skip the Recompete Radar (USASpending.gov) lookup.")
+    parser.add_argument("--no-grants", action="store_true",
+                        help="Skip the Grants.gov assistance-opportunity pull.")
+    parser.add_argument("--no-sbir", action="store_true",
+                        help="Skip the SBIR.gov open-solicitation pull.")
     parser.add_argument("--recompete-months", type=int, default=18, metavar="N",
                         help="Recompete horizon: contracts expiring within N "
                              "months (default: 18).")
@@ -4248,6 +4529,18 @@ def main(argv=None):
         recompetes.sort(key=lambda r: r["end_date"])
         sys.stderr.write(f"    {len(recompetes)} contract(s) expiring soon\n")
 
+    # Other opportunity banks with free, keyless APIs (grants + SBIR/STTR).
+    grants = []
+    if not args.no_grants:
+        sys.stderr.write("  Grants.gov: querying assistance opportunities...\n")
+        grants = fetch_grants()
+        sys.stderr.write(f"    {len(grants)} grant opportunity(ies)\n")
+    sbir = []
+    if not args.no_sbir:
+        sys.stderr.write("  SBIR.gov: querying open R&D solicitations...\n")
+        sbir = fetch_sbir()
+        sys.stderr.write(f"    {len(sbir)} open SBIR/STTR solicitation(s)\n")
+
     # Evaluate every opportunity.
     results = [evaluate(opp) for opp in all_opps]
 
@@ -4283,13 +4576,14 @@ def main(argv=None):
     saved = []
     if not args.no_excel:
         try:
-            saved.append(export_spreadsheet(results, xlsx_path, recompetes))
+            saved.append(export_spreadsheet(results, xlsx_path, recompetes,
+                                            grants, sbir))
         except Exception as exc:  # never let one save abort the other
             sys.stderr.write(f"WARNING: could not save spreadsheet: {exc}\n")
     if not args.no_report:
         try:
             saved.append(export_html_report(results, report_path, args.days,
-                                            recompetes))
+                                            recompetes, grants, sbir))
         except Exception as exc:
             sys.stderr.write(f"WARNING: could not save HTML report: {exc}\n")
 

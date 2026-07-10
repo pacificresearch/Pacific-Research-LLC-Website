@@ -18,6 +18,28 @@ winnable, un-killed work, so you know exactly which codes to **add to your SAM.g
 Reps & Certs**. This sweep makes many more API calls; it's built to run overnight.
 Add **`--narrow`** for a fast, profile-only run (target NAICS/PSC just as before).
 
+## Beyond SAM.gov — other opportunity banks
+
+SAM.gov is only the contracts channel. The tool now also pulls, live, from two
+other federal banks that have **free, keyless APIs**, each on its own tab:
+
+- **Grants.gov (Assistance $)** — federal **grants & cooperative agreements** (a
+  different instrument than contracts), including State Dept **global-health APS**
+  and assistance awards that never touch SAM.gov.
+- **SBIR-STTR (Open R&D)** — open small-business R&D innovation solicitations
+  from SBIR.gov, squarely in PRG's research lane.
+
+For **short-term international consultancies** — which are scattered across
+login-only portals with no open API — there's a curated **International Sources**
+tab + 🌐 HTML section (a *register-here* directory, not a live pull), with
+fit-notes tuned to PRG's founder (ACRP clinical creds, Spanish, veteran +
+evacuation-ops): **UNGM** (one registration → UNDP/UNOPS/WHO/UNICEF/IOM),
+**World Bank eConsultant2**, **ADB CMS**, **IDB**, **Devex / DevelopmentAid**,
+**ReliefWeb**, and implementing-partner rosters (**Chemonics, DAI, Tetra Tech,
+Abt Global, FHI 360, Palladium, RTI, Jhpiego, MSH**). Best first move: register
+on UNGM + 2–3 partner rosters this week — it's free. Skip the live pulls with
+`--no-grants` / `--no-sbir`.
+
 ## What it does
 
 1. **Query construction** — pulls active opportunities from the SAM.gov
