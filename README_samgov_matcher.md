@@ -6,12 +6,25 @@ contract opportunities by the company's target NAICS codes, evaluates each one
 against Pacific Research Group LLC's SDVOSB profile and core capabilities, and
 prints a clean Markdown screening report to the console.
 
+## Wide net by default (not capped by NAICS)
+
+By **default the tool casts the widest *relevant* net**: it sweeps **every
+set-aside PRG is eligible for** (SDVOSB, VOSB, Total Small Business) **across ALL
+NAICS**, not just the target list — because PRG's structural edge is being an
+SDVOSB, so a set-aside *anywhere* is winnable regardless of NAICS. The screening
+gates then find the compelling ones, and a **🧭 NAICS Gap** report (Excel tab +
+HTML section) flags the NAICS codes — not currently in PRG's profile — that carry
+winnable, un-killed work, so you know exactly which codes to **add to your SAM.gov
+Reps & Certs**. This sweep makes many more API calls; it's built to run overnight.
+Add **`--narrow`** for a fast, profile-only run (target NAICS/PSC just as before).
+
 ## What it does
 
 1. **Query construction** — pulls active opportunities from the SAM.gov
    Opportunities API for each **core-target NAICS** code (`541715`, `541611`,
    `541990`, `811210`) *and* each **low-barrier NAICS** code (staffing,
-   administrative, facilities, and health-support categories) within a
+   administrative, facilities, and health-support categories), **plus (unless
+   `--narrow`) a sweep of every eligible set-aside across all NAICS**, within a
    posted-date window.
 2. **Socioeconomic filtering** — inspects each notice's `typeOfSetAside` code
    and flags it as **SDVOSB**, **Total SB**, **VOSB**, another restricted

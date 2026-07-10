@@ -269,6 +269,13 @@ HUBZONE_CODES = {"HZC", "HZS"}
 EIGHTA_CODES = {"8A", "8AN"}
 WOSB_CODES = {"WOSB", "WOSBSS", "EDWOSB", "EDWOSBSS"}
 
+# WIDE-NET sweep: every set-aside code PRG is eligible for, queried across ALL
+# NAICS (not just the target list). This is the widest *relevant* net — PRG's
+# structural edge is being an SDVOSB, so a set-aside anywhere is winnable
+# regardless of NAICS. The screening gates then find the compelling ones and the
+# NAICS-gap report flags codes PRG should add to its SAM registration.
+SETASIDE_QUERY_CODES = ["SDVOSBC", "SDVOSBS", "VSA", "VSS", "SBA", "SBP"]
+
 # Target PSC (Product/Service) codes — more specific than NAICS. Queried in
 # addition to NAICS to catch work classified by service type, which pros do.
 TARGET_PSC = OrderedDict([
@@ -1325,6 +1332,7 @@ def evaluate(opp):
         "agency_bucket": _agency_bucket(opp),
         "naics": naics or "N/A",
         "naics_tier": tier,
+        "naics_in_profile": naics in ALL_QUERY_NAICS,
         "setaside": setaside_label,
         "value_display": value_display,
         "value_num": value_num,
@@ -2633,6 +2641,48 @@ def _summary_rows(results, recompetes=None):
     return rows
 
 
+_NAICS_GAP_COLS = [
+    ("NAICS (not in PRG profile)", "naics"),
+    ("# Winnable Opportunities", "count"),
+    ("Best Win Score", "best_win"),
+    ("Top Set-Aside", "setaside"),
+    ("Example Opportunity", "example_title"),
+    ("Example Agency", "example_agency"),
+    ("Recommendation", "recommendation"),
+]
+
+
+def _naics_gap_rows(results):
+    """Wide-net payoff: NAICS codes NOT in PRG's profile that carry set-aside-
+    eligible, un-killed opportunities — i.e. codes worth ADDING to the SAM
+    registration. Grouped by NAICS, ranked by how many winnable notices sit
+    there."""
+    from collections import defaultdict
+    groups = defaultdict(list)
+    for r in results:
+        if (not r.get("naics_in_profile") and r["raw_setaside_eligible"]
+                and not r["disqualified"] and not r["is_awarded"]
+                and not r["is_expired"] and not r["is_future"]
+                and not r.get("watch_template")):
+            groups[r["naics"]].append(r)
+    rows = []
+    for code, rs in groups.items():
+        rs.sort(key=lambda r: r["win_score"], reverse=True)
+        best = rs[0]
+        rows.append({
+            "naics": code,
+            "count": len(rs),
+            "best_win": best["win_score"],
+            "setaside": best["setaside"],
+            "example_title": best["title"],
+            "example_agency": best["agency"],
+            "recommendation": "Add this NAICS to SAM.gov (Reps & Certs) to be "
+                              "listed and to match agency market research",
+        })
+    rows.sort(key=lambda x: (x["count"], x["best_win"]), reverse=True)
+    return rows
+
+
 def _top10(results):
     """The single best-bet shortlist: highest-scoring eligible, pursuable
     opportunities (not awarded, not expired), ranked, capped at 10."""
@@ -2687,6 +2737,7 @@ def export_spreadsheet(results, path, recompetes=None):
         ("Recompete Radar", _RECOMPETE_COLS, recompetes or []),
         ("WATCH-TEMPLATE (hire-to-win)", _TEMPLATE_COLS, template_rows),
         ("WATCHLIST (prep, future)", _WATCHLIST_COLS, watchlist),
+        ("NAICS Gap - Add to SAM", _NAICS_GAP_COLS, _naics_gap_rows(results)),
         ("KILL LOG (screened out)", _KILL_COLS, killed),
         ("Resources (Hunt & Help)", _RESOURCE_COLS, _resource_rows()),
     ]
@@ -2770,6 +2821,9 @@ def export_spreadsheet(results, path, recompetes=None):
             "Founder PP Usable?": 30, "POC (from notice)": 34,
             "Notice ID": 30, "What to Build (matched)": 34,
             "Metric": 34, "Value": 12, "Detail": 44,
+            "NAICS (not in PRG profile)": 24, "# Winnable Opportunities": 22,
+            "Best Win Score": 14, "Top Set-Aside": 22, "Example Opportunity": 46,
+            "Example Agency": 28, "Recommendation": 54,
         }
         for idx, (h, _) in enumerate(cols, start=1):
             ws.column_dimensions[get_column_letter(idx)].width = widths.get(h, 16)
@@ -3528,6 +3582,34 @@ def export_html_report(results, path, days, recompetes=None):
         p.append('<p class="empty">Nothing auto-screened-out this run.</p>')
     p.append('</section>')
 
+    # NAICS gap — wide-net payoff: codes to add to SAM registration.
+    gap = _naics_gap_rows(results)
+    p.append('<section><h2>🧭 NAICS Gap — Codes to Add to Your SAM '
+             'Registration</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'From the WIDE net (all eligible set-asides across ALL NAICS): these '
+             'codes are NOT in PRG\'s current profile but carry set-aside-eligible, '
+             'un-killed opportunities. Add the high-count ones to your SAM.gov Reps '
+             '&amp; Certs so agency market research finds you and you match more '
+             'searches.</p>')
+    if gap:
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>NAICS</th><th># Winnable</th><th>Best Win</th>'
+                 '<th>Top Set-Aside</th><th>Example Opportunity</th>'
+                 '<th>Agency</th></tr></thead><tbody>')
+        for g in gap[:40]:
+            p.append(f"<tr><td><b>{_html_escape(g['naics'])}</b></td>"
+                     f"<td class='num'>{g['count']}</td>"
+                     f"<td class='num'>{g['best_win']}</td>"
+                     f"<td>{_html_escape(g['setaside'])}</td>"
+                     f"<td>{_html_escape(_clean(g['example_title'], 55))}</td>"
+                     f"<td>{_html_escape(g['example_agency'])}</td></tr>")
+        p.append('</tbody></table></div>')
+    else:
+        p.append('<p class="empty">No out-of-profile NAICS with winnable work '
+                 'this run (or run without --narrow to cast the wide net).</p>')
+    p.append('</section>')
+
     # Pipeline insights
     p.append('<section><h2>Growth &amp; Pipeline Insights</h2><div class="card">')
     if agency_counts:
@@ -4054,6 +4136,12 @@ def parse_args(argv):
                         help="Suppress the console Markdown report.")
     parser.add_argument("--no-psc", action="store_true",
                         help="Skip the extra PSC (Product/Service Code) queries.")
+    parser.add_argument("--narrow", action="store_true",
+                        help="Restrict to PRG's target NAICS/PSC only. By DEFAULT "
+                             "the tool casts the WIDE net — every set-aside PRG is "
+                             "eligible for across ALL NAICS — and reports which "
+                             "NAICS to add to SAM. Use --narrow for a fast, "
+                             "profile-only run.")
     parser.add_argument("--no-recompetes", action="store_true",
                         help="Skip the Recompete Radar (USASpending.gov) lookup.")
     parser.add_argument("--recompete-months", type=int, default=18, metavar="N",
@@ -4114,6 +4202,28 @@ def main(argv=None):
                     continue
                 seen.add(key)
                 all_opps.append(opp)
+
+    # WIDE NET — sweep EVERY set-aside PRG is eligible for across ALL NAICS, not
+    # just the target list. This is where opportunities in codes PRG hasn't
+    # registered surface; the NAICS-gap report then flags which to add to SAM.
+    if not args.narrow:
+        sys.stderr.write("  Wide net: sweeping all eligible set-asides across "
+                         "ALL NAICS (this is the big one)...\n")
+        for sa in SETASIDE_QUERY_CODES:
+            batch = fetch_opportunities(
+                api_key, sa, posted_from, posted_to, args.limit,
+                code_param="typeOfSetAside",
+            )
+            new = 0
+            for opp in batch:
+                key = opp.get("noticeId") or opp.get("solicitationNumber") or id(opp)
+                if key in seen:
+                    continue
+                seen.add(key)
+                all_opps.append(opp)
+                new += 1
+            sys.stderr.write(f"  set-aside {sa}: {len(batch)} record(s) "
+                             f"({new} new)\n")
 
     # Recompete Radar — upcoming rebids from USASpending.gov (keyless API).
     recompetes = []
