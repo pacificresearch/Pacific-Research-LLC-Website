@@ -13,10 +13,22 @@ standard is a credible path through:
 
 **WIN → SOURCE → PERFORM → CONTROL → INVOICE → COLLECT → PROFIT**
 
-Founder credentials (clinical research ACRP-PM/CP, biomedical equipment
-CBET, MA Int'l Studies/Spanish/evacuation ops, program management,
-technical writing) matter as (a) personal-delivery capability on a
-subset of contracts and (b) PM-credibility signal on the rest.
+Founder credentials matter as (a) personal-delivery capability on a
+subset of contracts and (b) PM-credibility signal on the rest. Full map
+(from the resume — use ALL of these when screening): clinical research
+operations (ACRP-PM/CP, Stanford, 1,500+ participants, NIH + industry,
+4x JAMA-published, GCP/21 CFR, REDCap/OnCore/Medidata, decentralized
+trials); biomedical equipment / healthcare technology management (AAMI
+CBET, USAF 4A2X5, Joint Commission/DoD accreditation readiness);
+emergency medicine (NREMT, CPT-I phlebotomy, BLS/ACLS/PALS, PHTLS/TCCC,
+Level I trauma center); high-throughput testing/vaccination and
+refugee/evacuee medical operations (Operation Allies Welcome, 25K+
+evacuees, interagency/CDC compliance); international affairs (MA Int'l
+Studies; Brazil/Peru/China field experience); cultural heritage and
+humanities PM literacy (BA Classics — museum, collections, archival,
+fine-art scopes; the appraiser credential itself is hire-to-win); data
+analytics (SAS, SPSS, R, Python); program management and technical
+writing; DOT shipping.
 
 ## OPPORTUNITY SCREENING RULE — RUN BEFORE ANY ANALYSIS
 
