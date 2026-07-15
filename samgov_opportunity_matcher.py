@@ -393,6 +393,11 @@ INDIVIDUAL_CREDENTIAL_TEMPLATE = [
     "licensed counselor", "licensed clinical", "licensed psychologist",
     "licensed social worker", "certified professional coder",
     "american board of radiology", "licensed dietitian", "licensed physicist",
+    # Accredited appraisers (fine art / personal property / real estate) — a
+    # hireable individual credential (ASA/AAA/ISA, USPAP-compliant), not a
+    # firm license. Route to hire-to-win, never a silent score-down.
+    "accredited appraiser", "certified appraiser", "qualified appraiser",
+    "uspap", "appraiser",
 ]
 # TYPE B — CORPORATE / OEM / PROPRIETARY authorization (a certified COMPANY).
 # The authorization belongs to a corporation PRG cannot put on payroll; subbing
@@ -585,16 +590,44 @@ LABOR_THIN = [                # 1-9: thin market / geographic / OEM-cert bound
 # GATE 3 — founder PM literacy (0-25). NOT "can founder do the work" — can the
 # founder spec it, QA it, and talk to the CO without a translator.
 FOUNDER_DOMAIN_KEYWORDS = [   # 20-25: inside a founder credential domain
+    # Clinical research operations (Stanford, 1,500+ participants, NIH +
+    # industry, 4x JAMA; ACRP-PM/CP, GCP)
     "clinical research", "clinical trial", "clinical study", "gcp",
     "human subjects", "irb", "clinical data", "patient recruitment",
+    "decentralized trial", "telehealth", "econsent", "redcap", "ctms",
+    "electronic data capture", "data management plan", "honest broker",
+    # Biomedical equipment / healthcare technology (USAF 4A2X5, CBET,
+    # >98% PM compliance on 200+ devices, Joint Commission/DoD readiness)
     "biomedical equipment", "medical equipment", "medical device",
     "healthcare technology", "hospital equipment", "clinical engineering",
+    "accreditation readiness", "joint commission", "medical readiness",
+    # Emergency medicine / EMS (Level I trauma center, NREMT, ACLS/PALS,
+    # PHTLS/TCCC; CPT-I phlebotomy)
+    "emergency medical", "emergency department", "triage", "ems",
+    "emergency medical technician", "phlebotomy", "specimen collection",
+    "vaccination", "immunization", "health screening", "covid-19 testing",
+    "mass casualty", "medical surge",
+    # Refugee / humanitarian / evacuation operations (Operation Allies
+    # Welcome — 25K+ evacuees; interagency, CDC compliance)
+    "evacuation", "evacuee", "refugee", "resettlement", "humanitarian",
+    "repatriation", "displaced persons",
+    # International / diplomatic (MA International Studies; Brazil, Peru,
+    # China field experience)
     "global health", "international health", "diplomatic", "embassy program",
-    "evacuation", "spanish language", "latin america",
+    "spanish language", "latin america", "foreign affairs",
+    "international development", "capacity building",
+    # Cultural heritage / humanities (BA Classics) — PM literacy for
+    # collections work; the appraiser credential itself is hire-to-win.
+    "cultural heritage", "heritage collection", "museum", "curatorial",
+    "collections management", "archival", "archives", "fine art",
+    "works of art", "art collection", "classical",
+    # Research analysis / evaluation / technical writing (SAS, SPSS, R,
+    # Python; Google Advanced Data Analytics)
     "program evaluation", "longitudinal study", "research analysis",
     "literature review", "systematic review", "technical writing",
     "technical documentation", "health program", "public health program",
     "statistical modeling", "study design", "protocol development",
+    "data analytics", "statistical analysis",
 ]
 ADJACENT_DOMAIN_KEYWORDS = [  # 10-19: founder can spec/QA without a translator
     "program support", "program management support", "data analysis",
@@ -604,6 +637,14 @@ ADJACENT_DOMAIN_KEYWORDS = [  # 10-19: founder can spec/QA without a translator
     "market research", "survey", "needs assessment", "report preparation",
     "administrative support", "project management", "management consulting",
     "knowledge management", "conference support",
+    # Resume-adjacent: healthcare admin, education, records/inventory, QA
+    "medical records", "records management", "credentialing",
+    "medical staffing", "health education", "education services",
+    "instruction", "tutoring", "quality assurance", "quality control",
+    "process improvement", "standard operating procedures", "inventory",
+    "medical courier", "specimen transport", "laboratory support",
+    "public health", "case management", "enrollment support",
+    "translation services", "interpretation services",
 ]
 LOW_LITERACY_KEYWORDS = [     # 1-9: founder cannot judge work quality
     "environmental sampling", "environmental compliance",
@@ -1705,9 +1746,19 @@ def evaluate(opp):
     # international ambitions later, but none are first-contract material).
     buyer_type, buyer_is_international, buyer_hit = _buyer_type(opp)
     if buyer_is_international and not disqualified:
-        win_score = max(0, win_score - 20)
-        soft_flags = list(soft_flags) + [
-            f"international/non-US buyer ({buyer_hit}) — no SDVOSB preference"]
+        # Founder-consultancy lane: when the scope sits inside a founder
+        # credential domain (gate3 >= 20), an international/overseas-post
+        # buyer is PRG's separate consultancy lane — the set-aside edge never
+        # existed there, so it costs a nudge, not a cliff.
+        if rub["gate3_score"] >= 20:
+            win_score = max(0, win_score - 8)
+            soft_flags = list(soft_flags) + [
+                f"international buyer ({buyer_hit}) — founder-consultancy "
+                "lane; no set-aside applies"]
+        else:
+            win_score = max(0, win_score - 20)
+            soft_flags = list(soft_flags) + [
+                f"international/non-US buyer ({buyer_hit}) — no SDVOSB preference"]
         if win_score < GREEN_MIN and win_band == "Green":
             win_band, win_emoji, win_note = "Yellow", "🟡", "On the fence — no US set-aside edge"
         if win_score < YELLOW_MIN and win_band == "Yellow":
@@ -1771,16 +1822,18 @@ def evaluate(opp):
         c = poc_list[0]
         poc_display = " / ".join(b for b in (c.get("name"), c.get("email"),
                                              c.get("phone")) if b)
-    # Capture v3 pursuit role (the six-way decision).
+    # Capture v3 pursuit role (the six-way decision). A hire-to-win
+    # credential (WATCH-TEMPLATE) is a concrete teaming play — it outranks
+    # the generic "unrestricted prime → subcontracting angle" routing.
     if disqualified or is_expired:
         role = "PASS"
+    elif is_watch_template:
+        role = "PRIME WITH TEAMING PARTNER"
     elif is_awarded or is_sub or notice_class == "AWARD":
         role = "PURSUE AS SUBCONTRACTOR"
     elif is_watch:
         role = ("RESPOND TO SOURCES SOUGHT" if respond_recommended
                 else "MONITOR / PREPOSITION")
-    elif is_watch_template:
-        role = "PRIME WITH TEAMING PARTNER"
     elif verdict == "RESEARCH":
         role = "MONITOR / PREPOSITION"
     else:
@@ -2460,6 +2513,7 @@ def prg_rubric(opp, setaside_label, setaside_eligible, is_sdvosb, value_num,
     thin = _keyword_hits(text, LABOR_THIN)
     commodity = _keyword_hits(text, LABOR_COMMODITY)
     specialized = _keyword_hits(text, LABOR_SPECIALIZED)
+    trade_market = _keyword_hits(text, DELEGABLE_TRADE_KEYWORDS)
     if thin:
         gate2, specialty = 5, "specialist"
         g2_note = f"thin/constrained labor market ('{thin[0]}')"
@@ -2471,6 +2525,12 @@ def prg_rubric(opp, setaside_label, setaside_eligible, is_sdvosb, value_num,
         gate2 = min(19, 15 + max(0, len(specialized) - 1))
         specialty = specialized[0]
         g2_note = f"specialized but findable ({specialized[0]}) — hire with lead time"
+    elif trade_market:
+        # Aggregator play: local trade/field-service subs are one of the
+        # DEEPEST sourcing markets there is (every metro has dozens).
+        gate2, specialty = 20, f"{trade_market[0]} sub"
+        g2_note = (f"deep local trade-sub market ({trade_market[0]}) — "
+                   "source 3+ quotes")
     else:
         gate2, specialty = 12, "professional labor"
         g2_note = "labor market unclear — verify before bid"
@@ -2488,6 +2548,13 @@ def prg_rubric(opp, setaside_label, setaside_eligible, is_sdvosb, value_num,
     elif adjacent_hits:
         gate3 = min(19, 15 + max(0, len(adjacent_hits) - 2))
         g3_note = f"adjacent domain — founder can spec/QA ({adjacent_hits[0]})"
+    elif trade_market:
+        # Routine trade scopes are inspectable by a competent PM: acceptance
+        # is a QASP walk-through, not specialist judgment (a clean floor, a
+        # patched roof, a mowed field). Supervision literacy is adequate.
+        gate3 = 15
+        g3_note = (f"routine trade scope ({trade_market[0]}) — QASP/"
+                   "checklist supervisable")
     else:
         gate3 = 10
         g3_note = "PM literacy unclear — verify scope"
@@ -5253,6 +5320,38 @@ _SELFTEST_CASES = [
         "forbid_verdict": "NO-BID",
         "expect_falsy": ["is_solo"],
         "expect_contains": {"win_band": "ellow"},  # Yellow (at best) — never Green
+    },
+    {
+        "label": "State/Vienna 19AU9026Q0012 — heritage-collection appraisal "
+                 "(appraiser = hireable credential → WATCH-TEMPLATE, not Red)",
+        "opp": {
+            "solicitationNumber": "19AU9026Q0012",
+            "noticeId": "st13",
+            "title": "Appraisal of Heritage Collection — U.S. Embassy Vienna",
+            "description": ("Professional appraisal services to evaluate 33 "
+                            "pieces of contemporary and historic works of art, "
+                            "sculptures, textiles, and furniture comprising "
+                            "the Cultural Heritage collection. An acknowledged "
+                            "subject matter expert in fine art appraisal is "
+                            "required; a qualified appraiser shall document "
+                            "condition and establish fair market values. "
+                            "Report and valuation written in English."),
+            "naicsCode": "541990",
+            "classificationCode": "R707",
+            "typeOfSetAside": "",
+            "typeOfSetAsideDescription": "",
+            "organizationName": "U.S. Tri-Mission Vienna",
+            "fullParentPathName": "STATE, DEPARTMENT OF",
+            "placeOfPerformance": {"country": {"code": "AUT",
+                                               "name": "Austria"}},
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "WATCH-TEMPLATE",
+        "expect_truthy": ["watch_template", "credential_needed",
+                          "buyer_is_international"],
+        "expect_falsy": ["disqualified"],
+        "expect_equals": {"role": "PRIME WITH TEAMING PARTNER"},
     },
     {
         "label": "Synthetic size-standard mention — '$34.5 million size "
