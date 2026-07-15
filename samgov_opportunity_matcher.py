@@ -516,6 +516,131 @@ KC5_MAX_SOLO_VALUE = 10_000_000
 _SIZE_STANDARD_RE = re.compile(r"[^.]{0,40}size\s+standard[^.]{0,80}",
                                re.IGNORECASE)
 
+# ---------------------------------------------------------------------------
+# PRG RUBRIC v2 — three-gate model + weighted scoring.
+# Business model: win as prime, hire 1099/W2 labor, founder PMs the work.
+# The founder does NOT need to personally perform delivery; founder
+# credentials matter as (a) personal-delivery capability on a subset and
+# (b) PM-credibility signal on the rest.
+# ---------------------------------------------------------------------------
+
+# GATE 0 — product purchase / subscription / license RESALE with no meaningful
+# services labor. No labor to arbitrage → hard kill.
+RESALE_KILL_KEYWORDS = [
+    "subscription", "subscriptions", "license renewal", "renewal of license",
+    "software license", "perpetual license", "saas", "reseller",
+    "letter of supply", "database access", "journal access", "ebsco",
+    "site license", "annual license", "licenses for", "subscription renewal",
+]
+# Services-labor signals that rescue a "license/subscription" notice from the
+# resale kill (implementation/integration/help-desk work is real labor).
+RESALE_SERVICES_EXEMPT = [
+    "implementation services", "integration services", "configuration",
+    "migration services", "help desk", "training services", "development",
+    "customization", "support staff", "labor hours", "personnel shall",
+]
+
+# GATE 0 — firm-level professional licensure PRG does not hold (land
+# surveying, PE stamp, architecture) — kill unless the solicitation allows
+# the license to be held by key personnel.
+FIRM_LICENSURE_KILL = [
+    "professional engineer", "pe stamp", "stamped by a licensed",
+    "licensed land surveyor", "professional land surveyor",
+    "land surveying license", "registered land surveyor",
+    "licensed architect", "registered architect", "architect-engineer",
+    "a-e firm", "licensed engineering firm", "firm must be licensed",
+]
+KEY_PERSONNEL_LICENSE_OK = [
+    "may be held by key personnel", "key personnel may hold",
+    "licensed key personnel", "key personnel shall hold",
+    "licensure may be met by key personnel", "held by an employee",
+]
+
+# GATE 2 — does a hirable labor market exist? (0-25)
+LABOR_COMMODITY = [           # 20-25: deep 1099/W2 professional market
+    "analyst", "analysts", "writer", "technical writer", "editor",
+    "communications specialist", "communication specialist", "comms",
+    "public affairs", "survey researcher", "survey research",
+    "biostatistician", "statistician", "data scientist", "trainer",
+    "instructor", "facilitator", "administrative support", "admin support",
+    "research assistant", "program analyst", "management analyst",
+    "graphic design", "transcription", "translator", "outreach specialist",
+]
+LABOR_SPECIALIZED = [         # 10-19: findable but specialized — lead time
+    "biomedical equipment technician", "biomedical technician", "bmet",
+    "clinical research coordinator", "clinical research associate",
+    "regulatory specialist", "regulatory affairs", "epidemiologist",
+    "industrial hygienist", "health physicist", "gis analyst",
+    "environmental scientist", "environmental specialist", "logistician",
+    "medical coder", "credentialed", "subject matter expert",
+]
+LABOR_THIN = [                # 1-9: thin market / geographic / OEM-cert bound
+    "oem certified", "factory trained", "factory certified",
+    "manufacturer certified", "remote duty station", "rotating personnel",
+    "cleared personnel", "polygraph",
+]
+
+# GATE 3 — founder PM literacy (0-25). NOT "can founder do the work" — can the
+# founder spec it, QA it, and talk to the CO without a translator.
+FOUNDER_DOMAIN_KEYWORDS = [   # 20-25: inside a founder credential domain
+    "clinical research", "clinical trial", "clinical study", "gcp",
+    "human subjects", "irb", "clinical data", "patient recruitment",
+    "biomedical equipment", "medical equipment", "medical device",
+    "healthcare technology", "hospital equipment", "clinical engineering",
+    "global health", "international health", "diplomatic", "embassy program",
+    "evacuation", "spanish language", "latin america",
+    "program evaluation", "longitudinal study", "research analysis",
+    "literature review", "systematic review", "technical writing",
+    "technical documentation", "health program", "public health program",
+    "statistical modeling", "study design", "protocol development",
+]
+ADJACENT_DOMAIN_KEYWORDS = [  # 10-19: founder can spec/QA without a translator
+    "program support", "program management support", "data analysis",
+    "data management", "training coordination", "training development",
+    "curriculum", "communications", "communication support", "outreach",
+    "stakeholder engagement", "strategic planning", "policy analysis",
+    "market research", "survey", "needs assessment", "report preparation",
+    "administrative support", "project management", "management consulting",
+    "knowledge management", "conference support",
+]
+LOW_LITERACY_KEYWORDS = [     # 1-9: founder cannot judge work quality
+    "environmental sampling", "environmental compliance",
+    "environmental remediation", "air monitoring", "soil sampling",
+    "groundwater",
+    "it infrastructure", "network engineering", "network infrastructure",
+    "cybersecurity engineering", "cloud migration", "data center",
+    "financial audit", "financial statement audit", "actuarial",
+    "geotechnical", "hydrology", "utility survey", "land survey",
+]
+
+# Weighted modifiers.
+DELIVERABLE_SCOPE_KEYWORDS = [   # deliverable-based vs level-of-effort
+    "report", "reports", "study", "studies", "analysis", "assessment",
+    "evaluation report", "white paper", "deliverables", "literature review",
+    "manuscript", "curriculum", "training materials", "plan development",
+    "modeling", "data set", "dataset", "final report",
+]
+LOE_SCOPE_KEYWORDS = [
+    "full-time", "full time", "man-hours", "labor hours", "level of effort",
+    "personnel shall be on-site", "staff augmentation", "seat support",
+    "positions", "billets",
+]
+RECURRING_KEYWORDS = [
+    "option year", "option years", "option period", "base year",
+    "base plus", "multi-year", "multiyear", "ordering period", "idiq",
+]
+ONSITE_KEYWORDS = [
+    "on-site", "onsite", "on site", "government facility", "duty station",
+    "contractor personnel shall report",
+]
+_SOCAL_STATES = {"CA"}           # crude: any CA PoP skips the -5 travel hit
+
+# Rating bands (rubric v2): Green = 75+, Yellow = 55-74, Red = below 55 or
+# any Gate 0 hit.
+RUBRIC_BASE = 30                 # for passing Gates 0 and 1
+GREEN_MIN = 75
+YELLOW_MIN = 55
+
 # International / non-US-government buyers. None recognize US small-business or
 # SDVOSB set-asides — PRG's main structural advantage evaporates — so score DOWN
 # and flag (never first-contract material). Not a hard kill: a specific one may
@@ -1460,9 +1585,6 @@ def evaluate(opp):
         lb_score += 1  # bonus if it also brushes core capability
 
     value_display, value_num = _extract_value(opp)
-    is_solo, solo_score, solo_reason = classify_solo(
-        opp, setaside_eligible, value_num
-    )
 
     # Richer decision fields.
     fte = _estimate_fte(_haystack(opp))
@@ -1488,15 +1610,23 @@ def evaluate(opp):
         llc_note = "Yes — LLC may bid" + (" (SDVOSB cert req'd)" if is_sdvosb else "")
     else:
         llc_note = "No — set-aside excludes PRG"
-    win_score, win_band, win_emoji, win_note = _win_assessment(
-        setaside_label, setaside_eligible, is_sdvosb, tier,
-        tech_match, matched_kw, is_solo, fte, value_num, incumbent,
-        deadline_days,
-    )
+    # PRG rubric v2 — three-gate model + weighted scoring (replaces the old
+    # set-aside-weighted composite that rated undeliverable contracts Green).
+    rub = prg_rubric(opp, setaside_label, setaside_eligible, is_sdvosb,
+                     value_num, fte, incumbent, deadline_days,
+                     disqualified, kill_gate, kill_reason)
+    win_score = rub["win_score"]
+    win_band, win_emoji, win_note = (rub["win_band"], rub["win_emoji"],
+                                     rub["win_note"])
+    # "Solo" (rubric v2) = the founder can personally deliver the entire
+    # scope — NOT "single-person contract".
+    is_solo = rub["founder_can_deliver"]
+    solo_score = win_score
+    solo_reason = rub["solo_reason"]
     # Apply first-contract-winnable score-up signals (LPTA, remote, neutral PP).
     if not disqualified and score_up_bonus:
         win_score = min(100, win_score + score_up_bonus)
-        if win_score >= 68 and win_band != "Green":
+        if win_score >= GREEN_MIN and win_band != "Green":
             win_band, win_emoji, win_note = "Green", "🟢", "Best bet — pursue"
 
     # Categorical score-down: electronic/commercial equipment repair & maintenance
@@ -1506,9 +1636,9 @@ def evaluate(opp):
         win_score = max(0, win_score - 18)
         soft_flags = list(soft_flags) + [
             "equipment-repair NAICS (8112/8113) — PRG owns no bench"]
-        if win_score < 68 and win_band == "Green":
+        if win_score < GREEN_MIN and win_band == "Green":
             win_band, win_emoji, win_note = "Yellow", "🟡", "On the fence — verify scope"
-        if win_score < 45 and win_band == "Yellow":
+        if win_score < YELLOW_MIN and win_band == "Yellow":
             win_band, win_emoji, win_note = "Red", "🔴", "Weak fit — likely NO-BID"
 
     # Buyer type: international / non-US-government buyers recognize no US small-
@@ -1520,9 +1650,9 @@ def evaluate(opp):
         win_score = max(0, win_score - 20)
         soft_flags = list(soft_flags) + [
             f"international/non-US buyer ({buyer_hit}) — no SDVOSB preference"]
-        if win_score < 68 and win_band == "Green":
+        if win_score < GREEN_MIN and win_band == "Green":
             win_band, win_emoji, win_note = "Yellow", "🟡", "On the fence — no US set-aside edge"
-        if win_score < 45 and win_band == "Yellow":
+        if win_score < YELLOW_MIN and win_band == "Yellow":
             win_band, win_emoji, win_note = "Red", "🔴", "Weak fit — non-US buyer"
 
     # --- STAGE 0: timing + notice-type gating (takes precedence over scoring) ---
@@ -1561,7 +1691,7 @@ def evaluate(opp):
         verdict = "SHORT-FUSE"
     elif pp_wall and incumbent:
         verdict = "RESEARCH"          # PP wall + incumbent = long odds first time
-    elif setaside_label == "None" and win_score < 55:
+    elif setaside_label == "None" and win_score < YELLOW_MIN:
         verdict = "RESEARCH"          # open competition, weak edge
     else:
         verdict = "BID"
@@ -1674,6 +1804,14 @@ def evaluate(opp):
         "win_band": win_band,
         "win_emoji": win_emoji,
         "win_note": win_note,
+        "labor_plan": rub["labor_plan"],
+        "pp_value": rub["pp_value"],
+        "passthrough_risk": rub["passthrough_risk"],
+        "bonding_required": rub["bonding_required"],
+        "gate1_notes": rub["gate1_notes"],
+        "gate2_score": rub["gate2_score"],
+        "gate3_score": rub["gate3_score"],
+        "modifier_notes": "; ".join(rub["modifier_notes"]),
         "poc": _extract_poc(opp),
         "psc": (opp.get("classificationCode") or "").strip(),
         "posted": (opp.get("postedDate") or "").split("T")[0],
@@ -2000,6 +2138,22 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
         return _fail("Gate 0.5 (structural)",
                      f"requires an asset/vehicle PRG lacks — '{st[0]}'")
 
+    # GATE 0 — product / subscription / license RESALE with no meaningful
+    # services labor. No labor to arbitrage → hard kill (rubric v2).
+    rs = _keyword_hits(text, RESALE_KILL_KEYWORDS)
+    if rs and not _keyword_hits(text, RESALE_SERVICES_EXEMPT):
+        return _fail("Gate 0 (resale)",
+                     f"product/subscription/license resale, no services labor "
+                     f"('{rs[0]}')")
+
+    # GATE 0 — firm-level professional licensure PRG does not hold (surveying,
+    # PE stamp, architecture), unless key personnel may hold the license.
+    fl = _keyword_hits(text, FIRM_LICENSURE_KILL)
+    if fl and not _keyword_hits(text, KEY_PERSONNEL_LICENSE_OK):
+        return _fail("Gate 0 (firm licensure)",
+                     f"requires firm-level professional licensure PRG does "
+                     f"not hold ('{fl[0]}')")
+
     # TYPE B — corporate / OEM / proprietary-system authorization (UNHIREABLE).
     # The authorization belongs to a company PRG can't put on payroll; subbing the
     # principal purpose is an illegal pass-through (>50% subcontracted) → HARD
@@ -2069,10 +2223,12 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
         return _fail("Gate 1 (workforce/CBA)",
                      f"incumbent-workforce / CBA signal — '{wf[0]}'")
 
-    # GATE 5 — bonding / capital beyond a laptop.
+    # GATE 0 — bonding (bid/performance bonds). Hard kill, but flagged
+    # explicitly as "bonding required" rather than silently scored.
     bond = _keyword_hits(text, BONDING_KILL_KEYWORDS)
     if bond:
-        return _fail("Gate 5 (bonding)", f"bonding required — '{bond[0]}'")
+        return _fail("Gate 0 (bonding required)",
+                     f"bonding required — '{bond[0]}'")
 
     # GATE 4 — commodity supply / distribution of goods (a product buy, not a
     # service). Product/supply classification + a supply verb with no analytic
@@ -2092,10 +2248,10 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
         return _fail("Gate 3 (coverage)",
                      f"requires coverage PRG can't commit solo — '{cov[0]}'")
 
-    # GATE 1 — self-performance: a sole performer can't field a team.
-    if fte is not None and fte >= 3:
-        return _fail("Gate 1 (self-perform)",
-                     f"~{fte} FTE — needs a team; can't self-perform 50%")
+    # NOTE (rubric v2): a multi-FTE team is NOT a kill — PRG's model is win as
+    # prime and hire W2/1099 labor with the founder as PM. W2 hires count as
+    # self-performance under the limitations-on-subcontracting rule; the labor
+    # plan (Gate 1) and labor-market score (Gate 2) price the staffing risk.
 
     # TYPE A (generic) — a "shall/must hold a <license/certification>" that
     # survived every kill above. An individual can hold it, so it's a hire-to-win
@@ -2156,64 +2312,183 @@ def _estimate_fte(text):
     return max(counts) if counts else None
 
 
-def classify_solo(opp, setaside_eligible, value_num):
-    """Assess whether one person (with an AI assistant) could realistically
-    deliver this contract. Returns (is_solo, solo_score, reason).
+def prg_rubric(opp, setaside_label, setaside_eligible, is_sdvosb, value_num,
+               fte, incumbent, deadline_days, disqualified, kill_gate,
+               kill_reason):
+    """PRG rubric v2 — three-gate model plus weighted scoring.
 
-    Heuristic — favors small-dollar knowledge work (research, analysis,
-    writing, data, review) and penalizes crew/physical/large-team signals.
+    Gate 0 (hard disqualifiers, applied in screen_gates or here) → score 0,
+    Red, never shown in Green/Yellow lists. Gate 1 = can PRG legally prime it
+    (eligibility + limitations-on-subcontracting labor plan + ostensible-
+    subcontractor flag). Gate 2 = does a hirable labor market exist (0-25).
+    Gate 3 = can the founder credibly SUPERVISE it (0-25 — PM literacy only,
+    NOT "can the founder do the work"). Weighted modifiers after gates.
+    Bands: Green = 75+, Yellow = 55-74, Red = below 55 or any Gate 0 hit.
     """
     text = _haystack(opp)
-    hits = _keyword_hits(text, SOLO_FRIENDLY_KEYWORDS)
-    excludes = _keyword_hits(text, SOLO_EXCLUDE_KEYWORDS)
-    fte = _estimate_fte(text)
+    out = {
+        "win_score": 0, "win_band": "Red", "win_emoji": "🔴", "win_note": "",
+        "labor_plan": "n/a — killed at Gate 0", "pp_value": "Low",
+        "passthrough_risk": "low", "founder_can_deliver": False,
+        "solo_reason": "", "gate1_notes": "", "gate2_score": 0,
+        "gate3_score": 0, "modifier_notes": [],
+        "bonding_required": "bonding" in (kill_gate or "").lower(),
+    }
 
-    score = 0
-    score += min(len(hits), 5)                 # knowledge-work signals
-    score -= 2 * min(len(excludes), 4)         # crew / physical / big-team signals
+    # --- GATE 0: hard disqualifiers (kills from screen_gates + ineligible
+    # set-asides like 8(a)/HUBZone/WOSB). Score 0, Red, stop.
+    if disqualified:
+        out["win_note"] = f"Gate 0 — {kill_reason or 'hard disqualifier'}"
+        return out
+    if not setaside_eligible:
+        out["labor_plan"] = "n/a — ineligible set-aside"
+        out["win_note"] = "Gate 0 — set-aside PRG is ineligible for"
+        return out
+    if deadline_days is not None and deadline_days < 0:
+        out["labor_plan"] = "n/a — expired"
+        out["win_note"] = "Response deadline has passed"
+        return out
 
-    # Dollar size: smaller = more solo-doable.
-    if value_num is None:
-        score += 1                             # unstated (often small buys)
-    elif value_num <= MICRO_PURCHASE:
-        score += 3
-    elif value_num <= SIMPLIFIED_ACQ_THRESHOLD:
-        score += 2
-    elif value_num > 1_000_000:
-        score -= 3
-
-    # Headcount: a solo shop can't field a big team.
-    if fte is None:
-        score += 1
-    elif fte <= 1:
-        score += 2
-    elif fte <= 2:
-        score += 1
+    # --- GATE 2: does a hirable labor market exist? (0-25)
+    thin = _keyword_hits(text, LABOR_THIN)
+    commodity = _keyword_hits(text, LABOR_COMMODITY)
+    specialized = _keyword_hits(text, LABOR_SPECIALIZED)
+    if thin:
+        gate2, specialty = 5, "specialist"
+        g2_note = f"thin/constrained labor market ('{thin[0]}')"
+    elif commodity:
+        gate2 = min(25, 22 + max(0, len(commodity) - 1))
+        specialty = commodity[0]
+        g2_note = f"commodity professional labor ({commodity[0]}) — deep 1099 market"
+    elif specialized:
+        gate2 = min(19, 15 + max(0, len(specialized) - 1))
+        specialty = specialized[0]
+        g2_note = f"specialized but findable ({specialized[0]}) — hire with lead time"
     else:
-        score -= 4
+        gate2, specialty = 12, "professional labor"
+        g2_note = "labor market unclear — verify before bid"
 
-    is_solo = (
-        setaside_eligible
-        and score >= 3
-        and len(hits) >= 1
-        and (fte is None or fte <= 2)
-        and (value_num is None or value_num <= SIMPLIFIED_ACQ_THRESHOLD * 2)
-    )
+    # --- GATE 3: can the founder credibly supervise it? (0-25, PM literacy)
+    founder_hits = _keyword_hits(text, FOUNDER_DOMAIN_KEYWORDS)
+    adjacent_hits = _keyword_hits(text, ADJACENT_DOMAIN_KEYWORDS)
+    low_hits = _keyword_hits(text, LOW_LITERACY_KEYWORDS)
+    if low_hits and not founder_hits:
+        gate3 = 5
+        g3_note = f"founder cannot judge work quality ({low_hits[0]})"
+    elif founder_hits:
+        gate3 = min(25, 23 + max(0, len(founder_hits) - 2))
+        g3_note = f"founder credential domain ({founder_hits[0]})"
+    elif adjacent_hits:
+        gate3 = min(19, 15 + max(0, len(adjacent_hits) - 2))
+        g3_note = f"adjacent domain — founder can spec/QA ({adjacent_hits[0]})"
+    else:
+        gate3 = 10
+        g3_note = "PM literacy unclear — verify scope"
 
-    # Compose a short "why it's solo-doable" note.
-    bits = []
-    if hits:
-        bits.append(f"knowledge work ({', '.join(hits[:3])})")
-    if value_num is not None and value_num <= SIMPLIFIED_ACQ_THRESHOLD:
-        bits.append(f"small dollar value ({_format_currency(value_num)})")
-    elif value_num is None:
-        bits.append("small/unstated value")
-    if fte is not None and fte <= 2:
-        bits.append(f"~{fte} person")
-    if excludes:
-        bits.append(f"⚠ check for crew work ({excludes[0]})")
-    reason = "; ".join(bits) + "." if bits else "Light-scope knowledge task."
-    return (is_solo, score, "One-person doable: " + reason)
+    # --- GATE 1: can PRG legally prime it? Labor plan under the limitations-
+    # on-subcontracting rule (services: ≤50% of the government's payment may
+    # go to non-similarly-situated subs; W2 hires always count as PRG).
+    if is_sdvosb or setaside_label == "SDVOSB":
+        labor_plan = (f"W2 {specialty} (SDVOSB LoS 50% cap — W2 hires or "
+                      "SDVOSB 1099s)")
+    elif setaside_label == "VOSB":
+        labor_plan = (f"W2 {specialty} (VOSB LoS 50% cap — W2 hires or "
+                      "VOSB 1099s)")
+    elif setaside_label == "Total SB":
+        labor_plan = (f"1099 {specialty} (Total SB — sole-prop 1099s are "
+                      "similarly situated, no cap issue)")
+    elif setaside_label == "None":
+        labor_plan = f"W2 or any 1099 {specialty} (unrestricted, no LoS cap)"
+    else:
+        labor_plan = f"W2 {specialty} (verify LoS for {setaside_label})"
+    # Ostensible-subcontractor risk: one indivisible specialty likely performed
+    # end-to-end by a single sub the founder can't meaningfully manage.
+    passthrough_risk = "high" if (gate3 <= 9 and not commodity) else "low"
+    gate1_notes = "eligible to prime"
+    if passthrough_risk == "high":
+        gate1_notes += "; pass-through risk: high (indivisible specialty scope)"
+
+    # --- Weighted modifiers (applied after gates).
+    deliverable_hits = _keyword_hits(text, DELIVERABLE_SCOPE_KEYWORDS)
+    loe_hits = _keyword_hits(text, LOE_SCOPE_KEYWORDS)
+    crew_hits = _keyword_hits(text, SOLO_EXCLUDE_KEYWORDS)
+    small_buy = ((value_num is not None
+                  and value_num < SIMPLIFIED_ACQ_THRESHOLD)
+                 or "simplified acquisition" in text)
+    # "Solo" (rubric v2) = the FOUNDER can personally deliver the entire scope
+    # (founder credential domain + deliverable-based + no crew/LOE signals +
+    # small enough), NOT merely "single-person contract".
+    founder_can_deliver = bool(
+        founder_hits and deliverable_hits and not crew_hits and not loe_hits
+        and (fte is None or fte <= 1)
+        and (value_num is None or value_num <= 2 * SIMPLIFIED_ACQ_THRESHOLD))
+
+    mods = []
+    if founder_can_deliver:
+        mods.append((15, "founder can personally deliver (Solo: Yes)"))
+    if small_buy:
+        mods.append((10, "under $250K / simplified acquisition — PP builder"))
+    if deliverable_hits and not loe_hits:
+        mods.append((10, "deliverable-based scope (not level-of-effort)"))
+    if _keyword_hits(text, RECURRING_KEYWORDS):
+        mods.append((5, "recurring / multi-year (base plus options)"))
+    if is_sdvosb:
+        mods.append((5, "SDVOSB set-aside — thinner competition"))
+    if (deadline_days is not None and 0 <= deadline_days < 5
+            and not founder_can_deliver):
+        mods.append((-10, "under 5 days AND needs hiring/teaming first"))
+    if incumbent:
+        mods.append((-10, "identifiable incumbent recompete, no opening"))
+    pop = opp.get("placeOfPerformance") or {}
+    pop_state = ""
+    if isinstance(pop, dict):
+        s = pop.get("state") or {}
+        pop_state = ((s.get("code") or s.get("name") or "")
+                     if isinstance(s, dict) else str(s or ""))
+    if (_keyword_hits(text, ONSITE_KEYWORDS) and pop_state
+            and pop_state.strip().upper() not in _SOCAL_STATES):
+        mods.append((-5, "majority on-site outside Southern California"))
+
+    score = RUBRIC_BASE + gate2 + gate3 + sum(d for d, _ in mods)
+    score = max(0, min(100, score))
+    if score >= GREEN_MIN:
+        band, emoji, note = "Green", "🟢", "Best bet — pursue"
+    elif score >= YELLOW_MIN:
+        band, emoji, note = "Yellow", "🟡", "On the fence — worth a look"
+    else:
+        band, emoji, note = "Red", "🔴", "Do not pursue — low odds"
+
+    # Past-performance strategic value: small fast wins are worth more than
+    # face value to a first-time prime.
+    if small_buy or founder_can_deliver:
+        pp_value = "High"
+    elif value_num is None or value_num <= 1_000_000:
+        pp_value = "Med"
+    else:
+        pp_value = "Low"
+
+    if founder_can_deliver:
+        solo_reason = ("Founder-deliverable: "
+                       f"{founder_hits[0]} scope, deliverable-based, no "
+                       "crew/LOE signals — higher margin, zero staffing risk")
+    else:
+        why = ("outside founder credential domains" if not founder_hits
+               else "needs hired labor (crew/LOE/team signals or size)")
+        solo_reason = f"Not founder-deliverable — {why}; PM + hired labor model"
+
+    out.update({
+        "win_score": score, "win_band": band, "win_emoji": emoji,
+        "win_note": note + f" — G2 labor {gate2}/25 ({g2_note}); "
+                           f"G3 supervision {gate3}/25 ({g3_note})",
+        "labor_plan": labor_plan, "pp_value": pp_value,
+        "passthrough_risk": passthrough_risk,
+        "founder_can_deliver": founder_can_deliver,
+        "solo_reason": solo_reason, "gate1_notes": gate1_notes,
+        "gate2_score": gate2, "gate3_score": gate3,
+        "modifier_notes": [f"{'+' if d > 0 else ''}{d} {label}"
+                           for d, label in mods],
+    })
+    return out
 
 
 # --- Location, staffing, timeframe, fit, and win-likelihood --------------------
@@ -2348,87 +2623,6 @@ def _fit_label(tier, tech_match, matched_kw):
     return "Weak / off-target"
 
 
-def _win_assessment(setaside_label, setaside_eligible, is_sdvosb, tier,
-                    tech_match, matched_kw, is_solo, fte, value_num, incumbent,
-                    deadline_days=None):
-    """Composite win score (0-100) with a three-band verdict:
-
-      GREEN  = genuine best bet — pursue.
-      YELLOW = on the fence — worth a look, not a slam dunk.
-      RED    = do not pursue (ineligible, deadline passed, or poor odds).
-
-    Tuned so a clean SDVOSB, solo-doable, eligible opportunity clears Green
-    even without a clinical/biomedical keyword match — because for a small
-    solo shop those ARE the best first bets. Heuristic, not a guarantee.
-    """
-    # Hard gate: can't bid -> Red.
-    if not setaside_eligible:
-        return (10, "Red", "🔴", "Do not pursue — set-aside excludes PRG")
-    # Deadline already passed -> Red.
-    if deadline_days is not None and deadline_days < 0:
-        return (15, "Red", "🔴", "Do not pursue — response deadline has passed")
-
-    score = 0
-    # 1. Set-aside advantage (less competition in PRG's lane).
-    if is_sdvosb:
-        score += 40
-    elif setaside_label == "VOSB":
-        score += 32
-    elif setaside_label == "Total SB":
-        score += 28
-    elif setaside_label == "None":
-        score += 18          # unrestricted = open competition, harder
-    else:
-        score += 26
-
-    # 2. Executability for a solo shop (heaviest lever for PRG right now).
-    if is_solo:
-        score += 25
-    elif fte is None:
-        score += 12
-    elif fte <= 2:
-        score += 18
-    elif fte <= 10:
-        score += 8
-    else:
-        score += 2           # big team is hard for a new solo co
-
-    # 3. Capability fit (a bonus, not a gate — adjacent admin work still counts).
-    if tier == "primary" and len(matched_kw) >= 3:
-        score += 15
-    elif tech_match:
-        score += 10
-    elif tier == "low_barrier":
-        score += 6
-    else:
-        score += 2
-
-    # 4. Value sanity (smaller = more winnable for a first contract).
-    if value_num is None:
-        score += 10
-    elif value_num <= SIMPLIFIED_ACQ_THRESHOLD:
-        score += 12
-    elif value_num <= 2_000_000:
-        score += 8
-    elif value_num <= 10_000_000:
-        score += 4
-    else:
-        score += 2
-
-    # 5. Incumbent headwind.
-    if incumbent:
-        score -= 10
-
-    score = max(0, min(100, score))
-    if score >= 68:
-        band, emoji, note = "Green", "🟢", "Best bet — pursue"
-    elif score >= 45:
-        band, emoji, note = "Yellow", "🟡", "On the fence — worth a look"
-    else:
-        band, emoji, note = "Red", "🔴", "Do not pursue — low odds"
-    return (score, band, emoji, note)
-
-
 def _date_range(days_back):
     """Return (postedFrom, postedTo) as MM/DD/YYYY strings."""
     today = dt.date.today()
@@ -2448,16 +2642,19 @@ def _opportunity_table(rows, eligible_key, reason_key):
     """
     lines = [
         "| Win | Rating | Solicitation # | Title | Agency | Set-Aside "
-        "| Est. Value | Personnel | Solo? | Location | Short Reason |",
-        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
+        "| Est. Value | Personnel | Solo? | Labor Plan | PP Value "
+        "| Location | Short Reason |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- "
+        "| :--- | :--- | :--- | :--- |",
     ]
     for r in sorted(rows, key=lambda x: x["win_score"], reverse=True):
-        solo = "Yes" if r["is_solo"] else "No"
+        solo = "Yes" if r["is_solo"] else "No"   # Solo = founder-deliverable
         lines.append(
             f"| {r['win_score']} | {r['win_emoji']} {r['win_band']} "
             f"| {r['solicitation']} | {r['title']} | {r['agency']} "
             f"| {r['setaside']} | {r['value_display']} | {r['personnel']} "
-            f"| {solo} | {r['location']} | {r[reason_key]} |"
+            f"| {solo} | {r.get('labor_plan', '')} | {r.get('pp_value', '')} "
+            f"| {r['location']} | {r[reason_key]} |"
         )
     return lines
 
@@ -2592,7 +2789,7 @@ def render_report(results):
     lines.append("")
 
     # --- Section 5: solo-friendly (one-person) ---------------------------
-    lines.append("### 5. Solo-Friendly Opportunities (You + an AI Assistant)")
+    lines.append("### 5. Solo: Founder-Deliverable Opportunities")
     lines.append("")
     lines.append(
         "_Small-scale knowledge work — research, analysis, writing, data, and "
@@ -2709,7 +2906,11 @@ _RICH_COLS = [
     ("Est. Value (Revenue)", "value_display"),
     ("Personnel (FTE)", "personnel"),
     ("Hire New or Take Over?", "staffing_type"),
-    ("Solo-Doable?", lambda r: "Yes" if r["is_solo"] else "No"),
+    # "Solo" (rubric v2) = founder can personally deliver the entire scope.
+    ("Solo (Founder-Deliverable)?", lambda r: "Yes" if r["is_solo"] else "No"),
+    ("Labor Plan", "labor_plan"),
+    ("PP Value", "pp_value"),
+    ("Pass-Through Risk", "passthrough_risk"),
     ("Timeframe", "timeframe"),
     ("Location", "location"),
     ("Intl / CONUS", "location_type"),
@@ -4329,8 +4530,8 @@ _SELFTEST_CASES = [
         "expect_verdict": "NO-BID",
     },
     {
-        "label": "USSOCOM H9242126QE036 — SaaS resale, 3-day fuse (SHORT-FUSE, "
-                 "scoring still runs, not killed)",
+        "label": "USSOCOM H9242126QE036 — SaaS subscription resale "
+                 "(rubric v2 Gate 0: resale, no services labor → KILL)",
         "opp": {
             "solicitationNumber": "H9242126QE036",
             "noticeId": "st4",
@@ -4345,7 +4546,9 @@ _SELFTEST_CASES = [
             "type": "Combined Synopsis/Solicitation",
         },
         "deadline_offset_days": 3,
-        "expect_verdict": "SHORT-FUSE",
+        "expect_verdict": "NO-BID",
+        "expect_equals": {"kill_gate": "Gate 0 (resale)", "win_band": "Red",
+                          "win_score": 0},
     },
     {
         "label": "GE MAC 5500 ECG PM — OEM pass-through (brand equipment + "
@@ -4516,6 +4719,158 @@ _SELFTEST_CASES = [
         "expect_verdict": "NO-BID",
         "expect_equals": {"kill_gate": "Gate 0 (KC5 wrong scale)"},
     },
+    # --- Rubric v2 regression set (from the last report's known-bad ratings) ---
+    {
+        "label": "REGRESSION trash can replacement — product purchase "
+                 "(Gate 0, product → Red; old rubric scored this 72/Green)",
+        "opp": {
+            "solicitationNumber": "REG-TRASHCAN",
+            "noticeId": "rg1",
+            "title": "Replacement Trash Can Receptacles",
+            "description": ("Furnish and deliver replacement trash can "
+                            "receptacles to the facility loading dock. Brand "
+                            "name or equal."),
+            "naicsCode": "332999",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Veterans Affairs",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+        "expect_equals": {"win_band": "Red", "win_score": 0},
+    },
+    {
+        "label": "REGRESSION EBSCO subscriptions — resale (Gate 0 → Red)",
+        "opp": {
+            "solicitationNumber": "REG-EBSCO",
+            "noticeId": "rg2",
+            "title": "EBSCO Research Database Subscriptions Renewal",
+            "description": ("Annual renewal of EBSCO research database "
+                            "subscriptions for the medical library."),
+            "naicsCode": "519130",
+            "typeOfSetAside": "SBA",
+            "typeOfSetAsideDescription": "Total Small Business",
+            "fullParentPathName": "Department of Health and Human Services",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+        "expect_equals": {"kill_gate": "Gate 0 (resale)", "win_band": "Red",
+                          "win_score": 0},
+    },
+    {
+        "label": "REGRESSION vacuum pump replacement — construction/install "
+                 "primary scope (Gate 0 → Red)",
+        "opp": {
+            "solicitationNumber": "REG-VACPUMP",
+            "noticeId": "rg3",
+            "title": "Medical Vacuum Pump Replacement, Building 1",
+            "description": ("Removal of the existing medical vacuum pumps and "
+                            "installation of new pumps, including associated "
+                            "piping and electrical work."),
+            "naicsCode": "238220",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Veterans Affairs",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+        "expect_equals": {"win_band": "Red", "win_score": 0},
+    },
+    {
+        "label": "REGRESSION duct bank survey — firm land-surveying licensure "
+                 "with no key-personnel allowance (Gate 0 → Red)",
+        "opp": {
+            "solicitationNumber": "REG-DUCTBANK",
+            "noticeId": "rg4",
+            "title": "Underground Utility Duct Bank Survey",
+            "description": ("Survey and mapping of the underground utility "
+                            "duct bank. The firm must be licensed to perform "
+                            "land surveying; all deliverables shall be sealed "
+                            "by a licensed land surveyor."),
+            "naicsCode": "541370",
+            "typeOfSetAside": "SBA",
+            "typeOfSetAsideDescription": "Total Small Business",
+            "fullParentPathName": "General Services Administration",
+            "type": "Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+        "expect_equals": {"kill_gate": "Gate 0 (firm licensure)",
+                          "win_band": "Red", "win_score": 0},
+    },
+    {
+        "label": "REGRESSION DOJ Communication Support (SDVOSB) — hirable "
+                 "commodity labor, founder can supervise (Green, W2 plan)",
+        "opp": {
+            "solicitationNumber": "REG-DOJ-COMMS",
+            "noticeId": "rg5",
+            "title": "Communication Support Services",
+            "description": ("The contractor shall provide communication "
+                            "support services including communications "
+                            "specialists to develop outreach materials, "
+                            "newsletters, and stakeholder engagement reports. "
+                            "Base year plus four option years."),
+            "naicsCode": "541611",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Justice",
+            "type": "Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "BID",
+        "expect_equals": {"win_band": "Green"},
+        "expect_contains": {"labor_plan": "W2 communications specialist"},
+    },
+    {
+        "label": "REGRESSION HHS clinical modeling (Total SB) — founder "
+                 "domain, deliverable-based, small (Green, Solo: Yes)",
+        "opp": {
+            "solicitationNumber": "REG-HHS-MODEL",
+            "noticeId": "rg6",
+            "title": "Statistical Modeling of Clinical Trial Outcomes",
+            "description": ("The contractor shall perform statistical "
+                            "modeling of clinical trial outcomes data and "
+                            "deliver a final report with model documentation. "
+                            "A biostatistician-level analysis is required. "
+                            "Estimated value: $180,000."),
+            "naicsCode": "541715",
+            "typeOfSetAside": "SBA",
+            "typeOfSetAsideDescription": "Total Small Business",
+            "fullParentPathName": "Department of Health and Human Services",
+            "type": "Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "BID",
+        "expect_truthy": ["is_solo"],
+        "expect_equals": {"win_band": "Green", "pp_value": "High"},
+        "expect_contains": {"labor_plan": "1099 biostatistician"},
+    },
+    {
+        "label": "REGRESSION environmental compliance — founder cannot judge "
+                 "quality (Gate 3 low → Yellow at best, never Green)",
+        "opp": {
+            "solicitationNumber": "REG-ENVCOMP",
+            "noticeId": "rg7",
+            "title": "Environmental Compliance Support Services",
+            "description": ("Environmental compliance support including "
+                            "environmental sampling, air monitoring, and "
+                            "preparation of annual compliance reports by "
+                            "qualified environmental scientists. Base year "
+                            "plus two option years."),
+            "naicsCode": "541620",
+            "typeOfSetAside": "SBA",
+            "typeOfSetAsideDescription": "Total Small Business",
+            "fullParentPathName": "General Services Administration",
+            "type": "Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "forbid_verdict": "NO-BID",
+        "expect_falsy": ["is_solo"],
+        "expect_contains": {"win_band": "ellow"},  # Yellow (at best) — never Green
+    },
     {
         "label": "Synthetic size-standard mention — '$34.5 million size "
                  "standard' is NOT a contract value (KC5 must not fire)",
@@ -4568,12 +4923,17 @@ def run_selftests():
             if r.get(field) != val:
                 passed = False
                 want += f" & {field}=={val!r}"
+        for field, sub in case.get("expect_contains", {}).items():
+            if sub.lower() not in str(r.get(field, "")).lower():
+                passed = False
+                want += f" & {sub!r} in {field}"
         ok = ok and passed
         print(f"  [{'PASS' if passed else 'FAIL'}] {case['label']}")
         extra = ""
         report_fields = (case.get("expect_truthy", [])
                          + case.get("expect_falsy", [])
-                         + list(case.get("expect_equals", {})))
+                         + list(case.get("expect_equals", {}))
+                         + list(case.get("expect_contains", {})))
         if report_fields:
             extra = " | " + ", ".join(
                 f"{f}={r.get(f)!r}" for f in report_fields)

@@ -403,25 +403,43 @@ which must **not** be hard-killed.
   box filter the matrix in place. The
 **International** tab is a dedicated category for opportunities with an overseas
 place of performance (separate from domestic/CONUS work), and the executive
-report has a matching 🌍 International section and KPI. The **Solo-Friendly** tab flags small-scale
-knowledge work (research, analysis, writing, data, reviews) that one person
-could realistically deliver, scored down for crew/physical/large-team signals
-and large dollar values.
+report has a matching 🌍 International section and KPI. The **Solo-Friendly**
+tab flags scopes the **founder can personally deliver end-to-end** (founder
+credential domain, deliverable-based, no crew/LOE signals) — higher margin,
+zero staffing risk.
 
 Each row is a **decision dashboard** ordered best-bet first, with:
 
-- **Win Score (0–100)** and a three-band **rating** — 🟢 Green (68+, genuine
-  best bet — pursue), 🟡 Yellow (45–67, on the fence — worth a look), 🔴 Red
-  (<45, or ineligible, or the deadline has passed — do not pursue). The Win
-  Score and Rating cells are color-coded in Excel. The score is tuned so a
-  clean SDVOSB, solo-doable, eligible opportunity reaches Green even without a
-  clinical/biomedical keyword match, and blends set-aside advantage, solo
-  executability, capability fit, value sanity, and incumbent headwind. It is a
-  planning heuristic, not a guarantee.
+- **Win Score (0–100)** from the **rubric v2 three-gate model**. Business
+  model: win as prime, hire 1099/W2 labor, founder PMs the work — the founder
+  does NOT need to personally perform delivery.
+  - **Gate 0 — hard disqualifiers** (score 0, 🔴 Red, kept out of the
+    Green/Yellow lists): product purchase / subscription / license resale
+    with no services labor; construction, installation, or licensed trades as
+    primary scope; firm-level professional licensure PRG doesn't hold (unless
+    key personnel may hold it); bonding required (flagged explicitly);
+    ineligible set-asides (8(a)/HUBZone/WOSB); facility clearance at proposal.
+  - **Gate 1 — can PRG legally prime it**: set-aside eligibility plus a
+    limitations-on-subcontracting **Labor Plan** (W2 hires or similarly-
+    situated 1099s on SDVOSB/VOSB set-asides; any sole-prop 1099 on Total SB)
+    and an ostensible-subcontractor **Pass-Through Risk** flag.
+  - **Gate 2 — does a hirable labor market exist** (0–25): commodity
+    professional labor 20–25, findable-but-specialized 10–19, thin/OEM-bound
+    1–9.
+  - **Gate 3 — can the founder credibly supervise it** (0–25, PM literacy
+    only): founder credential domain 20–25, adjacent 10–19, can't-judge 1–9.
+  - **Weighted modifiers**: +15 founder can personally deliver (Solo: Yes),
+    +10 under $250K/simplified acquisition, +10 deliverable-based scope,
+    +5 recurring/multi-year, +5 SDVOSB set-aside, −10 <5-day fuse needing
+    hires, −10 incumbent recompete, −5 majority on-site outside SoCal.
+  - **Bands**: 🟢 Green 75+, 🟡 Yellow 55–74, 🔴 Red below 55 or any Gate 0
+    hit. A planning heuristic, not a guarantee.
 - **Fit for PRG**, **Set-Aside**, **Eligible as LLC?**, **Est. Value**,
   **Personnel (FTE)**, **Hire New or Take Over?** (incumbent detection),
-  **Solo-Doable?**, **Timeframe**, **Location**, and **Intl / CONUS** (filter
-  this column to separate overseas consulting from domestic work).
+  **Solo (Founder-Deliverable)?** (the founder can personally deliver the
+  entire scope — NOT merely "single-person contract"), **Labor Plan**,
+  **PP Value** (High/Med/Low past-performance strategic value),
+  **Pass-Through Risk**, **Timeframe**, **Location**, and **Intl / CONUS**.
 
 If
 `openpyxl` is not installed, the script automatically falls back to writing one
