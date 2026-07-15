@@ -3779,6 +3779,32 @@ def _key_findings_html(ranked, eligible):
             f'in Mind</h2>{rows}</section>')
 
 
+_ROLE_SHORT = {
+    "BID AS PRIME": "Prime",
+    "PRIME WITH TEAMING PARTNER": "Prime + team",
+    "PURSUE AS SUBCONTRACTOR": "Sub",
+    "RESPOND TO SOURCES SOUGHT": "Respond (SS)",
+    "MONITOR / PREPOSITION": "Monitor",
+    "PASS": "Pass",
+}
+
+
+def _role_short(role):
+    """Compact label for the six-way pursuit role, for narrow table cells."""
+    return _ROLE_SHORT.get(role, role or "—")
+
+
+def _role_filter_key(role):
+    """Map a pursuit role to the matrix filter bucket it belongs to."""
+    if role == "BID AS PRIME":
+        return "prime"
+    if role == "PRIME WITH TEAMING PARTNER":
+        return "team"
+    if role == "PURSUE AS SUBCONTRACTOR":
+        return "sub"
+    return ""
+
+
 def export_html_report(results, path, days, recompetes=None, grants=None,
                        sbir=None, reliefweb=None):
     """Write a self-contained executive HTML report of the opportunity pipeline."""
@@ -3792,12 +3818,33 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
                 and not r["is_awarded"] and not r["is_expired"]
                 and not r["disqualified"] and not r["is_future"]
                 and not r.get("watch_template")]
-    ranked = sorted(eligible, key=lambda r: r["win_score"], reverse=True)
+    # Rank by capture priority first (win score breaks ties) — the whole
+    # report is ordered by the aggregation model, not the raw win score.
+    ranked = sorted(eligible, key=lambda r: (r.get("priority", 0),
+                                             r["win_score"]), reverse=True)
     top10 = ranked[:10]
     killed = [r for r in results if r["disqualified"]
                      and not r["is_awarded"] and not r["is_expired"]]
     watchlist = sorted([r for r in results if r["is_future"]],
-                       key=lambda r: r["win_score"], reverse=True)
+                       key=lambda r: (r.get("priority", 0), r["win_score"]),
+                       reverse=True)
+
+    # --- Capture-model role groups (best-of, for the executive summary) ---
+    def _best_of(role):
+        rows = [r for r in ranked if r.get("role") == role]
+        return rows[0] if rows else None
+    best_prime = _best_of("BID AS PRIME")
+    best_team = _best_of("PRIME WITH TEAMING PARTNER")
+    best_sub = next((r for r in sorted(
+        results, key=lambda r: (r.get("priority", 0), r["win_score"]),
+        reverse=True) if r.get("role") == "PURSUE AS SUBCONTRACTOR"), None)
+    best_pp = next((r for r in ranked if r.get("pp_value") == "High"), None)
+
+    n_prime = sum(1 for r in ranked if r.get("role") == "BID AS PRIME")
+    n_team = sum(1 for r in ranked
+                 if r.get("role") == "PRIME WITH TEAMING PARTNER")
+    n_sub = sum(1 for r in results
+                if r.get("role") == "PURSUE AS SUBCONTRACTOR")
 
     # --- KPIs ---
     total_value = sum(r["value_num"] for r in eligible if r["value_num"])
@@ -3805,9 +3852,8 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
     n_solo = sum(1 for r in eligible if r["is_solo"])
     n_sdvosb = sum(1 for r in eligible if r["is_sdvosb"])
     n_green = sum(1 for r in eligible if r["win_band"] == "Green")
+
     agency_counts = Counter(r["agency"] for r in eligible if r["agency"] != "N/A")
-    top_agency, top_agency_n = (agency_counts.most_common(1)[0]
-                                if agency_counts else ("—", 0))
 
     # --- Chart data ---
     agency_value = Counter()
@@ -3815,20 +3861,24 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
         if r["value_num"]:
             agency_value[r["agency"]] += r["value_num"]
     chart_agency = [(a, v) for a, v in agency_value.most_common(8)]
-    rag_counts = Counter(r["win_band"] for r in eligible)
-    chart_rag = [(b, rag_counts.get(b, 0), _RAG_HEX[b])
-                 for b in ("Green", "Yellow", "Red")]
+    model_counts = Counter(r.get("fulfillment_model", "—") for r in ranked)
+    _model_hex = {"founder-delivered": "#2E7D4F",
+                  "professional services": "#1E5F9E",
+                  "staffing (W2/1099)": "#7A5BA6",
+                  "trade-sub management": "#9A6B1C",
+                  "value-added supply": "#C0392B"}
+    chart_models = [(m, n, _model_hex.get(m, "#5A6B7E"))
+                    for m, n in model_counts.most_common(6)]
 
     n_intl = sum(1 for r in eligible if r["is_international"])
-    n_green = sum(1 for r in eligible if r["win_band"] == "Green")
     kpis = [
-        ("Total Pipeline Value", _format_currency(total_value) if total_value else "N/A",
+        ("Pipeline Value", _format_currency(total_value) if total_value else "N/A",
          "sum of published values"),
-        ("Eligible Opportunities", str(n_active), "PRG can bid"),
-        ("Best Bets (Green)", str(n_green), "pursue first"),
-        ("Solo-Friendly", str(n_solo), "one-person doable"),
+        ("Prime Plays", str(n_prime), "bid as prime"),
+        ("Teaming Plays", str(n_team), "prime + trade/staffing sub"),
+        ("Subcontract Targets", str(n_sub), "pursue as sub"),
+        ("Best Bets (Green)", str(n_green), "highest priority"),
         ("SDVOSB Set-Asides", str(n_sdvosb), "your direct lane"),
-        ("International", str(n_intl), "overseas consulting"),
     ]
 
     # --- Assemble HTML ---
@@ -3847,11 +3897,11 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
 
     # KPI cards — each count card is a clickable filter for the matrix below.
     kpi_filter = {
-        "Eligible Opportunities": "all",
+        "Prime Plays": "role:prime",
+        "Teaming Plays": "role:team",
+        "Subcontract Targets": "role:sub",
         "Best Bets (Green)": "band:Green",
-        "Solo-Friendly": "solo",
         "SDVOSB Set-Asides": "sdvosb",
-        "International": "intl",
     }
     p.append('<section class="kpis">')
     for label, val, sub in kpis:
@@ -3864,35 +3914,73 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
                  f'<div class="kpi-s">{_html_escape(sub)}{hint}</div></div>')
     p.append('</section>')
 
+    # Capture Executive Summary — the aggregation-model headline (best prime,
+    # teaming, subcontract, and past-performance plays this window).
+    def _summary_line(label, r, sub_role=False):
+        if not r:
+            return (f'<div class="find"><div class="find-i">—</div><div>'
+                    f'<b>{label}:</b> <span class="muted">none this window'
+                    f'</span></div></div>')
+        title = _html_escape(_clean(r["title"], 66))
+        if _is_http(r["link"]):
+            title = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
+                     f'rel="noopener">{title}</a>')
+        meta = (f'priority <b>{r.get("priority", 0)}</b> · '
+                f'{_html_escape(r.get("fulfillment_model", ""))} · '
+                f'GM {_html_escape(r.get("margin_est", ""))} · '
+                f'{_html_escape(r["agency"])}')
+        dl = str(r["response_deadline"]).split("T")[0]
+        if r["deadline_days"] is not None and 0 <= r["deadline_days"] <= 7:
+            meta += f' · <b class="urgent">due {dl} ({r["deadline_days"]}d)</b>'
+        return (f'<div class="find"><div class="find-i">★</div><div>'
+                f'<b>{label}:</b> {title}<br><span class="muted" '
+                f'style="font-size:12px">{meta}</span></div></div>')
+    p.append('<section class="findings"><h2>Capture Executive Summary</h2>')
+    p.append(f'<p class="muted" style="font-size:12.5px;margin:2px 0 8px">'
+             f'Aggregation model: PRG primes and manages; execution is sourced '
+             f'through subs, staffing, trades, and distributors. '
+             f'{n_prime} prime · {n_team} teaming · {n_sub} subcontract '
+             f'targets from {len(results)} notices screened.</p>')
+    p.append(_summary_line("Best immediate prime", best_prime))
+    p.append(_summary_line("Best teaming play", best_team))
+    p.append(_summary_line("Best subcontract target", best_sub))
+    p.append(_summary_line("Best past-performance builder", best_pp))
+    p.append('</section>')
+
     # Key findings / review
     p.append(_key_findings_html(ranked, eligible))
 
     # Top 10 — Do These First
     p.append('<section><h2>🎯 Top 10 — Do These First</h2>')
     p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
-             'Your highest-scoring, still-open, bid-as-prime opportunities — '
-             'the shortlist to act on this week.</p>')
+             'Your highest-priority, still-open opportunities — ranked by the '
+             'capture priority score (win probability, margin, delegation, '
+             'speed to cash). Act on these first.</p>')
     if top10:
         p.append('<div class="scroll"><table><thead><tr>'
-                 '<th>#</th><th>Rating</th><th>Win</th><th>Title</th>'
-                 '<th>Agency</th><th>Set-Aside</th><th>Est. Value</th>'
-                 '<th>Solo</th><th>Respond By</th></tr></thead><tbody>')
+                 '<th>#</th><th>Priority</th><th>Rating</th><th>Role</th>'
+                 '<th>Title</th><th>Agency</th><th>Fulfillment</th>'
+                 '<th>GM%</th><th>Est. Value</th><th>Respond By</th>'
+                 '</tr></thead><tbody>')
         for i, r in enumerate(top10, 1):
             chip = (f'<span class="chip" style="background:'
                     f'{_RAG_HEX[r["win_band"]]}">{r["win_band"]}</span>')
-            title = _html_escape(_clean(r["title"], 60))
+            title = _html_escape(_clean(r["title"], 54))
             if _is_http(r["link"]):
                 title = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
                          f'rel="noopener">{title}</a>')
             dl = str(r["response_deadline"]).split("T")[0]
             if r["deadline_days"] is not None and 0 <= r["deadline_days"] <= 7:
                 dl = f'<b class="urgent">{dl} · {r["deadline_days"]}d 🔴</b>'
-            p.append(f"<tr><td class='num'><b>{i}</b></td><td>{chip}</td>"
-                     f"<td class='num'>{r['win_score']}</td><td>{title}</td>"
+            p.append(f"<tr><td class='num'><b>{i}</b></td>"
+                     f"<td class='num'><b>{r.get('priority', 0)}</b></td>"
+                     f"<td>{chip}</td>"
+                     f"<td>{_html_escape(_role_short(r.get('role', '')))}</td>"
+                     f"<td>{title}</td>"
                      f"<td>{_html_escape(r['agency'])}</td>"
-                     f"<td>{_html_escape(r['setaside'])}</td>"
+                     f"<td>{_html_escape(r.get('fulfillment_model', ''))}</td>"
+                     f"<td class='num'>{_html_escape(r.get('margin_est', ''))}</td>"
                      f"<td class='num'>{_html_escape(r['value_display'])}</td>"
-                     f"<td>{'Yes' if r['is_solo'] else '—'}</td>"
                      f"<td>{dl}</td></tr>")
         p.append('</tbody></table></div>')
     else:
@@ -3903,27 +3991,30 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
     p.append('<section class="charts">')
     p.append('<div class="card"><h3>Pipeline Value by Agency</h3>'
              + _svg_hbars(chart_agency, _format_currency, "#1E3A5F") + '</div>')
-    p.append('<div class="card"><h3>Opportunities by Win Rating</h3>'
-             + _svg_hbars(chart_rag, lambda v: str(int(v))) + '</div>')
+    p.append('<div class="card"><h3>Opportunities by Fulfillment Model</h3>'
+             + _svg_hbars(chart_models, lambda v: str(int(v))) + '</div>')
     p.append('</section>')
 
     # Contract matrix (interactive: filter buttons + live search).
     p.append('<section><h2>Contract / Opportunity Matrix</h2>')
     p.append('<div class="filterbar">'
              '<button class="fb active" data-filter="all">All</button>'
+             '<button class="fb" data-filter="role:prime">Prime</button>'
+             '<button class="fb" data-filter="role:team">Prime + team</button>'
+             '<button class="fb" data-filter="role:sub">Subcontract</button>'
              '<button class="fb" data-filter="band:Green">🟢 Best bets</button>'
              '<button class="fb" data-filter="band:Yellow">🟡 On the fence</button>'
-             '<button class="fb" data-filter="band:Red">🔴 Skip</button>'
-             '<button class="fb" data-filter="solo">🧑‍💻 Solo</button>'
+             '<button class="fb" data-filter="solo">Founder-deliverable</button>'
              '<button class="fb" data-filter="intl">🌍 International</button>'
              '<button class="fb" data-filter="sdvosb">SDVOSB</button>'
              '<input id="q" class="fsearch" type="search" '
              'placeholder="Search title / agency / #…">'
              '<span id="count" class="count"></span></div>')
     p.append('<div class="scroll"><table id="matrix"><thead><tr>'
-             '<th>Rating</th><th>Win</th><th>Solicitation #</th><th>Agency</th>'
-             '<th>Est. Value</th><th>Set-Aside</th><th>NAICS / PSC</th>'
-             '<th>Personnel</th><th>Solo</th><th>Location</th><th>Respond By</th>'
+             '<th>Priority</th><th>Rating</th><th>Role</th>'
+             '<th>Solicitation #</th><th>Agency</th><th>Fulfillment</th>'
+             '<th>GM%</th><th>Est. Value</th><th>Set-Aside</th>'
+             '<th>NAICS / PSC</th><th>Location</th><th>Respond By</th>'
              '</tr></thead><tbody id="matrixBody">')
     for r in ranked:
         chip = (f'<span class="chip" style="background:{_RAG_HEX[r["win_band"]]}">'
@@ -3943,22 +4034,25 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
             f"{r['solicitation']} {r['title']} {r['agency']} {r['naics']}".lower())
         p.append(
             f'<tr data-band="{r["win_band"]}" '
+            f'data-role="{_role_filter_key(r.get("role", ""))}" '
             f'data-solo="{1 if r["is_solo"] else 0}" '
             f'data-intl="{1 if r["is_international"] else 0}" '
             f'data-sdvosb="{1 if r["is_sdvosb"] else 0}" '
             f'data-text="{searchtext}">'
-            f"<td>{chip}</td><td class='num'>{r['win_score']}</td>"
+            f"<td class='num'><b>{r.get('priority', 0)}</b></td>"
+            f"<td>{chip}</td>"
+            f"<td>{_html_escape(_role_short(r.get('role', '')))}</td>"
             f"<td>{sol}</td>"
             f"<td>{_html_escape(r['agency'])}</td>"
+            f"<td>{_html_escape(r.get('fulfillment_model', ''))}</td>"
+            f"<td class='num'>{_html_escape(r.get('margin_est', ''))}</td>"
             f"<td class='num'>{_html_escape(r['value_display'])}</td>"
             f"<td>{_html_escape(r['setaside'])}</td>"
             f"<td>{_html_escape(naics_psc)}</td>"
-            f"<td>{_html_escape(r['personnel'])}</td>"
-            f"<td>{'Yes' if r['is_solo'] else '—'}</td>"
             f"<td>{_html_escape(r['location'])}</td>"
             f"<td>{deadline}</td></tr>")
     if not ranked:
-        p.append('<tr><td colspan="11" class="empty">No eligible '
+        p.append('<tr><td colspan="12" class="empty">No eligible '
                  'opportunities in this window.</td></tr>')
     p.append('</tbody></table></div></section>')
 
@@ -3970,6 +4064,20 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
                  f'style="background:{_RAG_HEX[r["win_band"]]}">{r["win_band"]} '
                  f'· {r["win_score"]}</span> <strong>{_html_escape(r["title"])}</strong>'
                  f' <span class="muted">({_html_escape(r["solicitation"])})</span></div>')
+        # Capture line — role, fulfillment model, margin, and priority up front.
+        p.append(f'<p><b>Capture:</b> {_html_escape(r.get("role", ""))} · '
+                 f'{_html_escape(r.get("fulfillment_model", ""))} · '
+                 f'est. GM {_html_escape(r.get("margin_est", ""))} · '
+                 f'priority {r.get("priority", 0)}'
+                 + (f' · <span class="muted">labor: '
+                    f'{_html_escape(r.get("labor_plan", ""))}</span>'
+                    if r.get("labor_plan") else '') + '.</p>')
+        if r.get("passthrough_risk") == "high":
+            p.append('<p class="urgent" style="font-size:12.5px"><b>⚠ '
+                     'Ostensible-subcontractor risk:</b> scope is one '
+                     'indivisible specialty — structure real PRG management '
+                     '(QC, invoicing, ≥ the self-perform floor) or it reads as '
+                     'a pass-through.</p>')
         scope = r["naics_desc"] or "professional services"
         p.append(f'<p><b>Scope:</b> {_html_escape(r["title"])} — '
                  f'{_html_escape(r["agency"])} ({_html_escape(scope)}).</p>')
@@ -4565,6 +4673,7 @@ _REPORT_JS = r"""
     if(f==='intl') return tr.getAttribute('data-intl')==='1';
     if(f==='sdvosb') return tr.getAttribute('data-sdvosb')==='1';
     if(f.indexOf('band:')===0) return tr.getAttribute('data-band')===f.slice(5);
+    if(f.indexOf('role:')===0) return tr.getAttribute('data-role')===f.slice(5);
     return true;
   }
   function apply(){
