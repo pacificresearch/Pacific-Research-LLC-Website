@@ -206,6 +206,16 @@ PWS/attachments) and gets a disposition:
   maintenance, logistics, guards, trade labor), Gate 3 coverage (24/7, on-call,
   guaranteed response, embedded/daily on-site), Gate 1 self-performance (≥3
   FTE — needs a team).
+- **KC1 / KC5 envelope gates** (from PRG's opportunity screening rule in the
+  repo's `CLAUDE.md`): construction (NAICS 23xxxx incl. 238 trades),
+  manufacturing (NAICS 31–33xxxx), and Y/Z PSC codes (construction /
+  maintenance of real property) are **automatic kills by code alone**, no
+  keywords needed; and any notice whose stated value exceeds **$10M** is
+  killed as wrong-scale (a single-member LLC can't self-perform the required
+  50%). Size-standard dollar mentions ("size standard: $34.5 million") are
+  excluded from the value check. KC2 (self-performance / no pass-throughs),
+  KC3 (physical delivery), and KC4 (dead timeline) map to the existing
+  Type B / capital / workforce / bonding / coverage / timing gates.
 - **WATCH-TEMPLATE** → *hire-to-win* (see below).
 - **FUTURE** → pre-solicitations and Sources Sought that fit PRG go to the
   **WATCHLIST** (prep and shape the requirement; not biddable yet).

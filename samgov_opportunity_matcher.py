@@ -495,6 +495,27 @@ OEM_EXEMPT_CONTEXT = ["saas", "software license", "subscription", "reseller",
 # Equipment-repair NAICS families (PRG owns no bench) — score down categorically.
 EQUIP_REPAIR_NAICS_PREFIXES = ("8112", "8113")
 
+# PRG OPPORTUNITY SCREENING RULE (mirrors CLAUDE.md on main) — five kill
+# criteria, any one = NO-BID. KC2 (self-performance / pass-through), KC3
+# (physical delivery), and KC4 (dead timeline) are already enforced by the
+# existing gates (Type B / capital / workforce / bonding / specialty /
+# coverage / FTE self-perform, and the stage-0 timing gate). KC1 and KC5
+# below close the two remaining structural gaps.
+#
+# KC1 — NAICS/PSC families PRG can never perform (physical delivery of
+# construction or manufactured goods). Construction (23xxxx, incl. 238 trades)
+# and manufacturing (31-33xxxx) NAICS, and Y/Z PSC codes (construction /
+# maintenance of real property), are automatic kills regardless of set-aside.
+KC1_NAICS_KILL_PREFIXES = ("23", "31", "32", "33")
+KC1_PSC_KILL_PREFIXES = ("Y", "Z")
+# KC5 — wrong scale: a single-member LLC cannot self-perform the required
+# share (LOS 50% services) of a contract above this ceiling.
+KC5_MAX_SOLO_VALUE = 10_000_000
+# Dollar figures that are small-business SIZE STANDARDS ("size standard:
+# $34.5 million"), not contract values — stripped before the KC5 check.
+_SIZE_STANDARD_RE = re.compile(r"[^.]{0,40}size\s+standard[^.]{0,80}",
+                               re.IGNORECASE)
+
 # International / non-US-government buyers. None recognize US small-business or
 # SDVOSB set-asides — PRG's main structural advantage evaporates — so score DOWN
 # and flag (never first-contract material). Not a hard kill: a specific one may
@@ -2001,6 +2022,28 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
     if cap:
         return _fail("Gate 2 (capital/workforce upfront)",
                      f"requires pre-award workforce/equipment PRG can't pre-fund ('{cap[0]}')")
+
+    # KC1 — NAICS/PSC envelope: construction (23xxxx) / manufacturing (31-33xxxx)
+    # NAICS and Y/Z PSC codes are physical-delivery work PRG can never perform.
+    # Checked before the Type A credential template so e.g. a construction job
+    # requiring a licensed tradesperson is killed, never routed to hire-to-win.
+    psc = (opp.get("classificationCode") or "").strip().upper()
+    if naics and naics.startswith(KC1_NAICS_KILL_PREFIXES):
+        return _fail("Gate 0 (KC1 NAICS/PSC envelope)",
+                     f"NAICS {naics} — construction/manufacturing outside PRG's "
+                     "knowledge-work envelope")
+    if psc and psc.startswith(KC1_PSC_KILL_PREFIXES):
+        return _fail("Gate 0 (KC1 NAICS/PSC envelope)",
+                     f"PSC {psc} — construction/maintenance of real property")
+
+    # KC5 — wrong scale: a stated value beyond what a single-member LLC can
+    # self-perform 50% of. Size-standard dollar mentions are stripped first so
+    # "size standard: $34.5 million" never trips this.
+    scale_vals = _parse_dollar_amounts(_SIZE_STANDARD_RE.sub("", text))
+    if scale_vals and max(scale_vals) > KC5_MAX_SOLO_VALUE:
+        return _fail("Gate 0 (KC5 wrong scale)",
+                     f"~{_format_currency(max(scale_vals))} — beyond a "
+                     "single-member LLC's 50% self-performance capacity")
 
     # TYPE A — a specific individual professional credential (a licensed/certified
     # PERSON). PRG can hire that person W-2, so this is winnable with a contingent
@@ -4413,6 +4456,84 @@ _SELFTEST_CASES = [
         "expect_truthy": ["disqualified", "buyer_is_international"],
         "expect_falsy": ["tech_match"],
         "expect_equals": {"setaside": "None"},
+    },
+    {
+        "label": "Synthetic construction NAICS 236220 — roof replacement "
+                 "(KC1 NAICS envelope → KILL even under SDVOSB set-aside)",
+        "opp": {
+            "solicitationNumber": "KC1-NAICS-TEST",
+            "noticeId": "st9",
+            "title": "Roof Replacement, Building 204",
+            "description": ("Replacement of the roof membrane and flashing on "
+                            "Building 204."),
+            "naicsCode": "236220",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Veterans Affairs",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+        "expect_equals": {"kill_gate": "Gate 0 (KC1 NAICS/PSC envelope)"},
+    },
+    {
+        "label": "Synthetic Y-PSC design-build — real-property PSC "
+                 "(KC1 PSC envelope → KILL despite service NAICS)",
+        "opp": {
+            "solicitationNumber": "KC1-PSC-TEST",
+            "noticeId": "st10",
+            "title": "Design-Build, Flood Risk Management Project",
+            "description": ("Design-build services for a flood risk management "
+                            "project."),
+            "naicsCode": "541330",
+            "classificationCode": "Y1DA",
+            "typeOfSetAside": "SBA",
+            "typeOfSetAsideDescription": "Total Small Business",
+            "fullParentPathName": "U.S. Army Corps of Engineers",
+            "type": "Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+        "expect_equals": {"kill_gate": "Gate 0 (KC1 NAICS/PSC envelope)"},
+    },
+    {
+        "label": "Synthetic $25M program support — wrong scale "
+                 "(KC5 → KILL, single-member LLC can't self-perform 50%)",
+        "opp": {
+            "solicitationNumber": "KC5-SCALE-TEST",
+            "noticeId": "st11",
+            "title": "Enterprise Program Management Support Services",
+            "description": ("Program management and administrative support "
+                            "services. Estimated ceiling: $25,000,000 over a "
+                            "five-year ordering period."),
+            "naicsCode": "541611",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "General Services Administration",
+            "type": "Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+        "expect_equals": {"kill_gate": "Gate 0 (KC5 wrong scale)"},
+    },
+    {
+        "label": "Synthetic size-standard mention — '$34.5 million size "
+                 "standard' is NOT a contract value (KC5 must not fire)",
+        "opp": {
+            "solicitationNumber": "KC5-SIZESTD-TEST",
+            "noticeId": "st12",
+            "title": "Management Consulting Support",
+            "description": ("Management and program support consulting. The "
+                            "small business size standard is $34.5 million."),
+            "naicsCode": "541611",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "General Services Administration",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "forbid_verdict": "NO-BID",
+        "expect_falsy": ["disqualified"],
     },
 ]
 
