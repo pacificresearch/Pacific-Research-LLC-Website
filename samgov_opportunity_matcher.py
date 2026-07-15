@@ -415,7 +415,9 @@ CORP_AUTHORIZATION_KILL = [
 # labor). Anything needing multiple trained/certified technicians, a trade crew,
 # owned equipment / a lab, or a facility at proposal time → HARD KILL.
 CAPITAL_WORKFORCE_KILL = [
-    "asse", "medical gas", "nfpa 99",
+    # "asse 6030"-style certs only — bare "asse" would substring-match
+    # "assembly"/"assessment" and mis-kill in-lane work.
+    "asse 6", "asse certified", "asse-certified", "medical gas", "nfpa 99",
     "licensed electrician", "master electrician", "journeyman",
     "licensed plumber", "hvac certification", "epa 608", "boiler operator",
     "asbestos", "lead abatement", "stationary engineer",
@@ -640,6 +642,62 @@ _SOCAL_STATES = {"CA"}           # crude: any CA PoP skips the -5 travel hit
 RUBRIC_BASE = 30                 # for passing Gates 0 and 1
 GREEN_MIN = 75
 YELLOW_MIN = 55
+
+# ---------------------------------------------------------------------------
+# CAPTURE MODEL v3 — contract AGGREGATION, management, and execution.
+# PRG primes and owns the customer relationship, compliance, QC, and
+# invoicing; execution is sourced through subs, 1099s, staffing firms,
+# trade contractors, distributors, and teaming partners. Opportunities are
+# judged on WIN → SOURCE → PERFORM → CONTROL → INVOICE → COLLECT → PROFIT,
+# not on whether the founder can personally do the labor.
+# ---------------------------------------------------------------------------
+
+# Value-added components that rescue a product/supply buy from the pure-
+# commodity-resale kill (the aggregator adds margin through these).
+VALUE_ADD_KEYWORDS = [
+    "installation", "install and", "assembly", "commissioning", "site prep",
+    "removal and disposal", "haul away", "training", "configuration",
+    "integration", "maintenance plan", "warranty service",
+    "delivery and setup", "setup", "white glove", "inside delivery",
+]
+
+# Delegable trade / field services — NOT kills under the capture model.
+# Deep local sub markets exist; PRG primes, manages, and QCs. Flagged so the
+# margin model prices sub-management (thinner) rather than professional labor.
+DELEGABLE_TRADE_KEYWORDS = [
+    "janitorial", "custodial", "housekeeping", "grounds maintenance",
+    "landscaping", "pest control", "snow removal", "facility maintenance",
+    "facilities maintenance", "hvac", "plumbing", "electrical work",
+    "painting services", "roofing", "paving", "asphalt", "concrete",
+    "striping", "site work", "drainage", "fencing", "tree removal",
+    "welding", "carpentry", "masonry", "boiler", "elevator",
+    "generator maintenance", "fire alarm", "fire suppression",
+    "equipment maintenance", "equipment repair", "preventive maintenance",
+    "calibration services", "install and maintain",
+    "installation and maintenance", "logistics", "distribution", "warehouse",
+    "supply chain", "freight", "courier", "fleet", "food service",
+    "cafeteria", "laundry", "groundskeeping", "demolition", "renovation",
+    "construction", "build-out", "new construction", "utilities", "pipe",
+    "pumps", "water systems",
+]
+
+# Guard services need a firm-level state license (e.g., CA PPO) the PRIME
+# must hold — not delegable to a sub without ostensible-subcontractor risk.
+GUARD_LICENSE_KILL = [
+    "security guard", "guard services", "armed guard", "unarmed guard",
+    "security officer services", "protective services officer",
+]
+
+# Miller Act: performance/payment bonds are mandatory on federal construction
+# above this. PRG has no bonding capacity — construction above it is a kill;
+# below it, construction is a prime-with-trade-sub play (self-perform ≥15%).
+MILLER_ACT_THRESHOLD = 150_000
+
+# Capture priority weights (sum = 1.0) for the 1-10 dimension scores.
+CAPTURE_WEIGHTS = {
+    "p_win": 0.25, "margin": 0.25, "delegation": 0.15, "speed_cash": 0.10,
+    "perf_risk": 0.10, "wc_burden": 0.05, "pp_val": 0.05, "scalability": 0.05,
+}
 
 # International / non-US-government buyers. None recognize US small-business or
 # SDVOSB set-asides — PRG's main structural advantage evaporates — so score DOWN
@@ -1713,6 +1771,21 @@ def evaluate(opp):
         c = poc_list[0]
         poc_display = " / ".join(b for b in (c.get("name"), c.get("email"),
                                              c.get("phone")) if b)
+    # Capture v3 pursuit role (the six-way decision).
+    if disqualified or is_expired:
+        role = "PASS"
+    elif is_awarded or is_sub or notice_class == "AWARD":
+        role = "PURSUE AS SUBCONTRACTOR"
+    elif is_watch:
+        role = ("RESPOND TO SOURCES SOUGHT" if respond_recommended
+                else "MONITOR / PREPOSITION")
+    elif is_watch_template:
+        role = "PRIME WITH TEAMING PARTNER"
+    elif verdict == "RESEARCH":
+        role = "MONITOR / PREPOSITION"
+    else:
+        role = rub["role_hint"]
+
     loe = _estimate_loe(opp, value_num, notice_type)
     deadline_headline = ""
     if verdict == "SHORT-FUSE":
@@ -1812,6 +1885,10 @@ def evaluate(opp):
         "gate2_score": rub["gate2_score"],
         "gate3_score": rub["gate3_score"],
         "modifier_notes": "; ".join(rub["modifier_notes"]),
+        "role": role,
+        "priority": rub["priority"],
+        "fulfillment_model": rub["fulfillment_model"],
+        "margin_est": rub["margin_est"],
         "poc": _extract_poc(opp),
         "psc": (opp.get("classificationCode") or "").strip(),
         "posted": (opp.get("postedDate") or "").split("T")[0],
@@ -2119,6 +2196,8 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
     """
     text = _haystack(opp)
     nt = (notice_type or "").lower()
+    # Conditional-gate flags accumulated on the way to a PASS (capture v3).
+    pre_flags = []
 
     def _fail(gate, reason):
         return ("FAIL", gate, reason, [], False, 0, False, "", "")
@@ -2138,21 +2217,23 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
         return _fail("Gate 0.5 (structural)",
                      f"requires an asset/vehicle PRG lacks — '{st[0]}'")
 
-    # GATE 0 — product / subscription / license RESALE with no meaningful
-    # services labor. No labor to arbitrage → hard kill (rubric v2).
+    # GATE 0 — pure resale with NO value-added component (capture v3: value-
+    # added resale — install, config, training, maintenance — is a real
+    # aggregator play; zero-value-add subscription/license renewals are not).
     rs = _keyword_hits(text, RESALE_KILL_KEYWORDS)
-    if rs and not _keyword_hits(text, RESALE_SERVICES_EXEMPT):
-        return _fail("Gate 0 (resale)",
-                     f"product/subscription/license resale, no services labor "
-                     f"('{rs[0]}')")
+    if (rs and not _keyword_hits(text, RESALE_SERVICES_EXEMPT)
+            and not _keyword_hits(text, VALUE_ADD_KEYWORDS)):
+        return _fail("Gate 0 (resale, no value-add)",
+                     f"pure resale with no value-added component ('{rs[0]}')")
 
     # GATE 0 — firm-level professional licensure PRG does not hold (surveying,
-    # PE stamp, architecture), unless key personnel may hold the license.
-    fl = _keyword_hits(text, FIRM_LICENSURE_KILL)
+    # PE stamp, architecture, guard-firm licenses), unless key personnel may
+    # hold the license. Not delegable: licensure attaches to the PRIME.
+    fl = _keyword_hits(text, FIRM_LICENSURE_KILL + GUARD_LICENSE_KILL)
     if fl and not _keyword_hits(text, KEY_PERSONNEL_LICENSE_OK):
         return _fail("Gate 0 (firm licensure)",
-                     f"requires firm-level professional licensure PRG does "
-                     f"not hold ('{fl[0]}')")
+                     f"requires firm-level licensure PRG does not hold "
+                     f"('{fl[0]}')")
 
     # TYPE B — corporate / OEM / proprietary-system authorization (UNHIREABLE).
     # The authorization belongs to a company PRG can't put on payroll; subbing the
@@ -2177,27 +2258,39 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
         return _fail("Gate 2 (capital/workforce upfront)",
                      f"requires pre-award workforce/equipment PRG can't pre-fund ('{cap[0]}')")
 
-    # KC1 — NAICS/PSC envelope: construction (23xxxx) / manufacturing (31-33xxxx)
-    # NAICS and Y/Z PSC codes are physical-delivery work PRG can never perform.
-    # Checked before the Type A credential template so e.g. a construction job
-    # requiring a licensed tradesperson is killed, never routed to hire-to-win.
-    psc = (opp.get("classificationCode") or "").strip().upper()
-    if naics and naics.startswith(KC1_NAICS_KILL_PREFIXES):
-        return _fail("Gate 0 (KC1 NAICS/PSC envelope)",
-                     f"NAICS {naics} — construction/manufacturing outside PRG's "
-                     "knowledge-work envelope")
-    if psc and psc.startswith(KC1_PSC_KILL_PREFIXES):
-        return _fail("Gate 0 (KC1 NAICS/PSC envelope)",
-                     f"PSC {psc} — construction/maintenance of real property")
-
-    # KC5 — wrong scale: a stated value beyond what a single-member LLC can
-    # self-perform 50% of. Size-standard dollar mentions are stripped first so
-    # "size standard: $34.5 million" never trips this.
+    # Stated dollar scale (size-standard mentions stripped so "size standard:
+    # $34.5 million" never counts as a contract value).
     scale_vals = _parse_dollar_amounts(_SIZE_STANDARD_RE.sub("", text))
-    if scale_vals and max(scale_vals) > KC5_MAX_SOLO_VALUE:
+    scale = max(scale_vals) if scale_vals else None
+
+    # CONSTRUCTION (capture v3) — no longer an automatic kill. PRG can prime
+    # small construction/trade work through licensed local subs (LoS: prime
+    # self-performs ≥15% of general construction — PM/QC/admin counts). The
+    # Miller Act makes performance/payment bonds mandatory above $150K, and
+    # PRG has no bonding capacity, so bonded or >$150K construction is still
+    # a hard kill.
+    psc = (opp.get("classificationCode") or "").strip().upper()
+    is_construction = bool(
+        (naics and naics.startswith("23"))
+        or (psc and psc.startswith(KC1_PSC_KILL_PREFIXES)))
+    if is_construction:
+        if _keyword_hits(text, BONDING_KILL_KEYWORDS):
+            return _fail("Gate 0 (bonding required)",
+                         "construction with bid/performance bonding — no "
+                         "bonding capacity (flag: bonding required)")
+        if scale is not None and scale > MILLER_ACT_THRESHOLD:
+            return _fail("Gate 0 (construction > Miller Act)",
+                         f"~{_format_currency(scale)} construction — bonds "
+                         "mandatory above $150K; no bonding capacity")
+        pre_flags.append("construction — prime via licensed trade sub; "
+                         "self-perform ≥15% (PM/QC/admin); verify bond waiver")
+
+    # KC5 — wrong scale for a first/early contract: beyond PRG's realistic
+    # management, working-capital, and limitations-on-subcontracting capacity.
+    if scale is not None and scale > KC5_MAX_SOLO_VALUE:
         return _fail("Gate 0 (KC5 wrong scale)",
-                     f"~{_format_currency(max(scale_vals))} — beyond a "
-                     "single-member LLC's 50% self-performance capacity")
+                     f"~{_format_currency(scale)} — beyond a first-contract "
+                     "prime's management and LoS capacity")
 
     # TYPE A — a specific individual professional credential (a licensed/certified
     # PERSON). PRG can hire that person W-2, so this is winnable with a contingent
@@ -2230,23 +2323,35 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
         return _fail("Gate 0 (bonding required)",
                      f"bonding required — '{bond[0]}'")
 
-    # GATE 4 — commodity supply / distribution of goods (a product buy, not a
-    # service). Product/supply classification + a supply verb with no analytic
-    # verb → PRG performs no supply/distribution, so kill regardless of set-aside.
+    # COMMODITY SUPPLY (capture v3) — a pure product buy with NO value-added
+    # component is excluded (no margin to aggregate). With a value-add
+    # component (install, config, training, maintenance) it's a viable
+    # supply-and-services play, flagged for the nonmanufacturer rule: on a
+    # set-aside supply contract PRG must furnish the product of a small U.S.
+    # manufacturer (or hold an SBA class waiver).
     if _is_commodity_supply(opp):
-        return _fail("Gate 4 (commodity supply)",
-                     "supply/distribution of goods — PRG performs no product supply")
+        if not _keyword_hits(text, VALUE_ADD_KEYWORDS):
+            return _fail("Gate 4 (commodity, no value-add)",
+                         "pure product supply with no value-added component")
+        pre_flags.append("supply + value-add — verify nonmanufacturer rule "
+                         "(small U.S. manufacturer or SBA waiver)")
 
-    # GATE 4 — scope reality (work outside PRG's solo lane).
-    dq = _keyword_hits(text, DISQUALIFIER_KEYWORDS)
+    # DELEGABLE TRADE / FIELD SERVICES (capture v3) — NOT a kill: deep local
+    # sub markets exist and PRG primes/manages/QCs. Flagged so the margin
+    # model prices sub-management and LoS is checked (similarly situated subs
+    # or W2 crews for the 50% services cap).
+    dq = _keyword_hits(text, DELEGABLE_TRADE_KEYWORDS)
     if dq:
-        return _fail("Gate 4 (scope)", f"scope outside PRG's solo lane — '{dq[0]}'")
+        pre_flags.append(f"trade/field scope ('{dq[0]}') — sub-fulfilled; "
+                         "check LoS: similarly situated subs or W2 crew")
 
-    # GATE 3 — coverage model (embedded / 24-7 / guaranteed response).
+    # COVERAGE (capture v3) — 24/7 / embedded / guaranteed-response is
+    # staffable through subs/staffing firms, but it is a performance-risk and
+    # working-capital flag (payroll float, deduction exposure), not a kill.
     cov = _keyword_hits(text, COVERAGE_KILLER_KEYWORDS)
     if cov:
-        return _fail("Gate 3 (coverage)",
-                     f"requires coverage PRG can't commit solo — '{cov[0]}'")
+        pre_flags.append(f"coverage commitment ('{cov[0]}') — staffing-firm "
+                         "fulfillment; deduction/payroll-float risk")
 
     # NOTE (rubric v2): a multi-FTE team is NOT a kill — PRG's model is win as
     # prime and hire W2/1099 labor with the founder as PM. W2 hires count as
@@ -2263,7 +2368,7 @@ def screen_gates(opp, fte, deadline_days, naics, setaside_label, notice_type):
         return _template("licensed/certified individual")
 
     # Soft signals — score down / flag, never fail on their own.
-    soft = []
+    soft = list(pre_flags)
     if fte == 2:
         soft.append("~2 FTE — would need a teaming partner")
     if deadline_days is not None and 0 <= deadline_days < 5:
@@ -2333,6 +2438,8 @@ def prg_rubric(opp, setaside_label, setaside_eligible, is_sdvosb, value_num,
         "solo_reason": "", "gate1_notes": "", "gate2_score": 0,
         "gate3_score": 0, "modifier_notes": [],
         "bonding_required": "bonding" in (kill_gate or "").lower(),
+        "priority": 0, "fulfillment_model": "n/a",
+        "margin_est": "n/a", "role_hint": "PASS",
     }
 
     # --- GATE 0: hard disqualifiers (kills from screen_gates + ineligible
@@ -2475,6 +2582,65 @@ def prg_rubric(opp, setaside_label, setaside_eligible, is_sdvosb, value_num,
         why = ("outside founder credential domains" if not founder_hits
                else "needs hired labor (crew/LOE/team signals or size)")
         solo_reason = f"Not founder-deliverable — {why}; PM + hired labor model"
+
+    # --- CAPTURE MODEL v3: fulfillment classification, margin estimate,
+    # 1-10 dimension scores, and the weighted priority (0-100).
+    r_naics = (opp.get("naicsCode") or "").strip()
+    r_psc = (opp.get("classificationCode") or "").strip().upper()
+    is_constr = bool(r_naics.startswith("23")
+                     or (r_psc and r_psc.startswith(KC1_PSC_KILL_PREFIXES)))
+    trade_hits = (_keyword_hits(text, DELEGABLE_TRADE_KEYWORDS)
+                  or (["construction"] if is_constr else []))
+    supply_hits = (_keyword_hits(text, SUPPLY_VERB_KEYWORDS)
+                   and _keyword_hits(text, VALUE_ADD_KEYWORDS))
+    coverage_hits = _keyword_hits(text, COVERAGE_KILLER_KEYWORDS)
+    if founder_can_deliver:
+        model, margin_est, m_margin = "founder-delivered", "40-60%", 9
+    elif supply_hits:
+        model, margin_est, m_margin = "value-added supply", "10-20%", 3
+    elif trade_hits:
+        model, margin_est, m_margin = "trade-sub management", "8-15%", 4
+    elif loe_hits or coverage_hits:
+        model, margin_est, m_margin = "staffing (W2/1099)", "15-30%", 5
+    else:
+        model, margin_est, m_margin = "professional services", "30-50%", 8
+
+    nt = (opp.get("type") or "").lower()
+    simplified = small_buy or "combined synopsis" in nt or "rfq" in text
+    d = {
+        "p_win": max(1, min(10, round(score / 10)
+                            + (1 if is_sdvosb else 0)
+                            - (2 if setaside_label == "None" else 0))),
+        "margin": m_margin,
+        "delegation": (9 if commodity else 7 if trade_hits or supply_hits
+                       else 6 if specialized else 2 if thin else 5),
+        "perf_risk": max(1, 8 - (2 if trade_hits else 0)
+                         - (3 if coverage_hits else 0)
+                         - (2 if passthrough_risk == "high" else 0)
+                         - (1 if loe_hits else 0)),
+        "wc_burden": (9 if small_buy else
+                      4 if (supply_hits or trade_hits) else
+                      5 if (loe_hits or coverage_hits) else 7),
+        "speed_cash": (8 if simplified else 5) - (1 if loe_hits else 0),
+        "pp_val": {"High": 8, "Med": 5, "Low": 3}[pp_value],
+        "scalability": (8 if _keyword_hits(text, RECURRING_KEYWORDS) else 4),
+    }
+    priority = round(sum(CAPTURE_WEIGHTS[k] * d[k] for k in CAPTURE_WEIGHTS)
+                     * 10)
+
+    # Role hint (final role also considers notice class in evaluate()):
+    # teaming when execution rides on subs/staffing or pass-through risk is
+    # high; prime when PRG's PM + hired labor carries it.
+    needs_team = (trade_hits or supply_hits or coverage_hits
+                  or passthrough_risk == "high"
+                  or (fte is not None and fte >= 5))
+    role_hint = ("PRIME WITH TEAMING PARTNER" if needs_team
+                 else "BID AS PRIME")
+
+    out.update({
+        "priority": priority, "fulfillment_model": model,
+        "margin_est": margin_est, "role_hint": role_hint,
+    })
 
     out.update({
         "win_score": score, "win_band": band, "win_emoji": emoji,
@@ -2641,18 +2807,21 @@ def _opportunity_table(rows, eligible_key, reason_key):
     Rows are ordered by win score (best first) so the strongest bets sit on top.
     """
     lines = [
-        "| Win | Rating | Solicitation # | Title | Agency | Set-Aside "
-        "| Est. Value | Personnel | Solo? | Labor Plan | PP Value "
-        "| Location | Short Reason |",
+        "| Priority | Win | Rating | Role | Solicitation # | Title | Agency "
+        "| Set-Aside | Est. Value | Fulfillment | Est. GM% | Solo? "
+        "| Labor Plan | PP Value | Location | Short Reason |",
         "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- "
-        "| :--- | :--- | :--- | :--- |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
     ]
-    for r in sorted(rows, key=lambda x: x["win_score"], reverse=True):
+    for r in sorted(rows, key=lambda x: (x.get("priority", 0), x["win_score"]),
+                    reverse=True):
         solo = "Yes" if r["is_solo"] else "No"   # Solo = founder-deliverable
         lines.append(
-            f"| {r['win_score']} | {r['win_emoji']} {r['win_band']} "
+            f"| {r.get('priority', 0)} | {r['win_score']} "
+            f"| {r['win_emoji']} {r['win_band']} | {r.get('role', '')} "
             f"| {r['solicitation']} | {r['title']} | {r['agency']} "
-            f"| {r['setaside']} | {r['value_display']} | {r['personnel']} "
+            f"| {r['setaside']} | {r['value_display']} "
+            f"| {r.get('fulfillment_model', '')} | {r.get('margin_est', '')} "
             f"| {solo} | {r.get('labor_plan', '')} | {r.get('pp_value', '')} "
             f"| {r['location']} | {r[reason_key]} |"
         )
@@ -2669,6 +2838,39 @@ def render_report(results):
         f"[{COMPANY_WEBSITE}]({COMPANY_WEBSITE}) • "
         f"Generated {dt.date.today().isoformat()}"
     )
+    lines.append("")
+
+    # --- Capture executive summary (aggregation model) ---
+    def _best(rows, key=lambda r: (r.get("priority", 0), r["win_score"])):
+        rows = sorted(rows, key=key, reverse=True)
+        return rows[0] if rows else None
+
+    live = [r for r in results if not r["is_expired"] and not r["is_awarded"]]
+    passed = [r for r in live if not r["disqualified"]]
+    biddable = [r for r in passed if not r["is_future"]
+                and not r.get("watch_template")]
+    b_prime = _best([r for r in biddable if r.get("role") == "BID AS PRIME"])
+    b_team = _best([r for r in biddable
+                    if r.get("role") == "PRIME WITH TEAMING PARTNER"])
+    b_sub = _best([r for r in results
+                   if r.get("role") == "PURSUE AS SUBCONTRACTOR"])
+    b_pp = _best([r for r in biddable if r.get("pp_value") == "High"])
+    lines.append("### A. Capture Executive Summary")
+    lines.append("")
+    lines.append(f"- **Reviewed:** {len(results)} | **Passed screen:** "
+                 f"{len(passed)} | **Biddable now:** {len(biddable)}")
+    for label, row in (("Best immediate prime", b_prime),
+                       ("Best teaming play", b_team),
+                       ("Best subcontract target", b_sub),
+                       ("Best past-performance builder", b_pp)):
+        if row:
+            lines.append(
+                f"- **{label}:** {row['title']} ({row['solicitation']}, "
+                f"{row['agency']}) — priority {row.get('priority', 0)}, "
+                f"{row.get('fulfillment_model', '')}, "
+                f"GM {row.get('margin_est', '')}")
+        else:
+            lines.append(f"- **{label}:** none this window")
     lines.append("")
 
     # Award notices (already won) only belong in the subcontracting view.
@@ -2895,8 +3097,12 @@ def _render_recommendation(lines, i, r):
 # Full decision-dashboard columns, ordered for go/no-go review.
 _RICH_COLS = [
     ("Go / No-Go", "verdict"),
+    ("Recommended Role", "role"),
+    ("Priority (capture)", "priority"),
     ("Win Score", "win_score"),
     ("Rating", lambda r: f"{r['win_emoji']} {r['win_band']}"),
+    ("Fulfillment Model", "fulfillment_model"),
+    ("Est. GM%", "margin_est"),
     ("Est. LOE", "loe"),
     ("Title", "title"),
     ("Agency", "agency"),
@@ -4547,8 +4753,8 @@ _SELFTEST_CASES = [
         },
         "deadline_offset_days": 3,
         "expect_verdict": "NO-BID",
-        "expect_equals": {"kill_gate": "Gate 0 (resale)", "win_band": "Red",
-                          "win_score": 0},
+        "expect_equals": {"kill_gate": "Gate 0 (resale, no value-add)",
+                          "win_band": "Red", "win_score": 0},
     },
     {
         "label": "GE MAC 5500 ECG PM — OEM pass-through (brand equipment + "
@@ -4661,8 +4867,8 @@ _SELFTEST_CASES = [
         "expect_equals": {"setaside": "None"},
     },
     {
-        "label": "Synthetic construction NAICS 236220 — roof replacement "
-                 "(KC1 NAICS envelope → KILL even under SDVOSB set-aside)",
+        "label": "Synthetic construction NAICS 236220 — small roof job, no "
+                 "bonding (capture v3: prime via trade sub, NOT killed)",
         "opp": {
             "solicitationNumber": "KC1-NAICS-TEST",
             "noticeId": "st9",
@@ -4676,28 +4882,31 @@ _SELFTEST_CASES = [
             "type": "Combined Synopsis/Solicitation",
             "responseDeadLine": "2026-12-01",
         },
-        "expect_verdict": "NO-BID",
-        "expect_equals": {"kill_gate": "Gate 0 (KC1 NAICS/PSC envelope)"},
+        "expect_verdict": "BID",
+        "expect_falsy": ["disqualified"],
+        "expect_equals": {"role": "PRIME WITH TEAMING PARTNER",
+                          "fulfillment_model": "trade-sub management"},
     },
     {
-        "label": "Synthetic Y-PSC design-build — real-property PSC "
-                 "(KC1 PSC envelope → KILL despite service NAICS)",
+        "label": "Synthetic construction WITH performance bond — Miller Act "
+                 "bonding stays a hard kill (flagged 'bonding required')",
         "opp": {
-            "solicitationNumber": "KC1-PSC-TEST",
+            "solicitationNumber": "KC1-BOND-TEST",
             "noticeId": "st10",
-            "title": "Design-Build, Flood Risk Management Project",
-            "description": ("Design-build services for a flood risk management "
-                            "project."),
-            "naicsCode": "541330",
-            "classificationCode": "Y1DA",
-            "typeOfSetAside": "SBA",
-            "typeOfSetAsideDescription": "Total Small Business",
-            "fullParentPathName": "U.S. Army Corps of Engineers",
+            "title": "Parking Lot Paving and Striping",
+            "description": ("Asphalt paving and striping of the north parking "
+                            "lot. Performance and payment bonds are required "
+                            "in accordance with FAR 52.228-15."),
+            "naicsCode": "237310",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Veterans Affairs",
             "type": "Solicitation",
             "responseDeadLine": "2026-12-01",
         },
         "expect_verdict": "NO-BID",
-        "expect_equals": {"kill_gate": "Gate 0 (KC1 NAICS/PSC envelope)"},
+        "expect_truthy": ["bonding_required"],
+        "expect_contains": {"kill_gate": "bonding"},
     },
     {
         "label": "Synthetic $25M program support — wrong scale "
@@ -4756,12 +4965,12 @@ _SELFTEST_CASES = [
             "responseDeadLine": "2026-12-01",
         },
         "expect_verdict": "NO-BID",
-        "expect_equals": {"kill_gate": "Gate 0 (resale)", "win_band": "Red",
-                          "win_score": 0},
+        "expect_equals": {"kill_gate": "Gate 0 (resale, no value-add)",
+                          "win_band": "Red", "win_score": 0},
     },
     {
-        "label": "REGRESSION vacuum pump replacement — construction/install "
-                 "primary scope (Gate 0 → Red)",
+        "label": "REGRESSION vacuum pump replacement — capture v3: small "
+                 "unbonded trade job = prime with mechanical sub (not killed)",
         "opp": {
             "solicitationNumber": "REG-VACPUMP",
             "noticeId": "rg3",
@@ -4776,8 +4985,73 @@ _SELFTEST_CASES = [
             "type": "Combined Synopsis/Solicitation",
             "responseDeadLine": "2026-12-01",
         },
+        "expect_verdict": "BID",
+        "expect_falsy": ["disqualified"],
+        "expect_equals": {"role": "PRIME WITH TEAMING PARTNER",
+                          "fulfillment_model": "trade-sub management"},
+    },
+    {
+        "label": "CAPTURE janitorial services — delegable trade, deep local "
+                 "sub market (not killed; prime with teaming)",
+        "opp": {
+            "solicitationNumber": "CAP-JANITORIAL",
+            "noticeId": "cp1",
+            "title": "Janitorial Services, Federal Building",
+            "description": ("Janitorial and custodial services for the "
+                            "federal building, five days per week. Base year "
+                            "plus four option years."),
+            "naicsCode": "561720",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "General Services Administration",
+            "type": "Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "BID",
+        "expect_falsy": ["disqualified"],
+        "expect_equals": {"role": "PRIME WITH TEAMING PARTNER",
+                          "fulfillment_model": "trade-sub management"},
+    },
+    {
+        "label": "CAPTURE value-added supply — furniture supply AND "
+                 "installation (NMR flag, not killed)",
+        "opp": {
+            "solicitationNumber": "CAP-SUPPLY-VA",
+            "noticeId": "cp2",
+            "title": "Exam Room Furniture — Supply and Installation",
+            "description": ("Furnish and deliver exam room furniture "
+                            "including installation, assembly, and removal "
+                            "and disposal of existing furniture."),
+            "naicsCode": "337127",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Veterans Affairs",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "BID",
+        "expect_falsy": ["disqualified"],
+        "expect_equals": {"fulfillment_model": "value-added supply"},
+        "expect_contains": {"soft_flags_display": "nonmanufacturer"},
+    },
+    {
+        "label": "CAPTURE guard services — firm-level PPO licensure stays a "
+                 "kill (not delegable without ostensible-sub risk)",
+        "opp": {
+            "solicitationNumber": "CAP-GUARDS",
+            "noticeId": "cp3",
+            "title": "Unarmed Security Guard Services",
+            "description": ("Unarmed guard services at the facility, two "
+                            "posts, day shift."),
+            "naicsCode": "561612",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Veterans Affairs",
+            "type": "Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
         "expect_verdict": "NO-BID",
-        "expect_equals": {"win_band": "Red", "win_score": 0},
+        "expect_equals": {"kill_gate": "Gate 0 (firm licensure)"},
     },
     {
         "label": "REGRESSION duct bank survey — firm land-surveying licensure "

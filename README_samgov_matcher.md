@@ -410,6 +410,26 @@ zero staffing risk.
 
 Each row is a **decision dashboard** ordered best-bet first, with:
 
+- **Capture model v3 (aggregation)**: PRG primes and owns the customer
+  relationship, compliance, QC, and invoicing; execution is sourced through
+  subs, 1099s, staffing firms, trade contractors, and distributors. Every
+  row gets a **Recommended Role** (BID AS PRIME / PRIME WITH TEAMING
+  PARTNER / PURSUE AS SUBCONTRACTOR / RESPOND TO SOURCES SOUGHT /
+  MONITOR–PREPOSITION / PASS), a **Fulfillment Model** with an **estimated
+  gross-margin band** (founder-delivered 40–60%, professional services
+  30–50%, staffing 15–30%, value-added supply 10–20%, trade-sub management
+  8–15%), and a weighted **Priority (0–100)** blending win probability
+  (25%), margin (25%), delegation feasibility (15%), speed to cash (10%),
+  performance risk (10%), working capital (5%), PP value (5%), and
+  scalability (5%). Delegable trades (janitorial, facilities, paving,
+  HVAC…) and value-added product supply are **plays, not kills**;
+  still killed: pure no-value-add resale, bonded or >$150K (Miller Act)
+  construction, firm-level licensure (PE/surveying/architecture/guard PPO),
+  CBA workforce takeovers, pre-award capital, FCL, >$10M first-contract
+  scale. Supply set-asides carry a **nonmanufacturer-rule** flag; indivisible
+  single-specialty scopes carry an **ostensible-subcontractor** flag. The
+  report opens with a **Capture Executive Summary** (best immediate prime,
+  best teaming play, best subcontract target, best PP builder).
 - **Win Score (0–100)** from the **rubric v2 three-gate model**. Business
   model: win as prime, hire 1099/W2 labor, founder PMs the work — the founder
   does NOT need to personally perform delivery.
