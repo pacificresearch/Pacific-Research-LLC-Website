@@ -993,6 +993,12 @@ def _intl_source_rows():
             for (c, n, u, note) in INTERNATIONAL_SOURCES]
 
 
+def _sled_source_rows():
+    """SLED_MARKETPLACE_SOURCES tuples -> row dicts."""
+    return [{"category": c, "name": n, "url": u, "note": note}
+            for (c, n, u, note) in SLED_MARKETPLACE_SOURCES]
+
+
 # Columns for the other-data-bank tabs (grants, SBIR, international directory).
 _GRANTS_COLS = [
     ("Title", "title"),
@@ -1455,6 +1461,61 @@ INTERNATIONAL_SOURCES = [
     ("US assistance", "Grants.gov (also pulled live in this report)",
      "https://grants.gov/search-grants",
      "State Dept global-health APS + assistance awards that never touch SAM.gov."),
+]
+
+# SLED (state/local/education) + federal marketplace sources. None expose a
+# clean keyless API the way SAM.gov does, so these are REGISTER-HERE directory
+# entries with a priority call — not live pulls. Ordered by leverage for PRG.
+SLED_MARKETPLACE_SOURCES = [
+    ("Federal — register first",
+     "VA OSDBU — Forecast of Contracting Opportunities",
+     "https://www.va.gov/osdbu/",
+     "PRG's single highest-leverage agency: under 38 USC 8127 (Kingdomware) "
+     "the VA MUST set aside for SDVOSB/VOSB when two capable firms exist. "
+     "The forecast shows next-FY buys BEFORE they hit SAM.gov — preposition, "
+     "call the OSDBU, respond to the sources sought. **Check monthly.**"),
+    ("Federal — register first", "SBA SUBNet",
+     "https://subnet.sba.gov/",
+     "Subcontracting opportunities posted by large primes who NEED small-"
+     "business/SDVOSB participation to meet FAR 52.219-9 plan goals — feeds "
+     "the PURSUE AS SUBCONTRACTOR lane directly. Browsable without a login. "
+     "**Sweep weekly.**"),
+    ("Federal — register first", "Unison Marketplace (formerly FedBid)",
+     "https://marketplace.unisonglobal.com/",
+     "Reverse-auction simplified buys, many SDVOSB-set-aside, mostly under "
+     "$250K — fast-cash past-performance builders. Discipline required: it's "
+     "a price race, so bid only value-added supply/services where you hold a "
+     "real supplier quote first. Free seller registration."),
+    ("California / SLED — home turf",
+     "Cal eProcure + CA DVBE certification (DGS)",
+     "https://caleprocure.ca.gov/",
+     "California's SAM.gov. **Highest-leverage state move: get the DVBE "
+     "certification** — CA statute sets a 3% DVBE participation goal, so "
+     "state primes actively hunt DVBE subs and agencies set contracts aside. "
+     "Federal SDVOSB verification does most of the paperwork lift. Both "
+     "prime AND sub demand, zero federal competition politics."),
+    ("California / SLED — home turf", "PlanetBids",
+     "https://www.planetbids.com/",
+     "The bid portal for dozens of SoCal cities, counties, and special "
+     "districts (one free vendor registration per agency). Start with the "
+     "LA-metro agencies and register under services + supply commodity "
+     "codes; DVBE preference often applies locally too."),
+    ("California / SLED — home turf", "OpenGov Procurement",
+     "https://procurement.opengov.com/",
+     "Portal platform for a growing set of CA/AZ/NV municipalities — "
+     "searchable public listings, register per agency. Sweep monthly for "
+     "janitorial/facilities/program-support scopes in PRG's lanes."),
+    ("California / SLED — home turf", "Bonfire (Euna Solutions)",
+     "https://vendor.bonfirehub.com/",
+     "One vendor account follows many agencies (cities, water/transit "
+     "districts, universities). Good coverage of CA special districts — "
+     "recurring facilities and professional-services RFPs."),
+    ("Low priority — skip for now", "DLA DIBBS",
+     "https://www.dibbs.bsm.dla.mil/",
+     "Mostly exact-NSN manufactured-part supply governed by the "
+     "nonmanufacturer rule — the pure no-value-add resale this report's own "
+     "Gate 0 kills. Revisit only if PRG later builds a value-added medical "
+     "supply niche with a distributor relationship."),
 ]
 
 
@@ -3507,6 +3568,7 @@ def export_spreadsheet(results, path, recompetes=None, grants=None, sbir=None,
         ("SBIR-STTR (Open R&D)", _SBIR_COLS, sbir or []),
         ("ReliefWeb (Intl Gigs)", _RELIEFWEB_COLS, reliefweb or []),
         ("International Sources", _INTL_SRC_COLS, _intl_source_rows()),
+        ("SLED + Marketplaces", _INTL_SRC_COLS, _sled_source_rows()),
         ("KILL LOG (screened out)", _KILL_COLS, killed),
         ("Resources (Hunt & Help)", _RESOURCE_COLS, _resource_rows()),
     ]
@@ -4595,6 +4657,40 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
                  '<th>What it covers / fit for PRG</th><th>Register</th>'
                  '</tr></thead><tbody>')
         for row in _isrc_by_cat[cat]:
+            u = _html_escape(row["url"])
+            note = _html_escape(row["note"]).replace("**", "")
+            p.append(f"<tr><td><b>{_html_escape(row['name'])}</b></td>"
+                     f"<td>{note}</td>"
+                     f'<td><a href="{u}" target="_blank" rel="noopener">{u}</a>'
+                     "</td></tr>")
+        p.append('</tbody></table></div>')
+    p.append('</section>')
+
+    # SLED + marketplace sources — the biggest pool this report does NOT pull
+    # live (state/local portals need per-agency accounts; no open APIs).
+    p.append('<section><h2>🏛️ SLED &amp; Marketplaces — The Pool This Report '
+             'Doesn\'t Pull</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'State/local/education portals and federal marketplaces post an '
+             'estimated 50–90K open solicitations nationwide at any moment, '
+             'but each needs its own vendor registration and none offer an '
+             'open API — so this is a <b>register-here directory</b>, '
+             'priority-ordered for PRG. <b>Best first moves: the VA forecast '
+             '(SDVOSB rule-of-two), then Cal eProcure + the CA DVBE '
+             'certification (3% state participation goals = built-in '
+             'demand).</b></p>')
+    _sled_by_cat, _sled_order = {}, []
+    for row in _sled_source_rows():
+        if row["category"] not in _sled_by_cat:
+            _sled_by_cat[row["category"]] = []
+            _sled_order.append(row["category"])
+        _sled_by_cat[row["category"]].append(row)
+    for cat in _sled_order:
+        p.append(f'<h3 style="margin:16px 0 6px">{_html_escape(cat)}</h3>')
+        p.append('<div class="scroll"><table><thead><tr><th>Source</th>'
+                 '<th>Why / how it fits PRG</th><th>Register</th>'
+                 '</tr></thead><tbody>')
+        for row in _sled_by_cat[cat]:
             u = _html_escape(row["url"])
             note = _html_escape(row["note"]).replace("**", "")
             p.append(f"<tr><td><b>{_html_escape(row['name'])}</b></td>"
