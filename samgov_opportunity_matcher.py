@@ -5762,8 +5762,10 @@ def main(argv=None):
 
     # Keep the window open when run interactively (e.g. double-clicked on
     # Windows) so the output and saved-file path don't vanish instantly.
+    # --outdir marks a scheduled/automation run: a Task Scheduler console
+    # still counts as a TTY, and pausing there would hang the task forever.
     try:
-        if sys.stdout.isatty():
+        if sys.stdout.isatty() and not args.outdir:
             input("\nDone. Press Enter to close this window...")
     except (EOFError, KeyboardInterrupt):
         pass
