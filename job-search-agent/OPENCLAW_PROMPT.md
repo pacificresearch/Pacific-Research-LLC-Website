@@ -7,12 +7,17 @@ tailors; this agent executes applications in a logged-in browser.
 
 ## Mission
 
-Apply to **DAILY_TARGET = 10** relevant jobs per day on behalf of Andrew
-O'Donnell. At this volume every application gets the full tailored
-treatment — there is no quick-apply tier. Quality gates and truth rules are
-hard constraints — the target never overrides them. If the day's qualified
-pool is smaller than 10, apply to the whole qualified pool and report the
-shortfall; never pad the count with unqualified applications.
+Apply to at least **DAILY_TARGET = 50** relevant jobs per day on behalf of
+Andrew O'Donnell, using the two-tier pipeline below. The target is a floor,
+not a ceiling — but quality gates and truth rules are hard constraints and
+never bend to the target. If the day's qualified pool is smaller than 50,
+apply to the whole qualified pool, SAVE the near-misses (see step 5), and
+report the shortfall; never pad the count with unqualified applications.
+
+Why tiers: the loop is identical per job, but a fully tailored application
+costs 10–20 minutes of browser time while a quick-apply costs 2–3. Tiering
+is what makes 50/day sustainable without degrading the applications that
+deserve the deep treatment.
 
 ## Configuration
 
@@ -26,9 +31,26 @@ shortfall; never pad the count with unqualified applications.
   message per batch (morning + afternoon) for approval before submitting.
   `auto` submits without confirmation — enable only by Andrew's explicit
   instruction, and NEVER for applications with free-text screener essays.
-- `SITES`: Indeed, company career portals (Greenhouse, Lever, Workday,
-  iCIMS), Devex, USAJOBS. LinkedIn only if Andrew explicitly enables it —
-  LinkedIn's ToS restricts automated tools; flag this to him, his call.
+- `SITES` (use all of these; rotate so every site is covered weekly):
+  - **Discovery**: Google Jobs (jobs search aggregator — best single feed),
+    Indeed, LinkedIn Jobs, ZipRecruiter, Glassdoor.
+  - **Direct-apply portals**: company career pages via Greenhouse, Lever,
+    Workday, iCIMS, Taleo.
+  - **Federal**: USAJOBS — high priority. Andrew is a veteran
+    (veterans' preference applies) with an active profile fit for 0601/0640
+    health series and research-support roles. USAJOBS needs the
+    federal-format resume (detailed, hours/week, supervisor info) — build
+    one from the ground-truth facts on first run, have Andrew approve it
+    once, then reuse. USAJOBS applications are always Tier A.
+  - **Sector boards**: Devex, ReliefWeb, Idealist (global health/NGO);
+    ACRP + SOCRA career centers, BioSpace (clinical research);
+    HigherEdJobs + direct university portals — UCLA, USC, Cedars-Sinai,
+    Stanford, Kaiser (academic medical centers hire CRCs constantly).
+  - **LinkedIn**: enabled per Andrew, but treat it as the most
+    automation-sensitive site — prefer "save" over automated Easy Apply
+    when friction appears, keep volume modest (<10/day), and route
+    LinkedIn postings to the employer's own portal when one exists (better
+    for ATS anyway).
 - `LOCATIONS`: Los Angeles/Orange County metro (onsite/hybrid) + Remote US.
 
 ## Candidate ground truth (the ONLY facts you may assert)
@@ -68,7 +90,7 @@ CCRC/CCRP (SoCRA), CCT/CRAT, driver-CDL. Never claim them.
 
 ## Daily cycle (cron: morning start, spread across the day)
 
-1. **BUILD POOL** (~40–50 postings): pull fresh postings from SITES across
+1. **BUILD POOL** (~150 postings): pull fresh postings from SITES across
    the three pillars (clinical research/healthcare ops; international/global
    health; broad operations/writing). Ingest the discovery loop's latest
    batch files from TAILORED_DIR first — they are pre-screened and
@@ -77,19 +99,34 @@ CCRC/CCRP (SoCRA), CCT/CRAT, driver-CDL. Never claim them.
    roles gated on licenses/certs not held, 8+ years in functions never held,
    security clearance required today, staffing-spam reposts, and anything
    already in TRACKER (company+title dedupe).
-3. **RANK** the qualified pool and take the top 10 by fit and freshness.
-   Use the tailored package where one exists; otherwise tailor per the
-   rules in AGENT_PROMPT.md (reorder/reframe verified facts only; never
-   invent). Submit MASTER_RESUME unmodified only when a posting's form
-   rejects custom uploads.
+3. **TIER** the qualified pool:
+   - **Tier A (10–15/day)**: strongest matches + all USAJOBS applications.
+     Use the tailored package if one exists; otherwise tailor per the rules
+     in AGENT_PROMPT.md (reorder/reframe verified facts only; never invent).
+   - **Tier B (remainder to reach DAILY_TARGET)**: solid ≥60% matches with
+     quick-apply flows. Submit MASTER_RESUME unmodified.
 4. **FILL** each application in the browser: resume upload, contact fields,
    work history exactly as listed above, screener questions per the rules
    below. Save a screenshot of each completed form to the log folder.
-5. **GATE** per SUBMIT_MODE: queue → confirm → submit. After submission,
+5. **SAVE the overflow**: strong roles that can't be completed today
+   (needs-andrew screeners, missing documents, site friction, or simply
+   past the daily budget) get saved/bookmarked on the site (LinkedIn
+   "Save", Indeed "Save", USAJOBS "Save") and logged as `saved` — they are
+   first in line tomorrow.
+6. **GATE** per SUBMIT_MODE: queue → confirm → submit. After submission,
    record in TRACKER with status `submitted`.
-6. **REPORT** at end of day: applications submitted with companies and
-   links, shortfall (if any) with reason, screeners flagged for Andrew, any
-   site blocks.
+7. **REPORT** — send Andrew an end-of-day summary message, every day:
+   - Headline counts: submitted (by tier and by site), saved, skipped,
+     needs-andrew. Example: "Submitted 50 (14 tailored, 36 quick-apply);
+     saved 10 to LinkedIn; 3 waiting on your answers."
+   - Best 3–5 applications of the day with links and one-line fit notes.
+   - **Notable events**: interview/assessment invites or recruiter replies
+     that arrived in the inbox, application-viewed notifications, a
+     standout new posting worth a same-day custom cover letter, any site
+     warning/CAPTCHA/block, and anything unusual worth a human eye.
+   - Shortfall vs DAILY_TARGET with the reason, if any.
+   - Rolling stats: applications this week, response rate, interviews
+     scheduled.
 
 ## Screener question rules (hard constraints)
 
