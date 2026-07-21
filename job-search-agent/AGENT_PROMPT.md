@@ -15,12 +15,12 @@ questions mid-cycle; you flag ambiguities in the output instead.
 
 ## Ground truth (source of truth for all claims)
 
-- Master resume file: `ODonnell_Andrew_Resume_2026^ADC.pdf`. **Status: NOT
-  FOUND in Google Drive or Gmail as of 2026-07-21.** Until it is uploaded to
-  Drive, the operative ground truth is
-  `ODonnell_Andrew_Resume_ClinicalInk.pdf` (Drive file ID
-  `1ncGUxhkAHBQQOeBfgfS9h3XmjHrQpIDx`), supplemented by the Indeed profile
-  resume. When the master file appears in Drive, switch to it.
+- Master resume: `job-search-agent/resume/ODonnell_Andrew_Resume_2026ADC.pdf`
+  (uploaded by Andrew 2026-07-21, canonical). Variant
+  `ODonnell_Andrew_Resume_2026AD.pdf` sits alongside it — identical except it
+  retains the CHOC Code Lobby Surge bullet. Supplementary sources:
+  `ODonnell_Andrew_Resume_ClinicalInk.pdf` in Google Drive (validation-analyst
+  tailoring of the same facts) and the Indeed profile.
 - Verified fact base: Stanford Dept of Medicine CRC Associate (Nov 2021 – Feb
   2026, 1,500+ participants, NIH + industry Phase II–IV, REDCap/OnCore/
   Medidata Rave, ≥90% on-time query resolution, Honest Broker for Gilead
@@ -36,6 +36,16 @@ questions mid-cycle; you flag ambiguities in the output instead.
   DOT, NREMT, CPT I, BLS/ACLS/PALS, PHTLS, TCCC; Stanford Online AI in
   Healthcare; Google Advanced Data Analytics. Tools: SAS, SPSS, R, Python,
   Epic, Cerner, Jira, Smartsheet.
+- Additional master-confirmed facts (2026ADC): Stanford recruitment/enrollment
+  leadership with the site consistently ranked among top enrollment sites
+  nationally; therapeutic areas infectious disease, post-acute sequelae of
+  SARS-CoV-2, chronic disease; involvement in budgeting, billing, and
+  feasibility management; CHOC code-event assistance (intubation,
+  resuscitation, medication prep, patient transport); USAF cross-disciplinary
+  team training with zero equipment-related incidents; international field
+  experience under the Chapman MA — International Business program (Rio de
+  Janeiro & Brasília, Brazil), Medical Intern (Cuzco, Peru), Education Intern
+  (Hangzhou, China).
 - Anything not in the fact base is out of bounds for resume bullets. Spanish
   fluency appears in PRG business records but NOT on the resume — do not put
   it in tailored bullets until Andrew confirms it belongs on the master.
@@ -62,9 +72,9 @@ reposts already covered in the tracker.
 **Tool fallback:** scheduled cycles may start without MCP connector tools
 (`mcp__Indeed__*`, `mcp__Google_Drive__*`). If Indeed tools are absent, run
 the pillar searches with WebSearch and read postings with WebFetch (Indeed,
-LinkedIn, Devex, company career pages). If Drive is absent, ground truth is
-the verified fact base transcribed above — it is a faithful copy of the
-ClinicalInk resume and sufficient for truth-checking.
+LinkedIn, Devex, company career pages). The master resume lives in the repo,
+so ground truth never depends on a connector; the fact base transcribed above
+is a faithful summary of it and sufficient for truth-checking.
 
 ## Execution loop (per cycle)
 

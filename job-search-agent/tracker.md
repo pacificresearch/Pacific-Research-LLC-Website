@@ -21,8 +21,9 @@ Dedupe key: company + title. Never re-package a listed job.
 
 ## Open questions for Andrew
 
-- Upload master `ODonnell_Andrew_Resume_2026^ADC.pdf` to Google Drive — not
-  found; agent is grounding on `ODonnell_Andrew_Resume_ClinicalInk.pdf`.
+- ~~Upload master resume~~ RESOLVED 2026-07-21: master
+  `ODonnell_Andrew_Resume_2026ADC.pdf` committed to
+  `job-search-agent/resume/` (canonical), with the `2026AD` variant alongside.
 - Confirm Spanish proficiency level for the resume (decisive for the CLRI
   Pasadena role and future bilingual postings).
 - Confirm target locations: currently searching Los Angeles, CA + Remote US.
