@@ -14,10 +14,11 @@
 #  Run it once by pasting this into PowerShell:
 #    iex (irm "https://raw.githubusercontent.com/pacificresearch/Pacific-Research-LLC-Website/claude/samgov-opportunity-matcher-0a3c2f/automation/setup_prg_automation.ps1")
 #
-#  NOTE: scheduled scans only run while the PC is on and awake. If it was
-#  asleep at the scheduled time, run the .bat in the reports folder by hand
-#  (or wake the machine before 6:30 AM — Task Scheduler can also be set to
-#  "wake the computer to run this task" in the task's Conditions tab).
+#  The daily/weekly tasks are registered with "wake the computer to run"
+#  and "run as soon as possible after a missed start" — a machine asleep at
+#  6:30 AM wakes for the scan, and one that was powered off catches up the
+#  moment it's back on. A fully powered-off PC at 6:30 still can't wake
+#  itself; the catch-up run fires at next boot instead.
 # =====================================================================
 
 $ErrorActionPreference = 'Stop'
@@ -74,11 +75,24 @@ $update
 py "%~dp0samgov_opportunity_matcher.py" --days 90 --outdir "%~dp0Monthly"
 "@ | Set-Content $monthlyBat -Encoding ASCII
 
-# 5. Register scheduled tasks
+# 5. Register scheduled tasks. Daily/weekly use Register-ScheduledTask so we
+#    can set WakeToRun (wake the PC from sleep at 6:30) and StartWhenAvailable
+#    (if the machine was off/asleep past the trigger, run the moment it's
+#    back) — a laptop closed at 6:30 AM still produces the morning report as
+#    soon as it's opened. Plain schtasks can't set either flag.
 Write-Host '  Registering scheduled tasks...' -ForegroundColor Cyan
-schtasks /Create /TN 'PRG SAMgov Daily Morning'  /TR "`"$dailyBat`""   /SC DAILY          /ST 06:30 /F | Out-Null
-schtasks /Create /TN 'PRG SAMgov Weekly Scan'    /TR "`"$weeklyBat`""  /SC WEEKLY  /D MON /ST 09:00 /F | Out-Null
-schtasks /Create /TN 'PRG SAMgov Monthly Report' /TR "`"$monthlyBat`"" /SC MONTHLY /D 1   /ST 09:00 /F | Out-Null
+$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -WakeToRun `
+    -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Hours 2)
+Register-ScheduledTask -TaskName 'PRG SAMgov Daily Morning' -Force `
+    -Action (New-ScheduledTaskAction -Execute $dailyBat) `
+    -Trigger (New-ScheduledTaskTrigger -Daily -At 6:30am) `
+    -Settings $settings | Out-Null
+Register-ScheduledTask -TaskName 'PRG SAMgov Weekly Scan' -Force `
+    -Action (New-ScheduledTaskAction -Execute $weeklyBat) `
+    -Trigger (New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 9:00am) `
+    -Settings $settings | Out-Null
+# Monthly trigger has no New-ScheduledTaskTrigger equivalent — keep schtasks.
+schtasks /Create /TN 'PRG SAMgov Monthly Report' /TR "`"$monthlyBat`"" /SC MONTHLY /D 1 /ST 09:00 /F | Out-Null
 
 # 6. Run one scan now so you have fresh files immediately
 Write-Host '  Running a first scan now (2-5 minutes)...' -ForegroundColor Cyan
