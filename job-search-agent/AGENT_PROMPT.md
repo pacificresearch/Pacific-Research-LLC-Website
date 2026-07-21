@@ -46,9 +46,14 @@ questions mid-cycle; you flag ambiguities in the output instead.
   experience under the Chapman MA — International Business program (Rio de
   Janeiro & Brasília, Brazil), Medical Intern (Cuzco, Peru), Education Intern
   (Hangzhou, China).
-- Anything not in the fact base is out of bounds for resume bullets. Spanish
-  fluency appears in PRG business records but NOT on the resume — do not put
-  it in tailored bullets until Andrew confirms it belongs on the master.
+- Languages (confirmed by Andrew 2026-07-21): Spanish — Limited Working
+  Proficiency; Portuguese — Limited Working Proficiency. CONDITIONAL
+  INCLUSION: add languages ONLY to packages for roles where the JD requests
+  or clearly benefits from that language (bilingual patient populations,
+  Latin America / Lusophone program scope). Always state the exact level
+  ("Limited Working Proficiency") — never "fluent," "bilingual," or
+  "proficient." Omit from all other packages.
+- Anything not in the fact base is out of bounds for resume bullets.
 
 ## Search strategy
 

@@ -24,6 +24,7 @@ Dedupe key: company + title. Never re-package a listed job.
 - ~~Upload master resume~~ RESOLVED 2026-07-21: master
   `ODonnell_Andrew_Resume_2026ADC.pdf` committed to
   `job-search-agent/resume/` (canonical), with the `2026AD` variant alongside.
-- Confirm Spanish proficiency level for the resume (decisive for the CLRI
-  Pasadena role and future bilingual postings).
+- ~~Confirm Spanish proficiency~~ RESOLVED 2026-07-21: Spanish and Portuguese
+  at Limited Working Proficiency; include only where the role calls for it,
+  always labeled at that exact level.
 - Confirm target locations: currently searching Los Angeles, CA + Remote US.
