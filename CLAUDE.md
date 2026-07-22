@@ -64,6 +64,11 @@ words total; no full analysis unless asked.
 7. **Dead timeline** (deadline passed, mandatory site visit missed, or
    insufficient days to team/hire and responsibly respond) or **wrong
    scale** for a first/early contract (stated value > $10M).
+   Minimum responsible lead times by fulfillment complexity:
+   **founder-deliverable 2 days; single specialist hire 7 days;
+   teaming / trade subs / staffing / multiple hires / contingent
+   credential partners 10 days.** Below the minimum = PASS (lead time),
+   even if the opportunity is otherwise attractive.
 
 ### What is NOT a kill
 
