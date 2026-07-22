@@ -27,13 +27,31 @@ $branchRaw = 'https://raw.githubusercontent.com/pacificresearch/Pacific-Research
 Write-Host ''
 Write-Host '=== PRG SAM.gov automation setup ===' -ForegroundColor Cyan
 
-# 1. Folders
-$root    = Join-Path $env:USERPROFILE 'Desktop\PRG_SAMgov_Reports'
+# 1. Folders — resolve the REAL Desktop (OneDrive Known-Folder-Move aware).
+#    $env:USERPROFILE\Desktop is often a hidden legacy folder when OneDrive
+#    redirects the Desktop; GetFolderPath returns the one the user can see.
+$desktop = [Environment]::GetFolderPath('Desktop')
+if (-not $desktop) { $desktop = Join-Path $env:USERPROFILE 'Desktop' }
+$root    = Join-Path $desktop 'PRG_SAMgov_Reports'
 $daily   = Join-Path $root 'Daily'
 $weekly  = Join-Path $root 'Weekly'
 $monthly = Join-Path $root 'Monthly'
 $null = New-Item -ItemType Directory -Force -Path $root, $daily, $weekly, $monthly
 Write-Host "  Reports folder: $root" -ForegroundColor Green
+
+# 1b. If an old install dropped reports in the hidden legacy Desktop folder,
+#     move them into the visible one so nothing is lost.
+$legacy = Join-Path $env:USERPROFILE 'Desktop\PRG_SAMgov_Reports'
+if (($legacy -ne $root) -and (Test-Path $legacy)) {
+    Write-Host "  Migrating reports from hidden folder: $legacy" -ForegroundColor Yellow
+    Get-ChildItem $legacy -Recurse -File | ForEach-Object {
+        $rel  = $_.FullName.Substring($legacy.Length).TrimStart('\')
+        $dest = Join-Path $root $rel
+        $null = New-Item -ItemType Directory -Force -Path (Split-Path $dest)
+        Move-Item $_.FullName $dest -Force
+    }
+    Remove-Item $legacy -Recurse -Force -ErrorAction SilentlyContinue
+}
 
 # 2. Download the latest matcher script
 $script = Join-Path $root 'samgov_opportunity_matcher.py'
