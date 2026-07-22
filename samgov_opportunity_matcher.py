@@ -1825,6 +1825,26 @@ def evaluate(opp):
         if win_score < YELLOW_MIN and win_band == "Yellow":
             win_band, win_emoji, win_note = "Red", "🔴", "Weak fit — non-US buyer"
 
+    # LEAD-TIME GATE (Gate 0): a scope whose fulfillment needs hiring or
+    # teaming cannot be responsibly bid inside its minimum lead time — a
+    # 3-day fuse on a crew contract is not an opportunity, it's a trap.
+    min_lead = rub["min_lead_days"]
+    if credential_needed:
+        # Hire-to-win credential = contingent partner to recruit → teaming lead.
+        min_lead = max(min_lead, 10)
+    if (not disqualified and not is_expired and not is_awarded
+            and not rub["founder_can_deliver"]
+            and deadline_days is not None and 0 <= deadline_days < min_lead):
+        disqualified = True
+        is_watch_template = False
+        kill_gate = "Gate 0 (lead time)"
+        kill_reason = (f"only {deadline_days}d to respond but fulfillment "
+                       f"needs hiring/teaming — minimum {min_lead}d lead")
+        win_score, win_band, win_emoji = 0, "Red", "🔴"
+        win_note = "Gate 0 — " + kill_reason
+        is_solo = False
+        rub["priority"] = 0
+
     # --- STAGE 0: timing + notice-type gating (takes precedence over scoring) ---
     notice_class = _classify_notice(notice_type)
     short_fuse = (deadline_days is not None
@@ -2003,6 +2023,8 @@ def evaluate(opp):
         "priority": rub["priority"],
         "fulfillment_model": rub["fulfillment_model"],
         "margin_est": rub["margin_est"],
+        "min_lead_days": rub["min_lead_days"],
+        "lead_display": rub["lead_display"],
         "poc": _extract_poc(opp),
         "psc": (opp.get("classificationCode") or "").strip(),
         "posted": (opp.get("postedDate") or "").split("T")[0],
@@ -2554,6 +2576,7 @@ def prg_rubric(opp, setaside_label, setaside_eligible, is_sdvosb, value_num,
         "bonding_required": "bonding" in (kill_gate or "").lower(),
         "priority": 0, "fulfillment_model": "n/a",
         "margin_est": "n/a", "role_hint": "PASS",
+        "min_lead_days": 0, "lead_display": "n/a",
     }
 
     # --- GATE 0: hard disqualifiers (kills from screen_gates + ineligible
@@ -2765,9 +2788,22 @@ def prg_rubric(opp, setaside_label, setaside_eligible, is_sdvosb, value_num,
     role_hint = ("PRIME WITH TEAMING PARTNER" if needs_team
                  else "BID AS PRIME")
 
+    # Minimum responsible lead time before the deadline, by fulfillment
+    # complexity: founder-deliverable scopes can turn fast; anything needing
+    # a hire gets a week; teaming/multiple hires get ten days. Below the
+    # minimum, evaluate() kills the row (Gate 0 lead time) instead of
+    # letting it masquerade as an actionable SHORT-FUSE.
+    if founder_can_deliver:
+        min_lead_days, lead_display = 2, "2d (founder-deliverable)"
+    elif needs_team:
+        min_lead_days, lead_display = 10, "10d (teaming / multiple hires)"
+    else:
+        min_lead_days, lead_display = 7, "7d (single specialist hire)"
+
     out.update({
         "priority": priority, "fulfillment_model": model,
         "margin_est": margin_est, "role_hint": role_hint,
+        "min_lead_days": min_lead_days, "lead_display": lead_display,
     })
 
     out.update({
@@ -3245,6 +3281,7 @@ _RICH_COLS = [
     ("Labor Plan", "labor_plan"),
     ("PP Value", "pp_value"),
     ("Pass-Through Risk", "passthrough_risk"),
+    ("Lead Time Needed", "lead_display"),
     ("Timeframe", "timeframe"),
     ("Location", "location"),
     ("Intl / CONUS", "location_type"),
@@ -5448,6 +5485,46 @@ _SELFTEST_CASES = [
                           "buyer_is_international"],
         "expect_falsy": ["disqualified"],
         "expect_equals": {"role": "PRIME WITH TEAMING PARTNER"},
+    },
+    {
+        "label": "LEAD TIME — janitorial (teaming needed) with a 4-day fuse "
+                 "→ killed at Gate 0 lead time (needs 10d)",
+        "opp": {
+            "solicitationNumber": "LEAD-JAN-4D",
+            "noticeId": "lt1",
+            "title": "Janitorial Services, Field Office",
+            "description": ("Janitorial and custodial services for the field "
+                            "office, five days per week."),
+            "naicsCode": "561720",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "General Services Administration",
+            "type": "Solicitation",
+        },
+        "deadline_offset_days": 4,
+        "expect_verdict": "NO-BID",
+        "expect_equals": {"kill_gate": "Gate 0 (lead time)", "win_score": 0},
+    },
+    {
+        "label": "LEAD TIME — founder-deliverable clinical analysis with a "
+                 "3-day fuse → still actionable (SHORT-FUSE, not killed)",
+        "opp": {
+            "solicitationNumber": "LEAD-SOLO-3D",
+            "noticeId": "lt2",
+            "title": "Rapid Literature Review — Clinical Trial Retention",
+            "description": ("The contractor shall deliver a literature review "
+                            "and final report on clinical trial participant "
+                            "retention strategies. Estimated value: $45,000."),
+            "naicsCode": "541715",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Health and Human Services",
+            "type": "Combined Synopsis/Solicitation",
+        },
+        "deadline_offset_days": 3,
+        "expect_verdict": "SHORT-FUSE",
+        "expect_truthy": ["is_solo"],
+        "expect_falsy": ["disqualified"],
     },
     {
         "label": "Synthetic size-standard mention — '$34.5 million size "
