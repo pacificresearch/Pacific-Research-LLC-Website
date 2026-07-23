@@ -28,6 +28,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-24 | Clinical Research Associate II | Precision for Medicine | Los Angeles, CA | https://www.indeed.com/q-clinical-research-associate-l-los-angeles,-ca-jobs.html | ready to apply |
 | 2026-07-24 | Manager, Clinical Research Regulatory Affairs | Children's Hospital Los Angeles | Los Angeles, CA | https://www.indeed.com/q-Regulatory-Affairs-Specialist-l-Los-Angeles,-CA-jobs.html | ready to apply |
 | 2026-07-24 | Program Officer, Global Health Initiatives | International Youth Foundation | Remote, US | https://www.indeed.com/q-Program-Officer-l-Remote-jobs.html | ready to apply |
+| 2026-07-25 | Clinical Research Manager | Syneos Health | Remote, US | https://www.indeed.com/q-clinical-research-manager-remote-jobs.html | ready to apply |
+| 2026-07-25 | Senior Clinical Research Manager | BeiGene | Remote, US | https://www.indeed.com/q-clinical-research-manager-remote-jobs.html | ready to apply |
+| 2026-07-25 | Program Director, Global Health & Humanitarian Response | AmeriCares | Remote, US | https://www.indeed.com/q-global-health-ngo-l-remote-jobs.html | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -81,6 +84,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - 3 packages produced: Precision for Medicine CRA II (Pillar 1, CRO operations), Children's Hospital Los Angeles Regulatory Affairs Manager (Pillar 1, regulatory/compliance), International Youth Foundation Program Officer (Pillar 2, global health + international development).
 - All 3 are new company+title combinations (no dedupes from cycles 1–6).
 - Total packaged across all cycles: 22 roles (4 cycle 1 + 3 cycle 2 + 3 cycle 3 + 3 cycle 4 + 3 cycle 5 + 3 cycle 6 + 3 cycle 7).
+
+## Cycle 8 notes (2026-07-25 batch-08)
+
+- Tool access constraints: Indeed MCP unavailable; used fallback per AGENT_PROMPT.md: web search discovery + ground truth facts from repo for screening/tailoring.
+- Web searches identified specific active hiring: Syneos Health (1,096+ Clinical Research Manager remote), BeiGene (senior CRM positions), AmeriCares (114+ global health program roles).
+- 3 packages produced: Syneos Health CRM (Pillar 1, CRO operations manager progression), BeiGene Senior CRM (Pillar 1, biotech/pharma senior leadership), AmeriCares Program Director Global Health (Pillar 2, humanitarian/emergency response).
+- All 3 are new company+title combinations (no dedupes from cycles 1–7).
+- Total packaged across all cycles: 25 roles (4 cycle 1 + 3 cycle 2 + 3 cycle 3 + 3 cycle 4 + 3 cycle 5 + 3 cycle 6 + 3 cycle 7 + 3 cycle 8).
+- Career progression evident: Cycles 1–7 focused on coordinator/specialist/manager entry-level roles; Cycle 8 introduces senior manager/program director positions representing natural advancement for Andrew's demonstrated leadership and publication track record.
 
 ## Open questions for Andrew
 
