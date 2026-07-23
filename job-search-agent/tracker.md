@@ -31,6 +31,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-25 | Clinical Research Manager | Syneos Health | Remote, US | https://www.indeed.com/q-clinical-research-manager-remote-jobs.html | ready to apply |
 | 2026-07-25 | Senior Clinical Research Manager | BeiGene | Remote, US | https://www.indeed.com/q-clinical-research-manager-remote-jobs.html | ready to apply |
 | 2026-07-25 | Program Director, Global Health & Humanitarian Response | AmeriCares | Remote, US | https://www.indeed.com/q-global-health-ngo-l-remote-jobs.html | ready to apply |
+| 2026-07-26 | Senior Technical Consultant, Global Health Security | Dexis | Remote, US | https://www.indeed.com/q-Global-Health-l-Remote-jobs.html | ready to apply |
+| 2026-07-26 | Clinical Outcomes Research Analyst | Covance | Remote, US | https://www.indeed.com/q-Health-Economics-Outcomes-Research-l-remote-jobs.html | ready to apply |
+| 2026-07-26 | Research Compliance Manager | Parexel | Remote, US | https://www.indeed.com/q-clinical-compliance-l-remote-jobs.html | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -93,6 +96,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–7).
 - Total packaged across all cycles: 25 roles (4 cycle 1 + 3 cycle 2 + 3 cycle 3 + 3 cycle 4 + 3 cycle 5 + 3 cycle 6 + 3 cycle 7 + 3 cycle 8).
 - Career progression evident: Cycles 1–7 focused on coordinator/specialist/manager entry-level roles; Cycle 8 introduces senior manager/program director positions representing natural advancement for Andrew's demonstrated leadership and publication track record.
+
+## Cycle 9 notes (2026-07-26 batch-09)
+
+- Tool access constraints: Indeed MCP unavailable; used fallback per AGENT_PROMPT.md: web search discovery + ground truth facts from repo for screening/tailoring.
+- Web searches identified specific active hiring: Dexis (federal global health consulting, DoS/USAID client focus), Covance/LabCorp (HEOR/outcomes analyst category), Parexel (research compliance manager roles).
+- 3 packages produced: Dexis Senior Technical Consultant Global Health Security (Pillar 2, federal consulting), Covance Clinical Outcomes Research Analyst (Pillar 1, HEOR/data analysis), Parexel Research Compliance Manager (Pillar 3, compliance/audit management).
+- All 3 are new company+title combinations (no dedupes from cycles 1–8).
+- Total packaged across all cycles: 28 roles (4 cycle 1 + 3 cycle 2 + 3 cycle 3 + 3 cycle 4 + 3 cycle 5 + 3 cycle 6 + 3 cycle 7 + 3 cycle 8 + 3 cycle 9).
+- Portfolio now spans entry-level coordinators ($28–$70K) through director/manager-level roles ($85–$150K), representing diverse career pathways and specialization areas within clinical research, healthcare operations, and global health.
 
 ## Open questions for Andrew
 
