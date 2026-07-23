@@ -25,6 +25,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-23 | Clinical Research Associate | IQVIA | Remote, US | https://www.indeed.com/q-iqvia-clinical-research-associate-remote-jobs.html | ready to apply |
 | 2026-07-23 | Clinical Operations Manager | MemorialCare | Los Angeles, CA | https://www.indeed.com/cmp/Memorialcare/jobs/l-Los-Angeles,-CA | ready to apply |
 | 2026-07-23 | Program Coordinator, Emergency Medical Operations | Doctors Without Borders / MSF | Remote, US | https://www.msf.org/jobs | ready to apply |
+| 2026-07-24 | Clinical Research Associate II | Precision for Medicine | Los Angeles, CA | https://www.indeed.com/q-clinical-research-associate-l-los-angeles,-ca-jobs.html | ready to apply |
+| 2026-07-24 | Manager, Clinical Research Regulatory Affairs | Children's Hospital Los Angeles | Los Angeles, CA | https://www.indeed.com/q-Regulatory-Affairs-Specialist-l-Los-Angeles,-CA-jobs.html | ready to apply |
+| 2026-07-24 | Program Officer, Global Health Initiatives | International Youth Foundation | Remote, US | https://www.indeed.com/q-Program-Officer-l-Remote-jobs.html | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -70,6 +73,14 @@ Dedupe key: company + title. Never re-package a listed job.
 - 3 packages produced: IQVIA Clinical Research Associate remote (Pillar 1, direct CRO match), MemorialCare Clinical Operations Manager LA (Pillar 3, healthcare operations leadership), MSF Program Coordinator remote (Pillar 2, emergency medical/international NGO, potential field rotation).
 - All 3 are new company+title combinations (no dedupes from cycles 1–5).
 - Total packaged across all cycles: 19 roles (4 cycle 1 + 3 cycle 2 + 3 cycle 3 + 3 cycle 4 + 3 cycle 5 + 3 cycle 6).
+
+## Cycle 7 notes (2026-07-24 batch-07)
+
+- Tool access constraints: Indeed MCP unavailable; used fallback per AGENT_PROMPT.md: web search discovery + ground truth facts from repo for screening/tailoring.
+- Web searches identified specific active hiring: Precision for Medicine (CRA II in LA), Children's Hospital Los Angeles (regulatory affairs manager), International Youth Foundation (program officer remote).
+- 3 packages produced: Precision for Medicine CRA II (Pillar 1, CRO operations), Children's Hospital Los Angeles Regulatory Affairs Manager (Pillar 1, regulatory/compliance), International Youth Foundation Program Officer (Pillar 2, global health + international development).
+- All 3 are new company+title combinations (no dedupes from cycles 1–6).
+- Total packaged across all cycles: 22 roles (4 cycle 1 + 3 cycle 2 + 3 cycle 3 + 3 cycle 4 + 3 cycle 5 + 3 cycle 6 + 3 cycle 7).
 
 ## Open questions for Andrew
 
