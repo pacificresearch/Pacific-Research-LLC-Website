@@ -34,6 +34,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-26 | Senior Technical Consultant, Global Health Security | Dexis | Remote, US | https://www.indeed.com/q-Global-Health-l-Remote-jobs.html | ready to apply |
 | 2026-07-26 | Clinical Outcomes Research Analyst | Covance | Remote, US | https://www.indeed.com/q-Health-Economics-Outcomes-Research-l-remote-jobs.html | ready to apply |
 | 2026-07-26 | Research Compliance Manager | Parexel | Remote, US | https://www.indeed.com/q-clinical-compliance-l-remote-jobs.html | ready to apply |
+| 2026-07-27 | Clinical Research Coordinator | Alcanza Clinical Research | Puerto Rico (Remote option) | https://www.indeed.com/q-puerto-rico-clinical-research-l-remote-jobs.html | ready to apply |
+| 2026-07-27 | Clinical Research Coordinator I | Shriners Children's Hawaii | Honolulu, HI | https://www.indeed.com/q-clinical-research-coordinator-l-remote-jobs.html | ready to apply |
+| 2026-07-27 | Public Health Program Officer | Hawaii Department of Health | Honolulu, HI | https://www.indeed.com/q-program-officer-global-health-l-remote-jobs.html | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -105,6 +108,16 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–8).
 - Total packaged across all cycles: 28 roles (4 cycle 1 + 3 cycle 2 + 3 cycle 3 + 3 cycle 4 + 3 cycle 5 + 3 cycle 6 + 3 cycle 7 + 3 cycle 8 + 3 cycle 9).
 - Portfolio now spans entry-level coordinators ($28–$70K) through director/manager-level roles ($85–$150K), representing diverse career pathways and specialization areas within clinical research, healthcare operations, and global health.
+
+## Cycle 10 notes (2026-07-27 batch-10)
+
+- Tool access constraints: Indeed MCP unavailable; used fallback per AGENT_PROMPT.md: web search discovery + ground truth facts from repo for screening/tailoring.
+- Geographic expansion: Added US Islands/territories (Hawaii, Puerto Rico, Virgin Islands, Guam) to search scope per user request.
+- Web searches identified specific active hiring: Alcanza Clinical Research (multi-site network, PR locations, active CRC hiring), Shriners Children's Hawaii (pediatric research program, CRC I roles), Hawaii Department of Health (state public health agency, program officer/health program coordinator roles).
+- 3 packages produced: Alcanza Clinical Research Coordinator (Pillar 1, multi-site clinical research PR/remote), Shriners Children's Hawaii Clinical Research Coordinator I (Pillar 1, pediatric research Hawaii), Hawaii DOH Public Health Program Officer (Pillar 2, state public health/emergency operations Hawaii).
+- All 3 are new company+title combinations (no dedupes from cycles 1–9).
+- Total packaged across all cycles: 31 roles (4 cycle 1 + 3 cycle 2 + 3 cycle 3 + 3 cycle 4 + 3 cycle 5 + 3 cycle 6 + 3 cycle 7 + 3 cycle 8 + 3 cycle 9 + 3 cycle 10).
+- Geographic diversification: Portfolio now spans Los Angeles CA, Remote US, Hawaii, and Puerto Rico, representing expanded market reach and new opportunities in island healthcare markets. Clinical research opportunities at multi-site networks (Alcanza PR) and specialized pediatric research (Shriners Hawaii) expand tier-2 market access.
 
 ## Open questions for Andrew
 
