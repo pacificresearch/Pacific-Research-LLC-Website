@@ -22,6 +22,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-21 | Medical Writer, Scientific Communications | Biotech/CRO/Clinical Research | Remote, US | https://www.indeed.com/q-remote-medical-writer-jobs.html | ready to apply |
 | 2026-07-21 | Grants Coordinator / Research Administrator | Federal Funding/Research Admin | Remote, US | https://www.indeed.com/q-grant-coordinator-l-remote-jobs.html | ready to apply |
 | 2026-07-21 | Clinical Research Operations Manager | Study Startup & Enrollment | Los Angeles, CA | https://www.indeed.com/q-clinical-research-operations-manager-jobs.html | ready to apply |
+| 2026-07-23 | Clinical Research Associate | IQVIA | Remote, US | https://www.indeed.com/q-iqvia-clinical-research-associate-remote-jobs.html | ready to apply |
+| 2026-07-23 | Clinical Operations Manager | MemorialCare | Los Angeles, CA | https://www.indeed.com/cmp/Memorialcare/jobs/l-Los-Angeles,-CA | ready to apply |
+| 2026-07-23 | Program Coordinator, Emergency Medical Operations | Doctors Without Borders / MSF | Remote, US | https://www.msf.org/jobs | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -59,6 +62,14 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–4).
 - Total packaged across all cycles: 16 roles (4 cycle 1 + 3 cycle 2 + 3 cycle 3 + 3 cycle 4 + 3 cycle 5).
 - Noted: Medical Writer roles often seek 2–5+ years dedicated medical writing or advanced degree; grants roles typically ask 5–7 years federal grants admin; operations roles may see 5–10 years tenure expectations. Andrew's clinical research background supports mid-level entry to coordinator/manager tier roles.
+
+## Cycle 6 notes (2026-07-23 batch-06)
+
+- Tool access constraints: Indeed MCP rejected by environment; WebFetch blocked by job sites (403). Used fallback per AGENT_PROMPT.md: web search aggregates + ground truth facts from repo for screening/tailoring.
+- Web searches confirmed active hiring: IQVIA (22 CRA remote openings), MemorialCare (114 LA positions including operations roles), Doctors Without Borders / MSF (active program coordinator/manager recruiting).
+- 3 packages produced: IQVIA Clinical Research Associate remote (Pillar 1, direct CRO match), MemorialCare Clinical Operations Manager LA (Pillar 3, healthcare operations leadership), MSF Program Coordinator remote (Pillar 2, emergency medical/international NGO, potential field rotation).
+- All 3 are new company+title combinations (no dedupes from cycles 1–5).
+- Total packaged across all cycles: 19 roles (4 cycle 1 + 3 cycle 2 + 3 cycle 3 + 3 cycle 4 + 3 cycle 5 + 3 cycle 6).
 
 ## Open questions for Andrew
 
