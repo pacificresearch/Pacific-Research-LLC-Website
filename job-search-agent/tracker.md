@@ -43,6 +43,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-29 | Associate Director, Clinical Trial Reporting | Takeda Pharmaceutical | Boston, MA (Remote option) | https://jobs.takeda.com/category/clinical-development-jobs/1113/14987/1000000000100/2 | ready to apply |
 | 2026-07-29 | Associate Director, Clinical Data Science | Gilead Sciences | Remote, US | https://careers.gilead.com/careers | ready to apply |
 | 2026-07-29 | Regulatory Affairs Specialist | Regeneron Pharmaceuticals | Remote (Yonkers, NY-based) | https://careers.regeneron.com/ | ready to apply |
+| 2026-07-30 | Director of Clinical Operations | Molina Healthcare | Remote, US | https://careers.molinahealthcare.com/search-jobs | ready to apply |
+| 2026-07-30 | Director, Clinical Operations, Research & Clinical Sciences | Helus Pharma | Remote, US | https://www.linkedin.com/jobs/view/director-clinical-operations-research-clinical-sciences-at-helus-pharma/ | ready to apply |
+| 2026-07-30 | Director, Solution Design & Innovation Engineering, Clinical Data Hub | Mayo Clinic | Remote (Rochester, MN-based) | https://jobs.mayoclinic.org/ | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -142,6 +145,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–11).
 - Total packaged across all cycles: 37 roles (4 cycle 1 + 3 each cycles 2–11 + 3 cycle 12).
 - Career advancement tier: Cycle 12 introduces associate director level positions at major global pharmaceutical companies (Takeda $20B+, Gilead $30B+, Regeneron $15B+), representing significant advancement into leadership and management tiers with team oversight responsibilities. Salary progression: entry associate director $87-115K → director-level pharma $130-180K range. Portfolio now includes director-level progression pathways in pharma sector.
+
+## Cycle 13 notes (2026-07-30 batch-13)
+
+- Tool access constraints: Indeed MCP unavailable; used fallback per AGENT_PROMPT.md: web search discovery + ground truth facts from repo for screening/tailoring.
+- Web searches identified specific active hiring: Molina Healthcare (421+ clinical operations positions, 63 new openings), Helus Pharma (director clinical operations/research positions), Mayo Clinic (director solution design & innovation engineering for clinical data hub).
+- 3 packages produced: Molina Healthcare Director Clinical Operations (Pillar 1/3, $110K–$180K managed care operations leadership), Helus Pharma Director Clinical Operations Research (Pillar 1, $140K–$220K pharma director), Mayo Clinic Director CDH Innovation Engineering (Pillar 1, $185K–$277K health system informatics/innovation).
+- All 3 are new company+title combinations (no dedupes from cycles 1–12).
+- Total packaged across all cycles: 40 roles (4 cycle 1 + 3 each cycles 2–12 + 3 cycle 13).
+- Career advancement tier: Cycle 13 advances to true director-level positions at major health systems (Mayo Clinic 70K+ employees), managed care (Molina Healthcare 4M+ members, $40B+ revenue), and specialized pharma (Helus). Salary progression: associate director $115–180K → director $140–277K range. Portfolio spans full career progression: entry coordinator ($28K) → director-level leadership ($277K).
 
 ## Open questions for Andrew
 
