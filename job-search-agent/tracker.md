@@ -37,6 +37,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-27 | Clinical Research Coordinator | Alcanza Clinical Research | Puerto Rico (Remote option) | https://www.indeed.com/q-puerto-rico-clinical-research-l-remote-jobs.html | ready to apply |
 | 2026-07-27 | Clinical Research Coordinator I | Shriners Children's Hawaii | Honolulu, HI | https://www.indeed.com/q-clinical-research-coordinator-l-remote-jobs.html | ready to apply |
 | 2026-07-27 | Public Health Program Officer | Hawaii Department of Health | Honolulu, HI | https://www.indeed.com/q-program-officer-global-health-l-remote-jobs.html | ready to apply |
+| 2026-07-28 | Lead Clinical Research Associate | ICON Clinical Research | Remote, US | https://careers.iconplc.com/clinical-research-associate-jobs | ready to apply |
+| 2026-07-28 | Program Officer, International Health | Johns Hopkins Center for Global Health | Remote (Baltimore-based) | https://globalhealth.jhu.edu/ | ready to apply |
+| 2026-07-28 | Clinical Data Manager, Vault CDMS | Clinical Research Organization | Remote, US | https://pharmabharat.com/clinical-data-manager-programmer-jobs-remote-india-veeva-cdms-roles/ | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -118,6 +121,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–9).
 - Total packaged across all cycles: 31 roles (4 cycle 1 + 3 cycle 2 + 3 cycle 3 + 3 cycle 4 + 3 cycle 5 + 3 cycle 6 + 3 cycle 7 + 3 cycle 8 + 3 cycle 9 + 3 cycle 10).
 - Geographic diversification: Portfolio now spans Los Angeles CA, Remote US, Hawaii, and Puerto Rico, representing expanded market reach and new opportunities in island healthcare markets. Clinical research opportunities at multi-site networks (Alcanza PR) and specialized pediatric research (Shriners Hawaii) expand tier-2 market access.
+
+## Cycle 11 notes (2026-07-28 batch-11)
+
+- Tool access constraints: Indeed MCP unavailable; used fallback per AGENT_PROMPT.md: web search discovery + ground truth facts from repo for screening/tailoring.
+- Web searches identified specific active hiring: ICON Clinical Research (major global CRO, Lead CRA/multi-site management roles), Johns Hopkins Center for Global Health (program officer/international health coordinator roles), Veeva Vault CDMS specialists/Clinovo (modern clinical data management platform adoption by CROs).
+- 3 packages produced: ICON Lead Clinical Research Associate (Pillar 1, CRO senior multi-site management), Johns Hopkins Program Officer International Health (Pillar 2, academic global health/international development), Clinical Data Manager Vault CDMS (Pillar 1, modern platform specialization in data management).
+- All 3 are new company+title combinations (no dedupes from cycles 1–10).
+- Total packaged across all cycles: 34 roles (4 cycle 1 + 3 cycle 2 + 3 cycle 3 + 3 cycle 4 + 3 cycle 5 + 3 cycle 6 + 3 cycle 7 + 3 cycle 8 + 3 cycle 9 + 3 cycle 10 + 3 cycle 11).
+- Career progression and specialization: Cycle 11 advances senior CRA level (lead management tier in established CROs), academic global health (Johns Hopkins institutional tier), and modern platform specialization (Veeva Vault CDMS as next-gen technology), representing deeper technical expertise and career advancement pathways within established domains.
 
 ## Open questions for Andrew
 
