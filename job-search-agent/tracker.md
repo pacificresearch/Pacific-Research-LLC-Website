@@ -46,6 +46,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-30 | Director of Clinical Operations | Molina Healthcare | Remote, US | https://careers.molinahealthcare.com/search-jobs | ready to apply |
 | 2026-07-30 | Director, Clinical Operations, Research & Clinical Sciences | Helus Pharma | Remote, US | https://www.linkedin.com/jobs/view/director-clinical-operations-research-clinical-sciences-at-helus-pharma/ | ready to apply |
 | 2026-07-30 | Director, Solution Design & Innovation Engineering, Clinical Data Hub | Mayo Clinic | Remote (Rochester, MN-based) | https://jobs.mayoclinic.org/ | ready to apply |
+| 2026-07-31 | Clinical Scientist Associate Director, Cardiovascular Trials | Amgen | Remote, US | https://careers.amgen.com/ | ready to apply |
+| 2026-07-31 | Clinical Operations Program Lead | Biogen | Remote, US | https://careers.biogen.com/ | ready to apply |
+| 2026-07-31 | Medical Affairs Scientist, Clinical Evidence & Partnership | Pfizer | Remote, US | https://careers.pfizer.com/ | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -154,6 +157,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–12).
 - Total packaged across all cycles: 40 roles (4 cycle 1 + 3 each cycles 2–12 + 3 cycle 13).
 - Career advancement tier: Cycle 13 advances to true director-level positions at major health systems (Mayo Clinic 70K+ employees), managed care (Molina Healthcare 4M+ members, $40B+ revenue), and specialized pharma (Helus). Salary progression: associate director $115–180K → director $140–277K range. Portfolio spans full career progression: entry coordinator ($28K) → director-level leadership ($277K).
+
+## Cycle 14 notes (2026-07-31 batch-14)
+
+- Tool access constraints: Indeed MCP unavailable; used fallback per AGENT_PROMPT.md: web search discovery + ground truth facts from repo for screening/tailoring.
+- Web searches identified specific active hiring: Amgen (clinical scientist associate director cardiovascular trials, $169K–$229K), Biogen (clinical operations program lead, $194K–$267K), Pfizer (medical affairs scientist positions, $140K–$200K estimated).
+- 3 packages produced: Amgen Clinical Scientist Associate Director (Pillar 1, $169K–$229K biotech scientist leadership), Biogen Clinical Operations Program Lead (Pillar 1/3, $194K–$267K program operations), Pfizer Medical Affairs Scientist (Pillar 2/3, $140K–$200K medical affairs/evidence).
+- All 3 are new company+title combinations (no dedupes from cycles 1–13).
+- Total packaged across all cycles: 43 roles (4 cycle 1 + 3 each cycles 2–13 + 3 cycle 14).
+- Career advancement tier: Cycle 14 introduces major biotech (Amgen $26B+, Biogen $15B+) and pharma ($80B+ Pfizer) senior scientist/leadership positions, representing specialized scientific leadership and evidence-generation tiers. Salary progression: director $140–277K → biotech scientist/program lead $194–267K range, representing lateral specialization within senior compensation tier. Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K).
 
 ## Open questions for Andrew
 
