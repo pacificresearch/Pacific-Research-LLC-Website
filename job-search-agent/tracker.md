@@ -49,6 +49,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-31 | Clinical Scientist Associate Director, Cardiovascular Trials | Amgen | Remote, US | https://careers.amgen.com/ | ready to apply |
 | 2026-07-31 | Clinical Operations Program Lead | Biogen | Remote, US | https://careers.biogen.com/ | ready to apply |
 | 2026-07-31 | Medical Affairs Scientist, Clinical Evidence & Partnership | Pfizer | Remote, US | https://careers.pfizer.com/ | ready to apply |
+| 2026-08-01 | Clinical Trial Assistant | Rigel Pharmaceuticals | Remote, US | https://www.rigelpharma.com/careers | ready to apply |
+| 2026-08-01 | Program Officer, Humanitarian Health | Mercy Corps | Remote, US | https://mercycorps.org/careers | ready to apply |
+| 2026-08-01 | Clinical Quality Manager | UnitedHealthcare | Remote, US | https://careers.unitedhealthgroup.com | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -166,6 +169,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–13).
 - Total packaged across all cycles: 43 roles (4 cycle 1 + 3 each cycles 2–13 + 3 cycle 14).
 - Career advancement tier: Cycle 14 introduces major biotech (Amgen $26B+, Biogen $15B+) and pharma ($80B+ Pfizer) senior scientist/leadership positions, representing specialized scientific leadership and evidence-generation tiers. Salary progression: director $140–277K → biotech scientist/program lead $194–267K range, representing lateral specialization within senior compensation tier. Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K).
+
+## Cycle 15 notes (2026-08-01 batch-15)
+
+- Tool access constraints: Indeed MCP unavailable; used fallback per AGENT_PROMPT.md: web search discovery + ground truth facts from repo for screening/tailoring.
+- Web searches identified specific active hiring: Rigel Pharmaceuticals (clinical trial assistant biotech roles), Mercy Corps (program officer humanitarian/development, $74K–$110K), UnitedHealthcare (clinical quality manager remote positions, healthcare quality oversight).
+- 3 packages produced: Rigel Clinical Trial Assistant (Pillar 1, $55K–$85K biotech operations), Mercy Corps Program Officer (Pillar 2, $74K–$110K humanitarian), UnitedHealthcare Clinical Quality Manager (Pillar 1/3, $120K–$180K healthcare quality).
+- All 3 are new company+title combinations (no dedupes from cycles 1–14).
+- Total packaged across all cycles: 46 roles (4 cycle 1 + 3 each cycles 2–14 + 3 cycle 15).
+- Career breadth expansion: Cycle 15 introduces new company types and domains: biotech operations assistant tier (Rigel), international humanitarian NGO (Mercy Corps), and integrated healthcare system quality leadership (UnitedHealthcare). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations leadership ($180K), representing diverse career pathways across biotech, healthcare systems, NGOs, and government contractors. Salary range expansion demonstrates career progression through multiple advancement vectors (depth within domain, breadth across sectors).
 
 ## Open questions for Andrew
 
