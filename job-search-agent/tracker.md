@@ -52,6 +52,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-01 | Clinical Trial Assistant | Rigel Pharmaceuticals | Remote, US | https://www.rigelpharma.com/careers | ready to apply |
 | 2026-08-01 | Program Officer, Humanitarian Health | Mercy Corps | Remote, US | https://mercycorps.org/careers | ready to apply |
 | 2026-08-01 | Clinical Quality Manager | UnitedHealthcare | Remote, US | https://careers.unitedhealthgroup.com | ready to apply |
+| 2026-08-02 | Manager, Medical Affairs Operations | Zentalis Pharmaceuticals | Remote, US | https://zentalis.com/careers/job-opportunities | ready to apply |
+| 2026-08-02 | International Development Consultant, Health Security & Operations | PATH | Remote, US | https://www.path.org/careers/ | ready to apply |
+| 2026-08-02 | Clinical Analyst | CVS Health | Remote, US | https://careers.cvshealth.com/ | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -178,6 +181,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–14).
 - Total packaged across all cycles: 46 roles (4 cycle 1 + 3 each cycles 2–14 + 3 cycle 15).
 - Career breadth expansion: Cycle 15 introduces new company types and domains: biotech operations assistant tier (Rigel), international humanitarian NGO (Mercy Corps), and integrated healthcare system quality leadership (UnitedHealthcare). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations leadership ($180K), representing diverse career pathways across biotech, healthcare systems, NGOs, and government contractors. Salary range expansion demonstrates career progression through multiple advancement vectors (depth within domain, breadth across sectors).
+
+## Cycle 16 notes (2026-08-02 batch-16)
+
+- Tool access constraints: Indeed MCP unavailable; used fallback per AGENT_PROMPT.md: web search discovery + ground truth facts from repo for screening/tailoring.
+- Web searches identified specific active hiring: Zentalis Pharmaceuticals (manager medical affairs operations, $135K–$160K biotech), PATH and international development organizations (international development consultant, $75K–$120K humanitarian), CVS Health (clinical analyst remote, $60K–$133K healthcare analytics).
+- 3 packages produced: Zentalis Manager Medical Affairs Operations (Pillar 1, $135K–$160K pharma operations), PATH International Development Consultant (Pillar 2, $75K–$120K humanitarian), CVS Health Clinical Analyst (Pillar 1/3, $60K–$133K healthcare analytics).
+- All 3 are new company+title combinations (no dedupes from cycles 1–15).
+- Total packaged across all cycles: 49 roles (4 cycle 1 + 3 each cycles 2–15 + 3 cycle 16).
+- Career specialization progression: Cycle 16 introduces specialized medical affairs management (Zentalis pharma/biotech), pure international development consulting (PATH/NGO humanitarian operations), and healthcare system analytics (CVS Health integrated healthcare). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–160K), representing specialized functional advancement pathways within established domains and across sector leaders.
 
 ## Open questions for Andrew
 
