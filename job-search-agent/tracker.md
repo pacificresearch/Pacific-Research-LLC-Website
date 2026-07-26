@@ -55,6 +55,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-02 | Manager, Medical Affairs Operations | Zentalis Pharmaceuticals | Remote, US | https://zentalis.com/careers/job-opportunities | ready to apply |
 | 2026-08-02 | International Development Consultant, Health Security & Operations | PATH | Remote, US | https://www.path.org/careers/ | ready to apply |
 | 2026-08-02 | Clinical Analyst | CVS Health | Remote, US | https://careers.cvshealth.com/ | ready to apply |
+| 2026-08-03 | Healthcare Analyst, Health Outcomes Research | Optum | Remote, US | https://careers.optum.com/ | ready to apply |
+| 2026-08-03 | Program Officer, Global Health & Nutrition | Helen Keller International | Remote, US | https://helenkellerintl.org/careers/us-international/ | ready to apply |
+| 2026-08-03 | Research Administrator | Research Foundation CUNY | Remote, US | https://www.rfcuny.org/careers | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -190,6 +193,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–15).
 - Total packaged across all cycles: 49 roles (4 cycle 1 + 3 each cycles 2–15 + 3 cycle 16).
 - Career specialization progression: Cycle 16 introduces specialized medical affairs management (Zentalis pharma/biotech), pure international development consulting (PATH/NGO humanitarian operations), and healthcare system analytics (CVS Health integrated healthcare). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–160K), representing specialized functional advancement pathways within established domains and across sector leaders.
+
+## Cycle 17 notes (2026-08-03 batch-17)
+
+- Tool access constraints: Indeed MCP unavailable; used fallback per AGENT_PROMPT.md: web search discovery + ground truth facts from repo for screening/tailoring.
+- Web searches identified specific active hiring: Optum (healthcare analyst outcomes research, $75K–$150K), Helen Keller International (program officer global health positions, international NGO, $65K–$110K), Research Foundation CUNY (research administrator remote positions, $56K–$112K).
+- 3 packages produced: Optum Healthcare Analyst (Pillar 1, $75K–$150K healthcare analytics), Helen Keller International Program Officer (Pillar 2, $65K–$110K international health), Research Foundation CUNY Research Administrator (Pillar 3, $56K–$112K academic research).
+- All 3 are new company+title combinations (no dedupes from cycles 1–16).
+- Total packaged across all cycles: 52 roles (4 cycle 1 + 3 each cycles 2–16 + 3 cycle 17).
+- Career function diversity: Cycle 17 introduces healthcare analytics/outcomes research (Optum), international health program operations (Helen Keller), and academic research administration (Research Foundation CUNY). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–160K) → academic research administration ($56–112K), representing diverse functional pathways across healthcare, international development, and academic research sectors.
 
 ## Open questions for Andrew
 
