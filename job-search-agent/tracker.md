@@ -61,6 +61,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-04 | Clinical Trial Project Manager | ICON Clinical Research | Remote, US | https://careers.iconplc.com/ | ready to apply |
 | 2026-08-04 | Monitoring & Evaluation Specialist, Epidemiology & Data Systems | Abt Associates | Remote, US | https://www.abtglobal.com/careers | ready to apply |
 | 2026-08-04 | Healthcare Compliance Officer | Healthcare Services Organization | Remote, US | Career portals (Accretive Health, Veradigm, etc.) | ready to apply |
+| 2026-08-05 | Clinical Research Coordinator | University of California San Francisco (UCSF) | Remote / Bay Area, CA | https://careers.ucsf.edu | ready to apply |
+| 2026-08-05 | Clinical Operations Manager | Quest Diagnostics | Remote, US | https://careers.questdiagnostics.com/ | ready to apply |
+| 2026-08-05 | Program Officer, International Operations | World Vision International | Remote / Home-Based, US | https://www.worldvision.org/careers | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -205,6 +208,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–16).
 - Total packaged across all cycles: 52 roles (4 cycle 1 + 3 each cycles 2–16 + 3 cycle 17).
 - Career function diversity: Cycle 17 introduces healthcare analytics/outcomes research (Optum), international health program operations (Helen Keller), and academic research administration (Research Foundation CUNY). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–160K) → academic research administration ($56–112K), representing diverse functional pathways across healthcare, international development, and academic research sectors.
+
+## Cycle 19 notes (2026-08-05 batch-19)
+
+- Tool access constraints: Indeed MCP unavailable; used fallback per AGENT_PROMPT.md: web search discovery + ground truth facts from repo for screening/tailoring.
+- Web searches identified specific active hiring: UCSF (clinical research coordinator remote, $81K–$189K academic medical center), Quest Diagnostics (clinical operations manager remote positions, $116K–$168K diagnostics/clinical operations), World Vision International (program officer remote/home-based positions, $3K–$6K/month international NGO).
+- 3 packages produced: UCSF Clinical Research Coordinator (Pillar 1, $81K–$189K academic medical center), Quest Diagnostics Clinical Operations Manager (Pillar 1/3, $116K–$168K clinical diagnostics), World Vision Program Officer (Pillar 2, $36K–$72K international humanitarian).
+- All 3 are new company+title combinations (no dedupes from cycles 1–18).
+- Total packaged across all cycles: 58 roles (4 cycle 1 + 3 each cycles 2–18 + 3 cycle 19).
+- Career progression and sector diversification: Cycle 19 expands clinical research pathways into academic medical centers (UCSF from Stanford coordinator level), introduces diagnostic/clinical operations specialization (Quest Diagnostics from healthcare technology background), and reinforces international NGO program operations (World Vision from Operation Allies Welcome/federal coordination expertise). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–172K) → academic research administration ($56–112K) → CRO project management ($104–172K) → international health M&E ($64–123K) → healthcare compliance ($61–130K) → academic medical center clinical research ($81–189K) → diagnostic operations ($116–168K) → international NGO programs ($36–72K), representing comprehensive advancement and diversification across clinical research, healthcare operations, diagnostics, and international development sectors.
 
 ## Cycle 18 notes (2026-08-04 batch-18)
 
