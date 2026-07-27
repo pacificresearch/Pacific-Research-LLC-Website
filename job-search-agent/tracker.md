@@ -67,6 +67,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-06 | Clinical Operations Manager | Medpace | Remote, US | https://careers.medpace.com/ | ready to apply |
 | 2026-08-06 | Senior Programme & Portfolio Manager, Global Humanitarian Response | Oxfam | Remote / Global, US | https://www.oxfam.org/en/careers | ready to apply |
 | 2026-08-06 | Director of Research Administration | Boston University | Remote / Boston, MA | https://careers.bu.edu | ready to apply |
+| 2026-08-07 | Clinical Operations Coordinator | Johnson & Johnson | Remote, US | https://careers.jnj.com/ | ready to apply |
+| 2026-08-07 | Operations Coordinator, Humanitarian Response | International Committee of the Red Cross (ICRC) | Remote / Field-Based, Global | https://careers.icrc.org/ | ready to apply |
+| 2026-08-07 | Post Award Research Manager | Yale University | Remote / New Haven, CT | https://careers.yale.edu | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -211,6 +214,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–16).
 - Total packaged across all cycles: 52 roles (4 cycle 1 + 3 each cycles 2–16 + 3 cycle 17).
 - Career function diversity: Cycle 17 introduces healthcare analytics/outcomes research (Optum), international health program operations (Helen Keller), and academic research administration (Research Foundation CUNY). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–160K) → academic research administration ($56–112K), representing diverse functional pathways across healthcare, international development, and academic research sectors.
+
+## Cycle 21 notes (2026-08-07 batch-21)
+
+- Tool access constraints: Indeed MCP unavailable; used fallback per AGENT_PROMPT.md: web search discovery + ground truth facts from repo for screening/tailoring.
+- Web searches identified specific active hiring: Johnson & Johnson (clinical operations coordinator remote roles, $90K–$150K pharma operations), ICRC (operations coordinator humanitarian positions, $70K–$120K international), Yale University (post award research manager remote positions, $60K–$120K academic research).
+- 3 packages produced: J&J Clinical Operations Coordinator (Pillar 1, $90K–$150K pharma), ICRC Operations Coordinator (Pillar 2, $70K–$120K humanitarian), Yale University Post Award Research Manager (Pillar 3, $60K–$120K academic).
+- All 3 are new company+title combinations (no dedupes from cycles 1–20).
+- Total packaged across all cycles: 64 roles (4 cycle 1 + 3 each cycles 2–20 + 3 cycle 21).
+- Sector and role expansion: Cycle 21 expands into major pharma clinical operations (J&J from clinical development perspective), established international humanitarian response (ICRC with 140+ years track record), and top-tier R1 research administration (Yale from post-award/grant management angle). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–172K) → academic/research administration ($56–150K) → CRO project management ($104–172K) → international health M&E ($64–123K) → healthcare compliance ($61–130K) → academic medical center clinical research ($81–189K) → diagnostic operations ($116–168K) → international NGO programs ($36–120K) → CRO clinical operations ($90–160K) → humanitarian response ($70–120K) → major pharma clinical operations ($90–150K).
 
 ## Cycle 20 notes (2026-08-06 batch-20)
 
