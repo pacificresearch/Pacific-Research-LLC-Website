@@ -70,6 +70,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-07 | Clinical Operations Coordinator | Johnson & Johnson | Remote, US | https://careers.jnj.com/ | ready to apply |
 | 2026-08-07 | Operations Coordinator, Humanitarian Response | International Committee of the Red Cross (ICRC) | Remote / Field-Based, Global | https://careers.icrc.org/ | ready to apply |
 | 2026-08-07 | Post Award Research Manager | Yale University | Remote / New Haven, CT | https://careers.yale.edu | ready to apply |
+| 2026-08-08 | Clinical Research Associate (CRA) | Merck | Remote, US | https://jobs.merck.com/ | ready to apply |
+| 2026-08-08 | Program Officer, Operations | Action Against Hunger | Remote / Field, Global | https://careers.actionagainsthunger.org/ | ready to apply |
+| 2026-08-08 | Research Operations Director | University of California Los Angeles (UCLA) | Remote / Los Angeles, CA | https://careers.ucla.edu | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -214,6 +217,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–16).
 - Total packaged across all cycles: 52 roles (4 cycle 1 + 3 each cycles 2–16 + 3 cycle 17).
 - Career function diversity: Cycle 17 introduces healthcare analytics/outcomes research (Optum), international health program operations (Helen Keller), and academic research administration (Research Foundation CUNY). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–160K) → academic research administration ($56–112K), representing diverse functional pathways across healthcare, international development, and academic research sectors.
+
+## Cycle 22 notes (2026-08-08 batch-22)
+
+- Tool access constraints: Indeed MCP unavailable; used fallback per AGENT_PROMPT.md: web search discovery + ground truth facts from repo for screening/tailoring.
+- Web searches identified specific active hiring: Merck (clinical research associate CRA remote roles, $33K–$137K avg $79K pharma clinical research), Action Against Hunger (program officer positions, $40K–$100K+ international humanitarian), UCLA (research operations director remote positions, $75K–$162K academic research).
+- 3 packages produced: Merck CRA (Pillar 1, $33K–$137K pharma clinical research), Action Against Hunger Program Officer Operations (Pillar 2, $40K–$100K+ international humanitarian), UCLA Research Operations Director (Pillar 3, $75K–$162K academic).
+- All 3 are new company+title combinations (no dedupes from cycles 1–21).
+- Total packaged across all cycles: 67 roles (4 cycle 1 + 3 each cycles 2–21 + 3 cycle 22).
+- Sector breadth and specialization: Cycle 22 expands pharma clinical research at tier-1 company (Merck with $60B+ revenue), international humanitarian operations at established NGO (Action Against Hunger with 55+ countries, 26.5M+ served), and academic research operations at top R1 medical center (UCLA). Portfolio now represents comprehensive coverage of clinical research, healthcare operations, international development, and academic research sectors with advancement pathways from entry ($28K) through director-level leadership ($277K).
 
 ## Cycle 21 notes (2026-08-07 batch-21)
 
