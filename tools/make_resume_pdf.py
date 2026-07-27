@@ -17,40 +17,56 @@ from reportlab.platypus import (
     KeepTogether,
 )
 from reportlab.lib.styles import ParagraphStyle
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+# Embed real fonts so viewers never substitute a slanted/oblique lookalike.
+# Liberation Sans is metrically compatible with Helvetica/Arial.
+_FDIR = "/usr/share/fonts/truetype/liberation"
+pdfmetrics.registerFont(TTFont("LiberationSans", f"{_FDIR}/LiberationSans-Regular.ttf"))
+pdfmetrics.registerFont(TTFont("LiberationSans-Bold", f"{_FDIR}/LiberationSans-Bold.ttf"))
+pdfmetrics.registerFont(TTFont("LiberationSans-Italic", f"{_FDIR}/LiberationSans-Italic.ttf"))
+pdfmetrics.registerFont(TTFont("LiberationSans-BoldItalic", f"{_FDIR}/LiberationSans-BoldItalic.ttf"))
+pdfmetrics.registerFontFamily("LiberationSans", normal="LiberationSans",
+                              bold="LiberationSans-Bold", italic="LiberationSans-Italic",
+                              boldItalic="LiberationSans-BoldItalic")
 
 DARK = HexColor("#1a1a1a")
 RULE = HexColor("#444444")
 
 styles = {
-    "name": ParagraphStyle("name", fontName="Helvetica-Bold", fontSize=16,
+    "name": ParagraphStyle("name", fontName="LiberationSans-Bold", fontSize=16,
                            leading=19, alignment=TA_CENTER, textColor=DARK,
                            spaceAfter=2),
-    "contact": ParagraphStyle("contact", fontName="Helvetica", fontSize=9,
+    "contact": ParagraphStyle("contact", fontName="LiberationSans", fontSize=9,
                               leading=12, alignment=TA_CENTER, textColor=DARK,
                               spaceAfter=2),
-    "headline": ParagraphStyle("headline", fontName="Helvetica-Bold", fontSize=11,
+    "headline": ParagraphStyle("headline", fontName="LiberationSans-Bold", fontSize=11,
                                leading=14, alignment=TA_CENTER, textColor=DARK,
                                spaceBefore=4, spaceAfter=4),
-    "section": ParagraphStyle("section", fontName="Helvetica-Bold", fontSize=10.5,
+    "section": ParagraphStyle("section", fontName="LiberationSans-Bold", fontSize=10.5,
                               leading=13, textColor=DARK, spaceBefore=10,
                               spaceAfter=1),
-    "body": ParagraphStyle("body", fontName="Helvetica", fontSize=9.2,
+    "body": ParagraphStyle("body", fontName="LiberationSans", fontSize=9.2,
                            leading=12.2, alignment=TA_JUSTIFY, textColor=DARK,
                            spaceAfter=3),
-    "jobtitle": ParagraphStyle("jobtitle", fontName="Helvetica", fontSize=9.4,
+    "jobtitle": ParagraphStyle("jobtitle", fontName="LiberationSans", fontSize=9.4,
                                leading=12.4, textColor=DARK, spaceBefore=6,
                                spaceAfter=2),
-    "bullet": ParagraphStyle("bullet", fontName="Helvetica", fontSize=9.2,
+    "bullet": ParagraphStyle("bullet", fontName="LiberationSans", fontSize=9.2,
                              leading=12.0, alignment=TA_JUSTIFY, textColor=DARK),
-    "edu": ParagraphStyle("edu", fontName="Helvetica", fontSize=9.2,
+    "edu": ParagraphStyle("edu", fontName="LiberationSans", fontSize=9.2,
                           leading=12.4, textColor=DARK, spaceAfter=2),
 }
+
+for _s in styles.values():
+    _s.bulletFontName = "LiberationSans"
 
 
 def one_bullet(text, space_after=1.5):
     return ListFlowable(
         [ListItem(Paragraph(text, styles["bullet"]), leftIndent=14)],
-        bulletType="bullet", start="•", bulletFontSize=9.2,
+        bulletType="bullet", start="•", bulletFontSize=9.2, bulletFontName="LiberationSans",
         leftIndent=14, spaceBefore=0, spaceAfter=space_after,
     )
 

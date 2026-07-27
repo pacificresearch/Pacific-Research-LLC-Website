@@ -103,6 +103,11 @@ separately (no SDVOSB preference; founder-consultancy lane).
   `KeepTogether` inside `KeepTogether` — nesting breaks ReportLab layout
   and blows up page count). Always visually verify page breaks in the
   rendered PDF before delivering it.
+- **HARD RULE — resume PDF fonts**: always EMBED real TrueType fonts
+  (Liberation Sans via `pdfmetrics.registerFont`); never rely on base-14
+  Helvetica. Non-embedded fonts get substituted by some viewers with
+  slanted/oblique lookalikes. Verify with a font scan that no unembedded
+  font draws any glyph.
 
 ## Repository context
 
