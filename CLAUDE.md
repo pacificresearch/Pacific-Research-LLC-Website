@@ -103,6 +103,13 @@ separately (no SDVOSB preference; founder-consultancy lane).
   `KeepTogether` inside `KeepTogether` — nesting breaks ReportLab layout
   and blows up page count). Always visually verify page breaks in the
   rendered PDF before delivering it.
+- **HARD RULE — resume prose style**: NEVER use em dashes (—) or double
+  hyphens (--) anywhere in resume text; they read as AI-written. Use
+  commas, semicolons, or split sentences instead. Also avoid tacked-on
+  editorial clauses ("a demonstrated commitment to...", "disciplined
+  stewardship of..."); state the fact and stop. Hyphenated compound
+  words (day-to-day, pre-award) are fine. Verify zero em dashes in
+  every generated file before delivering.
 - **DELIVERY FORMAT**: the user's PDF viewer renders generated PDFs
   slanted regardless of embedded fonts — deliver tailored resumes as
   plain **.docx** (upright Calibri, standard bullets, no italics, no

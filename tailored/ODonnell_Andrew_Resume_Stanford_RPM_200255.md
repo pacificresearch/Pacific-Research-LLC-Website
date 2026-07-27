@@ -4,7 +4,7 @@ Los Angeles, CA | aodhan.o@outlook.com | 650.213.2381 | linkedin.com/in/andrewda
 
 ## SPONSORED RESEARCH OPERATIONS PROFESSIONAL
 
-Research operations professional with 8+ years of experience, including 4+ years within the Stanford University School of Medicine supporting sponsored projects funded by NIH and industry sponsors. Direct experience partnering with principal investigators, sponsors, and CROs on the regulatory, administrative, and financial dimensions of funded clinical trials — budgeting, billing, and feasibility management; interpretation of protocol, institutional, and sponsor requirements; and sustained audit readiness under FDA regulations (21 CFR) and ICH GCP. ACRP-Certified Project Manager with a record of advising and training research staff, driving process improvement, and communicating complex compliance requirements clearly to faculty-led teams.
+Research operations professional with 8+ years of experience, including 4+ years within the Stanford University School of Medicine supporting sponsored projects funded by NIH and industry sponsors. Direct experience partnering with principal investigators, sponsors, and CROs on the regulatory, administrative, and financial dimensions of funded clinical trials, including budgeting, billing, and feasibility management; interpretation of protocol, institutional, and sponsor requirements; and sustained audit readiness under FDA regulations (21 CFR) and ICH GCP. ACRP-Certified Project Manager with a record of advising and training research staff, driving process improvement, and communicating complex compliance requirements clearly to faculty-led teams.
 
 ## CORE COMPETENCIES
 
@@ -30,14 +30,14 @@ Sponsored Project Operations (Federal & Industry) | Pre-Award Support: Budgeting
 ### Technical Operations Manager (Contract) | International SOS (Iqarus), Fort Lee, VA | Aug 2021 - Sep 2021
 
 - Led biomedical operations at the first U.S. haven site for Operation Allies Welcome, coordinating with Army Public Health and federal interagency partners to achieve 100% compliance with CDC vaccination and screening requirements for 25K+ evacuees.
-- Redesigned high-throughput COVID-19 testing and vaccination workflows, cutting average processing time per patient from 30 to approximately 18 minutes (40% faster) — a Lean-style process improvement delivered under intense operational pressure — and trained staff and interagency partners on the new workflows.
+- Redesigned high-throughput COVID-19 testing and vaccination workflows, cutting average processing time per patient from 30 to approximately 18 minutes (40% faster), and trained staff and interagency partners on the new workflows.
 - Supervised biomedical and technical personnel across daily shift operations, directing task assignment, readiness, and escalation of clinical support issues.
 
 ### Healthcare Technology Manager | 4A2x5 | U.S. Air Force, Various Locations | Sep 2017 - Sep 2025, ADT - Reserve
 
-- Maintained 98%+ preventive-maintenance compliance across 200+ biomedical devices valued at $2M+, sustaining Joint Commission and DoD accreditation readiness — disciplined stewardship of high-value institutional assets under external regulatory scrutiny.
+- Maintained 98%+ preventive-maintenance compliance across 200+ biomedical devices valued at $2M+, sustaining Joint Commission and DoD accreditation readiness.
 - Led HTM for the 752nd Medical Squadron during Global Medic 2019, supervising 6 biomedical personnel and ensuring operational readiness of mobile medical infrastructure in a multinational mass-casualty exercise.
-- Supervised and trained airmen in equipment maintenance and safety procedures, building cross-disciplinary teams and achieving zero equipment-related incidents — a demonstrated commitment to safety communication and safe behaviors.
+- Supervised and trained airmen in equipment maintenance and safety procedures, building cross-disciplinary teams and achieving zero equipment-related incidents.
 
 ### Emergency Department Technician | RCET | Children's Hospital of Orange County, Santa Ana, CA | Jan 2018 - Oct 2021
 
