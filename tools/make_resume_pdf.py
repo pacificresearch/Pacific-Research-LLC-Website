@@ -138,18 +138,17 @@ story.append(Paragraph(
     "Box | DocuSign | Jira | Confluence | Google Workspace", styles["body"]))
 
 stanford_bullets = [
-    "Served as a day-to-day liaison between principal investigators, sponsors, and CROs on regulatory, "
+    "Served as liaison between principal investigators, sponsors, and CROs on regulatory, "
     "administrative, and financial matters across concurrent NIH (federally sponsored) and industry clinical "
     "trials (Phase II-IV), supporting seamless trial execution and audit readiness.",
     "Supported budgeting, billing, and feasibility management for funded studies, applying university, "
-    "hospital, and sponsor requirements to day-to-day financial and operational decisions.",
-    "Interpreted and explained protocol, institutional, and sponsor requirements to study teams; served as "
-    "the day-to-day escalation point for study procedures and documentation standards.",
+    "hospital, and sponsor requirements to financial and operational decisions.",
+    "Interpreted and explained protocol, institutional, and sponsor requirements to study teams and served as "
+    "the escalation point for study procedures and documentation standards.",
     "Ensured regulatory compliance for multi-site NIH-sponsored projects under ICH GCP and FDA regulations "
     "(21 CFR); maintained HIPAA-compliant consent processes as designated Honest Broker for Gilead "
     "GS-US-685-6819, working directly with trial leadership.",
-    "Trained and onboarded incoming clinical research coordinators on protocol workflows, eConsent, ePRO, and "
-    "REDCap/OnCore data entry; developed study-specific training materials.",
+    "Served as day-to-day lead supervising junior staff members.",
     "Drove process improvement in data operations: optimized REDCap/OnCore databases with validation rules, "
     "queries, and dashboards, achieving 90%+ on-time query resolution; executed clinical operations for "
     "1,500+ participants with the site consistently ranked among the top enrollment sites nationally.",
