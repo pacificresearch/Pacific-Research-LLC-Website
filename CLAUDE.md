@@ -90,6 +90,20 @@ Sub-$250K simplified acquisitions are strategic PP builders — worth more
 than face value. International/UN/foreign-affairs work is evaluated
 separately (no SDVOSB preference; founder-consultancy lane).
 
+## Resume tailoring workflow
+
+- `master_resume.md` (branch `claude/resume-job-tailoring-ma94gi`) is the
+  source-of-truth resume. Tailored versions live in `tailored/` as both
+  Markdown and PDF; the PDF generator is `tools/make_resume_pdf.py`
+  (ReportLab).
+- **HARD RULE — resume PDF pagination**: a job/entry header must NEVER be
+  orphaned at the bottom of a page separated from its bullets, and a
+  section header + rule must NEVER appear without content beneath it.
+  Glue header + first content with a FLAT `KeepTogether` (never nest
+  `KeepTogether` inside `KeepTogether` — nesting breaks ReportLab layout
+  and blows up page count). Always visually verify page breaks in the
+  rendered PDF before delivering it.
+
 ## Repository context
 
 - The SAM.gov screening tool lives on branch
