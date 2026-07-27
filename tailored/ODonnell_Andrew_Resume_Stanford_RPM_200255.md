@@ -1,0 +1,69 @@
+# Andrew O'Donnell
+
+Los Angeles, CA | aodhan.o@outlook.com | 650.213.2381 | linkedin.com/in/andrewdavidodonnell/
+
+## SPONSORED RESEARCH OPERATIONS PROFESSIONAL
+
+Research operations professional with 8+ years of experience, including 4+ years within the Stanford University School of Medicine supporting sponsored projects funded by NIH and industry sponsors. Direct experience partnering with principal investigators, sponsors, and CROs on the regulatory, administrative, and financial dimensions of funded clinical trials — budgeting, billing, and feasibility management; interpretation of protocol, institutional, and sponsor requirements; and sustained audit readiness under FDA regulations (21 CFR) and ICH GCP. ACRP-Certified Project Manager with a record of advising and training research staff, driving process improvement, and communicating complex compliance requirements clearly to faculty-led teams.
+
+## CORE COMPETENCIES
+
+Sponsored Project Operations (Federal & Industry) | Pre-Award Support: Budgeting & Feasibility | Post-Award Support: Billing, Compliance & Audit Readiness | Principal Investigator & Sponsor Liaison | Policy & Protocol Interpretation | Regulatory Compliance (FDA 21 CFR, ICH GCP, HIPAA, Human Subjects Protections) | Clinical Trial Management | Process Improvement | Cross-Functional Team Coordination | Staff Training, Onboarding & Mentoring | Analytical & Written Communication | Data Quality & Query Resolution
+
+## TECHNICAL SKILLS
+
+- **Research Systems:** CTMS - OnCore, Oracle Siebel | EDC - Medidata Rave, REDCap | eTMF | eConsent | ePRO/eCOA | Epic | IRT | Cerner | Safety Reporting - AE/SAE, CTCAE
+- **Analytics & Reporting:** Excel (Advanced Functions) | SAS | SPSS | R | Python | Smartsheet
+- **Collaboration:** Microsoft Office Suite | Teams | Zoom | Slack | Adobe Acrobat Sign | SharePoint | Box | DocuSign | Jira | Confluence | Google Workspace
+
+## EXPERIENCE
+
+### Clinical Research Coordinator Associate | Stanford University Department of Medicine, Palo Alto, CA | Nov 2021 - Feb 2026
+
+- Served as a day-to-day liaison between principal investigators, sponsors, and CROs on regulatory, administrative, and financial matters across concurrent NIH (federally sponsored) and industry clinical trials (Phase II-IV), supporting seamless trial execution and audit readiness.
+- Supported budgeting, billing, and feasibility management for funded studies, applying university, hospital, and sponsor requirements to day-to-day financial and operational decisions.
+- Interpreted and explained protocol, institutional, and sponsor requirements to study teams; served as the day-to-day escalation point for study procedures and documentation standards.
+- Ensured regulatory compliance for multi-site NIH-sponsored projects under ICH GCP and FDA regulations (21 CFR); maintained HIPAA-compliant consent processes as designated Honest Broker for Gilead GS-US-685-6819, working directly with trial leadership.
+- Trained and onboarded incoming clinical research coordinators on protocol workflows, eConsent, ePRO, and REDCap/OnCore data entry; developed study-specific training materials.
+- Drove process improvement in data operations: optimized REDCap/OnCore databases with validation rules, queries, and dashboards, achieving 90%+ on-time query resolution; executed clinical operations for 1,500+ participants with the site consistently ranked among the top enrollment sites nationally.
+
+### Technical Operations Manager (Contract) | International SOS (Iqarus), Fort Lee, VA | Aug 2021 - Sep 2021
+
+- Led biomedical operations at the first U.S. haven site for Operation Allies Welcome, coordinating with Army Public Health and federal interagency partners to achieve 100% compliance with CDC vaccination and screening requirements for 25K+ evacuees.
+- Redesigned high-throughput COVID-19 testing and vaccination workflows, cutting average processing time per patient from 30 to approximately 18 minutes (40% faster) — a Lean-style process improvement delivered under intense operational pressure — and trained staff and interagency partners on the new workflows.
+- Supervised biomedical and technical personnel across daily shift operations, directing task assignment, readiness, and escalation of clinical support issues.
+
+### Healthcare Technology Manager | 4A2x5 | U.S. Air Force, Various Locations | Sep 2017 - Sep 2025, ADT - Reserve
+
+- Maintained 98%+ preventive-maintenance compliance across 200+ biomedical devices valued at $2M+, sustaining Joint Commission and DoD accreditation readiness — disciplined stewardship of high-value institutional assets under external regulatory scrutiny.
+- Led HTM for the 752nd Medical Squadron during Global Medic 2019, supervising 6 biomedical personnel and ensuring operational readiness of mobile medical infrastructure in a multinational mass-casualty exercise.
+- Supervised and trained airmen in equipment maintenance and safety procedures, building cross-disciplinary teams and achieving zero equipment-related incidents — a demonstrated commitment to safety communication and safe behaviors.
+
+### Emergency Department Technician | RCET | Children's Hospital of Orange County, Santa Ana, CA | Jan 2018 - Oct 2021
+
+- Delivered frontline care in a top-ranked Level I pediatric trauma center across 20K+ annual emergency encounters; precepted and trained new emergency department technicians.
+
+## LICENSES AND CERTIFICATIONS
+
+- Association of Clinical Research Professionals - Project Manager (ACRP-PM), Certified Professional (ACRP-CP)
+- CITI Good Clinical Practice (GCP) | HIPAA | Aerosol Transmissible Diseases | DOT Shipping
+- Google Advanced Data Analytics | Stanford Online AI in Healthcare | Interprofessional Healthcare Informatics
+- AAMI Certified Biomedical Equipment Technician (CBET)
+- NREMT Registry No. E3767060 | CPT I Registry No. CPT 02270029 | American Heart Association BLS, ACLS, PALS
+
+## PUBLICATIONS
+
+Contributor to four peer-reviewed publications from federally and industry-sponsored trials:
+
+- JAMA. 2023. Higher-dose fluvoxamine and time to sustained recovery in outpatients with COVID-19: The ACTIV-6 randomized clinical trial. ClinicalTrials.gov: NCT04885530.
+- JAMA. 2024. Nirmatrelvir-ritonavir and symptoms in adults with post-acute sequelae of SARS-CoV-2 infection: The STOP-PASC randomized clinical trial. ClinicalTrials.gov: NCT05576662.
+- JAMA Network Open. 2024. Effect of montelukast versus placebo on time to sustained recovery in outpatients with COVID-19: The ACTIV-6 randomized clinical trial. ClinicalTrials.gov: NCT04885530.
+- JAMA Internal Medicine. 2025. Metformin and time to sustained recovery in adults with COVID-19: The ACTIV-6 randomized clinical trial. ClinicalTrials.gov: NCT04885530.
+
+## EDUCATION
+
+- **MA, International Studies** | Chapman University, Orange, CA
+  - Graduate Fellowship Award (2x) | Sigma Iota Rho Honor Society
+- **BA, Classics** | California State University Long Beach, Long Beach, CA
+  - Eta Sigma Phi Honor Society
+- **Certificate in Pre-Medicine and General Sciences with Distinction** | UCLA Extension, Los Angeles, CA
