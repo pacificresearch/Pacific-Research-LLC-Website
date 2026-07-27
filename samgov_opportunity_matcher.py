@@ -125,6 +125,21 @@ LOW_BARRIER_NAICS = OrderedDict(
         ("541720", "R&D in Social Sciences & Humanities"),
         ("541910", "Marketing Research & Public Opinion Polling"),
         ("611710", "Educational Support Services"),
+        # DELEGABLE TRADES (capture v3) — deep local sub markets, recurring
+        # agency demand, and constant SDVOSB/SB set-asides. PRG primes and
+        # manages; licensed local subs perform. The Miller Act/bonding gate
+        # still kills anything bonded or >$150K construction.
+        ("561730", "Landscaping Services"),
+        ("561710", "Pest Control & Exterminating"),
+        ("561790", "Other Building Services (snow, exterior cleaning)"),
+        ("238320", "Painting & Wall Covering Contractors"),
+        ("238160", "Roofing Contractors"),
+        ("238220", "Plumbing / Heating / Air-Conditioning Contractors"),
+        ("238990", "All Other Specialty Trade Contractors"),
+        ("237310", "Highway / Street Paving & Related"),
+        ("236220", "Commercial Building Construction (small jobs)"),
+        ("811310", "Commercial Machinery Repair & Maintenance"),
+        ("493110", "General Warehousing & Storage"),
     ]
 )
 
@@ -286,6 +301,10 @@ TARGET_PSC = OrderedDict([
     ("B506", "Special Studies/Analysis — Medical"),
     ("Q301", "Medical — Laboratory Testing / Analysis"),
     ("AN11", "R&D — Health/Medical (applied research)"),
+    # Facilities / trade service PSCs (capture v3 — sub-fulfilled easy wins)
+    ("S201", "Housekeeping — Custodial / Janitorial"),
+    ("S208", "Housekeeping — Landscaping / Groundskeeping"),
+    ("S299", "Housekeeping — Other"),
 ])
 
 # --- Deep-screen gates (PRG capability baseline: solo clinical-research pro,
