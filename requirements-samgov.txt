@@ -1,0 +1,4 @@
+requests>=2.25.0
+# Optional — only needed for the --excel flag (xlsx output). Without it, the
+# script falls back to writing CSV files, which Excel opens natively.
+openpyxl>=3.0.0
