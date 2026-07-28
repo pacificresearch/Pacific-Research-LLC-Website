@@ -1806,7 +1806,7 @@ def evaluate(opp):
     if not disqualified and score_up_bonus:
         win_score = min(100, win_score + score_up_bonus)
         if win_score >= GREEN_MIN and win_band != "Green":
-            win_band, win_emoji, win_note = "Green", "🟢", "Best bet — pursue"
+            win_band, win_emoji, win_note = "Green", "🟢", "Work on first"
 
     # Categorical score-down: electronic/commercial equipment repair & maintenance
     # (NAICS 8112xx / 8113xx). PRG owns no bench, so these are structurally weak
@@ -1816,9 +1816,9 @@ def evaluate(opp):
         soft_flags = list(soft_flags) + [
             "equipment-repair NAICS (8112/8113) — PRG owns no bench"]
         if win_score < GREEN_MIN and win_band == "Green":
-            win_band, win_emoji, win_note = "Yellow", "🟡", "On the fence — verify scope"
+            win_band, win_emoji, win_note = "Yellow", "🟡", "Good fit — verify scope"
         if win_score < YELLOW_MIN and win_band == "Yellow":
-            win_band, win_emoji, win_note = "Red", "🔴", "Weak fit — likely NO-BID"
+            win_band, win_emoji, win_note = "Red", "🔴", "Don't pursue — likely NO-BID"
 
     # Buyer type: international / non-US-government buyers recognize no US small-
     # business or SDVOSB preference, so PRG's structural edge disappears. Score
@@ -1840,9 +1840,9 @@ def evaluate(opp):
             soft_flags = list(soft_flags) + [
                 f"international/non-US buyer ({buyer_hit}) — no SDVOSB preference"]
         if win_score < GREEN_MIN and win_band == "Green":
-            win_band, win_emoji, win_note = "Yellow", "🟡", "On the fence — no US set-aside edge"
+            win_band, win_emoji, win_note = "Yellow", "🟡", "Good fit — no US set-aside edge"
         if win_score < YELLOW_MIN and win_band == "Yellow":
-            win_band, win_emoji, win_note = "Red", "🔴", "Weak fit — non-US buyer"
+            win_band, win_emoji, win_note = "Red", "🔴", "Don't pursue — non-US buyer"
 
     # LEAD-TIME GATE (Gate 0): a scope whose fulfillment needs hiring or
     # teaming cannot be responsibly bid inside its minimum lead time — a
@@ -2729,11 +2729,11 @@ def prg_rubric(opp, setaside_label, setaside_eligible, is_sdvosb, value_num,
     score = RUBRIC_BASE + gate2 + gate3 + sum(d for d, _ in mods)
     score = max(0, min(100, score))
     if score >= GREEN_MIN:
-        band, emoji, note = "Green", "🟢", "Best bet — pursue"
+        band, emoji, note = "Green", "🟢", "Work on first"
     elif score >= YELLOW_MIN:
-        band, emoji, note = "Yellow", "🟡", "On the fence — worth a look"
+        band, emoji, note = "Yellow", "🟡", "Good fit"
     else:
-        band, emoji, note = "Red", "🔴", "Do not pursue — low odds"
+        band, emoji, note = "Red", "🔴", "Don't pursue"
 
     # Past-performance strategic value: small fast wins are worth more than
     # face value to a first-time prime.
@@ -4062,7 +4062,7 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
         ("Prime Plays", str(n_prime), "bid as prime"),
         ("Teaming Plays", str(n_team), "prime + trade/staffing sub"),
         ("Subcontract Targets", str(n_sub), "pursue as sub"),
-        ("Best Bets (Green)", str(n_green), "highest priority"),
+        ("Work On First (Green)", str(n_green), "highest priority"),
         ("SDVOSB Set-Asides", str(n_sdvosb), "your direct lane"),
     ]
 
@@ -4085,7 +4085,7 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
         "Prime Plays": "role:prime",
         "Teaming Plays": "role:team",
         "Subcontract Targets": "role:sub",
-        "Best Bets (Green)": "band:Green",
+        "Work On First (Green)": "band:Green",
         "SDVOSB Set-Asides": "sdvosb",
     }
     p.append('<section class="kpis">')
@@ -4187,8 +4187,8 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
              '<button class="fb" data-filter="role:prime">Prime</button>'
              '<button class="fb" data-filter="role:team">Prime + team</button>'
              '<button class="fb" data-filter="role:sub">Subcontract</button>'
-             '<button class="fb" data-filter="band:Green">🟢 Best bets</button>'
-             '<button class="fb" data-filter="band:Yellow">🟡 On the fence</button>'
+             '<button class="fb" data-filter="band:Green">🟢 Work on first</button>'
+             '<button class="fb" data-filter="band:Yellow">🟡 Good fit</button>'
              '<button class="fb" data-filter="solo">Founder-deliverable</button>'
              '<button class="fb" data-filter="intl">🌍 International</button>'
              '<button class="fb" data-filter="sdvosb">SDVOSB</button>'
