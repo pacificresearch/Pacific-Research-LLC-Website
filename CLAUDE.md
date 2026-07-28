@@ -67,8 +67,10 @@ words total; no full analysis unless asked.
    Minimum responsible lead times by fulfillment complexity:
    **founder-deliverable 2 days; single specialist hire 7 days;
    teaming / trade subs / staffing / multiple hires / contingent
-   credential partners 10 days.** Below the minimum = PASS (lead time),
-   even if the opportunity is otherwise attractive.
+   credential partners 10 days.** Below the minimum, keep the
+   opportunity VISIBLE but stamp it **⏳ EXPIRING-SOON** with the lead
+   math (e.g., "3d left, needs 10d lead") — never queue it as
+   ready-to-work, and never silently drop it.
 
 ### What is NOT a kill
 
