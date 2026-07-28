@@ -1851,25 +1851,24 @@ def evaluate(opp):
         if win_score < YELLOW_MIN and win_band == "Yellow":
             win_band, win_emoji, win_note = "Red", "🔴", "Don't pursue — non-US buyer"
 
-    # LEAD-TIME GATE (Gate 0): a scope whose fulfillment needs hiring or
-    # teaming cannot be responsibly bid inside its minimum lead time — a
-    # 3-day fuse on a crew contract is not an opportunity, it's a trap.
+    # LEAD-TIME FLAG: a scope whose fulfillment needs hiring or teaming
+    # cannot be responsibly bid inside its minimum lead time. These rows are
+    # NOT hidden — they stay in the report stamped ⏳ EXPIRING-SOON with the
+    # lead math, so nothing quietly disappears; they're just never presented
+    # as ready-to-work items.
     min_lead = rub["min_lead_days"]
     if credential_needed:
         # Hire-to-win credential = contingent partner to recruit → teaming lead.
         min_lead = max(min_lead, 10)
-    if (not disqualified and not is_expired and not is_awarded
-            and not rub["founder_can_deliver"]
-            and deadline_days is not None and 0 <= deadline_days < min_lead):
-        disqualified = True
-        is_watch_template = False
-        kill_gate = "Gate 0 (lead time)"
-        kill_reason = (f"only {deadline_days}d to respond but fulfillment "
-                       f"needs hiring/teaming — minimum {min_lead}d lead")
-        win_score, win_band, win_emoji = 0, "Red", "🔴"
-        win_note = "Gate 0 — " + kill_reason
-        is_solo = False
-        rub["priority"] = 0
+    lead_short = (not disqualified and not is_expired and not is_awarded
+                  and not rub["founder_can_deliver"]
+                  and deadline_days is not None
+                  and 0 <= deadline_days < min_lead)
+    if lead_short:
+        is_watch_template = False   # no time to recruit the credential partner
+        soft_flags = list(soft_flags) + [
+            f"⏳ expiring — {deadline_days}d left but fulfillment needs "
+            f"{min_lead}d lead (hire/team)"]
 
     # --- STAGE 0: timing + notice-type gating (takes precedence over scoring) ---
     notice_class = _classify_notice(notice_type)
@@ -1903,6 +1902,8 @@ def evaluate(opp):
         verdict = "WATCH-TEMPLATE"    # Type A individual credential — hire-to-win
     elif disqualified:
         verdict = "NO-BID"
+    elif lead_short:
+        verdict = "EXPIRING-SOON"   # visible, labeled — not queued as workable
     elif short_fuse:
         verdict = "SHORT-FUSE"
     elif pp_wall and incumbent:
@@ -1951,6 +1952,10 @@ def evaluate(opp):
     if verdict == "SHORT-FUSE":
         deadline_headline = (f"⏰ {deadline_days}d left — "
                              f"due {str(opp.get('responseDeadLine') or '').split('T')[0]}")
+    elif verdict == "EXPIRING-SOON":
+        deadline_headline = (f"⏳ {deadline_days}d left, needs {min_lead}d "
+                             f"lead — due "
+                             f"{str(opp.get('responseDeadLine') or '').split('T')[0]}")
 
     return {
         "solicitation": (
@@ -1994,6 +1999,7 @@ def evaluate(opp):
         "verdict": verdict,
         "notice_class": notice_class,
         "short_fuse": short_fuse,
+        "expiring_soon": lead_short,
         "deadline_headline": deadline_headline,
         "is_sbir": is_sbir,
         "cycle_program": cycle_program,
@@ -5514,7 +5520,7 @@ _SELFTEST_CASES = [
     },
     {
         "label": "LEAD TIME — janitorial (teaming needed) with a 4-day fuse "
-                 "→ killed at Gate 0 lead time (needs 10d)",
+                 "→ visible but stamped EXPIRING-SOON (needs 10d)",
         "opp": {
             "solicitationNumber": "LEAD-JAN-4D",
             "noticeId": "lt1",
@@ -5528,8 +5534,10 @@ _SELFTEST_CASES = [
             "type": "Solicitation",
         },
         "deadline_offset_days": 4,
-        "expect_verdict": "NO-BID",
-        "expect_equals": {"kill_gate": "Gate 0 (lead time)", "win_score": 0},
+        "expect_verdict": "EXPIRING-SOON",
+        "expect_truthy": ["expiring_soon"],
+        "expect_falsy": ["disqualified"],
+        "expect_contains": {"soft_flags_display": "expiring"},
     },
     {
         "label": "LEAD TIME — founder-deliverable clinical analysis with a "
