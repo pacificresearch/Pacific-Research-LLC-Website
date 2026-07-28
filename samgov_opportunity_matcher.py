@@ -140,6 +140,13 @@ LOW_BARRIER_NAICS = OrderedDict(
         ("236220", "Commercial Building Construction (small jobs)"),
         ("811310", "Commercial Machinery Repair & Maintenance"),
         ("493110", "General Warehousing & Storage"),
+        # PRG's own SAM-registered education codes (must always be queried)
+        ("611310", "Colleges, Universities & Professional Schools"),
+        ("611630", "Language Schools"),
+        # Non-emergency medical transport — steady VA/SDVOSB volume; founder
+        # medical credibility + deep delegable driver labor market.
+        ("485991", "Special Needs Transportation"),
+        ("485999", "All Other Transit & Ground Passenger Transport"),
     ]
 )
 
