@@ -101,8 +101,13 @@ separately (no SDVOSB preference; founder-consultancy lane).
   section header + rule must NEVER appear without content beneath it.
   Glue header + first content with a FLAT `KeepTogether` (never nest
   `KeepTogether` inside `KeepTogether` — nesting breaks ReportLab layout
-  and blows up page count). Always visually verify page breaks in the
-  rendered PDF before delivering it.
+  and blows up page count). A date range in a job header must NEVER wrap
+  leaving a lone year on the next line: render the date segment as an
+  unbreakable token (non-breaking spaces; non-breaking hyphen in docx)
+  so the whole range wraps together or not at all. Always visually
+  verify page breaks in the rendered PDF before delivering it. Use
+  `tools/resume_render.py` (md to PDF) and `tools/resume_docx.js`
+  (JSON to docx) which enforce all of these rules.
 - **HARD RULE — resume prose style**: NEVER use em dashes (—) or double
   hyphens (--) anywhere in resume text; they read as AI-written. Use
   commas, semicolons, or split sentences instead. Also avoid tacked-on

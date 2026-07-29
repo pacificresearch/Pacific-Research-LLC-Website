@@ -115,8 +115,17 @@ def parse(md_path):
     return model
 
 
+def nowrap_dates(text):
+    """Make the trailing date segment unbreakable so a year is never
+    orphaned on its own line: the whole range wraps together or not at all."""
+    segs = text.split(" | ")
+    segs[-1] = segs[-1].replace(" ", "\u00a0")
+    return " | ".join(segs)
+
+
 def job_bold(text):
-    """Bold everything before the first ' | ' in a job header line."""
+    """Bold everything before the first ' | '; date segment is unbreakable."""
+    text = nowrap_dates(text)
     parts = text.split(" | ", 1)
     if len(parts) == 2:
         return f"<b>{esc(parts[0])}</b> | {esc(parts[1])}"

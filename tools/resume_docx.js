@@ -20,7 +20,16 @@ function boldRuns(text) {
   return [run(text)];
 }
 
+function nowrapDates(text) {
+  // Date segment must never wrap leaving a lone year on the next line.
+  const segs = text.split(" | ");
+  const last = segs.length - 1;
+  segs[last] = segs[last].replace(/ /g, "\u00a0").replace(/-/g, "\u2011");
+  return segs.join(" | ");
+}
+
 function jobRuns(text) {
+  text = nowrapDates(text);
   const i = text.indexOf(" | ");
   if (i === -1) return [run(text, true)];
   return [run(text.slice(0, i), true), run(text.slice(i))];
