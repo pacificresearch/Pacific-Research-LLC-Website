@@ -37,6 +37,7 @@ Clinical Trial Management | Protocol Compliance | ICH GCP & 21 CFR Adherence | D
 ### Emergency Department Technician | RCET | Children's Hospital of Orange County, Santa Ana, CA | Jan 2018 - Oct 2021
 
 - Delivered frontline care in a top-ranked Level I pediatric trauma center, assisting in triage, stabilization, and 20K+ annual emergency encounters.
+- Provided bedside care for pediatric hematology and oncology patients, including fever and neutropenia presentations and oncology code events; prepared sterile fields and supplies for implanted port access.
 - Precepted and trained new emergency department technicians on triage support, trauma bay setup, and respiratory equipment operation, serving as a peer resource during high-acuity periods.
 - Assisted in code events, including intubation, resuscitation, medication preparation, and patient transport, as an extension of physicians and nurses, contributing to improved patient outcomes in critical situations.
 - Sustained reliability of respiratory care equipment (CPAP, BiPAP, ventilators, high-flow O2) through proactive maintenance and troubleshooting, ensuring readiness for critical interventions.
