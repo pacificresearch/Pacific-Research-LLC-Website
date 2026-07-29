@@ -73,6 +73,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-08 | Clinical Research Associate (CRA) | Merck | Remote, US | https://jobs.merck.com/ | ready to apply |
 | 2026-08-08 | Program Officer, Operations | Action Against Hunger | Remote / Field, Global | https://careers.actionagainsthunger.org/ | ready to apply |
 | 2026-08-08 | Research Operations Director | University of California Los Angeles (UCLA) | Remote / Los Angeles, CA | https://careers.ucla.edu | ready to apply |
+| 2026-08-09 | Senior Clinical Research Project Manager (Remote) | TRiNDS, LLC | Remote, US | https://to.indeed.com/aal84jmgh76z | ready to apply |
+| 2026-08-09 | Clinical Project Manager (US) | Alimentiv | Remote / Raleigh-Durham, NC | https://to.indeed.com/aa6gndc4zq2r | ready to apply |
+| 2026-08-09 | Clinical Research Associate | Huntington Study Group | Remote, US | https://to.indeed.com/aanxsjfphbdk | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -217,6 +220,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–16).
 - Total packaged across all cycles: 52 roles (4 cycle 1 + 3 each cycles 2–16 + 3 cycle 17).
 - Career function diversity: Cycle 17 introduces healthcare analytics/outcomes research (Optum), international health program operations (Helen Keller), and academic research administration (Research Foundation CUNY). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–160K) → academic research administration ($56–112K), representing diverse functional pathways across healthcare, international development, and academic research sectors.
+
+## Cycle 23 notes (2026-08-09 batch-23)
+
+- Tool access constraints: Indeed MCP intermittently unavailable; used hybrid approach: Indeed search when available + WebSearch fallback + ground truth facts from repo for screening/tailoring.
+- Indeed searches identified specific active hiring: TRiNDS (senior clinical research project manager remote roles, CRO operations), Alimentiv (clinical project manager remote/Raleigh-Durham positions, $95.5K–$159K), Huntington Study Group (clinical research associate remote positions, $80K–$90K).
+- 3 packages produced: TRiNDS Senior Clinical Research Project Manager (Pillar 1, CRO operations leadership), Alimentiv Clinical Project Manager (Pillar 1, $95.5K–$159K biotech), Huntington Study Group CRA (Pillar 1, $80K–$90K research network).
+- All 3 are new company+title combinations (no dedupes from cycles 1–22).
+- Total packaged across all cycles: 70 roles (4 cycle 1 + 3 each cycles 2–22 + 3 cycle 23).
+- Clinical research advancement tier: Cycle 23 introduces specialized project management at dedicated CRO (TRiNDS), biotech clinical operations (Alimentiv), and established research networks (Huntington Study Group), representing vertical advancement within clinical research domain through specialized provider organizations. Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → CRO project management ($80–159K), representing career progression within clinical research and healthcare operations sectors with multiple advancement pathways and organizational tier expansion.
 
 ## Cycle 22 notes (2026-08-08 batch-22)
 
