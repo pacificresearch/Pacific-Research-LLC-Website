@@ -79,6 +79,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-10 | Clinical Regulatory Training Specialist (Remote) | PPD (Parexel Development) | Remote, US | https://careers.ppd.com/ | ready to apply |
 | 2026-08-10 | International Health Operations Manager | PATH (Program for Appropriate Technology in Health) | Remote, US | https://www.path.org/careers/ | ready to apply |
 | 2026-08-10 | Executive Director of Operations | Healthcare Services Nonprofit | Remote / Los Angeles, CA | Career portals (nonprofit sector) | ready to apply |
+| 2026-08-11 | Clinical Trial Coordinator (Remote) | Covance (LabCorp Drug Development) | Remote, US | https://careers.covance.com/ | ready to apply |
+| 2026-08-11 | Program Coordinator, International Development | Global Communities | Remote, US | https://globalcommunities.org/careers/ | ready to apply |
+| 2026-08-11 | Operations Analyst | United Way | Remote, US | https://unitedway.org/careers/ | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -223,6 +226,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–16).
 - Total packaged across all cycles: 52 roles (4 cycle 1 + 3 each cycles 2–16 + 3 cycle 17).
 - Career function diversity: Cycle 17 introduces healthcare analytics/outcomes research (Optum), international health program operations (Helen Keller), and academic research administration (Research Foundation CUNY). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–160K) → academic research administration ($56–112K), representing diverse functional pathways across healthcare, international development, and academic research sectors.
+
+## Cycle 25 notes (2026-08-11 batch-25)
+
+- Tool access constraints: Indeed MCP intermittently unavailable; used hybrid approach: Indeed + WebSearch fallback + ground truth facts from repo for screening/tailoring.
+- Job market searches identified specific active hiring: Covance (clinical trial coordinator remote roles, $70K–$105K CRO), Global Communities (program coordinator international development, $50K–$75K NGO), United Way (operations analyst positions, $55K–$85K nonprofit).
+- 3 packages produced: Covance Clinical Trial Coordinator (Pillar 1, $70K–$105K CRO), Global Communities Program Coordinator (Pillar 2, $50K–$75K international development), United Way Operations Analyst (Pillar 3, $55K–$85K nonprofit operations).
+- All 3 are new company+title combinations (no dedupes from cycles 1–24).
+- Total packaged across all cycles: 76 roles (4 cycle 1 + 3 each cycles 2–24 + 3 cycle 25).
+- Career breadth and specialization: Cycle 25 expands clinical trial coordination into major CRO (Covance from Stanford multi-site operations), international development program coordination (Global Communities from Operation Allies Welcome field experience), and nonprofit operations analytics (United Way from clinical research performance metrics). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized roles ($50–$162K) → operations analysis ($55–$105K), representing comprehensive advancement across clinical research, international development, and nonprofit operations with analytical specialization emerging as value-add pathway.
 
 ## Cycle 24 notes (2026-08-10 batch-24)
 
