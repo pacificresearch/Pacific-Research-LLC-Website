@@ -33,27 +33,27 @@ pdfmetrics.registerFont(TTFont("LiberationSans-Bold", f"{_FDIR}/LiberationSans-B
 pdfmetrics.registerFontFamily("LiberationSans", normal="LiberationSans",
                               bold="LiberationSans-Bold")
 
-DARK = HexColor("#1a1a1a")
-RULE = HexColor("#444444")
+DARK = HexColor("#000000")
+RULE = HexColor("#000000")
 
 S = {
-    "name": ParagraphStyle("name", fontName="LiberationSans-Bold", fontSize=16,
-                           leading=19, alignment=TA_CENTER, textColor=DARK, spaceAfter=2),
-    "contact": ParagraphStyle("contact", fontName="LiberationSans", fontSize=9,
-                              leading=12, alignment=TA_CENTER, textColor=DARK, spaceAfter=2),
-    "headline": ParagraphStyle("headline", fontName="LiberationSans-Bold", fontSize=11,
-                               leading=14, alignment=TA_CENTER, textColor=DARK,
+    "name": ParagraphStyle("name", fontName="LiberationSans-Bold", fontSize=17,
+                           leading=20, alignment=TA_CENTER, textColor=DARK, spaceAfter=2),
+    "contact": ParagraphStyle("contact", fontName="LiberationSans", fontSize=9.5,
+                              leading=12.5, alignment=TA_CENTER, textColor=DARK, spaceAfter=2),
+    "headline": ParagraphStyle("headline", fontName="LiberationSans-Bold", fontSize=11.5,
+                               leading=14.5, alignment=TA_CENTER, textColor=DARK,
                                spaceBefore=4, spaceAfter=4),
-    "section": ParagraphStyle("section", fontName="LiberationSans-Bold", fontSize=10.5,
-                              leading=13, textColor=DARK, spaceBefore=10, spaceAfter=1),
-    "body": ParagraphStyle("body", fontName="LiberationSans", fontSize=9.2,
-                           leading=12.2, textColor=DARK, spaceAfter=3),
-    "jobtitle": ParagraphStyle("jobtitle", fontName="LiberationSans", fontSize=9.4,
-                               leading=12.4, textColor=DARK, spaceBefore=6, spaceAfter=2),
-    "bullet": ParagraphStyle("bullet", fontName="LiberationSans", fontSize=9.2,
-                             leading=12.0, textColor=DARK),
-    "edu": ParagraphStyle("edu", fontName="LiberationSans", fontSize=9.2,
-                          leading=12.4, textColor=DARK, spaceAfter=2),
+    "section": ParagraphStyle("section", fontName="LiberationSans-Bold", fontSize=11,
+                              leading=13.5, textColor=DARK, spaceBefore=10, spaceAfter=1),
+    "body": ParagraphStyle("body", fontName="LiberationSans", fontSize=9.8,
+                           leading=12.6, textColor=DARK, spaceAfter=3),
+    "jobtitle": ParagraphStyle("jobtitle", fontName="LiberationSans", fontSize=9.8,
+                               leading=12.8, textColor=DARK, spaceBefore=6, spaceAfter=2),
+    "bullet": ParagraphStyle("bullet", fontName="LiberationSans", fontSize=9.8,
+                             leading=12.4, textColor=DARK),
+    "edu": ParagraphStyle("edu", fontName="LiberationSans", fontSize=9.8,
+                          leading=12.8, textColor=DARK, spaceAfter=2),
 }
 for _s in S.values():
     _s.bulletFontName = "LiberationSans"
@@ -72,7 +72,7 @@ def md_bold(t):
 def one_bullet(text):
     return ListFlowable(
         [ListItem(Paragraph(md_bold(text), S["bullet"]), leftIndent=14)],
-        bulletType="bullet", start="•", bulletFontSize=9.2,
+        bulletType="bullet", start="•", bulletFontSize=9.8,
         bulletFontName="LiberationSans", leftIndent=14, spaceBefore=0, spaceAfter=1.5,
     )
 
@@ -133,7 +133,7 @@ def job_para(text):
     parts = text.split(" | ", 1)
     title = parts[0]
     rest = (" | " + parts[1]) if len(parts) == 2 else ""
-    size = 9.4
+    size = 9.8
     while size > 7.5:
         w = (pdfmetrics.stringWidth(title, "LiberationSans-Bold", size)
              + pdfmetrics.stringWidth(rest.replace("\u00a0", " "), "LiberationSans", size))
@@ -152,8 +152,8 @@ def build(model):
              Paragraph(esc(model["summary"]), S["body"])]
     for sec in model["sections"]:
         header = [Paragraph(f"<b>{esc(sec['title'])}</b>", S["section"]),
-                  HRFlowable(width="100%", thickness=0.8, color=RULE,
-                             spaceBefore=1, spaceAfter=4)]
+                  HRFlowable(width="100%", thickness=1.6, color=RULE,
+                             spaceBefore=2, spaceAfter=5)]
         items = sec["items"]
         flows = []
         j = 0

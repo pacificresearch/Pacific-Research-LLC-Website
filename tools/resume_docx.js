@@ -44,7 +44,7 @@ const center = (text, size, bold, after) => new Paragraph({
 
 const sectionHeader = (text) => new Paragraph({
   spacing: { before: 200, after: 80 }, keepNext: true,
-  border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "444444" } },
+  border: { bottom: { style: BorderStyle.SINGLE, size: 14, color: "000000" } },
   children: [new TextRun({ text, font: FONT, size: 22, bold: true })],
 });
 
