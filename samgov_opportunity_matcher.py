@@ -1142,8 +1142,12 @@ def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
         "postedTo": posted_to,        # MM/DD/YYYY (required)
         "limit": min(limit, 1000),    # API max page size is 1000
         "offset": 0,
-        # Notice types: solicitation, presol, combined, sources sought, special,
-        # and award notices ('a') so we can surface subcontracting/teaming targets.
+        # Notice types (APEX guidance — engage early in the lifecycle):
+        # r=sources sought, p=presolicitation, k=combined synopsis/solicitation,
+        # o=solicitation. Amendments re-post under the parent notice's type and
+        # bump its posted date, so a fresh-posted-window query catches them.
+        # 's' (special) feeds the watchlist and 'a' (award) feeds the
+        # subcontracting tab only — neither dilutes the pursue lists.
         "ptype": "o,p,k,r,s,a",
     }
 
@@ -1729,6 +1733,14 @@ def evaluate(opp):
         (isinstance(award, dict) and (award.get("awardee") or award.get("amount")))
     )
     deadline_days = _deadline_days(opp)   # computed once, reused below
+    # Freshness (APEX guidance): the working set is what posted to SAM within
+    # the past week — amendments re-post and refresh this date too.
+    try:
+        posted_days_ago = (dt.date.today() - dt.date.fromisoformat(
+            (opp.get("postedDate") or "").split("T")[0])).days
+    except ValueError:
+        posted_days_ago = None
+    is_fresh = posted_days_ago is not None and 0 <= posted_days_ago <= 7
     is_expired = deadline_days is not None and deadline_days < 0
 
     # Prime eligibility for the CORE table = allowed to bid AND technically relevant.
@@ -1872,6 +1884,25 @@ def evaluate(opp):
 
     # --- STAGE 0: timing + notice-type gating (takes precedence over scoring) ---
     notice_class = _classify_notice(notice_type)
+
+    # APEX GUIDANCE — no last-minute bids: a BIDDABLE notice (solicitation /
+    # combined synopsis) expiring within the week is removed to the KILL LOG.
+    # Pre-RFP notices (sources sought, presolicitation, RFI) are exempt — a
+    # short-window sources-sought response is cheap early engagement, which is
+    # exactly the lifecycle stage APEX says to work.
+    if (not disqualified and not is_expired and not is_awarded
+            and notice_class not in WATCH_NOTICE_CLASSES
+            and deadline_days is not None and 0 <= deadline_days < 7):
+        disqualified = True
+        is_watch_template = False
+        lead_short = False
+        kill_gate = "Gate 0 (same-week expiry)"
+        kill_reason = (f"expires in {deadline_days}d — last-minute bids are "
+                       "not pursued (APEX guidance)")
+        win_score, win_band, win_emoji = 0, "Red", "🔴"
+        win_note = "Gate 0 — " + kill_reason
+        is_solo = False
+        rub["priority"] = 0
     short_fuse = (deadline_days is not None
                   and 0 <= deadline_days <= SHORT_FUSE_CALENDAR_DAYS)
     text_l = _haystack(opp)
@@ -2000,6 +2031,8 @@ def evaluate(opp):
         "notice_class": notice_class,
         "short_fuse": short_fuse,
         "expiring_soon": lead_short,
+        "posted_days_ago": posted_days_ago,
+        "is_fresh": is_fresh,
         "deadline_headline": deadline_headline,
         "is_sbir": is_sbir,
         "cycle_program": cycle_program,
@@ -3009,7 +3042,8 @@ def _opportunity_table(rows, eligible_key, reason_key):
         "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- "
         "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
     ]
-    for r in sorted(rows, key=lambda x: (x.get("priority", 0), x["win_score"]),
+    for r in sorted(rows, key=lambda x: (x.get("is_fresh", False),
+                                         x.get("priority", 0), x["win_score"]),
                     reverse=True):
         solo = "Yes" if r["is_solo"] else "No"   # Solo = founder-deliverable
         lines.append(
@@ -4018,7 +4052,8 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
                 and not r.get("watch_template")]
     # Rank by capture priority first (win score breaks ties) — the whole
     # report is ordered by the aggregation model, not the raw win score.
-    ranked = sorted(eligible, key=lambda r: (r.get("priority", 0),
+    ranked = sorted(eligible, key=lambda r: (r.get("is_fresh", False),
+                                             r.get("priority", 0),
                                              r["win_score"]), reverse=True)
     top10 = ranked[:10]
     killed = [r for r in results if r["disqualified"]
@@ -4076,7 +4111,8 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
         ("Teaming Plays", str(n_team), "prime + trade/staffing sub"),
         ("Subcontract Targets", str(n_sub), "pursue as sub"),
         ("Work On First (Green)", str(n_green), "highest priority"),
-        ("SDVOSB Set-Asides", str(n_sdvosb), "your direct lane"),
+        ("New This Week", str(sum(1 for r in eligible if r.get("is_fresh"))),
+         "posted in last 7 days"),
     ]
 
     # --- Assemble HTML ---
@@ -4100,6 +4136,7 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
         "Subcontract Targets": "role:sub",
         "Work On First (Green)": "band:Green",
         "SDVOSB Set-Asides": "sdvosb",
+        "New This Week": "fresh",
     }
     p.append('<section class="kpis">')
     for label, val, sub in kpis:
@@ -4143,6 +4180,45 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
     p.append(_summary_line("Best teaming play", best_team))
     p.append(_summary_line("Best subcontract target", best_sub))
     p.append(_summary_line("Best past-performance builder", best_pp))
+    p.append('</section>')
+
+    # Engage This Week — fresh pre-RFP notices (APEX: shape requirements
+    # BEFORE the RFP drops; a sources-sought response is cheap and puts PRG
+    # on the CO's radar as a capable source).
+    engage = sorted(
+        [r for r in results if r["is_future"] and r.get("is_fresh")
+         and not r["is_expired"]],
+        key=lambda r: (r.get("respond_recommended", False),
+                       r.get("priority", 0), r["win_score"]), reverse=True)
+    p.append('<section><h2>📣 Engage This Week — Fresh Sources Sought &amp; '
+             'Pre-Solicitations</h2>')
+    p.append('<p class="muted" style="font-size:13px;margin:0 0 12px">'
+             'Posted to SAM within the past 7 days and still pre-RFP. '
+             'Responding now shapes the requirement, can trigger an SDVOSB '
+             'set-aside decision, and costs a page — the cheapest capture '
+             'work there is.</p>')
+    if engage:
+        p.append('<div class="scroll"><table><thead><tr>'
+                 '<th>Respond?</th><th>Type</th><th>Title</th><th>Agency</th>'
+                 '<th>Set-Aside</th><th>Posted</th><th>Respond By</th>'
+                 '<th>Solicitation #</th></tr></thead><tbody>')
+        for r in engage[:25]:
+            title = _html_escape(_clean(r["title"], 60))
+            if _is_http(r["link"]):
+                title = (f'<a href="{_html_escape(r["link"])}" target="_blank" '
+                         f'rel="noopener">{title}</a>')
+            rec = ('<b style="color:#2E7D4F">YES — respond</b>'
+                   if r.get("respond_recommended") else 'review')
+            p.append(f"<tr><td>{rec}</td>"
+                     f"<td>{_html_escape(r['notice_type'])}</td>"
+                     f"<td>{title}</td><td>{_html_escape(r['agency'])}</td>"
+                     f"<td>{_html_escape(r['setaside'])}</td>"
+                     f"<td class='num'>{_html_escape(r['posted'])}</td>"
+                     f"<td>{str(r['response_deadline']).split('T')[0]}</td>"
+                     f"<td>{_html_escape(r['solicitation'])}</td></tr>")
+        p.append('</tbody></table></div>')
+    else:
+        p.append('<p class="empty">No fresh pre-RFP notices this window.</p>')
     p.append('</section>')
 
     # Key findings / review
@@ -4202,6 +4278,7 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
              '<button class="fb" data-filter="role:sub">Subcontract</button>'
              '<button class="fb" data-filter="band:Green">🟢 Work on first</button>'
              '<button class="fb" data-filter="band:Yellow">🟡 Good fit</button>'
+             '<button class="fb" data-filter="fresh">🆕 New this week</button>'
              '<button class="fb" data-filter="solo">Founder-deliverable</button>'
              '<button class="fb" data-filter="intl">🌍 International</button>'
              '<button class="fb" data-filter="sdvosb">SDVOSB</button>'
@@ -4212,7 +4289,8 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
              '<th>Priority</th><th>Rating</th><th>Role</th>'
              '<th>Solicitation #</th><th>Agency</th><th>Fulfillment</th>'
              '<th>GM%</th><th>Est. Value</th><th>Set-Aside</th>'
-             '<th>NAICS / PSC</th><th>Location</th><th>Respond By</th>'
+             '<th>NAICS / PSC</th><th>Location</th><th>Posted</th>'
+             '<th>Respond By</th>'
              '</tr></thead><tbody id="matrixBody">')
     for r in ranked:
         chip = (f'<span class="chip" style="background:{_RAG_HEX[r["win_band"]]}">'
@@ -4236,6 +4314,7 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
             f'data-solo="{1 if r["is_solo"] else 0}" '
             f'data-intl="{1 if r["is_international"] else 0}" '
             f'data-sdvosb="{1 if r["is_sdvosb"] else 0}" '
+            f'data-fresh="{1 if r.get("is_fresh") else 0}" '
             f'data-text="{searchtext}">'
             f"<td class='num'><b>{r.get('priority', 0)}</b></td>"
             f"<td>{chip}</td>"
@@ -4248,9 +4327,11 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
             f"<td>{_html_escape(r['setaside'])}</td>"
             f"<td>{_html_escape(naics_psc)}</td>"
             f"<td>{_html_escape(r['location'])}</td>"
+            f"<td class='num'>{'🆕 ' if r.get('is_fresh') else ''}"
+            f"{_html_escape(r['posted'])}</td>"
             f"<td>{deadline}</td></tr>")
     if not ranked:
-        p.append('<tr><td colspan="12" class="empty">No eligible '
+        p.append('<tr><td colspan="13" class="empty">No eligible '
                  'opportunities in this window.</td></tr>')
     p.append('</tbody></table></div></section>')
 
@@ -4904,6 +4985,7 @@ _REPORT_JS = r"""
     if(f==='solo') return tr.getAttribute('data-solo')==='1';
     if(f==='intl') return tr.getAttribute('data-intl')==='1';
     if(f==='sdvosb') return tr.getAttribute('data-sdvosb')==='1';
+    if(f==='fresh') return tr.getAttribute('data-fresh')==='1';
     if(f.indexOf('band:')===0) return tr.getAttribute('data-band')===f.slice(5);
     if(f.indexOf('role:')===0) return tr.getAttribute('data-role')===f.slice(5);
     return true;
@@ -5519,8 +5601,8 @@ _SELFTEST_CASES = [
         "expect_equals": {"role": "PRIME WITH TEAMING PARTNER"},
     },
     {
-        "label": "LEAD TIME — janitorial (teaming needed) with a 4-day fuse "
-                 "→ visible but stamped EXPIRING-SOON (needs 10d)",
+        "label": "APEX — janitorial solicitation expiring in 4d → removed "
+                 "(same-week expiry, no last-minute bids)",
         "opp": {
             "solicitationNumber": "LEAD-JAN-4D",
             "noticeId": "lt1",
@@ -5534,14 +5616,12 @@ _SELFTEST_CASES = [
             "type": "Solicitation",
         },
         "deadline_offset_days": 4,
-        "expect_verdict": "EXPIRING-SOON",
-        "expect_truthy": ["expiring_soon"],
-        "expect_falsy": ["disqualified"],
-        "expect_contains": {"soft_flags_display": "expiring"},
+        "expect_verdict": "NO-BID",
+        "expect_equals": {"kill_gate": "Gate 0 (same-week expiry)"},
     },
     {
-        "label": "LEAD TIME — founder-deliverable clinical analysis with a "
-                 "3-day fuse → still actionable (SHORT-FUSE, not killed)",
+        "label": "APEX — even founder-deliverable work expiring in 3d → "
+                 "removed (same-week expiry is a blanket rule)",
         "opp": {
             "solicitationNumber": "LEAD-SOLO-3D",
             "noticeId": "lt2",
@@ -5556,8 +5636,49 @@ _SELFTEST_CASES = [
             "type": "Combined Synopsis/Solicitation",
         },
         "deadline_offset_days": 3,
-        "expect_verdict": "SHORT-FUSE",
-        "expect_truthy": ["is_solo"],
+        "expect_verdict": "NO-BID",
+        "expect_equals": {"kill_gate": "Gate 0 (same-week expiry)"},
+    },
+    {
+        "label": "APEX — teaming scope at 8d: past the same-week cutoff but "
+                 "under the 10d teaming lead → visible as EXPIRING-SOON",
+        "opp": {
+            "solicitationNumber": "APEX-TEAM-8D",
+            "noticeId": "ap1",
+            "title": "Grounds Maintenance Services, VA Campus",
+            "description": ("Grounds maintenance and landscaping services, "
+                            "base year plus options."),
+            "naicsCode": "561730",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Veterans Affairs",
+            "type": "Solicitation",
+        },
+        "deadline_offset_days": 8,
+        "expect_verdict": "EXPIRING-SOON",
+        "expect_truthy": ["expiring_soon"],
+        "expect_falsy": ["disqualified"],
+    },
+    {
+        "label": "APEX — fresh sources sought with a 5-day window: pre-RFP "
+                 "is EXEMPT from same-week expiry (cheap early engagement)",
+        "opp": {
+            "solicitationNumber": "APEX-SS-FRESH",
+            "noticeId": "ap2",
+            "title": "Sources Sought — Program Evaluation Support",
+            "description": ("Sources sought: capable small businesses for "
+                            "program evaluation and research analysis "
+                            "support."),
+            "naicsCode": "541611",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Health and Human Services",
+            "type": "Sources Sought",
+            "postedDate": "TODAY",
+        },
+        "deadline_offset_days": 5,
+        "expect_verdict": "WATCH",
+        "expect_truthy": ["is_fresh", "respond_recommended"],
         "expect_falsy": ["disqualified"],
     },
     {
@@ -5593,6 +5714,8 @@ def run_selftests():
         if "deadline_offset_days" in case:
             opp["responseDeadLine"] = (
                 today + dt.timedelta(days=case["deadline_offset_days"])).isoformat()
+        if opp.get("postedDate") == "TODAY":
+            opp["postedDate"] = today.isoformat()
         r = evaluate(opp)
         if "expect_verdict" in case:
             passed = (r["verdict"] == case["expect_verdict"])
