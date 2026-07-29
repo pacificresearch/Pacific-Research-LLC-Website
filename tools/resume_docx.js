@@ -11,7 +11,9 @@ const {
 const model = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
 const FONT = "Calibri";
 
-const run = (text, bold) => new TextRun({ text, font: FONT, size: 21, bold: !!bold });
+const bind = (t) => t.replace(/ \| /g, "\u00a0| "); // bars end lines, never start them
+const runSized = (text, bold, size) => new TextRun({ text: bind(text), font: FONT, size, bold: !!bold });
+const run = (text, bold) => new TextRun({ text: bind(text), font: FONT, size: 21, bold: !!bold });
 
 // "**Label:** rest" or "**Label** | rest" -> [bold, plain] runs
 function boldRuns(text) {
@@ -31,13 +33,13 @@ function nowrapDates(text) {
 function jobRuns(text) {
   text = nowrapDates(text);
   const i = text.indexOf(" | ");
-  if (i === -1) return [run(text, true)];
-  return [run(text.slice(0, i), true), run(text.slice(i))];
+  if (i === -1) return [runSized(text, true, 19)];
+  return [runSized(text.slice(0, i), true, 19), runSized(text.slice(i), false, 19)];
 }
 
 const center = (text, size, bold, after) => new Paragraph({
   alignment: AlignmentType.CENTER, spacing: { after },
-  children: [new TextRun({ text, font: FONT, size, bold })],
+  children: [new TextRun({ text: bind(text), font: FONT, size, bold })],
 });
 
 const sectionHeader = (text) => new Paragraph({
@@ -89,7 +91,7 @@ const doc = new Document({
         size: { width: 12240, height: 15840 },
         margin: {
           top: convertInchesToTwip(0.6), bottom: convertInchesToTwip(0.6),
-          left: convertInchesToTwip(0.7), right: convertInchesToTwip(0.7),
+          left: convertInchesToTwip(0.6), right: convertInchesToTwip(0.6),
         },
       },
     },

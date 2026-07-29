@@ -47,11 +47,11 @@ S = {
     "section": ParagraphStyle("section", fontName="LiberationSans-Bold", fontSize=10.5,
                               leading=13, textColor=DARK, spaceBefore=10, spaceAfter=1),
     "body": ParagraphStyle("body", fontName="LiberationSans", fontSize=9.2,
-                           leading=12.2, alignment=TA_JUSTIFY, textColor=DARK, spaceAfter=3),
+                           leading=12.2, textColor=DARK, spaceAfter=3),
     "jobtitle": ParagraphStyle("jobtitle", fontName="LiberationSans", fontSize=9.4,
                                leading=12.4, textColor=DARK, spaceBefore=6, spaceAfter=2),
     "bullet": ParagraphStyle("bullet", fontName="LiberationSans", fontSize=9.2,
-                             leading=12.0, alignment=TA_JUSTIFY, textColor=DARK),
+                             leading=12.0, textColor=DARK),
     "edu": ParagraphStyle("edu", fontName="LiberationSans", fontSize=9.2,
                           leading=12.4, textColor=DARK, spaceAfter=2),
 }
@@ -60,6 +60,7 @@ for _s in S.values():
 
 
 def esc(t):
+    t = t.replace(" | ", "\u00a0| ")  # bar binds to preceding word (master style)
     return t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
@@ -123,13 +124,25 @@ def nowrap_dates(text):
     return " | ".join(segs)
 
 
-def job_bold(text):
-    """Bold everything before the first ' | '; date segment is unbreakable."""
+AVAIL = 612 - 2 * 0.6 * 72  # page width minus margins, points
+
+
+def job_para(text):
+    """Job header on ONE line, always: bold title, auto-shrunk to fit."""
     text = nowrap_dates(text)
     parts = text.split(" | ", 1)
-    if len(parts) == 2:
-        return f"<b>{esc(parts[0])}</b> | {esc(parts[1])}"
-    return f"<b>{esc(text)}</b>"
+    title = parts[0]
+    rest = (" | " + parts[1]) if len(parts) == 2 else ""
+    size = 9.4
+    while size > 7.5:
+        w = (pdfmetrics.stringWidth(title, "LiberationSans-Bold", size)
+             + pdfmetrics.stringWidth(rest.replace("\u00a0", " "), "LiberationSans", size))
+        if w <= AVAIL - 10:
+            break
+        size -= 0.1
+    st = ParagraphStyle(f"jt{size}", parent=S["jobtitle"], fontSize=size,
+                        leading=size + 3)
+    return Paragraph(f"<b>{esc(title)}</b>{esc(rest)}", st)
 
 
 def build(model):
@@ -147,7 +160,7 @@ def build(model):
         while j < len(items):
             it = items[j]
             if it["type"] == "job":
-                head = [Paragraph(job_bold(it["text"]), S["jobtitle"])]
+                head = [job_para(it["text"])]
                 if j + 1 < len(items) and items[j + 1]["type"] == "bullet":
                     head.append(one_bullet(items[j + 1]["text"]))
                     j += 1
@@ -186,7 +199,7 @@ def main():
     out_pdf = md_path.rsplit(".", 1)[0] + ".pdf"
     out_json = md_path.rsplit(".", 1)[0] + ".json"
     doc = SimpleDocTemplate(out_pdf, pagesize=letter,
-                            leftMargin=0.65 * inch, rightMargin=0.65 * inch,
+                            leftMargin=0.6 * inch, rightMargin=0.6 * inch,
                             topMargin=0.55 * inch, bottomMargin=0.55 * inch,
                             title=f"{model['name']} - Resume", author=model["name"])
     doc.build(build(model))
