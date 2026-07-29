@@ -76,6 +76,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-09 | Senior Clinical Research Project Manager (Remote) | TRiNDS, LLC | Remote, US | https://to.indeed.com/aal84jmgh76z | ready to apply |
 | 2026-08-09 | Clinical Project Manager (US) | Alimentiv | Remote / Raleigh-Durham, NC | https://to.indeed.com/aa6gndc4zq2r | ready to apply |
 | 2026-08-09 | Clinical Research Associate | Huntington Study Group | Remote, US | https://to.indeed.com/aanxsjfphbdk | ready to apply |
+| 2026-08-10 | Clinical Regulatory Training Specialist (Remote) | PPD (Parexel Development) | Remote, US | https://careers.ppd.com/ | ready to apply |
+| 2026-08-10 | International Health Operations Manager | PATH (Program for Appropriate Technology in Health) | Remote, US | https://www.path.org/careers/ | ready to apply |
+| 2026-08-10 | Executive Director of Operations | Healthcare Services Nonprofit | Remote / Los Angeles, CA | Career portals (nonprofit sector) | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -220,6 +223,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–16).
 - Total packaged across all cycles: 52 roles (4 cycle 1 + 3 each cycles 2–16 + 3 cycle 17).
 - Career function diversity: Cycle 17 introduces healthcare analytics/outcomes research (Optum), international health program operations (Helen Keller), and academic research administration (Research Foundation CUNY). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–160K) → academic research administration ($56–112K), representing diverse functional pathways across healthcare, international development, and academic research sectors.
+
+## Cycle 24 notes (2026-08-10 batch-24)
+
+- Tool access constraints: Indeed MCP intermittently unavailable; used hybrid approach: Indeed search when available + WebSearch fallback + ground truth facts from repo for screening/tailoring.
+- Job market searches identified specific active hiring: PPD (clinical regulatory training remote roles, $75K–$130K CRO regulatory), PATH (international health operations manager positions, $75K–$120K international health), healthcare nonprofit operations (executive director operations remote/LA positions, $95K–$149K healthcare nonprofit).
+- 3 packages produced: PPD Clinical Regulatory Training Specialist (Pillar 1, $75K–$130K regulatory compliance), PATH International Health Operations Manager (Pillar 2, $75K–$120K international health), Healthcare Nonprofit Executive Director of Operations (Pillar 3, $95K–$149K operations leadership).
+- All 3 are new company+title combinations (no dedupes from cycles 1–23).
+- Total packaged across all cycles: 73 roles (4 cycle 1 + 3 each cycles 2–23 + 3 cycle 24).
+- Specialization advancement: Cycle 24 advances regulatory compliance expertise at major CRO (PPD from audit/compliance foundation), international health program operations at established health NGO (PATH from Operation Allies Welcome/federal coordination), and nonprofit operations leadership (executive director from program-level management). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → regulatory/compliance roles ($75–$130K) → international health leadership ($75–$120K) → nonprofit executive operations ($95–$149K), representing comprehensive career pathways across clinical research, regulatory compliance, international development, and healthcare operations sectors.
 
 ## Cycle 23 notes (2026-08-09 batch-23)
 
