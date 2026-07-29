@@ -160,8 +160,9 @@ def build(model):
         while j < len(items):
             it = items[j]
             if it["type"] == "job":
+                # whole job block stays together: header + ALL its bullets
                 head = [job_para(it["text"])]
-                if j + 1 < len(items) and items[j + 1]["type"] == "bullet":
+                while j + 1 < len(items) and items[j + 1]["type"] == "bullet":
                     head.append(one_bullet(items[j + 1]["text"]))
                     j += 1
                 flows.append(("group", head))

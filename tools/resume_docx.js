@@ -64,8 +64,10 @@ for (const sec of model.sections) {
         children: jobRuns(it.text),
       }));
     } else if (it.type === "bullet") {
+      const next = sec.items[sec.items.indexOf(it) + 1];
       children.push(new Paragraph({
         numbering: { reference: "resume-bullets", level: 0 },
+        keepNext: !!(next && next.type === "bullet"),
         spacing: { after: 30 }, children: [run(it.text)],
       }));
     } else {
