@@ -4,7 +4,7 @@ Los Angeles, CA | aodhan.o@outlook.com | 650.213.2381 | linkedin.com/in/andrewda
 
 ## CLINICAL RESEARCH OPERATIONS SPECIALIST
 
-Clinical Research Professional with 8+ years of experience across Stanford University Department of Medicine, the U.S. Air Force, and a Level I Trauma Center. Skilled in clinical trial operations, regulatory compliance, and audit readiness under ICH GCP and 21 CFR. Experienced in digital health technologies, decentralized trial models, and emergency medicine workflows. Proven ability to drive enrollment, streamline operations, train and supervise staff, and partner with sponsors and CROs to deliver high-quality, patient-centered outcomes; managed 1,500+ participants across concurrent NIH and industry trials.
+Clinical Research Professional with 8+ years of experience across Stanford University Department of Medicine, the U.S. Air Force, and a Level I trauma center. Skilled in clinical trial operations, regulatory compliance, and audit readiness under ICH GCP and 21 CFR. Experienced in digital health technologies, decentralized trial models, and emergency medicine workflows. Proven ability to drive enrollment, streamline operations, train and supervise staff, and partner with sponsors and CROs to deliver high-quality, patient-centered outcomes; managed 1,500+ participants across concurrent NIH and industry trials.
 
 ## CORE COMPETENCIES
 
