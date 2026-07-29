@@ -4,11 +4,11 @@ Los Angeles, CA | aodhan.o@outlook.com | 650.213.2381 | linkedin.com/in/andrewda
 
 ## CLINICAL RESEARCH COORDINATOR
 
-Clinical Research Coordinator with 8+ years of experience across Stanford University School of Medicine, the U.S. Air Force, and a Level I trauma center. Coordinated concurrent NIH and industry clinical trials (Phase II-IV) for 1,500+ participants, with direct experience in informed consent, eligibility screening, study visits, safety reporting with CTCAE grading, and EDC data management under ICH GCP and 21 CFR. Licensed CPT-I phlebotomist with DOT specimen shipping certification and hands-on emergency department experience supporting acute patient events. ACRP-Certified Project Manager and Certified Professional.
+Clinical Research Coordinator with 8+ years of experience across Stanford University School of Medicine, the U.S. Air Force, and a Level I trauma center. Coordinated concurrent NIH and industry clinical trials (Phase II-IV) for 1,500+ participants, with direct experience in informed consent, eligibility screening, study visits, safety reporting with CTCAE grading, and EDC data management under ICH GCP and 21 CFR. Licensed CPT-I phlebotomist with DOT specimen shipping certification and bedside emergency department experience caring for pediatric hematology and oncology patients. ACRP-Certified Project Manager and Certified Professional.
 
 ## CORE COMPETENCIES
 
-Informed Consent & eConsent | Eligibility Screening & Enrollment | Patient Recruitment & Retention | Study Visit Coordination (Onsite & Decentralized) | AE/SAE Reporting & CTCAE Grading | Phlebotomy (CPT-I Licensed) | DOT-Certified Specimen Shipping | Investigational Product Shipments | Protocol Compliance (ICH GCP, 21 CFR, HIPAA) | EDC & Data Quality | Sponsor & CRO Relations | Staff Training & Preceptorship
+Informed Consent & eConsent | Eligibility Screening & Enrollment | Patient Recruitment & Retention | Study Visit Coordination (Onsite & Decentralized) | AE/SAE Reporting & CTCAE Grading | Pediatric Hematology/Oncology Patient Care | Sterile Technique & Port Access Preparation | Phlebotomy (CPT-I Licensed) | DOT-Certified Specimen Shipping | Investigational Product Shipments | Protocol Compliance (ICH GCP, 21 CFR, HIPAA) | EDC & Data Quality | Sponsor & CRO Relations | Staff Training & Preceptorship
 
 ## TECHNICAL SKILLS
 
@@ -36,6 +36,7 @@ Informed Consent & eConsent | Eligibility Screening & Enrollment | Patient Recru
 ### Emergency Department Technician | RCET | Children's Hospital of Orange County, Santa Ana, CA | Jan 2018 - Oct 2021
 
 - Delivered frontline care in a top-ranked Level I pediatric trauma center, assisting in triage, stabilization, and 20K+ annual emergency encounters.
+- Provided bedside care for pediatric hematology and oncology patients, including fever and neutropenia presentations and oncology code events; prepared sterile fields and supplies for implanted port access.
 - Assisted in code events, including intubation, resuscitation, medication preparation, and patient transport, as an extension of physicians and nurses.
 - Precepted and trained new emergency department technicians on triage support, trauma bay setup, and respiratory equipment operation.
 - Sustained reliability of respiratory care equipment (CPAP, BiPAP, ventilators, high-flow O2) through proactive maintenance and troubleshooting.
