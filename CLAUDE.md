@@ -64,13 +64,18 @@ words total; no full analysis unless asked.
 7. **Dead timeline** (deadline passed, mandatory site visit missed, or
    insufficient days to team/hire and responsibly respond) or **wrong
    scale** for a first/early contract (stated value > $10M).
-   Minimum responsible lead times by fulfillment complexity:
-   **founder-deliverable 2 days; single specialist hire 7 days;
-   teaming / trade subs / staffing / multiple hires / contingent
-   credential partners 10 days.** Below the minimum, keep the
-   opportunity VISIBLE but stamp it **⏳ EXPIRING-SOON** with the lead
-   math (e.g., "3d left, needs 10d lead") — never queue it as
-   ready-to-work, and never silently drop it.
+   APEX lead-time rules: a BIDDABLE notice (solicitation / combined
+   synopsis) expiring within 7 days = PASS ("same-week expiry — no
+   last-minute bids"), with NO founder exception. Pre-RFP notices
+   (sources sought, presolicitation, RFI) are exempt — short-window
+   responses are cheap early engagement. Beyond 7 days, minimum leads
+   by fulfillment complexity apply (single hire 7d; teaming / trade
+   subs / staffing / credential partners 10d); under the minimum, keep
+   the row VISIBLE stamped **⏳ EXPIRING-SOON**, never queued as
+   ready-to-work. Reports focus FIRST on notices posted to SAM within
+   the past week (sources sought, combined synopsis/solicitations,
+   solicitations + amendments, presolicitations — engage early in the
+   lifecycle), THEN on longer-runway open items.
 
 ### What is NOT a kill
 
