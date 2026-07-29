@@ -8,7 +8,7 @@ Clinical Research Coordinator with 8+ years of experience across Stanford Univer
 
 ## CORE COMPETENCIES
 
-Informed Consent & eConsent | Eligibility Screening & Enrollment | Patient Recruitment & Retention | Study Visit Coordination (Onsite & Decentralized) | AE/SAE Reporting & CTCAE Grading | Pediatric Hematology/Oncology Patient Care | Sterile Technique & Port Access Preparation | Phlebotomy (CPT-I Licensed) | DOT-Certified Specimen Shipping | Investigational Product Shipments | Protocol Compliance (ICH GCP, 21 CFR, HIPAA) | EDC & Data Quality | Sponsor & CRO Relations | Staff Training & Preceptorship
+Informed Consent & eConsent | Eligibility Screening & Enrollment | Patient Recruitment & Retention | Study Visit Coordination (Onsite & Decentralized) | AE/SAE Reporting & CTCAE Grading | Phlebotomy (CPT-I Licensed) | DOT-Certified Specimen Shipping | Investigational Product Shipments | Protocol Compliance (ICH GCP, 21 CFR, HIPAA) | EDC & Data Quality | Sponsor & CRO Relations | Staff Training & Preceptorship
 
 ## TECHNICAL SKILLS
 
