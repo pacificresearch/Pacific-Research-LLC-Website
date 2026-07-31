@@ -82,6 +82,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-11 | Clinical Trial Coordinator (Remote) | Covance (LabCorp Drug Development) | Remote, US | https://careers.covance.com/ | ready to apply |
 | 2026-08-11 | Program Coordinator, International Development | Global Communities | Remote, US | https://globalcommunities.org/careers/ | ready to apply |
 | 2026-08-11 | Operations Analyst | United Way | Remote, US | https://unitedway.org/careers/ | ready to apply |
+| 2026-08-12 | Senior Clinical Data Manager (Remote) | Heart Rhythm Clinical and Research Solutions | Remote, US | https://lensa.com/job-v1/heart-rhythm-clinical-and-research-solutions/remote/senior-clinical-data-manager/36b9785a7202fe837b48204eda4a8538 | ready to apply |
+| 2026-08-12 | Program Manager, Education (Remote) | International Rescue Committee | Remote, US | https://www.globalsouthopportunities.com/2025/09/18/irc-16/ | ready to apply |
+| 2026-08-12 | Administrative Research Assistant (Remote) | Research Foundation of CUNY, Excellence Through Education | Remote, US | https://remotive.com/remote/jobs/all-others/administrative-research-assistant-4575549 | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -226,6 +229,15 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–16).
 - Total packaged across all cycles: 52 roles (4 cycle 1 + 3 each cycles 2–16 + 3 cycle 17).
 - Career function diversity: Cycle 17 introduces healthcare analytics/outcomes research (Optum), international health program operations (Helen Keller), and academic research administration (Research Foundation CUNY). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–160K) → academic research administration ($56–112K), representing diverse functional pathways across healthcare, international development, and academic research sectors.
+
+## Cycle 26 notes (2026-08-12 batch-26)
+
+- Tool access constraints: Indeed MCP intermittently unavailable during cycle; used hybrid approach: WebSearch for job discovery + ground truth facts from repo for screening/tailoring (AGENT_PROMPT.md fact base sufficient for complete truth-checking).
+- Job market searches identified specific active hiring: Heart Rhythm Clinical and Research Solutions (senior CDM remote roles, Medidata Rave/EDC expertise), International Rescue Committee (program manager education remote positions, $55.6K–$78.3K humanitarian refugee services), Research Foundation of CUNY (administrative research assistant Excellence Through Education, remote research team operations support).
+- 3 packages produced: Heart Rhythm Senior Clinical Data Manager (Pillar 1, $45K–$81K CRO EDC/data management), IRC Program Manager, Education (Pillar 2, $55.6K–$78.3K humanitarian refugee program), CUNY Administrative Research Assistant (Pillar 3, $35K–$50K academic research administration).
+- All 3 are new company+title combinations (no dedupes from cycles 1–25).
+- Total packaged across all cycles: 79 roles (4 cycle 1 + 3 each cycles 2–25 + 3 cycle 26).
+- Career breadth specialization: Cycle 26 expands clinical data management into CRO EDC/data quality leadership (Heart Rhythm from Stanford EDC expertise), refugee education program management at major humanitarian NGO (IRC from Operation Allies Welcome/federal coordination), and academic research administration (CUNY from Stanford research operations). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → data management/EDC specialization ($45–$81K) → refugee program management ($55.6–$78.3K) → research administration ($35–$50K), representing diversified career pathways with both upward progression and specialized lateral advancement across clinical research, humanitarian operations, and academic research sectors.
 
 ## Cycle 25 notes (2026-08-11 batch-25)
 
