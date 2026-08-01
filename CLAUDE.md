@@ -97,6 +97,41 @@ Sub-$250K simplified acquisitions are strategic PP builders — worth more
 than face value. International/UN/foreign-affairs work is evaluated
 separately (no SDVOSB preference; founder-consultancy lane).
 
+## Resume tailoring workflow
+
+- `master_resume.md` (branch `claude/resume-job-tailoring-ma94gi`) is the
+  source-of-truth resume. Tailored versions live in `tailored/` as both
+  Markdown and PDF; the PDF generator is `tools/make_resume_pdf.py`
+  (ReportLab).
+- **HARD RULE — resume PDF pagination**: a job/entry header must NEVER be
+  orphaned at the bottom of a page separated from its bullets, and a
+  section header + rule must NEVER appear without content beneath it.
+  Glue header + first content with a FLAT `KeepTogether` (never nest
+  `KeepTogether` inside `KeepTogether` — nesting breaks ReportLab layout
+  and blows up page count). A date range in a job header must NEVER wrap
+  leaving a lone year on the next line: render the date segment as an
+  unbreakable token (non-breaking spaces; non-breaking hyphen in docx)
+  so the whole range wraps together or not at all. Always visually
+  verify page breaks in the rendered PDF before delivering it. Use
+  `tools/resume_render.py` (md to PDF) and `tools/resume_docx.js`
+  (JSON to docx) which enforce all of these rules.
+- **HARD RULE — resume prose style**: NEVER use em dashes (—) or double
+  hyphens (--) anywhere in resume text; they read as AI-written. Use
+  commas, semicolons, or split sentences instead. Also avoid tacked-on
+  editorial clauses ("a demonstrated commitment to...", "disciplined
+  stewardship of..."); state the fact and stop. Hyphenated compound
+  words (day-to-day, pre-award) are fine. Verify zero em dashes in
+  every generated file before delivering.
+- **DELIVERY FORMAT**: the user's PDF viewer renders generated PDFs
+  slanted regardless of embedded fonts — deliver tailored resumes as
+  plain **.docx** (upright Calibri, standard bullets, no italics, no
+  templates) unless the user asks for PDF.
+- **HARD RULE — resume PDF fonts**: always EMBED real TrueType fonts
+  (Liberation Sans via `pdfmetrics.registerFont`); never rely on base-14
+  Helvetica. Non-embedded fonts get substituted by some viewers with
+  slanted/oblique lookalikes. Verify with a font scan that no unembedded
+  font draws any glyph.
+
 ## Repository context
 
 - The SAM.gov screening tool lives on branch
