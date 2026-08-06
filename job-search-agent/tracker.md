@@ -90,6 +90,12 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-14 | Clinical Project Coordinator (Remote) | Compass Pathways | Remote, US | https://www.indeed.com/q-compass-pathways-l-remote-jobs.html | ready to apply |
 | 2026-08-14 | Program Officer (Remote) | GiveWell | Remote, US | https://job-boards.greenhouse.io/givewell/jobs/5263759008 | ready to apply |
 | 2026-08-14 | Program Officer (Remote) | Equimundo | Remote (Washington DC option) | https://www.idealist.org/en/nonprofit-job/862e6ebe56e64a4886bf19a1cd40d69d-program-officer-equimundo-washington | ready to apply |
+| 2026-08-16 | Clinical Research Operations Manager (Hematology/Oncology) | UCLA Health | Santa Monica, CA | https://to.indeed.com/aaq9pzd9jzf7 | ready to apply |
+| 2026-08-16 | Manager, Clinical Operations | IQVIA | Carlsbad, CA (home-based) | https://to.indeed.com/aan8rpr4wrql | ready to apply |
+| 2026-08-16 | Associate Clinical Project Manager | Abbott | Sylmar, CA | https://to.indeed.com/aadqlm9ngjml | ready to apply |
+| 2026-08-16 | Clinical Study Project Manager | IUVO Bioscience | Remote, US | https://to.indeed.com/aaktwdtlttyd | ready to apply |
+| 2026-08-16 | Clinical Data Manager (Data Integrity & Investigation) | RDI | Van Nuys, CA | https://to.indeed.com/aa6l9dg6s26k | ready to apply |
+| 2026-08-16 | Operations Manager | Allies for Every Child | Culver City, CA | https://to.indeed.com/aapfstkpw7fh | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -99,6 +105,16 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-21 | Associate Director of Business Development | Vitamin Angels | Requires 8–10 yrs fundraising portfolio track record |
 | 2026-07-21 | Associate Director, OPEN Learner Engagement | FHI 360 | Requires 10+ yrs online-education program mgmt + LMS/CoP portfolio |
 | 2026-08-13 | Associate Medical Director / Medical Monitor | Puma Biotechnology | Requires MD/DO credential not held (education: MA International Studies, BA Classics) |
+
+## Cycle 29 notes (2026-08-16 batch-29)
+
+- Tool access constraints: Indeed MCP available; used hybrid approach Indeed search + full JD retrieval via Indeed MCP get_job_details for all candidates.
+- Job market searches identified specific active hiring: UCLA Health (clinical operations $99.1K–$216.5K hematology/oncology), IQVIA (clinical operations $86.5K–$216K major CRO), Abbott (project management $90K–$180K medical device), IUVO Bioscience (project management $110K–$140K ophthalmology CRO), RDI (data management $100K–$135K diagnostic/IVD CRO), Allies for Every Child (operations $85K–$95K nonprofit).
+- 6 packages produced (ordered by maximum salary): UCLA Health Clinical Research Operations Manager (Pillar 1, $99.1K–$216.5K academic medical center clinical ops), IQVIA Manager Clinical Operations (Pillar 1, $86.5K–$216K major CRO operations), Abbott Associate Clinical Project Manager (Pillar 1, $90K–$180K medical device clinical research), IUVO Bioscience Clinical Study Project Manager (Pillar 1, $110K–$140K specialty CRO ophthalmology), RDI Clinical Data Manager (Pillar 1, $100K–$135K diagnostic CRO data integrity), Allies for Every Child Operations Manager (Pillar 3, $85K–$95K nonprofit operations).
+- Deduplication: All 6 company+title pairs verified as NEW (zero dedupes against cycles 1–28). Verified each against complete tracker.md packaged jobs table.
+- Hard skip gates: 0 (no roles fired hard gates).
+- Total packaged across all cycles: 90 roles (4 cycle 1 + 3 each cycles 2–25 + 3 cycle 26 + 2 cycle 27 + 3 cycle 28 + 6 cycle 29).
+- Career progression and sector diversity: Cycle 29 expands clinical operations leadership pathways (UCLA Health from multi-site ops background, operations manager tier advancement), major CRO operations scaling (IQVIA from multi-site trial coordination expertise), clinical project management at medical device company (Abbott from regulatory/project coordination foundation), specialty CRO project management (IUVO from clinical trial management), diagnostic data integrity and investigation specialization (RDI from EDC/data quality expertise), and nonprofit operations management (Allies from Operation Allies Welcome federal coordination + emergency operations). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → data management ($45–$135K) → nonprofit operations ($85–$95K), representing comprehensive career pathways across clinical research, medical device/pharma, CRO operations, data integrity specialization, and nonprofit operations sectors with salary range $28K–$216.5K.
 
 ## Cycle 28 notes (2026-08-14 batch-28)
 
