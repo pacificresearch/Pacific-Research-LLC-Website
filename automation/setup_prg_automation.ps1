@@ -73,7 +73,7 @@ $dailyBat = Join-Path $root 'run_daily.bat'
 @echo off
 setlocal enabledelayedexpansion
 $update
-py "%~dp0samgov_opportunity_matcher.py" --days 7 --outdir "%~dp0Daily"
+py "%~dp0samgov_opportunity_matcher.py" --days 7 --fast --outdir "%~dp0Daily"
 set "latest="
 for /f "delims=" %%f in ('dir /b /od "%~dp0Daily\PRG_Executive_Report_*.html" 2^>nul') do set "latest=%%f"
 if defined latest start "" "%~dp0Daily\!latest!"

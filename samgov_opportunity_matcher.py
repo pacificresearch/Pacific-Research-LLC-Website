@@ -5815,6 +5815,11 @@ def parse_args(argv):
     parser.add_argument("--recompete-months", type=int, default=18, metavar="N",
                         help="Recompete horizon: contracts expiring within N "
                              "months (default: 18).")
+    parser.add_argument("--fast", action="store_true",
+                        help="Fast scan: skip the slow secondary pulls "
+                             "(recompetes, grants, SBIR, ReliefWeb) so a daily "
+                             "run finishes in ~2-3 min. SAM.gov is still fully "
+                             "queried; use the weekly full run for the rest.")
     parser.add_argument("--selftest", action="store_true",
                         help="Run the built-in NO-BID rule self-tests and exit.")
     return parser.parse_args(argv)
@@ -5825,6 +5830,14 @@ def main(argv=None):
 
     if args.selftest:
         return run_selftests()
+
+    # --fast bundles the secondary-source skips so a daily run finishes quickly
+    # (SAM.gov itself is still fully queried).
+    if args.fast:
+        args.no_recompetes = True
+        args.no_grants = True
+        args.no_sbir = True
+        args.no_reliefweb = True
 
     api_key = args.api_key or API_KEY
 
