@@ -14,11 +14,11 @@
 #  Run it once by pasting this into PowerShell:
 #    iex (irm "https://raw.githubusercontent.com/pacificresearch/Pacific-Research-LLC-Website/claude/samgov-opportunity-matcher-0a3c2f/automation/setup_prg_automation.ps1")
 #
-#  The daily/weekly tasks are registered with "wake the computer to run"
-#  and "run as soon as possible after a missed start" — a machine asleep at
-#  6:30 AM wakes for the scan, and one that was powered off catches up the
-#  moment it's back on. A fully powered-off PC at 6:30 still can't wake
-#  itself; the catch-up run fires at next boot instead.
+#  The daily task runs at LOGON (2-min delay) and at 6:30 AM, and is set to
+#  run on battery power — so on a laptop it fires whenever you open and sign
+#  in, not just at a clock time you might sleep through. (Windows blocks
+#  scheduled tasks on battery by DEFAULT; this setup turns that off, which is
+#  the usual reason a laptop "opens and nothing runs.")
 # =====================================================================
 
 $ErrorActionPreference = 'Stop'
@@ -93,17 +93,29 @@ $update
 py "%~dp0samgov_opportunity_matcher.py" --days 90 --outdir "%~dp0Monthly"
 "@ | Set-Content $monthlyBat -Encoding ASCII
 
-# 5. Register scheduled tasks. Daily/weekly use Register-ScheduledTask so we
-#    can set WakeToRun (wake the PC from sleep at 6:30) and StartWhenAvailable
-#    (if the machine was off/asleep past the trigger, run the moment it's
-#    back) — a laptop closed at 6:30 AM still produces the morning report as
-#    soon as it's opened. Plain schtasks can't set either flag.
+# 5. Register scheduled tasks.
+#    CRITICAL laptop fixes:
+#    - DisallowStartIfOnBatteries / StopIfGoingOnBatteries = FALSE. Windows
+#      REFUSES to run scheduled tasks on battery by default and kills any
+#      already running when you unplug — the #1 reason a laptop "opens and
+#      nothing runs." These two lines are the real fix.
+#    - The daily task ALSO triggers AtLogOn (2-min delay for the network),
+#      so it runs whenever you open/sign in to the laptop — not just at a
+#      fixed clock time you might sleep through. Plus a 6:30 AM trigger with
+#      WakeToRun/StartWhenAvailable as a backstop.
 Write-Host '  Registering scheduled tasks...' -ForegroundColor Cyan
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -WakeToRun `
     -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Hours 2)
+$settings.DisallowStartIfOnBatteries = $false
+$settings.StopIfGoingOnBatteries     = $false
+
+# Daily: fire at logon (delayed) AND at 6:30 AM — whichever comes first.
+$logon = New-ScheduledTaskTrigger -AtLogOn
+$logon.Delay = 'PT2M'
+$daily630 = New-ScheduledTaskTrigger -Daily -At 6:30am
 Register-ScheduledTask -TaskName 'PRG SAMgov Daily Morning' -Force `
     -Action (New-ScheduledTaskAction -Execute $dailyBat) `
-    -Trigger (New-ScheduledTaskTrigger -Daily -At 6:30am) `
+    -Trigger $logon, $daily630 `
     -Settings $settings | Out-Null
 Register-ScheduledTask -TaskName 'PRG SAMgov Weekly Scan' -Force `
     -Action (New-ScheduledTaskAction -Execute $weeklyBat) `
@@ -113,12 +125,12 @@ Register-ScheduledTask -TaskName 'PRG SAMgov Weekly Scan' -Force `
 schtasks /Create /TN 'PRG SAMgov Monthly Report' /TR "`"$monthlyBat`"" /SC MONTHLY /D 1 /ST 09:00 /F | Out-Null
 
 # 6. Run one scan now so you have fresh files immediately
-Write-Host '  Running a first scan now (2-5 minutes)...' -ForegroundColor Cyan
-py $script --days 7 --outdir $daily
+Write-Host '  Running a first scan now (~2-3 minutes)...' -ForegroundColor Cyan
+py $script --days 7 --fast --outdir $daily
 
 Write-Host ''
 Write-Host '=== Setup complete ===' -ForegroundColor Green
-Write-Host "  Daily   : every day 6:30 AM    -> $daily  (report auto-opens)"
+Write-Host "  Daily   : at logon + 6:30 AM   -> $daily  (report auto-opens)"
 Write-Host "  Weekly  : Mondays 9:00 AM      -> $weekly"
 Write-Host "  Monthly : 1st of month 9:00 AM -> $monthly"
 Write-Host '  Each run saves a date-stamped Excel + HTML report and'
