@@ -93,36 +93,60 @@ $update
 py "%~dp0samgov_opportunity_matcher.py" --days 90 --outdir "%~dp0Monthly"
 "@ | Set-Content $monthlyBat -Encoding ASCII
 
-# 5. Register scheduled tasks.
-#    CRITICAL laptop fixes:
-#    - DisallowStartIfOnBatteries / StopIfGoingOnBatteries = FALSE. Windows
-#      REFUSES to run scheduled tasks on battery by default and kills any
-#      already running when you unplug — the #1 reason a laptop "opens and
-#      nothing runs." These two lines are the real fix.
-#    - The daily task ALSO triggers AtLogOn (2-min delay for the network),
-#      so it runs whenever you open/sign in to the laptop — not just at a
-#      fixed clock time you might sleep through. Plus a 6:30 AM trigger with
-#      WakeToRun/StartWhenAvailable as a backstop.
-Write-Host '  Registering scheduled tasks...' -ForegroundColor Cyan
-$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -WakeToRun `
-    -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Hours 2)
-$settings.DisallowStartIfOnBatteries = $false
-$settings.StopIfGoingOnBatteries     = $false
+# 5. Register scheduled tasks — via schtasks /XML in the CURRENT USER context
+#    so NO Administrator elevation is required (Register-ScheduledTask +
+#    WakeToRun needs admin and fails with "Access is denied" for normal
+#    users). The XML sets the two laptop-critical flags Windows gets wrong by
+#    default:
+#      DisallowStartIfOnBatteries=false  -> actually run when on battery
+#      StopIfGoingOnBatteries=false      -> don't get killed when unplugged
+#    The daily task triggers at LOGON (2-min delay so Wi-Fi is up) AND at
+#    6:30 AM, so it runs whenever you open/sign in to the laptop. WakeToRun
+#    is intentionally omitted (it needs admin and the logon trigger makes it
+#    unnecessary).
+Write-Host '  Registering scheduled tasks (no admin needed)...' -ForegroundColor Cyan
+$me = whoami   # DOMAIN\User or COMPUTER\User
 
-# Daily: fire at logon (delayed) AND at 6:30 AM — whichever comes first.
-$logon = New-ScheduledTaskTrigger -AtLogOn
-$logon.Delay = 'PT2M'
-$daily630 = New-ScheduledTaskTrigger -Daily -At 6:30am
-Register-ScheduledTask -TaskName 'PRG SAMgov Daily Morning' -Force `
-    -Action (New-ScheduledTaskAction -Execute $dailyBat) `
-    -Trigger $logon, $daily630 `
-    -Settings $settings | Out-Null
-Register-ScheduledTask -TaskName 'PRG SAMgov Weekly Scan' -Force `
-    -Action (New-ScheduledTaskAction -Execute $weeklyBat) `
-    -Trigger (New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 9:00am) `
-    -Settings $settings | Out-Null
-# Monthly trigger has no New-ScheduledTaskTrigger equivalent — keep schtasks.
-schtasks /Create /TN 'PRG SAMgov Monthly Report' /TR "`"$monthlyBat`"" /SC MONTHLY /D 1 /ST 09:00 /F | Out-Null
+function Register-PRGTask($name, $bat, $triggersXml) {
+    $xml = @"
+<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo><Description>PRG SAM.gov scan</Description></RegistrationInfo>
+  <Triggers>$triggersXml</Triggers>
+  <Principals>
+    <Principal id="Author">
+      <UserId>$me</UserId>
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <ExecutionTimeLimit>PT2H</ExecutionTimeLimit>
+    <Enabled>true</Enabled>
+  </Settings>
+  <Actions Context="Author"><Exec><Command>$bat</Command></Exec></Actions>
+</Task>
+"@
+    $xmlPath = Join-Path $env:TEMP ("prg_task_" + ($name -replace '\W','') + ".xml")
+    Set-Content -Path $xmlPath -Value $xml -Encoding Unicode
+    schtasks /Create /TN $name /XML "`"$xmlPath`"" /F | Out-Null
+    Remove-Item $xmlPath -ErrorAction SilentlyContinue
+}
+
+$logonAndDaily = @"
+<LogonTrigger><Enabled>true</Enabled><Delay>PT2M</Delay><UserId>$me</UserId></LogonTrigger>
+    <CalendarTrigger><StartBoundary>2026-01-01T06:30:00</StartBoundary><Enabled>true</Enabled><ScheduleByDay><DaysInterval>1</DaysInterval></ScheduleByDay></CalendarTrigger>
+"@
+$weeklyTrig = '<CalendarTrigger><StartBoundary>2026-01-01T09:00:00</StartBoundary><Enabled>true</Enabled><ScheduleByWeek><DaysOfWeek><Monday/></DaysOfWeek><WeeksInterval>1</WeeksInterval></ScheduleByWeek></CalendarTrigger>'
+$monthlyTrig = '<CalendarTrigger><StartBoundary>2026-01-01T09:00:00</StartBoundary><Enabled>true</Enabled><ScheduleByMonth><DaysOfMonth><Day>1</Day></DaysOfMonth><Months><January/><February/><March/><April/><May/><June/><July/><August/><September/><October/><November/><December/></Months></ScheduleByMonth></CalendarTrigger>'
+
+Register-PRGTask 'PRG SAMgov Daily Morning'  $dailyBat   $logonAndDaily
+Register-PRGTask 'PRG SAMgov Weekly Scan'     $weeklyBat  $weeklyTrig
+Register-PRGTask 'PRG SAMgov Monthly Report'  $monthlyBat $monthlyTrig
 
 # 6. Run one scan now so you have fresh files immediately
 Write-Host '  Running a first scan now (~2-3 minutes)...' -ForegroundColor Cyan
