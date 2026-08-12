@@ -5851,13 +5851,20 @@ def main(argv=None):
     if args.selftest:
         return run_selftests()
 
-    # --fast bundles the secondary-source skips so a daily run finishes quickly
-    # (SAM.gov itself is still fully queried).
+    # --fast bundles the skips that make a daily run finish in minutes, not
+    # hours. The big one is the WIDE-NET sweep: it pulls every small-business
+    # set-aside across ALL of SAM.gov and pages through thousands of records
+    # ("the big one" in the log). --fast turns it off (--narrow) and caps the
+    # per-code page size, so the daily queries PRG's own 40-odd codes only.
+    # The weekly/monthly full runs keep the wide net.
     if args.fast:
         args.no_recompetes = True
         args.no_grants = True
         args.no_sbir = True
         args.no_reliefweb = True
+        args.narrow = True
+        if args.limit > 100:
+            args.limit = 100
 
     api_key = args.api_key or API_KEY
 
