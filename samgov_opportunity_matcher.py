@@ -1104,7 +1104,7 @@ USASPENDING_URL = "https://api.usaspending.gov/api/v2/search/spending_by_award/"
 # ---------------------------------------------------------------------------
 
 # Run-level flags surfaced to the user at the end (e.g. partial results).
-_RUN_STATE = {"rate_limited": False}
+_RUN_STATE = {"rate_limited": False, "net_fail_streak": 0}
 
 
 def _is_http(url):
@@ -1113,15 +1113,35 @@ def _is_http(url):
 
 
 def _http_retry(fn, *args, **kwargs):
-    """Call requests.get/post with up to 3 tries and exponential backoff on
-    transient connection/timeout errors (not on HTTP status errors)."""
-    delay = 1.0
-    for attempt in range(3):
+    """Call requests.get/post with a short timeout, limited retries, and a
+    CIRCUIT BREAKER. Without the breaker a dead network makes every one of
+    ~60 queries burn its full timeout+retries (~90s each → over an hour for a
+    whole run). Once several requests fail in a row the network is clearly
+    down, so we stop retrying and fail each remaining call in one quick try —
+    the run finishes in seconds with a clean 'partial/empty' report instead
+    of hanging for hours.
+    """
+    # Cap every request's wait so one stall can't dominate the run.
+    kwargs.setdefault("timeout", 12)
+    breaker_tripped = _RUN_STATE.get("net_fail_streak", 0) >= 3
+    tries = 1 if breaker_tripped else 3
+    delay = 0.5
+    for attempt in range(tries):
         try:
-            return fn(*args, **kwargs)
+            resp = fn(*args, **kwargs)
+            _RUN_STATE["net_fail_streak"] = 0      # success resets the breaker
+            return resp
         except (requests.exceptions.ConnectionError,
                 requests.exceptions.Timeout):
-            if attempt == 2:
+            _RUN_STATE["net_fail_streak"] = _RUN_STATE.get(
+                "net_fail_streak", 0) + 1
+            if attempt == tries - 1:
+                if not breaker_tripped and _RUN_STATE["net_fail_streak"] == 3:
+                    sys.stderr.write(
+                        "\n*** NETWORK DOWN — 3 requests failed in a row. "
+                        "Fast-failing the rest of this run so it ends in "
+                        "seconds instead of hanging. Check your connection "
+                        "(Resolve-DnsName api.sam.gov) and re-run. ***\n\n")
                 raise
             time.sleep(delay)
             delay *= 2
