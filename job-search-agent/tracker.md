@@ -96,6 +96,11 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-16 | Clinical Study Project Manager | IUVO Bioscience | Remote, US | https://to.indeed.com/aaktwdtlttyd | ready to apply |
 | 2026-08-16 | Clinical Data Manager (Data Integrity & Investigation) | RDI | Van Nuys, CA | https://to.indeed.com/aa6l9dg6s26k | ready to apply |
 | 2026-08-16 | Operations Manager | Allies for Every Child | Culver City, CA | https://to.indeed.com/aapfstkpw7fh | ready to apply |
+| 2026-08-18 | Grants and Contracts Specialist | Betteredmen Foundation | Remote | https://to.indeed.com/aaw2xmql4vzn | ready to apply |
+| 2026-08-18 | Senior Clinical Research Associate | Puma Biotechnology | Los Angeles, CA | https://to.indeed.com/aavftvcntgrq | ready to apply |
+| 2026-08-18 | Clinical Research Site Operation Leader | Kelly | Inglewood, CA | https://to.indeed.com/aayd222wbgbv | ready to apply |
+| 2026-08-18 | Grant Manager | Fresh Youth Initiatives | Remote | https://to.indeed.com/aajv2rq4vn8w | ready to apply |
+| 2026-08-18 | Clinical Research Coordinator | CenExel Clinical Research | Sherman Oaks, CA | https://to.indeed.com/aa6yjd6hhhm | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -105,6 +110,17 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-21 | Associate Director of Business Development | Vitamin Angels | Requires 8–10 yrs fundraising portfolio track record |
 | 2026-07-21 | Associate Director, OPEN Learner Engagement | FHI 360 | Requires 10+ yrs online-education program mgmt + LMS/CoP portfolio |
 | 2026-08-13 | Associate Medical Director / Medical Monitor | Puma Biotechnology | Requires MD/DO credential not held (education: MA International Studies, BA Classics) |
+
+## Cycle 30 notes (2026-08-18 batch-30)
+
+- Dedup discovery: Abbott Associate Clinical Project Manager already in Cycle 29 remote (2026-08-16, Sylmar CA); Cycle 30 focused on 5 new company+title packages only.
+- Tool access: Indeed MCP available; used targeted searches across three pillars (Pillar 1: clinical research/healthcare ops, Pillar 2: international studies/global health, Pillar 3: operations/humanities) with Los Angeles, CA and Remote, US locations.
+- Job market findings: 5 companies with salary ranges $65K–$200.5K: Betteredmen Foundation ($80.6K–$200.5K), Puma Biotechnology ($140K–$165K), Kelly ($95K–$130K), Fresh Youth Initiatives ($65K–$70K), CenExel Clinical Research ($29–$34/hr ~$70.7K).
+- 5 packages produced (reordered by maximum salary, highest to lowest): (1) Betteredmen Foundation Grants and Contracts Specialist ($80.6K–$200.5K), (2) Puma Biotechnology Senior Clinical Research Associate ($140K–$165K), (3) Kelly Clinical Research Site Operation Leader ($95K–$130K), (4) Fresh Youth Initiatives Grant Manager ($65K–$70K), (5) CenExel Clinical Research Coordinator ($29–$34/hr).
+- Deduplication: All 5 verified as new company+title combinations vs. cycles 1–29 tracker history. Zero dedupes.
+- Hard skip gates: 0 (no roles disqualified).
+- Total packaged roles across all cycles: 95 roles (4 cycle 1 + 3 each cycles 2–25 + 3 cycle 26 + 2 cycle 27 + 3 cycle 28 + 6 cycle 29 + 5 cycle 30).
+- Career progression narrative: Cycle 30 expands grants/contracts management in nonprofit foundations (Betteredmen), senior CRA/field monitoring pathway (Puma), clinical site operations networks (Kelly), nonprofit grant/fundraising (Fresh Youth), and clinical research coordinator foundation (CenExel). Portfolio now spans entry coordinator ($28K) through director ($277K) through specialized senior scientist ($267K) through operations ($180K) through grants/contracts management ($65K–$200.5K).
 
 ## Cycle 29 notes (2026-08-16 batch-29)
 
