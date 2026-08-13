@@ -9,8 +9,10 @@ to the library when done.
 
 ## PACIFIC RESEARCH GROUP LLC
 
-**Certified SDVOSB / VOSB** | UEI: [___] | CAGE: [___]
-NAICS: [primary + the solicitation's NAICS] | POC: [name, phone, email]
+**SBA-Certified SDVOSB / VOSB** | UEI: J585TLDV1CH1 | CAGE: 1Z9B6
+NAICS: 541714 primary [+ this solicitation's NAICS — full list in
+`library/company_profile.md`] | POC: Andrew O'Donnell, Managing
+Director, (650) 213-2381, contact@pacificresearchllc.com
 
 ### Core Competencies
 [3–5 bullets, reordered so the ones matching this PWS come first. Use

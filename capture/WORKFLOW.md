@@ -79,6 +79,17 @@ Route by fulfillment model:
   postings MUST state "contingent upon contract award." Collect resumes
   and signed contingent-offer or letter-of-intent commitments for key
   personnel named in the proposal.
+
+  **Automated distribution — careers page (v1 automation):** every
+  posting is also published to `pacificresearchllc.com/careers` with
+  schema.org `JobPosting` JSON-LD markup. Google for Jobs indexes these
+  automatically (free organic distribution), and Indeed/board crawlers
+  pick up structured careers pages. Claude generates the posting file
+  and the careers-page update in the same pass; deploy goes out with the
+  website. Applications land at Andrew@pacificresearchllc.com via the
+  page's apply link. Manual paste to LinkedIn/Indeed remains for paid
+  visibility; an ATS with API syndication is the v2 upgrade if posting
+  volume justifies a subscription.
 - **Trade subs / staffing firms / distributors** → run the subcontractor
   tracker: identify 3+ candidates, collect quotes, NDA/teaming agreement,
   COI, and confirm they accept the flow-down clauses from the matrix.
@@ -89,6 +100,13 @@ Run `07_submission_checklist.md`: every compliance-matrix row closed,
 every amendment acknowledged, files named and formatted per instructions,
 signatures in place (SF1449/SF33 blocks), submitted ahead of deadline
 with delivery confirmation saved to `01_solicitation/`.
+
+Email channel: all CO correspondence and email submissions go from
+**Andrew@pacificresearchllc.com (Outlook)**. Claude drafts the
+submission email (subject line per solicitation instructions, attachments
+listed, professional cover text); Andrew reviews and sends. If the
+Microsoft 365 connector is linked, draft directly in Outlook; otherwise
+output the email as paste-ready text in the opportunity folder.
 
 ## Stage 3 — MONITOR
 
