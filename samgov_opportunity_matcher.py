@@ -383,6 +383,55 @@ FUTURE_NOTICE_MARKERS = ("presolicitation", "sources sought", "special notice",
 WATCH_NOTICE_CLASSES = {"PRESOL", "SOURCES_SOUGHT", "SPECIAL", "RFI", "FORECAST"}
 SHORT_FUSE_CALENDAR_DAYS = 7      # ~5 business days
 
+# ---------------------------------------------------------------------------
+# NON-COMPETITIVE GATE — drop/flag notices with no open-competition path:
+# sole-source and intent-to-award postings (someone else already won, or the
+# award is pre-decided) and pure information/planning notices. Runs FIRST in
+# evaluate(), before NAICS/keyword matching, so we don't score dead notices.
+#
+# DEFAULT = FLAG (route to the KILL LOG with the reason for audit). Set
+# DROP_NONCOMPETITIVE = True to remove them from the run entirely.
+# ---------------------------------------------------------------------------
+DROP_NONCOMPETITIVE = False
+
+# Rule 1 — sole-source SET-ASIDE codes (SAM.gov typeOfSetAside). The "S"/"N"
+# sole-source variants: SDVOSB, VOSB, HUBZone, WOSB/EDWOSB, 8(a) sole source.
+SOLE_SOURCE_SETASIDE_CODES = {
+    "SDVOSBS", "VSS", "HZS", "8AN", "WOSBSS", "EDWOSBSS",
+}
+# Notice `type` values that are inherently post-decision / non-biddable.
+NONCOMPETITIVE_NOTICE_TYPES = (
+    "justification", "j&a", "intent to bundle", "award notice",
+    "sale of surplus",
+)
+# Rule 2 — sole-source / intent-to-award language in title or description.
+SOLE_SOURCE_TEXT = [
+    "sole source", "sole-source", "single source", "single-source",
+    "only one responsible source", "only responsible source",
+    "only known source", "one responsible source", "brand name justification",
+    "not being competed", "will not be competed", "on a noncompetitive basis",
+    "on a non-competitive basis", "noncompetitive basis",
+    "far 6.302", "far 13.106-1(b)", "10 u.s.c. 3204", "41 u.s.c. 3304",
+]
+INTENT_TO_AWARD_TEXT = [
+    "intent to award", "intend to award", "intends to award",
+    "notice of intent", "intent to sole source", "intent to negotiate",
+    "pre-award notice", "intent to issue a purchase order",
+]
+# Rule 3 — RFI / planning-only language (FAR 15.201(e): a notice that is NOT a
+# solicitation and creates no obligation to award).
+PLANNING_ONLY_TEXT = [
+    "for information and planning purposes only",
+    "for planning purposes only", "information purposes only",
+    "does not constitute a solicitation", "is not a solicitation",
+    "this is not a request for proposal", "this is not a request for proposals",
+    "not a request for quote", "not a request for quotation",
+    "this is not an rfp", "this is not an rfq",
+    "far 15.201(e)", "15.201(e)", "no solicitation is available",
+    "no award will be made from this notice",
+    "will not result in a contract award",
+]
+
 
 def _classify_notice(notice_type):
     """Map a SAM.gov notice type to a routing class."""
@@ -402,6 +451,45 @@ def _classify_notice(notice_type):
     if "forecast" in nt:
         return "FORECAST"
     return "SOLICITATION"
+
+
+def screen_noncompetitive(opp):
+    """Early non-competitive gate. Returns (rule, reason) when the notice has
+    no open-competition path, else (None, None). Case-insensitive. Rules:
+
+      'sole-source'    — sole-source set-aside code, sole-source language, or a
+                         justification/J&A notice type (someone else wins).
+      'intent-to-award'— intent/notice-of-intent language (award pre-decided).
+      'planning-only'  — RFI / FAR 15.201(e) 'not a solicitation' language.
+
+    Detection only — the caller decides whether to drop, flag, or (for a
+    genuine sources-sought where planning language is expected) merely tag it.
+    """
+    code = (opp.get("typeOfSetAside") or "").strip().upper()
+    ntype = (opp.get("type") or opp.get("baseType") or "").lower()
+    text = " ".join(str(opp.get(k, "")) for k in ("title", "description")).lower()
+
+    # Rule 1 — sole-source by set-aside code or non-competitive notice type.
+    if code in SOLE_SOURCE_SETASIDE_CODES:
+        return ("sole-source", f"sole-source set-aside code '{code}'")
+    for t in NONCOMPETITIVE_NOTICE_TYPES:
+        if t in ntype:
+            return ("sole-source", f"non-competitive notice type '{t}'")
+
+    # Rule 2 — sole-source / intent-to-award language.
+    hit = next((p for p in SOLE_SOURCE_TEXT if p in text), None)
+    if hit:
+        return ("sole-source", f"sole-source language ('{hit}')")
+    hit = next((p for p in INTENT_TO_AWARD_TEXT if p in text), None)
+    if hit:
+        return ("intent-to-award", f"intent-to-award language ('{hit}')")
+
+    # Rule 3 — RFI / planning-only language.
+    hit = next((p for p in PLANNING_ONLY_TEXT if p in text), None)
+    if hit:
+        return ("planning-only", f"planning/RFI language ('{hit}')")
+
+    return (None, None)
 
 # --- The single most important axis: HIREABLE credential vs UNHIREABLE
 # authorization (PRG's win-and-manage model) ---------------------------------
@@ -1734,6 +1822,10 @@ def classify_subcontracting(opp, setaside_label, tier, tech_match):
 
 def evaluate(opp):
     """Evaluate a single opportunity and return a structured result dict."""
+    # NON-COMPETITIVE GATE — runs FIRST, before NAICS/keyword matching, so we
+    # don't spend scoring effort on notices with no open-competition path.
+    noncomp_rule, noncomp_reason = screen_noncompetitive(opp)
+
     setaside_label, setaside_eligible, is_sdvosb = classify_setaside(opp)
     tech_match, matched_kw = match_capabilities(opp)
     lb_match, lb_kw = match_low_barrier(opp)
@@ -1905,6 +1997,28 @@ def evaluate(opp):
     # --- STAGE 0: timing + notice-type gating (takes precedence over scoring) ---
     notice_class = _classify_notice(notice_type)
 
+    # NON-COMPETITIVE GATE (applied here so notice_class is known). Sole-source
+    # and intent-to-award notices are never winnable → flag to the KILL LOG
+    # (auditable) with the rule that fired. Planning-only/RFI language is
+    # EXPECTED on a genuine sources-sought/presol/special notice (those are our
+    # early-engagement targets), so there we only TAG it and leave the notice on
+    # the watchlist; planning-only language on a notice posing as a solicitation
+    # is flagged like the rest.
+    noncompetitive = bool(noncomp_rule)
+    if noncomp_rule in ("sole-source", "intent-to-award") or (
+            noncomp_rule == "planning-only"
+            and notice_class not in WATCH_NOTICE_CLASSES):
+        if not is_awarded:   # award notices already route to market-intel
+            disqualified = True
+            is_watch_template = False
+            lead_short = False
+            kill_gate = f"Gate 0 (non-competitive: {noncomp_rule})"
+            kill_reason = f"excluded: {noncomp_rule} — {noncomp_reason}"
+            win_score, win_band, win_emoji = 0, "Red", "🔴"
+            win_note = "Gate 0 — " + kill_reason
+            is_solo = False
+            rub["priority"] = 0
+
     # APEX GUIDANCE — no last-minute bids: a BIDDABLE notice (solicitation /
     # combined synopsis) expiring within the week is removed to the KILL LOG.
     # Pre-RFP notices (sources sought, presolicitation, RFI) are exempt — a
@@ -2051,6 +2165,9 @@ def evaluate(opp):
         "notice_class": notice_class,
         "short_fuse": short_fuse,
         "expiring_soon": lead_short,
+        "noncompetitive": noncompetitive,
+        "noncomp_rule": noncomp_rule or "",
+        "noncomp_reason": noncomp_reason or "",
         "posted_days_ago": posted_days_ago,
         "is_fresh": is_fresh,
         "deadline_headline": deadline_headline,
@@ -5702,6 +5819,115 @@ _SELFTEST_CASES = [
         "expect_falsy": ["disqualified"],
     },
     {
+        "label": "NON-COMPETITIVE — VA metabolomics 36C24826Q0990, sole "
+                 "source to Lovell/Metabolon (test case → excluded)",
+        "opp": {
+            "solicitationNumber": "36C24826Q0990",
+            "noticeId": "nc1",
+            "title": "Metabolomics Analysis Services — Intent to Sole Source",
+            "description": ("The Department of Veterans Affairs intends to "
+                            "award a firm-fixed-price contract on a sole "
+                            "source basis to Lovell Government Services as the "
+                            "authorized distributor of Metabolon, Inc. This "
+                            "notice of intent is not a request for competitive "
+                            "proposals. The Government has determined there is "
+                            "only one responsible source (FAR 13.106-1(b))."),
+            "naicsCode": "541715",
+            "typeOfSetAside": "",
+            "typeOfSetAsideDescription": "",
+            "fullParentPathName": "Department of Veterans Affairs",
+            "type": "Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+        "expect_truthy": ["noncompetitive"],
+        "expect_equals": {"noncomp_rule": "sole-source"},
+        "expect_contains": {"kill_gate": "non-competitive"},
+    },
+    {
+        "label": "NON-COMPETITIVE — SDVOSB SOLE SOURCE set-aside code SDVOSBS "
+                 "→ excluded even though PRG is an SDVOSB",
+        "opp": {
+            "solicitationNumber": "NC-SDVOSBS",
+            "noticeId": "nc2",
+            "title": "Program Support Services",
+            "description": "Program management and analysis support.",
+            "naicsCode": "541611",
+            "typeOfSetAside": "SDVOSBS",
+            "typeOfSetAsideDescription": "SDVOSB Sole Source",
+            "fullParentPathName": "General Services Administration",
+            "type": "Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+        "expect_truthy": ["noncompetitive"],
+        "expect_equals": {"noncomp_rule": "sole-source"},
+    },
+    {
+        "label": "NON-COMPETITIVE — RFI 'not a solicitation' language on a "
+                 "notice posing as a solicitation → excluded (planning-only)",
+        "opp": {
+            "solicitationNumber": "NC-RFI",
+            "noticeId": "nc3",
+            "title": "Market Research — Analytics Platform",
+            "description": ("This is not a solicitation. This request for "
+                            "information is issued for information and "
+                            "planning purposes only and does not constitute a "
+                            "solicitation (FAR 15.201(e))."),
+            "naicsCode": "541611",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Health and Human Services",
+            "type": "Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "NO-BID",
+        "expect_truthy": ["noncompetitive"],
+        "expect_equals": {"noncomp_rule": "planning-only"},
+    },
+    {
+        "label": "NON-COMPETITIVE guard — a genuine SOURCES SOUGHT with "
+                 "'not a solicitation' language is TAGGED, not killed",
+        "opp": {
+            "solicitationNumber": "NC-SS-OK",
+            "noticeId": "nc4",
+            "title": "Sources Sought — Clinical Research Support",
+            "description": ("This sources sought notice is for information and "
+                            "planning purposes only and does not constitute a "
+                            "solicitation. Capable clinical research firms are "
+                            "invited to respond."),
+            "naicsCode": "541715",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Health and Human Services",
+            "type": "Sources Sought",
+            "responseDeadLine": "2026-12-01",
+        },
+        "expect_verdict": "WATCH",
+        "expect_truthy": ["noncompetitive", "respond_recommended"],
+        "expect_falsy": ["disqualified"],
+    },
+    {
+        "label": "NON-COMPETITIVE guard — a normal competitive solicitation "
+                 "must NOT be flagged (no false positive)",
+        "opp": {
+            "solicitationNumber": "NC-CLEAN",
+            "noticeId": "nc5",
+            "title": "Program Evaluation Services",
+            "description": ("The contractor shall provide program evaluation "
+                            "and reporting services. Award will be made to the "
+                            "offeror representing the best value."),
+            "naicsCode": "541611",
+            "typeOfSetAside": "SDVOSBC",
+            "typeOfSetAsideDescription": "SDVOSB Set-Aside",
+            "fullParentPathName": "Department of Justice",
+            "type": "Combined Synopsis/Solicitation",
+            "responseDeadLine": "2026-12-01",
+        },
+        "forbid_verdict": "NO-BID",
+        "expect_falsy": ["noncompetitive", "disqualified"],
+    },
+    {
         "label": "Synthetic size-standard mention — '$34.5 million size "
                  "standard' is NOT a contract value (KC5 must not fire)",
         "opp": {
@@ -5975,6 +6201,30 @@ def main(argv=None):
 
     # Evaluate every opportunity.
     results = [evaluate(opp) for opp in all_opps]
+
+    # Non-competitive gate summary — how many each rule caught, with examples,
+    # so over-filtering is auditable. Runs whether flagging (default) or
+    # dropping. Rule counts come from every screened notice.
+    nc = [r for r in results if r.get("noncompetitive")]
+    if nc:
+        by_rule = Counter(r["noncomp_rule"] for r in nc)
+        sys.stderr.write(
+            f"\n  Non-competitive gate: flagged {len(nc)} of {len(results)} "
+            f"notice(s) — " + ", ".join(f"{k}: {v}" for k, v in
+                                        by_rule.most_common()) + "\n")
+        for rule in by_rule:
+            ex = next(r for r in nc if r["noncomp_rule"] == rule)
+            sys.stderr.write(
+                f"    e.g. [{rule}] {ex['solicitation']} — "
+                f"{_clean(ex['title'], 60)} ({ex['noncomp_reason']})\n")
+        if DROP_NONCOMPETITIVE:
+            keep = [r for r in results if not r.get("noncompetitive")]
+            sys.stderr.write(f"    DROP_NONCOMPETITIVE on — removing "
+                             f"{len(results) - len(keep)} from the run.\n")
+            results = keep
+        else:
+            sys.stderr.write("    (flag mode — kept in the KILL LOG for audit; "
+                             "set DROP_NONCOMPETITIVE=True to remove)\n")
 
     # FIX 6 — short-circuit anything already vetted this week (checksum match).
     seen_before = apply_vet_cache(results)
