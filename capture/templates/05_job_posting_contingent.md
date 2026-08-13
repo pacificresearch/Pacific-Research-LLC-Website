@@ -40,6 +40,73 @@ PRG is an equal opportunity employer. Veterans encouraged to apply.
 
 ---
 
+## Careers-page snippet (generate alongside every posting)
+
+Insert between the `<!-- JOBS:START -->` / `<!-- JOBS:END -->` markers in
+`site/careers/index.html` (remove the empty-state block when the first
+posting goes live; restore it when the last one closes). Two parts per
+posting:
+
+```html
+<article class="job-card" id="[slug]">
+  <h3>[Title]</h3>
+  <div class="job-meta">
+    <span class="badge badge-green">Contingent Upon Contract Award</span>
+    <span class="tag">[City, State]</span>
+    <span class="tag">[Full-time / Part-time / 1099]</span>
+    <span class="tag">[$XX–$XX/hr or salary range]</span>
+  </div>
+  <p>[One-paragraph summary from the posting text.]</p>
+  <ul>
+    <li>[Top 3 responsibilities]</li>
+  </ul>
+  <p><strong>Required:</strong> [minimums, one line]</p>
+  <div class="apply-row">
+    <a class="btn btn-primary" data-icon="send"
+       href="mailto:contact@pacificresearchllc.com?subject=Application%3A%20[Title%20URL-encoded]">Apply by Email</a>
+    <span class="job-note">Attach resume + certifications. Posted [date].</span>
+  </div>
+</article>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "JobPosting",
+  "title": "[Title]",
+  "description": "<p>[Full posting text as escaped HTML — Google requires the complete description here, not a summary.]</p>",
+  "datePosted": "[YYYY-MM-DD]",
+  "validThrough": "[YYYY-MM-DDT00:00]",
+  "employmentType": "[FULL_TIME / PART_TIME / CONTRACTOR]",
+  "hiringOrganization": {
+    "@type": "Organization",
+    "name": "Pacific Research Group LLC",
+    "sameAs": "https://pacificresearchllc.com",
+    "logo": "https://pacificresearchllc.com/assets/logo-primary-navy.png"
+  },
+  "jobLocation": {
+    "@type": "Place",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "[City]",
+      "addressRegion": "[ST]",
+      "addressCountry": "US"
+    }
+  },
+  "baseSalary": {
+    "@type": "MonetaryAmount",
+    "currency": "USD",
+    "value": {"@type": "QuantitativeValue",
+      "minValue": [min], "maxValue": [max], "unitText": "[HOUR/YEAR]"}
+  }
+}
+</script>
+```
+
+Google for Jobs indexes these automatically via the sitemap (careers URL
+is listed at `weekly` change frequency). Keep `validThrough` honest —
+expired postings with stale markup hurt indexing. The same source fields
+fill the LinkedIn/Indeed manual paste below.
+
 ## Candidate tracking
 | Candidate | Source | Resume on file | Screen | Contingent offer / LOI signed | Named in proposal? | Last contact |
 |-----------|--------|----------------|--------|-------------------------------|--------------------|--------------|
