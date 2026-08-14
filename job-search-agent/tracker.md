@@ -82,7 +82,6 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-11 | Clinical Trial Coordinator (Remote) | Covance (LabCorp Drug Development) | Remote, US | https://careers.covance.com/ | ready to apply |
 | 2026-08-11 | Program Coordinator, International Development | Global Communities | Remote, US | https://globalcommunities.org/careers/ | ready to apply |
 | 2026-08-11 | Operations Analyst | United Way | Remote, US | https://unitedway.org/careers/ | ready to apply |
-<<<<<<< HEAD
 | 2026-08-12 | Senior Clinical Data Manager (Remote) | Heart Rhythm Clinical and Research Solutions | Remote, US | https://lensa.com/job-v1/heart-rhythm-clinical-and-research-solutions/remote/senior-clinical-data-manager/36b9785a7202fe837b48204eda4a8538 | ready to apply |
 | 2026-08-12 | Program Manager, Education (Remote) | International Rescue Committee | Remote, US | https://www.globalsouthopportunities.com/2025/09/18/irc-16/ | ready to apply |
 | 2026-08-12 | Administrative Research Assistant (Remote) | Research Foundation of CUNY, Excellence Through Education | Remote, US | https://remotive.com/remote/jobs/all-others/administrative-research-assistant-4575549 | ready to apply |
@@ -106,6 +105,10 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-19 | Senior Operations Manager | Volunteers of America | Downey, CA | https://to.indeed.com/aam9g2zqk6pp | ready to apply |
 | 2026-08-19 | Operation/Program Manager | African Communities Public Health Coalition | Los Angeles, CA | https://to.indeed.com/aap98zgr6rtt | ready to apply |
 | 2026-08-19 | Program and Operations Manager | Alliance of Women Directors | Los Angeles, CA | https://to.indeed.com/aamtmcxgyywb | ready to apply |
+| 2026-08-20 | Executive Director | El Centro de Amistad | San Fernando, CA | https://to.indeed.com/aamwqgfz2jb6 | ready to apply |
+| 2026-08-20 | Director of Quality and Performance Excellence | Community Hospital of Huntington Park | Huntington Park, CA | https://to.indeed.com/aalt72zk6fbg | ready to apply |
+| 2026-08-20 | Regional Director of Healthcare Centers Operations | AIDS Healthcare Foundation | Los Angeles, CA | https://to.indeed.com/aabybwcts9sl | ready to apply |
+| 2026-08-20 | Executive Director | YMCA of Metropolitan Los Angeles | Sierra Madre, CA | https://to.indeed.com/aall8xvkdskf | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -115,6 +118,7 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-21 | Associate Director of Business Development | Vitamin Angels | Requires 8–10 yrs fundraising portfolio track record |
 | 2026-07-21 | Associate Director, OPEN Learner Engagement | FHI 360 | Requires 10+ yrs online-education program mgmt + LMS/CoP portfolio |
 | 2026-08-13 | Associate Medical Director / Medical Monitor | Puma Biotechnology | Requires MD/DO credential not held (education: MA International Studies, BA Classics) |
+| 2026-08-20 | Executive Director, Clinical Research Office | Children's Hospital Los Angeles | Requires 10+ years progressively responsible clinical research management (has ~4.5 years Stanford CRC + multidisciplinary background) |
 
 ## Cycle 30 notes (2026-08-18 batch-30)
 
@@ -311,6 +315,16 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–24).
 - Total packaged across all cycles: 76 roles (4 cycle 1 + 3 each cycles 2–24 + 3 cycle 25).
 - Career breadth and specialization: Cycle 25 expands clinical trial coordination into major CRO (Covance from Stanford multi-site operations), international development program coordination (Global Communities from Operation Allies Welcome field experience), and nonprofit operations analytics (United Way from clinical research performance metrics). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized roles ($50–$162K) → operations analysis ($55–$105K), representing comprehensive advancement across clinical research, international development, and nonprofit operations with analytical specialization emerging as value-add pathway.
+
+## Cycle 32 notes (2026-08-20 batch-32)
+
+- Tool access: Indeed MCP available; used targeted searches across three pillars (Pillar 1: clinical research/healthcare ops, Pillar 3: broad operations/humanities) with Los Angeles, CA and Remote, US locations with varied query terms (nonprofit operations, director healthcare operations, clinical research, international development, research administration).
+- Job market findings: 4 companies with salary ranges $110K–$210K: El Centro de Amistad ($175K–$210K executive nonprofit leadership), YMCA of Metropolitan Los Angeles ($110K–$135K executive branch leadership), AIDS Healthcare Foundation ($120K–$135K regional operations), Community Hospital of Huntington Park ($139.6K–$205.2K quality/performance).
+- 4 packages produced (reordered by maximum salary, highest to lowest): (1) El Centro de Amistad Executive Director ($175K–$210K), (2) Community Hospital of Huntington Park Director Quality & Performance Excellence ($139.6K–$205.2K), (3) AIDS Healthcare Foundation Regional Director ($120K–$135K), (4) YMCA of Metropolitan Los Angeles Executive Director ($110K–$135K).
+- Deduplication: All 4 verified as new company+title combinations vs. cycles 1–31 tracker history. Zero dedupes.
+- Hard skip gates: 1 (Children's Hospital Los Angeles Executive Director, Clinical Research Office: requires 10+ years progressively responsible clinical research management, not 4.5 years).
+- Total packaged roles across all cycles: 103 roles (4 cycle 1 + 3 each cycles 2–25 + 3 cycle 26 + 2 cycle 27 + 3 cycle 28 + 6 cycle 29 + 5 cycle 30 + 4 cycle 31 + 4 cycle 32).
+- Career progression narrative: Cycle 32 advances executive-level nonprofit leadership (El Centro de Amistad from federal program coordination tier), quality/performance excellence at hospital systems (Community Hospital from operations foundation), regional operations director advancement at HIV/AIDS healthcare mission-driven nonprofit (AIDS Healthcare Foundation from federal coordination), and executive branch director advancement at large nonprofit (YMCA from multi-site operations background). Portfolio now spans entry coordinator ($28K) through director ($289.8K) through specialized senior scientist ($267K) through nonprofit executive leadership ($110K–$210K), representing comprehensive advancement across clinical research, healthcare compliance, healthcare operations, nonprofit executive leadership, and mission-driven organization sectors.
 
 ## Cycle 31 notes (2026-08-19 batch-31)
 
