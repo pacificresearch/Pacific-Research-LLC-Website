@@ -49,7 +49,10 @@ notice IDs already present in `capture/reports/` and
 - Commit everything to a branch `capture/YYYY-MM-DD-<notice-id>`, push,
   open a draft PR titled "Capture: <notice id> <short title>".
 
-## 5. Notify (the run's final message — reaches Andrew by push + email)
+## 5. Update the pipeline board
+Refresh `capture/PIPELINE.md`: stages, deadlines, next actions, recently-done. This board is Andrew's single view of everything — keep it current and honest every run.
+
+## 6. Notify (the run's final message — reaches Andrew by push + email)
 Lead with: **CURRENT CONTRACT UNDER CONSIDERATION: <title> (<notice
 id>)** — agency, response deadline, pursuit role, fulfillment model,
 estimated value/margin band. Then, as a short checklist, the ⛔ actions
