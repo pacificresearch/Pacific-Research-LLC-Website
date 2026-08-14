@@ -97,6 +97,31 @@ Sub-$250K simplified acquisitions are strategic PP builders — worth more
 than face value. International/UN/foreign-affairs work is evaluated
 separately (no SDVOSB preference; founder-consultancy lane).
 
+## CAPTURE WORKFLOW — RUN AFTER THE SCREENING GATE
+
+When solicitation documents (SAM.gov attachments, RFQ/RFP packages) are
+uploaded and the opportunity survives the screening gate above, run the
+pipeline in `capture/WORKFLOW.md`:
+
+**SCREEN → PURSUE → SUBMIT → MONITOR → WIN/LOSS**
+
+Key rules (full detail in the workflow doc and `capture/templates/`):
+- Compliance matrix FIRST; every generated document traces to it.
+- Assemble proposal docs from `capture/library/`, never from scratch if
+  a library variant exists; file improvements back after every bid.
+- Pricing is built bottom-up (wage determination + fringe + sub quotes +
+  overhead + margin band) with the 50% limitation-on-subcontracting and
+  working-capital checks before anything is submitted.
+- All pre-award job postings are worded **contingent upon contract
+  award**; generate paste-ready text + structured fields (LinkedIn/
+  Indeed posting is manual or via ATS — no auto-post in v1).
+- Trade-sub/staffing/distributor plays run the subcontractor tracker
+  (quotes, NDAs, COIs, flow-downs), not job postings.
+- On win: `08_win_day_setup.md` — folder, dedicated project calendar
+  seeded from the contract, WAWF/IPP payment setup, staffing goes live.
+- On loss: `09_loss_debrief.md` — always request the debrief, file
+  reusable content to the library.
+
 ## Repository context
 
 - The SAM.gov screening tool lives on branch
