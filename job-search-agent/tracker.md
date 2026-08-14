@@ -82,6 +82,7 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-11 | Clinical Trial Coordinator (Remote) | Covance (LabCorp Drug Development) | Remote, US | https://careers.covance.com/ | ready to apply |
 | 2026-08-11 | Program Coordinator, International Development | Global Communities | Remote, US | https://globalcommunities.org/careers/ | ready to apply |
 | 2026-08-11 | Operations Analyst | United Way | Remote, US | https://unitedway.org/careers/ | ready to apply |
+<<<<<<< HEAD
 | 2026-08-12 | Senior Clinical Data Manager (Remote) | Heart Rhythm Clinical and Research Solutions | Remote, US | https://lensa.com/job-v1/heart-rhythm-clinical-and-research-solutions/remote/senior-clinical-data-manager/36b9785a7202fe837b48204eda4a8538 | ready to apply |
 | 2026-08-12 | Program Manager, Education (Remote) | International Rescue Committee | Remote, US | https://www.globalsouthopportunities.com/2025/09/18/irc-16/ | ready to apply |
 | 2026-08-12 | Administrative Research Assistant (Remote) | Research Foundation of CUNY, Excellence Through Education | Remote, US | https://remotive.com/remote/jobs/all-others/administrative-research-assistant-4575549 | ready to apply |
@@ -101,6 +102,10 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-18 | Clinical Research Site Operation Leader | Kelly | Inglewood, CA | https://to.indeed.com/aayd222wbgbv | ready to apply |
 | 2026-08-18 | Grant Manager | Fresh Youth Initiatives | Remote | https://to.indeed.com/aajv2rq4vn8w | ready to apply |
 | 2026-08-18 | Clinical Research Coordinator | CenExel Clinical Research | Sherman Oaks, CA | https://to.indeed.com/aa6yjd6hhhm | ready to apply |
+| 2026-08-19 | Clinical Research Billing Compliance Manager | Oregon Health & Science University | Portland, OR (Remote) | https://to.indeed.com/aatj8x97wf2s | ready to apply |
+| 2026-08-19 | Senior Operations Manager | Volunteers of America | Downey, CA | https://to.indeed.com/aam9g2zqk6pp | ready to apply |
+| 2026-08-19 | Operation/Program Manager | African Communities Public Health Coalition | Los Angeles, CA | https://to.indeed.com/aap98zgr6rtt | ready to apply |
+| 2026-08-19 | Program and Operations Manager | Alliance of Women Directors | Los Angeles, CA | https://to.indeed.com/aamtmcxgyywb | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -306,6 +311,16 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–24).
 - Total packaged across all cycles: 76 roles (4 cycle 1 + 3 each cycles 2–24 + 3 cycle 25).
 - Career breadth and specialization: Cycle 25 expands clinical trial coordination into major CRO (Covance from Stanford multi-site operations), international development program coordination (Global Communities from Operation Allies Welcome field experience), and nonprofit operations analytics (United Way from clinical research performance metrics). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized roles ($50–$162K) → operations analysis ($55–$105K), representing comprehensive advancement across clinical research, international development, and nonprofit operations with analytical specialization emerging as value-add pathway.
+
+## Cycle 31 notes (2026-08-19 batch-31)
+
+- Tool access: Indeed MCP available; used targeted searches across three pillars (Pillar 1: clinical research/healthcare ops, Pillar 3: nonprofit operations/program management) with Los Angeles, CA and Remote, US locations.
+- Job market findings: 4 companies with salary ranges $70K–$175K: Oregon Health & Science University ($103K–$175K billing compliance leadership), Volunteers of America ($95K–$100K nonprofit operations), African Communities Public Health Coalition ($65K–$85K nonprofit program director), Alliance of Women Directors ($70K nonprofit program coordination).
+- 4 packages produced (reordered by maximum salary, highest to lowest): (1) Oregon Health & Science University Clinical Research Billing Compliance Manager ($103K–$175K), (2) Volunteers of America Senior Operations Manager ($95K–$100K), (3) African Communities Public Health Coalition Operation/Program Manager ($65K–$85K), (4) Alliance of Women Directors Program and Operations Manager ($70K).
+- Deduplication: All 4 verified as new company+title combinations vs. cycles 1–30 tracker history. Zero dedupes.
+- Hard skip gates: 0 (no roles disqualified).
+- Total packaged roles across all cycles: 99 roles (4 cycle 1 + 3 each cycles 2–25 + 3 cycle 26 + 2 cycle 27 + 3 cycle 28 + 6 cycle 29 + 5 cycle 30 + 4 cycle 31).
+- Career progression narrative: Cycle 31 advances nonprofit operations leadership (Volunteers of America from federal program coordination tier), billing compliance management at academic medical center (Oregon Health & Science University from operations foundation), program director advancement at community health nonprofit (African Communities Public Health Coalition), and program coordination at creative industry nonprofit (Alliance of Women Directors from clinical research operations background). Portfolio now spans entry coordinator ($28K) through director ($277K) through specialized senior scientist ($267K) through nonprofit operations ($65K–$175K).
 
 ## Cycle 24 notes (2026-08-10 batch-24)
 
