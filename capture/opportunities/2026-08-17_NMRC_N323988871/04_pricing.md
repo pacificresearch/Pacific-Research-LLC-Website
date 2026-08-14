@@ -57,10 +57,15 @@ re-decide at RFQ time. Verify WD FIRST THING when the solicitation drops.
 | $36.50/hr | $75,920 | ~2.5% | ~$6,000 |
 | $38.46/hr | $80,000 | negative | ❌ |
 
-**⚠️ CONSEQUENCE: the posted $80–90K salary is NOT affordable under
-this contract's ceiling.** Posting needs revision to **$68,000–$76,000**
-(still at/above MD median for the occupation — honest and competitive,
-especially with federal holidays off + stable weekday schedule).
+**ANDREW'S DECISION (8/15): posting stays at $80–90K.** Accepted
+consequence: at $80K hire the contract is ≈ break-even to slightly
+negative (≈ −$3.5K/yr vs. billings, before ~$2–4K/yr overhead); at $90K
+it loses ~$15K/yr. Operating rule: POST 80–90, OFFER AT $80K; treat
+asks above ~$83K as walk-away unless the candidate is exceptional.
+30-month P&L swing between hiring at $80K vs $90K ≈ $28K. Contract is
+explicitly a strategic loss-leader/PP builder at this salary band —
+value = first prime DoD contract + CPARS + incumbency on a recompete
+likely to exceed SAT next cycle.
 
 ## Strategic read (why thin margin is still a BID)
 CLAUDE.md: sub-$250K simplified acquisitions are strategic
