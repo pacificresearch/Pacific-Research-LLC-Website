@@ -73,8 +73,11 @@ Narrative addressing each 7.3 element for proposed monitor(s):
   (ACRP-CP; ACRP-PM), documented GCP training, human subjects protection
   training, 1,500+ participants managed across multi-site NIH and
   industry protocols including Stanford University Department of
-  Medicine; formal "Honest Broker" data governance role; REDCap/OnCore/
-  Medidata; decentralized and hybrid trial monitoring workflows.
+  Medicine; co-author on FOUR peer-reviewed JAMA publications arising
+  from trials whose operations he supported [cite all 4 — objective,
+  verifiable evidence of trial-delivery quality]; formal "Honest
+  Broker" data governance role; REDCap/OnCore/Medidata; decentralized
+  and hybrid trial monitoring workflows.
 - [Monitor 2 — from bench, quals per 7.3]
 Supporting documentation (CVs, degree/cert copies, GCP/HSP certificates)
 provided as "Section 2 Qualification Support Docs" — excluded from page
