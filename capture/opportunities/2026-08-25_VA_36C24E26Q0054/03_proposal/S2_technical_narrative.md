@@ -69,15 +69,26 @@ visits executed to identical standards with pre-staged remote access.
 
 ## 4. Qualifications & Experience — PWS 7.0 (~2 pg)
 Narrative addressing each 7.3 element for proposed monitor(s):
-- Managing Director & Lead CRQA [NAME — redact in S3]: ACRP-certified
-  (ACRP-CP; ACRP-PM), documented GCP training, human subjects protection
-  training, 1,500+ participants managed across multi-site NIH and
-  industry protocols including Stanford University Department of
-  Medicine; co-author on FOUR peer-reviewed JAMA publications arising
-  from trials whose operations he supported [cite all 4 — objective,
-  verifiable evidence of trial-delivery quality]; formal "Honest
-  Broker" data governance role; REDCap/OnCore/Medidata; decentralized
-  and hybrid trial monitoring workflows.
+- Managing Director & Lead CRQA [NAME — redact in S3]: ACRP-certified,
+  documented GCP and human subjects protection training; 1,500+
+  participants' operational data managed as a clinical research
+  coordinator across multi-site NIH and industry protocols including
+  the Stanford University Department of Medicine — site-side GCP
+  execution: informed consent administration, source documentation,
+  eligibility verification, and DIRECT RESPONSE TO SPONSOR MONITORS'
+  findings and data queries across routine monitoring visits (deep
+  familiarity with the monitored side of every item in a CRQA
+  monitoring plan); co-author on four peer-reviewed JAMA publications
+  arising from trials whose operations he supported [cite all 4];
+  formal "Honest Broker" data governance role; REDCap/OnCore/Medidata.
+  [⚠️ PWS 7.3.4 GATE — see note below: monitoring-specific training
+  certificate REQUIRED; do not submit implying monitoring experience
+  we don't hold.]
+
+  HONESTY RULE (binding for all volumes): describe Andrew's experience
+  as coordinator-side GCP operations + query response WITH monitors —
+  NEVER as having performed monitoring visits. The transition
+  coordinator→monitor is standard and credible; misstating it is not.
 - [Monitor 2 — from bench, quals per 7.3]
 Supporting documentation (CVs, degree/cert copies, GCP/HSP certificates)
 provided as "Section 2 Qualification Support Docs" — excluded from page
