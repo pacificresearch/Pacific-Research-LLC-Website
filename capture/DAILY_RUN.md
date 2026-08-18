@@ -23,7 +23,15 @@ Look back 3 days so weekend/holiday gaps self-heal; dedupe against
 notice IDs already present in `capture/reports/` and
 `capture/opportunities/`.
 
-## 3. Screen and select
+## 3. Screen and select — VOLUME MODE (Andrew's standing order 8/17)
+FIRST: for EVERY pre-RFP notice (sources sought / RFI / presolicitation)
+that survives the gate, draft a tailored capability response the SAME
+DAY into its opportunity folder (cover + capability + SDVOSB set-aside
+advocacy + FAR 9.104-1 + SAM confirmation; download notice attachments
+and follow any prescribed format). Queue each as an Outlook draft when
+the connector is available; notify Andrew of ALL pending sends. Never
+send a generic blast — every response cites the notice's own scope
+language. Solicitations (biddable) still get ranked and selected below.
 - Apply the CLAUDE.md capture-v3 gate to every notice in the report.
 - Rank survivors by the report's weighted priority score, adjusted for:
   days of runway remaining, sub-$250K past-performance value, and
