@@ -54,8 +54,15 @@ WIN → SOURCE (locally) → PERFORM → CONTROL → INVOICE → COLLECT → PRO
    capture-v3 gate). Keep the domestic hard kills (bonded/large
    construction, firm licensure we don't hold, vehicles/FCL required at
    proposal, dead timeline, wrong scale >$10M early) and ADD:
-   - OFAC-sanctioned countries/parties, and active-conflict zones
-     where PRG cannot meet duty-of-care/security requirements.
+   - OFAC-sanctioned countries/parties (legal kill — non-negotiable).
+   - Conflict zones are NOT a kill (Andrew's standing decision 8/18:
+     "conflict zones are fine" — he is a veteran with TCCC/austere-
+     operations background and accepts the risk). Instead, every
+     conflict/high-threat pursuit gets a mandatory RISK block in the
+     screening doc: security and life-support costs priced in, DBA
+     insurance rated for the threat level, medevac coverage, and
+     duty-of-care plan for local hires. Higher margin bands apply —
+     danger pricing is standard in this market, never bid it thin.
    - Requirements demanding an in-country registered legal entity or
      in-country bank account AT PROPOSAL TIME (monitor-preposition
      instead; note where a local partner cures it).
