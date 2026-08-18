@@ -93,9 +93,10 @@ either a bank assignment or a local partner prime.
   create an individual-consultant profile for Andrew.
 - **IDB — Inter-American Development Bank** ·
   https://www.iadb.org/en/how-we-can-work-together/consultants
-  Latin America and Caribbean. **The best geographic fit in this tier**
-  given Brazil and Peru field experience; Spanish and Portuguese are a
-  real discriminator here rather than a nice-to-have.
+  Latin America and Caribbean. Brazil and Peru field experience is real
+  and usable. **PRG does not hold Spanish or Portuguese** (Andrew,
+  8/18) — language capability comes from named local partners, never
+  claimed for PRG. Do not write a bid that implies otherwise.
 - **ADB — Consultant Management System** · https://cms.adb.org/
   Asia-Pacific. Fits the China field experience.
 - **UNDP procurement** · https://procurement-notices.undp.org/

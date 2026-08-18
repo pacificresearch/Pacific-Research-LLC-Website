@@ -30,13 +30,17 @@ pursuit's country and pays for itself on the second pursuit there.)_
 Individuals vetted: **0** · Local firms vetted: **0** ·
 See `intl/experts/ROSTER.md`
 
-## 📋 Open decisions for Andrew
-1. Languages and proficiency levels (drives IDB/LatAm and China lanes)
-2. Passport validity and current visas
-3. Travel availability windows for the first BD trip
-4. Target countries beyond Brazil / Peru / China
-5. Budget ceiling for the first BD trip
-6. **LLC formation date** — sets the UNGM Level 2 eligibility date above
+## 📌 Andrew's answers (8/18) — binding inputs
+
+| Input | Answer | Consequence |
+|---|---|---|
+| **Languages** | **English only** — others travel-level | **PRG claims NO foreign language.** Local partners supply it and are named. Weight anglophone posts and overseas DoD bases up; LatAm needs a language partner. |
+| **Target regions** | **Europe / overseas DoD bases** (+ Brazil, Peru, China) | Ramstein, London, Tbilisi. DoD applies FAR Part 19 overseas more readily than State — best odds on the discretionary set-aside ask. |
+| **First BD trip budget** | **Under $5K — one short regional trip** | Beachhead must be reachable cheaply. Pre-award travel is minimal; sourcing is largely remote until award. |
+| **Beachhead** | **19AQMM26R0340 — Embassy Kingston landscaping** | Total SB set-aside PRG is eligible for; anglophone; PRIME WITH TEAMING PARTNER via local grounds subs. |
+
+Still needed: passport validity / current visas, travel windows, and the
+**LLC formation date** (sets the UNGM Level 2 eligibility date above).
 
 ## ✅ Recently done
 - 2026-08-18 — International system designed and committed:

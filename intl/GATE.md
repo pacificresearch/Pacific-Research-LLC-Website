@@ -180,7 +180,9 @@ Same shape as domestic, re-weighted:
   REGISTER–PREPOSITION, not a bid.
 - **Beachhead value** — first overseas past performance is worth more
   than its margin. A clean $60K embassy services award opens the lane.
-- **Language and network fit** — Brazil, Peru, China field experience
-  and Portuguese/Spanish/Mandarin capability are real discriminators
-  where they apply, and are worth nothing where they do not. Do not
-  stretch them.
+- **Language and network fit** — Brazil, Peru, and China field
+  experience is real and usable. **PRG holds no working foreign
+  language** (Andrew, 8/18: English only, others travel-level).
+  Language capability is supplied by named local partners and is never
+  claimed for PRG. Anglophone posts and overseas DoD bases carry the
+  lowest language friction; weight them up accordingly.
