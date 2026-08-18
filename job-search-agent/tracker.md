@@ -113,6 +113,10 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-21 | Programme Officer, Health Emergency Operations (Remote) | World Health Organization (WHO) | Remote, Geneva-based | https://www.who.int/careers | ready to apply |
 | 2026-08-21 | Program Coordinator, Field Operations (Remote) | CARE International | Remote, US | https://www.care.org/careers | ready to apply |
 | 2026-08-21 | Clinical Site Lead (Remote) | Novo Nordisk | Remote, Plainsboro NJ | https://careers.novonordisk.com | ready to apply |
+| 2026-08-22 | Public Health Epidemiologist (Remote) | CDC Foundation | Remote, US | https://jobs.lever.co/cdcfoundation/4f270685-31d8-4f6f-aa7f-932bc0ea4d07 | ready to apply |
+| 2026-08-22 | Clinical Trial Coordinator (Remote) | Novo Nordisk | Remote, US | https://www.remoterocketship.com/us/company/novonordisk/ | ready to apply |
+| 2026-08-22 | Program Officer, Global Health (Remote) | Bill & Melinda Gates Foundation | Remote, US | https://www.gatesfoundation.org/about/careers | ready to apply |
+| 2026-08-22 | Regulatory Affairs Specialist, Medical Device (Remote) | ICON Clinical Research | Remote, US | https://careers.iconplc.com/job/regulatory-affairs-specialist-medical-device-remote-us-in-various-jid-13193 | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -402,6 +406,17 @@ Dedupe key: company + title. Never re-package a listed job.
 - All 3 are new company+title combinations (no dedupes from cycles 1–17).
 - Total packaged across all cycles: 55 roles (4 cycle 1 + 3 each cycles 2–17 + 3 cycle 18).
 - Career advancement progression: Cycle 18 advances clinical trial project management (ICON CRO from prior coordinator/CRA levels), international health M&E expertise (Abt Associates from humanitarian operations), and healthcare compliance leadership (from clinical operations compliance backgrounds). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–160K) → academic research administration ($56–112K) → CRO project management ($104–172K) → international health M&E ($64–123K) → healthcare compliance ($61–130K), representing comprehensive advancement pathways across clinical research, healthcare, and international development sectors.
+
+## Cycle 34 notes (2026-08-22 batch-34)
+
+- Tool access: WebSearch used for job discovery with VARIED query terms (clinical operations specialist, research site manager, EDC systems analyst; health systems coordinator, international NGO coordinator; compliance officer healthcare, program administrator, nonprofit finance director); ground truth facts from repo (AGENT_PROMPT.md) for screening/tailoring.
+- Job market searches identified specific active hiring: CDC Foundation (public health epidemiologist remote, $86.5K–$105K federal research), Novo Nordisk (clinical trial coordinator remote, $53K–$98K pharma), Bill & Melinda Gates Foundation (program officer global health remote, $92K–$150K foundation), ICON Clinical Research (regulatory affairs specialist medical device remote, $60K–$177K CRO).
+- 4 packages produced: CDC Foundation Public Health Epidemiologist (Pillar 1, $86.5K–$105K federal), Novo Nordisk Clinical Trial Coordinator (Pillar 1, $53K–$98K pharma trials), Gates Foundation Program Officer Global Health (Pillar 2, $92K–$150K international), ICON Regulatory Affairs Specialist (Pillar 1/3, $60K–$177K CRO compliance).
+- All 4 are new company+title combinations (no dedupes from cycles 1–33).
+- Dedupes eliminated: 12 staffing/repost candidates already in tracker.
+- 0 hard skips fired.
+- Total packaged across all cycles: 119 roles (4 cycle 1 + 3 each cycles 2–25 + 3 cycle 26 + 2 cycle 27 + 3 cycle 28 + 6 cycle 29 + 5 cycle 30 + 2 cycle 31 + 4 cycle 32 + 4 cycle 33 + 4 cycle 34).
+- Career breadth and specialization: Cycle 34 expands public health epidemiology at federal research partner (CDC Foundation), reinforces pharma trial coordinator pathway (Novo Nordisk), advances international health program coordination at major global funder (Gates Foundation), and introduces medical device regulatory affairs specialization (ICON). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–$177K) → academic research administration ($56–$150K) → CRO project management ($104–$177K) → international health M&E ($52–$150K) → healthcare compliance/regulatory ($60–$177K) → federal health research ($86.5K–$105K) → foundation global health ($92K–$150K), representing comprehensive advancement across clinical research, pharma operations, federal research, CRO compliance, international development, and humanitarian response sectors.
 
 ## Cycle 33 notes (2026-08-21 batch-33)
 
