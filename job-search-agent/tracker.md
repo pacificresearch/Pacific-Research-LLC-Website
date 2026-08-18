@@ -117,6 +117,10 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-08-22 | Clinical Trial Coordinator (Remote) | Novo Nordisk | Remote, US | https://www.remoterocketship.com/us/company/novonordisk/ | ready to apply |
 | 2026-08-22 | Program Officer, Global Health (Remote) | Bill & Melinda Gates Foundation | Remote, US | https://www.gatesfoundation.org/about/careers | ready to apply |
 | 2026-08-22 | Regulatory Affairs Specialist, Medical Device (Remote) | ICON Clinical Research | Remote, US | https://careers.iconplc.com/job/regulatory-affairs-specialist-medical-device-remote-us-in-various-jid-13193 | ready to apply |
+| 2026-08-23 | Global Health Partnerships and Programs Manager (Remote) | Wycliffe Bible Translators USA | Remote, Worldwide | https://www.tealhq.com/job/global-health-partnerships-and-programs-manager_7ea1a94338f2e02aa58152a3a3d16aba170c8 | ready to apply |
+| 2026-08-23 | Clinical Trial Research Coordinator I (Santa Clara) | Kaiser Permanente Northern California | Santa Clara, CA (Bay Area) | https://www.kaiserpermanentejobs.org/job/santa-clara/clinical-trial-research-coordinator-i-santa-clara/641/83497845328 | ready to apply |
+| 2026-08-23 | Clinical Operations Manager (Bay Area) | Genentech | South San Francisco, CA (Bay Area) | https://careers.gene.com/us/en | ready to apply |
+| 2026-08-23 | Network Compliance Coordinator-Clinical (Remote) | SCAN Health Plan | Remote, Los Angeles, CA | https://www.tealhq.com/job/network-compliance-coordinator-clinical_9410f72d-9ddc-45d8-b1c9-57dd3b809338 | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -169,6 +173,18 @@ Dedupe key: company + title. Never re-package a listed job.
 - Total packaged across all cycles: 81 roles (4 cycle 1 + 3 each cycles 2–25 + 3 cycle 26 + 2 cycle 27).
 - Pillar 3 incomplete: Extended search for nonprofit operations specialist role with specific company+title not yielding new candidates without duplication. Recommend Cycle 28 focus on nonprofit operations/foundation program officer roles.
 - Career breadth extension: Cycle 27 advances clinical research coordination at major academic medical center (Johns Hopkins from Stanford coordinator level) and international health technical leadership (Last Mile Health from Operation Allies Welcome deployment/federal coordination expertise). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → data/EDC management ($45–$81K) → international health technical direction ($100–$150K) → research administration ($35–$50K) → academic clinical research ($45–$75K), representing diversified career pathways with both upward progression and specialized lateral advancement.
+
+## Cycle 35 notes (2026-08-23 batch-35)
+
+- Tool access: WebSearch used for job discovery with VARIED query terms (research coordinator healthcare, clinical site operations, trial management specialist, EDC systems administrator; development program coordinator, community health specialist international; nonprofit operations director, program implementation manager); ground truth facts from repo (AGENT_PROMPT.md) for screening/tailoring.
+- Job market searches identified specific active hiring: Wycliffe Bible Translators (global health partnerships manager remote/worldwide, $65K–$95K), Kaiser Permanente (clinical trial coordinator I Bay Area, $62K–$75K), Genentech (clinical operations manager Bay Area, $95K–$140K), SCAN Health Plan (network compliance coordinator clinical remote, $48.8K–$78.2K).
+- 4 packages produced: Wycliffe Bible Translators Global Health Partnerships Manager (Pillar 2, $65K–$95K international), Kaiser Permanente Clinical Trial Coordinator (Pillar 1, $62K–$75K healthcare research), Genentech Clinical Operations Manager (Pillar 1, $95K–$140K biotech), SCAN Health Plan Network Compliance Coordinator (Pillar 1/3, $48.8K–$78.2K health plan).
+- All 4 are new company+title combinations (no dedupes from cycles 1–34).
+- Screened but not packaged: 3 (Amgen HEOR Senior Manager, Cedars-Sinai Program Manager Digital Scheduling, Stanford Health CRC Anesthesia—ranked lower priority).
+- Skipped: 1 (Nature Nexus Institute Grants & Operations Director—hard gate: specialized grant-writing experience not verified in ground truth).
+- 0 hard skips in final package selection.
+- Total packaged across all cycles: 123 roles (4 cycle 1 + 3 each cycles 2–25 + 3 cycle 26 + 2 cycle 27 + 3 cycle 28 + 6 cycle 29 + 5 cycle 30 + 2 cycle 31 + 4 cycle 32 + 4 cycle 33 + 4 cycle 34 + 4 cycle 35).
+- Career breadth and specialization: Cycle 35 expands international health partnership development at major global faith-based organization (Wycliffe from Operation Allies Welcome + MA International Studies foundation), reinforces clinical research pathway at major integrated healthcare system (Kaiser Permanente from Stanford CRC level), advances biotech clinical operations leadership (Genentech from healthcare technology + trial operations expertise), and introduces health plan network compliance specialization (SCAN from clinical compliance + healthcare audit background). Portfolio now spans: entry coordinator ($28K) → director ($277K) → specialized senior scientist ($267K) → operations management ($180K) → medical affairs/healthcare analytics ($60–$177K) → academic research administration ($56–$150K) → CRO project management ($104–$177K) → international health M&E ($52–$150K) → healthcare compliance/regulatory ($48.8K–$178K) → federal health research ($86.5K–$105K) → foundation global health ($92K–$150K) → integrated healthcare system research ($62K–$75K) → biotech clinical operations ($95K–$140K) → health plan network compliance ($48.8K–$78.2K), representing comprehensive advancement across clinical research, biotech operations, healthcare system research, international development, federal research, compliance, and health plan operations sectors.
 
 ## Cycle 2 notes (2026-07-21 batch-02)
 
