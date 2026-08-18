@@ -62,7 +62,14 @@ factors. Pull from `capture/library/` and tailor; never submit generic
 boilerplate. Quote the PWS/SOW's own language back when describing
 approach.
 
-### 1c. Pricing (template: `04_pricing_worksheet.md`)
+### 1c. Pricing (template: `04_pricing_worksheet.md`) — DELEGATED AUTHORITY
+(Andrew's standing order 8/17): Claude prices independently from data —
+BLS OES wages for the labor category and location, applicable wage
+determinations, comparable awards and industry averages, and the margin
+bands below — and presents the finished number WITH the submission
+package for Andrew's review. Never block a bid waiting on pricing
+input; never price below documented direct cost without an explicit
+strategic note (e.g., PP-builder loss-leader).
 Build the number bottom-up: labor from the wage determination (SCA/DBA)
 plus fringe/H&W, sub quotes, materials, overhead, then margin checked
 against the band for the fulfillment model (CLAUDE.md). Verify the
