@@ -1693,8 +1693,16 @@ def classify_setaside(opp):
         return ("8(a)", IS_8A_CERTIFIED, False)
     if code in WOSB_CODES:
         return ("WOSB", IS_WOSB_CERTIFIED, False)
-    if not code:
-        return ("None", True, False)  # Unrestricted -> anyone (incl. SB) may bid
+    # UNRESTRICTED. SAM.gov expresses "no set-aside" two ways: an absent/empty
+    # typeOfSetAside, AND the explicit code "NONE" with the description "No Set
+    # aside used". Both mean full and open — anyone, PRG included, may bid.
+    # Missing the "NONE" spelling marked genuinely biddable unrestricted work
+    # INELIGIBLE ("set-aside 'No Set aside used' excludes PRG"), which is
+    # backwards. It matters most in --intl mode, because FAR 19.000(b)(1)(i)
+    # makes set-asides mandatory only inside the US, so overseas notices are
+    # disproportionately unrestricted.
+    if not code or code == "NONE" or desc.lower().startswith("no set aside"):
+        return ("None", True, False)
     # Unknown / other restricted set-aside.
     return (desc or code, False, False)
 
@@ -1956,7 +1964,21 @@ def evaluate(opp):
     # DOWN and flag — never a hard kill (a specific one may fit PRG's
     # international ambitions later, but none are first-contract material).
     buyer_type, buyer_is_international, buyer_hit = _buyer_type(opp)
-    if buyer_is_international and not disqualified:
+    # --intl: overseas IS the lane, so the penalty below is switched off. The
+    # set-aside posture becomes a FLAG instead — advocacy on US overseas buys
+    # (FAR 19.000(b)(1)(ii) is discretionary, so ASK), one credibility line only
+    # in UN/multilateral lanes. See intl/GATE.md sec. A.
+    if INTL_MODE and buyer_is_international and not disqualified:
+        if _intl_is_un_system(opp):
+            soft_flags = list(soft_flags) + [
+                "UN/multilateral buyer — no US set-aside regime; SDVOSB is one "
+                "credibility line, never a preference claim"]
+        else:
+            soft_flags = list(soft_flags) + [
+                "US overseas buy — FAR 19.000(b)(1)(ii) set-aside is "
+                "DISCRETIONARY: ask the CO to consider one (overseas awards "
+                "count toward agency SB goals)"]
+    elif buyer_is_international and not disqualified:
         # Founder-consultancy lane: when the scope sits inside a founder
         # credential domain (gate3 >= 20), an international/overseas-post
         # buyer is PRG's separate consultancy lane — the set-aside edge never
@@ -2037,6 +2059,21 @@ def evaluate(opp):
         win_note = "Gate 0 — " + kill_reason
         is_solo = False
         rub["priority"] = 0
+    # INTERNATIONAL KILLS (intl/GATE.md sec. B 8-11) — only in --intl mode, and
+    # only after the shared domestic kills have had their say.
+    if INTL_MODE and not disqualified and not is_awarded:
+        intl_gate, intl_reason = screen_intl(opp, _extract_value(opp)[1])
+        if intl_gate:
+            disqualified = True
+            is_watch_template = False
+            lead_short = False
+            kill_gate = intl_gate
+            kill_reason = intl_reason
+            win_score, win_band, win_emoji = 0, "Red", "\U0001F534"
+            win_note = "Gate 0 — " + kill_reason
+            is_solo = False
+            rub["priority"] = 0
+
     short_fuse = (deadline_days is not None
                   and 0 <= deadline_days <= SHORT_FUSE_CALENDAR_DAYS)
     text_l = _haystack(opp)
@@ -2053,7 +2090,10 @@ def evaluate(opp):
         notice_class in ("SOURCES_SOUGHT", "SPECIAL", "RFI")
         and (tier == "primary" or is_solo)
         and not disqualified
-        and not buyer_is_international)
+        # --intl: an international buyer is the point, not a disqualifier. A
+        # sources-sought response on a US overseas buy is where the
+        # 19.000(b)(1)(ii) set-aside ask gets made — the cheapest edge we have.
+        and (INTL_MODE or not buyer_is_international))
 
     # Verdict precedence: timing → notice-type → hire-to-win → kills → urgency → fit.
     is_watch = notice_class in WATCH_NOTICE_CLASSES
@@ -3026,6 +3066,157 @@ def prg_rubric(opp, setaside_label, setaside_eligible, is_sdvosb, value_num,
 # --- Location, staffing, timeframe, fit, and win-likelihood --------------------
 
 _DOMESTIC_COUNTRY = {"USA", "US", "UNITED STATES", "USA ", ""}
+
+# ---------------------------------------------------------------------------
+# PRG INTERNATIONAL (--intl) — the second capture lane.
+#
+# The domestic screen treats an overseas place of performance / non-US buyer as
+# a NEGATIVE: FAR 19.000(b)(1)(i) makes small-business set-asides mandatory only
+# in the US and its outlying areas, so PRG's SDVOSB edge weakens abroad. In
+# --intl mode overseas IS the lane, so that penalty is switched OFF and the
+# international kills in intl/GATE.md are switched ON instead.
+#
+# Note the corrected law, which the domestic comment understates: FAR
+# 19.000(b)(1)(ii) says contracting officers **MAY** apply Part 19 outside the
+# US, and overseas awards count toward agency small-business goals. So an
+# overseas SDVOSB set-aside is DISCRETIONARY, not unavailable — which is exactly
+# what an intl sources-sought response asks the CO for. See intl/GATE.md sec. A.
+# ---------------------------------------------------------------------------
+INTL_MODE = False
+
+# Kill 8 — comprehensively sanctioned / embargoed jurisdictions. This is the
+# LEGAL kill and it has no override. Kept deliberately SHORT: it lists only
+# jurisdictions under comprehensive programs, because most OFAC country programs
+# are targeted at listed persons and are NOT a jurisdiction-level kill. The list
+# moves — intl/COMPLIANCE_RAILS.md Rail 1 is the live-verification procedure and
+# this constant is only a fast pre-filter, never the clearance itself.
+INTL_SANCTIONED_JURISDICTIONS = [
+    "north korea", "democratic people's republic of korea", "dprk",
+    "iran", "islamic republic of iran",
+    "cuba",
+    "crimea", "donetsk", "luhansk",
+]
+# ISO-ish country codes for the same, matched against placeOfPerformance.
+INTL_SANCTIONED_COUNTRY_CODES = {"PRK", "KP", "IRN", "IR", "CUB", "CU"}
+
+# Kill 9 — an in-country registered legal entity or in-country bank account
+# required AT PROPOSAL TIME. PRG cannot stand one up on a bid clock.
+# -> REGISTER-PREPOSITION, not a bid.
+INTL_LOCAL_ENTITY_KILL = [
+    "locally registered company", "locally registered firm",
+    "registered in the host country", "registered legal entity in",
+    "local legal entity", "in-country legal entity",
+    "local bank account", "in-country bank account",
+    "must be registered with the ministry",
+    "local tax identification number required",
+    "local commercial registration required",
+    "national registration certificate required",
+]
+
+# Kill 10 — local-national-only / host-country-firm-only tenders. Not winnable
+# by a US entity; note whether a local prime with PRG as sub is realistic.
+INTL_LOCAL_ONLY_KILL = [
+    "local national only", "local nationals only",
+    "host country nationals only", "host-country firms only",
+    "local firms only", "national firms only",
+    "restricted to local companies", "open to local suppliers only",
+    "national preference applies", "domestic firms only",
+    "locally employed staff only",
+]
+
+# Kill 11 — the UNGM Level 2 wall. UN business above US $500,000 requires UNGM
+# Level 2, which requires the company to have been established a MINIMUM OF
+# THREE YEARS (plus 3 client reference letters and financial statements). PRG
+# cannot meet the three-year test, so UN-system tenders above this line are an
+# eligibility PASS, not a judgment call. Track the eligibility date in
+# intl/PIPELINE.md and delete this kill when PRG turns three.
+INTL_UNGM_LEVEL1_CEILING = 500_000
+INTL_PRG_UNGM_LEVEL2_ELIGIBLE = False   # flip to True once PRG is 3 years old
+# Buyer signals that put a notice in the UN-system procurement regime.
+INTL_UN_SYSTEM_MARKERS = [
+    "united nations", "ungm", "un global marketplace", "undp", "unops",
+    "unicef", "unhcr", "unesco", "unfpa", "wfp", "world food programme",
+    "world health organization", "who ", "iom ",
+    "international organization for migration",
+]
+
+# US posting offices whose notices are the core of the intl lane. Used to widen
+# the SAM query beyond PRG's NAICS/PSC list in --intl mode (SAM's v2 search has
+# no place-of-performance-country filter, so we widen the pull and filter after).
+INTL_QUERY_DEPTNAMES = [
+    "STATE, DEPARTMENT OF",
+    "AGENCY FOR INTERNATIONAL DEVELOPMENT",
+]
+
+
+def _intl_relevant(opp):
+    """True when a notice belongs in the international lane: an overseas place
+    of performance, or an international / US-overseas-post buyer. Everything
+    else is the domestic system's job and is dropped from an --intl run."""
+    _, _, pop_international = _extract_location(opp)
+    if pop_international:
+        return True
+    _, buyer_international, _ = _buyer_type(opp)
+    return buyer_international
+
+
+def _intl_is_un_system(opp):
+    """True when the buyer sits in the UN-system procurement regime (where no US
+    set-aside applies and the UNGM registration ceiling governs)."""
+    blob = " ".join(str(opp.get(k, "")) for k in (
+        "fullParentPathName", "organizationName", "departmentName",
+        "subTier", "office", "title")).lower() + " " + _haystack(opp)
+    return any(m in blob for m in INTL_UN_SYSTEM_MARKERS)
+
+
+def screen_intl(opp, scale):
+    """International-only kills from intl/GATE.md sec. B (8-11). Returns
+    (kill_gate, kill_reason), both "" when the notice survives.
+
+    `scale` is the estimated value from _extract_value (may be None).
+    Runs only in --intl mode, AFTER the shared domestic kills."""
+    text = _haystack(opp)
+    _, country_code, _ = _extract_location(opp)
+    pop = opp.get("placeOfPerformance") or {}
+    country_name = ""
+    if isinstance(pop, dict):
+        c = pop.get("country") or {}
+        if isinstance(c, dict):
+            country_name = (c.get("name") or "").lower()
+
+    # Kill 8 — sanctions. LEGAL kill, no override.
+    hit = next((j for j in INTL_SANCTIONED_JURISDICTIONS
+                if j in country_name or j in text), None)
+    if hit or (country_code or "").upper() in INTL_SANCTIONED_COUNTRY_CODES:
+        return ("Gate 0 (intl: sanctioned jurisdiction)",
+                f"comprehensively sanctioned jurisdiction ({hit or country_code}) "
+                "— legal kill, no override; re-verify live per Rail 1")
+
+    # Kill 11 — UNGM Level 2 wall (UN-system buyers only).
+    if (not INTL_PRG_UNGM_LEVEL2_ELIGIBLE and scale is not None
+            and scale > INTL_UNGM_LEVEL1_CEILING and _intl_is_un_system(opp)):
+        return ("Gate 0 (intl: UNGM Level 2 wall)",
+                f"~{_format_currency(scale)} UN-system buy needs UNGM Level 2, "
+                "which requires 3 years since formation — PRG is ineligible to "
+                "register at that level")
+
+    # Kill 9 — in-country entity / bank account required at proposal time.
+    ent = _keyword_hits(text, INTL_LOCAL_ENTITY_KILL)
+    if ent:
+        return ("Gate 0 (intl: in-country entity at proposal)",
+                f"requires an in-country legal entity/bank account at proposal "
+                f"('{ent[0]}') — REGISTER-PREPOSITION; a local partner may cure "
+                "it next cycle")
+
+    # Kill 10 — local-national-only / host-country-firm-only.
+    loc = _keyword_hits(text, INTL_LOCAL_ONLY_KILL)
+    if loc:
+        return ("Gate 0 (intl: local-firm-only)",
+                f"restricted to host-country firms/nationals ('{loc[0]}') — not "
+                "winnable as a US entity; consider local prime with PRG as sub")
+
+    return ("", "")
+
 
 # Signals that an incumbent already performs the work (you'd take over / may
 # inherit staff) vs. a brand-new requirement (you hire from scratch).
@@ -5946,6 +6137,176 @@ _SELFTEST_CASES = [
         "forbid_verdict": "NO-BID",
         "expect_falsy": ["disqualified"],
     },
+    # ---- INTERNATIONAL LANE (--intl) ---------------------------------------
+    {
+        "label": "INTL: Manila embassy services, overseas PoP — in --intl the "
+                 "international-buyer penalty is OFF and the notice survives",
+        "intl_mode": True,
+        "opp": {
+            "solicitationNumber": "INTL-EMB-TEST",
+            "noticeId": "sti1",
+            "title": "Sources Sought — Program Support Services, U.S. Embassy Manila",
+            "description": ("The Government is conducting market research for "
+                            "program management and administrative support "
+                            "services at Embassy Manila."),
+            "naicsCode": "541611",
+            "organizationName": "American Embassy Manila",
+            "fullParentPathName": "STATE, DEPARTMENT OF",
+            "placeOfPerformance": {"country": {"code": "PHL",
+                                               "name": "Philippines"}},
+            "type": "Sources Sought",
+            "postedDate": "TODAY",
+        },
+        "deadline_offset_days": 21,
+        "expect_falsy": ["disqualified"],
+        "expect_truthy": ["buyer_is_international"],
+        "expect_contains": {"soft_flags_display": "19.000(b)(1)(ii)"},
+    },
+    {
+        "label": "INTL kill 8: sanctioned jurisdiction (Iran PoP) — legal kill, "
+                 "no override",
+        "intl_mode": True,
+        "opp": {
+            "solicitationNumber": "INTL-OFAC-TEST",
+            "noticeId": "sti2",
+            "title": "Technical Advisory Services",
+            "description": "Advisory support services for a field program.",
+            "naicsCode": "541611",
+            "fullParentPathName": "STATE, DEPARTMENT OF",
+            "placeOfPerformance": {"country": {"code": "IRN", "name": "Iran"}},
+            "type": "Combined Synopsis/Solicitation",
+            "postedDate": "TODAY",
+        },
+        "deadline_offset_days": 30,
+        "expect_verdict": "NO-BID",
+        "expect_truthy": ["disqualified"],
+        "expect_equals": {"kill_gate": "Gate 0 (intl: sanctioned jurisdiction)"},
+    },
+    {
+        "label": "INTL kill 9: in-country legal entity required at proposal — "
+                 "REGISTER-PREPOSITION, not a bid",
+        "intl_mode": True,
+        "opp": {
+            "solicitationNumber": "INTL-ENTITY-TEST",
+            "noticeId": "sti3",
+            "title": "Facilities Support Services, Consulate General",
+            "description": ("Offerors must be a locally registered company "
+                            "with a local bank account at the time of proposal "
+                            "submission."),
+            "naicsCode": "561210",
+            "organizationName": "U.S. Consulate General",
+            "fullParentPathName": "STATE, DEPARTMENT OF",
+            "placeOfPerformance": {"country": {"code": "BRA", "name": "Brazil"}},
+            "type": "Combined Synopsis/Solicitation",
+            "postedDate": "TODAY",
+        },
+        "deadline_offset_days": 30,
+        "expect_truthy": ["disqualified"],
+        "expect_equals": {
+            "kill_gate": "Gate 0 (intl: in-country entity at proposal)"},
+    },
+    {
+        "label": "INTL kill 10: host-country-firms-only tender — not winnable "
+                 "as a US entity",
+        "intl_mode": True,
+        "opp": {
+            "solicitationNumber": "INTL-LOCALONLY-TEST",
+            "noticeId": "sti4",
+            "title": "Logistics Support Services",
+            "description": ("This tender is restricted to local companies; "
+                            "national preference applies."),
+            "naicsCode": "541614",
+            "fullParentPathName": "STATE, DEPARTMENT OF",
+            "placeOfPerformance": {"country": {"code": "PER", "name": "Peru"}},
+            "type": "Combined Synopsis/Solicitation",
+            "postedDate": "TODAY",
+        },
+        "deadline_offset_days": 30,
+        "expect_truthy": ["disqualified"],
+        "expect_equals": {"kill_gate": "Gate 0 (intl: local-firm-only)"},
+    },
+    {
+        "label": "INTL kill 11: UN-system buy over $500K — UNGM Level 2 needs "
+                 "3 years since formation; PRG is ineligible",
+        "intl_mode": True,
+        "opp": {
+            "solicitationNumber": "INTL-UNGM-TEST",
+            "noticeId": "sti5",
+            "title": "UNDP Request for Proposal — Health Programme Support",
+            "description": ("The United Nations Development Programme seeks a "
+                            "vendor for health programme support services. "
+                            "Estimated contract value $1,200,000."),
+            "naicsCode": "541611",
+            "organizationName": "United Nations Development Programme",
+            "placeOfPerformance": {"country": {"code": "KEN", "name": "Kenya"}},
+            "type": "Combined Synopsis/Solicitation",
+            "postedDate": "TODAY",
+        },
+        "deadline_offset_days": 30,
+        "expect_truthy": ["disqualified"],
+        "expect_equals": {"kill_gate": "Gate 0 (intl: UNGM Level 2 wall)"},
+    },
+    {
+        "label": "INTL: a UN-system buy UNDER the $500K Level 1 ceiling is NOT "
+                 "killed — and carries the no-set-aside credibility flag",
+        "intl_mode": True,
+        "opp": {
+            "solicitationNumber": "INTL-UNGM-OK-TEST",
+            "noticeId": "sti6",
+            "title": "UNDP Request for Proposal — Monitoring Support",
+            "description": ("The United Nations Development Programme seeks "
+                            "monitoring and evaluation support. Estimated "
+                            "value $180,000."),
+            "naicsCode": "541611",
+            "organizationName": "United Nations Development Programme",
+            "placeOfPerformance": {"country": {"code": "PER", "name": "Peru"}},
+            "type": "Combined Synopsis/Solicitation",
+            "postedDate": "TODAY",
+        },
+        "deadline_offset_days": 30,
+        "expect_falsy": ["disqualified"],
+        "expect_contains": {"soft_flags_display": "credibility line"},
+    },
+    {
+        "label": "INTL kills stay OFF in the domestic run — the same "
+                 "local-entity notice is not killed by an intl gate",
+        "intl_mode": False,
+        "opp": {
+            "solicitationNumber": "INTL-OFFMODE-TEST",
+            "noticeId": "sti7",
+            "title": "Facilities Support Services, Consulate General",
+            "description": ("Offerors must be a locally registered company "
+                            "with a local bank account at the time of proposal "
+                            "submission."),
+            "naicsCode": "561210",
+            "fullParentPathName": "STATE, DEPARTMENT OF",
+            "placeOfPerformance": {"country": {"code": "BRA", "name": "Brazil"}},
+            "type": "Combined Synopsis/Solicitation",
+            "postedDate": "TODAY",
+        },
+        "deadline_offset_days": 30,
+        "expect_falsy": ["disqualified"],
+    },
+    {
+        "label": "REGRESSION set-aside 'NONE' / 'No Set aside used' is "
+                 "UNRESTRICTED — must be eligible, not excluded",
+        "opp": {
+            "solicitationNumber": "SETASIDE-NONE-TEST",
+            "noticeId": "stsa1",
+            "title": "Program Management Support Services",
+            "description": ("The Government requires program management and "
+                            "administrative support services."),
+            "naicsCode": "541611",
+            "typeOfSetAside": "NONE",
+            "typeOfSetAsideDescription": "No Set aside used",
+            "fullParentPathName": "STATE, DEPARTMENT OF",
+            "type": "Combined Synopsis/Solicitation",
+            "postedDate": "TODAY",
+        },
+        "deadline_offset_days": 30,
+        "expect_falsy": ["disqualified"],
+        "expect_equals": {"setaside": "None"},
+    },
 ]
 
 
@@ -5962,13 +6323,24 @@ def run_selftests():
                 today + dt.timedelta(days=case["deadline_offset_days"])).isoformat()
         if opp.get("postedDate") == "TODAY":
             opp["postedDate"] = today.isoformat()
-        r = evaluate(opp)
+        # --intl cases exercise evaluate() with the international lane on.
+        global INTL_MODE
+        prev_intl, INTL_MODE = INTL_MODE, bool(case.get("intl_mode"))
+        try:
+            r = evaluate(opp)
+        finally:
+            INTL_MODE = prev_intl
         if "expect_verdict" in case:
             passed = (r["verdict"] == case["expect_verdict"])
             want = f"== {case['expect_verdict']}"
-        else:
+        elif "forbid_verdict" in case:
             passed = (r["verdict"] != case["forbid_verdict"])
             want = f"!= {case['forbid_verdict']}"
+        else:
+            # A case may assert only on fields (kill_gate, soft_flags, …) and
+            # leave the verdict itself unconstrained.
+            passed = True
+            want = "(fields only)"
         for field in case.get("expect_truthy", []):
             if not r.get(field):
                 passed = False
@@ -6066,6 +6438,16 @@ def parse_args(argv):
                              "(recompetes, grants, SBIR, ReliefWeb) so a daily "
                              "run finishes in ~2-3 min. SAM.gov is still fully "
                              "queried; use the weekly full run for the rest.")
+    parser.add_argument("--intl", action="store_true",
+                        help="INTERNATIONAL LANE (PRG International). Keeps only "
+                             "notices with an overseas place of performance or an "
+                             "international/US-overseas-post buyer, widens the "
+                             "SAM pull to State/foreign-assistance posting "
+                             "offices, drops the domestic international-buyer "
+                             "score penalty, and applies the international kills "
+                             "in intl/GATE.md (sanctions, in-country entity at "
+                             "proposal, local-firm-only, UNGM Level 2 wall). "
+                             "Outputs are named PRG_INTL_*.")
     parser.add_argument("--selftest", action="store_true",
                         help="Run the built-in NO-BID rule self-tests and exit.")
     return parser.parse_args(argv)
@@ -6076,6 +6458,15 @@ def main(argv=None):
 
     if args.selftest:
         return run_selftests()
+
+    # INTERNATIONAL LANE. evaluate() reads this module-level flag, so it has to
+    # be set before any notice is screened.
+    global INTL_MODE
+    INTL_MODE = bool(args.intl)
+    if INTL_MODE:
+        sys.stderr.write(
+            "INTERNATIONAL MODE (--intl): overseas place of performance or "
+            "international buyer only; intl/GATE.md kills applied.\n")
 
     # --fast bundles the skips that make a daily run finish in minutes, not
     # hours. The big one is the WIDE-NET sweep: it pulls every small-business
@@ -6158,6 +6549,35 @@ def main(argv=None):
                 new += 1
             sys.stderr.write(f"  set-aside {sa}: {len(batch)} record(s) "
                              f"({new} new)\n")
+
+    # INTERNATIONAL LANE — SAM's v2 search has no place-of-performance-country
+    # filter, so widen the pull by posting office (State, foreign assistance)
+    # and filter to overseas notices afterwards. Overseas DoD commands are
+    # already reached by the NAICS/PSC/set-aside sweeps above; the filter below
+    # is what actually keeps only the international ones.
+    if INTL_MODE:
+        for dept in INTL_QUERY_DEPTNAMES:
+            batch = fetch_opportunities(
+                api_key, dept, posted_from, posted_to, args.limit,
+                code_param="deptname",
+            )
+            new_n = 0
+            for opp in batch:
+                key = (opp.get("noticeId") or opp.get("solicitationNumber")
+                       or id(opp))
+                if key in seen:
+                    continue
+                seen.add(key)
+                all_opps.append(opp)
+                new_n += 1
+            sys.stderr.write(f"  dept {dept}: {len(batch)} record(s) "
+                             f"({new_n} new)\n")
+
+        before = len(all_opps)
+        all_opps = [o for o in all_opps if _intl_relevant(o)]
+        sys.stderr.write(
+            f"  --intl filter: kept {len(all_opps)} of {before} notice(s) with "
+            "an overseas place of performance or international buyer\n")
 
     # Recompete Radar — upcoming rebids from USASpending.gov (keyless API).
     recompetes = []
@@ -6243,17 +6663,22 @@ def main(argv=None):
     # Resolve output paths. --outdir writes date-stamped files into a folder
     # (for the scheduled automation history); otherwise write to the Desktop.
     stamp = dt.date.today().isoformat()
+    # --intl writes PRG_INTL_* so an international run never overwrites the
+    # domestic run's dated snapshot for the same day.
+    xl_stem = "PRG_INTL_Contracts" if INTL_MODE else "PRG_Contracts"
+    rp_stem = ("PRG_INTL_Executive_Report" if INTL_MODE
+               else "PRG_Executive_Report")
     if args.outdir:
         os.makedirs(args.outdir, exist_ok=True)
-        xlsx_path = os.path.join(args.outdir, f"PRG_Contracts_{stamp}.xlsx")
-        report_path = os.path.join(args.outdir, f"PRG_Executive_Report_{stamp}.html")
+        xlsx_path = os.path.join(args.outdir, f"{xl_stem}_{stamp}.xlsx")
+        report_path = os.path.join(args.outdir, f"{rp_stem}_{stamp}.html")
     else:
         # Default Desktop files carry the search date so each run is its own
         # dated snapshot (e.g. PRG_Contracts_2026-07-07.xlsx) instead of
         # overwriting the last one. An explicit --excel/--report still wins.
-        xlsx_path = args.excel or _desktop_path(f"PRG_Contracts_{stamp}.xlsx")
+        xlsx_path = args.excel or _desktop_path(f"{xl_stem}_{stamp}.xlsx")
         report_path = args.report or _desktop_path(
-            f"PRG_Executive_Report_{stamp}.html")
+            f"{rp_stem}_{stamp}.html")
 
     saved = []
     if not args.no_excel:

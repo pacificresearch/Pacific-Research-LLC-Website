@@ -122,6 +122,55 @@ Key rules (full detail in the workflow doc and `capture/templates/`):
 - On loss: `09_loss_debrief.md` — always request the debrief, file
   reusable content to the library.
 
+## INTERNATIONAL LANE — PRG International
+
+PRG runs a SECOND capture system for overseas work: **any** international
+contract, not healthcare-specific — embassy/consulate procurement,
+overseas DoD and State requirements, UN system tenders, development-bank
+assignments, foreign-affairs support, logistics, training, research,
+facilities, advisory. Same aggregation model, sourced locally: PRG primes
+and owns the contract; Andrew travels to post to source, vet, hire, and
+manage local experts and local firms. **Founder travel is a priced direct
+cost, never an overrun.**
+
+Everything lives in `intl/` and shares ONE library with the domestic
+system at `capture/library/`:
+
+- `intl/GATE.md` — the international screening gate. **Run it FIRST on
+  any overseas notice, before `capture/WORKFLOW.md`.**
+- `intl/WORKFLOW.md` — SCREEN → PURSUE → SUBMIT → MONITOR → WIN/LOSS
+- `intl/COMPLIANCE_RAILS.md` — the nine mandatory rails
+- `intl/PRICING.md` · `intl/SOURCES.md` · `intl/UNGM_REGISTRATION.md`
+- `intl/DAILY_RUN.md` — appends an INTERNATIONAL section to the same
+  morning report; one run, one notification, two lanes
+- `intl/PIPELINE.md` · `intl/experts/` · `intl/templates/`
+
+Three facts that override the domestic instincts — get these right:
+
+1. **SDVOSB overseas is DISCRETIONARY, not dead.** FAR 19.000(b)(1)(ii):
+   contracting officers *may* apply Part 19 outside the US, and overseas
+   awards count toward agency small-business goals. So on a U.S.
+   government overseas buy, **ask the CO to consider a set-aside** — that
+   is the cheapest real edge in this lane. In UN/multilateral/bank
+   procurement no US preference exists at all: SDVOSB is **one
+   credibility line**, never an entitlement.
+2. **UN business is capped at US $500,000 until PRG turns three.** UNGM
+   Level 2 (required above $500K) requires the company to have been
+   established a minimum of three years. Above that line it is an
+   eligibility PASS, not a judgment call.
+3. **Conflict zones are NOT a kill** (Andrew's standing decision 8/18 —
+   veteran, TCCC, accepts the risk). They require the mandatory six-line
+   RISK block and a higher margin band instead. **OFAC/sanctions IS a
+   kill, with no override.**
+
+Absolute honesty rule for this lane: never claim in-country presence, an
+office, a local entity, prior work in a country, or a language PRG does
+not have. Local partners supply presence and are **named as partners**.
+
+Screening tool: `python3 samgov_opportunity_matcher.py --intl` — overseas
+place of performance / international buyer only, domestic
+international-buyer penalty off, international kills on.
+
 ## Repository context
 
 - The SAM.gov screening tool lives on branch
@@ -129,3 +178,6 @@ Key rules (full detail in the workflow doc and `capture/templates/`):
   (`samgov_opportunity_matcher.py`, PR #1). Its capture-v3 gates, roles,
   and weighted priority score implement this rule; keep the two aligned
   when either changes.
+- The international lane (`intl/`, and the matcher's `--intl` mode)
+  implements `intl/GATE.md`; keep the gate doc and the matcher aligned
+  when either changes, same as the domestic pair.
