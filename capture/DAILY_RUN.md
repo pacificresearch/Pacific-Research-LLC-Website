@@ -91,6 +91,10 @@ waiting on Andrew:
 Then one line each for backlog survivors and the PASS count. No filler.
 
 ## Standing boundaries
+- **Replying to a CO: use the reply tools, not `send_mail`.** Find their
+  message and reply into the conversation so the exchange stays threaded
+  on their end (`capture/WORKFLOW.md` Stage 2). `send_mail` with "RE:"
+  in the subject starts a second thread. New conversations only.
 - ⛔ NEVER auto-send email to a contracting officer, submit a quote, or
   publish a job posting to an external board. Prepare + notify only.
   The careers page ships only via draft PR that Andrew merges.

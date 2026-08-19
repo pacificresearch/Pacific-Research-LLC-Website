@@ -1,7 +1,10 @@
 # CO reply — 36C26326Q1034 (BD PYXIS CATO)
 **Status: SENT 2026-08-19** via Outlook from Andrew@pacificresearchllc.com
 to Joshua.Imdacha@va.gov, on Andrew's explicit instruction. Saved to Sent
-Items. No further action on this notice — PRG is not pursuing it.
+Items. **Sent with send_mail rather than a threaded reply — it reached
+Joshua as a new message instead of on his thread. Process corrected in
+capture/WORKFLOW.md; not re-sent, since two emails about one withdrawal
+is worse than one misthreaded.** No further action on this notice — PRG is not pursuing it.
 
 **To:** Joshua.Imdacha@va.gov
 **From:** Andrew@pacificresearchllc.com
