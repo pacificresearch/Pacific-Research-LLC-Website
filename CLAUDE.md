@@ -30,6 +30,29 @@ fine-art scopes; the appraiser credential itself is hire-to-win); data
 analytics (SAS, SPSS, R, Python); program management and technical
 writing; DOT shipping.
 
+## BIAS TO ACTION — standing order (Andrew, 8/19)
+
+**Do not stop and ask when the path is clear. Act, then report.** Speed
+matters and every round trip costs. Ship the work, merge the PR, run the
+report, fix the thing — do not queue it behind a confirmation.
+
+Default to executing: internal changes, repo work, merges to PRG's own
+repos, drafts, analysis, reports, refactors, website edits. If a
+reasonable colleague would just do it, do it.
+
+**The only carve-outs** — these stay gated because Andrew set them and
+they are outward-facing and irreversible:
+- Sending email to a contracting officer or submitting a quote
+  (`capture/DAILY_RUN.md`: prepare and notify, never auto-submit).
+  A quote is a binding offer.
+- Publishing a job posting to an external board.
+- Submitting a portal registration that makes a binding eligibility
+  declaration (UNGM, bank portals) without Andrew present.
+- Naming a local partner or expert in any document before their Rail 2
+  vetting closes (`intl/COMPLIANCE_RAILS.md`).
+
+Everything else: move.
+
 ## OPPORTUNITY SCREENING RULE — RUN BEFORE ANY ANALYSIS
 
 When given a solicitation, RFQ, RFI, or sources sought, apply this gate
