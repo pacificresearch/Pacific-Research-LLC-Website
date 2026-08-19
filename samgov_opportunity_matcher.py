@@ -34,8 +34,10 @@ Notes:
 """
 
 import argparse
+import concurrent.futures as cf
 import datetime as dt
 import hashlib
+import html as html_module
 import json
 import os
 import re
@@ -1233,6 +1235,113 @@ def _http_retry(fn, *args, **kwargs):
                 raise
             time.sleep(delay)
             delay *= 2
+
+# ---------------------------------------------------------------------------
+# DESCRIPTION HYDRATION
+#
+# SAM's /opportunities/v2/search endpoint does NOT return the notice body. The
+# "description" field is a URL to a second endpoint. Verified 2026-08-19: this
+# is true for 100% of notices (329/329 sampled), not an occasional case.
+#
+# Until this was fixed, _haystack() saw title + an API URL + the NAICS/PSC codes
+# and nothing else, so EVERY keyword gate — resale, OEM passthrough, sole
+# source, bonding, licensure, capability match, solo detection, FTE parsing —
+# was screening on the title alone. That is how 36C26326Q1034 (a BD Pyxis CATO
+# *software subscription*, sole-source to the OEM) passed the gate: its title
+# reads "J065--BD PYXIS (CATO) Maintenance Support Services", which looks like
+# biomedical equipment maintenance and nothing in the title says otherwise.
+#
+# Descriptions are cached on disk by notice id so re-runs cost nothing.
+# ---------------------------------------------------------------------------
+DESC_CACHE_PATH = os.path.join(os.path.expanduser("~"), ".prg_desc_cache.json")
+DESC_URL = "https://api.sam.gov/prod/opportunities/v1/noticedesc"
+_DESC_CACHE = None
+
+
+def _desc_cache():
+    global _DESC_CACHE
+    if _DESC_CACHE is None:
+        try:
+            with open(DESC_CACHE_PATH) as fh:
+                _DESC_CACHE = json.load(fh)
+        except Exception:
+            _DESC_CACHE = {}
+    return _DESC_CACHE
+
+
+def _save_desc_cache():
+    try:
+        with open(DESC_CACHE_PATH, "w") as fh:
+            json.dump(_DESC_CACHE or {}, fh)
+    except Exception:
+        pass
+
+
+_TAG_RE = re.compile(r"<[^>]+>")
+
+
+def _strip_html(raw):
+    txt = _TAG_RE.sub(" ", raw or "")
+    txt = html_module.unescape(txt)
+    return re.sub(r"\s+", " ", txt).strip()
+
+
+def fetch_description(opp, api_key):
+    """Return the notice's real body text, fetching and caching as needed.
+
+    Returns "" on any failure — a missing description must never abort a run,
+    it just leaves that notice screened on its title as before."""
+    nid = opp.get("noticeId")
+    if not nid:
+        return ""
+    cache = _desc_cache()
+    if nid in cache:
+        return cache[nid]
+    try:
+        resp = _http_retry(requests.get, DESC_URL,
+                           params={"api_key": api_key, "noticeid": nid},
+                           timeout=20)
+        if resp.status_code == 429:
+            _RUN_STATE["rate_limited"] = True
+            return ""
+        resp.raise_for_status()
+        try:
+            body = resp.json().get("description", "")
+        except ValueError:
+            body = resp.text
+        text = _strip_html(body)[:20000]
+    except Exception:
+        text = ""
+    cache[nid] = text
+    return text
+
+
+def hydrate_descriptions(opps, api_key, workers=8):
+    """Replace each notice's description-URL with its real text, in parallel.
+
+    Only fetches notices whose description is still a bare URL."""
+    todo = [o for o in opps
+            if str(o.get("description", "")).strip().lower().startswith("http")]
+    if not todo:
+        return 0
+    sys.stderr.write(f"  Hydrating {len(todo)} notice description(s) "
+                     f"(cached across runs)...\n")
+    done = 0
+    with cf.ThreadPoolExecutor(max_workers=workers) as ex:
+        futs = {ex.submit(fetch_description, o, api_key): o for o in todo}
+        for fut in cf.as_completed(futs):
+            o = futs[fut]
+            try:
+                text = fut.result()
+            except Exception:
+                text = ""
+            if text:
+                o["description"] = text
+                done += 1
+    _save_desc_cache()
+    sys.stderr.write(f"    {done} of {len(todo)} description(s) retrieved\n")
+    return done
+
 
 def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
                         code_param="ncode"):
@@ -6578,6 +6687,12 @@ def main(argv=None):
         sys.stderr.write(
             f"  --intl filter: kept {len(all_opps)} of {before} notice(s) with "
             "an overseas place of performance or international buyer\n")
+
+    # HYDRATE DESCRIPTIONS before any screening. SAM's search endpoint returns
+    # a URL in place of the notice body, so without this every keyword gate
+    # sees only the title. This is the difference between screening a scope and
+    # screening a headline.
+    hydrate_descriptions(all_opps, api_key)
 
     # Recompete Radar — upcoming rebids from USASpending.gov (keyless API).
     recompetes = []
