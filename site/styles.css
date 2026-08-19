@@ -149,6 +149,19 @@ h1,h2,h3,h4,p{margin:0}
 .leader-card .role{font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-300);margin:6px 0 18px}
 .leader-card p{font-size:14.5px;line-height:1.65;color:rgba(255,255,255,.82)}
 .leader-badges{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.leader-card p.leader-lede{font-size:15px;line-height:1.6;color:rgba(255,255,255,.9)}
+.leader-record{list-style:none;margin:22px 0 0;padding:20px 0 0;border-top:1px solid rgba(255,255,255,.14);display:grid;gap:18px}
+.leader-record li{display:grid;grid-template-columns:86px 1fr;gap:16px;align-items:start}
+.leader-record .lr-n{font-family:var(--font-display);font-size:27px;font-weight:600;line-height:1.05;color:var(--sand-300);letter-spacing:-.01em;white-space:nowrap}
+.leader-record .lr-n small{font-size:16px;margin-left:1px}
+.leader-record .lr-t{font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.8)}
+.leader-record .lr-t b{color:#fff;font-weight:700}
+.leader-record .lr-t i{font-style:italic}
+.leader-card p.leader-note{margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,.14);font-size:13px;line-height:1.6;color:rgba(255,255,255,.68)}
+@media(max-width:560px){
+  .leader-record li{grid-template-columns:1fr;gap:4px}
+  .leader-record .lr-n{font-size:24px}
+}
 .ident-panel{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border-1);border-radius:var(--radius-md);overflow:hidden;margin-top:24px}
 .ident-cell{padding:16px 18px;border-right:1px solid var(--border-1);border-bottom:1px solid var(--border-1)}
 .ident-cell:nth-child(2n){border-right:none}
