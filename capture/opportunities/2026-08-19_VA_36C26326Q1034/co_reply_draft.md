@@ -1,5 +1,7 @@
 # CO reply — 36C26326Q1034 (BD PYXIS CATO)
-**Status: DRAFT — ⛔ Andrew reviews and sends.** Outward-facing to a CO.
+**Status: SENT 2026-08-19** via Outlook from Andrew@pacificresearchllc.com
+to Joshua.Imdacha@va.gov, on Andrew's explicit instruction. Saved to Sent
+Items. No further action on this notice — PRG is not pursuing it.
 
 **To:** Joshua.Imdacha@va.gov
 **From:** Andrew@pacificresearchllc.com
