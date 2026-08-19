@@ -32,12 +32,17 @@ notice IDs already present in `capture/reports/` and
 ## 3. Screen and select — VOLUME MODE (Andrew's standing order 8/17)
 FIRST: for every pre-RFP notice (sources sought / RFI / presolicitation)
 the matcher marks **`respond_recommended: True`**, draft a tailored
-capability response the SAME DAY into its opportunity folder (cover + capability + SDVOSB set-aside
-advocacy + FAR 9.104-1 + SAM confirmation; download notice attachments
-and follow any prescribed format). Queue each as an Outlook draft when
-the connector is available; notify Andrew of ALL pending sends. Never
-send a generic blast — every response cites the notice's own scope
-language. Solicitations (biddable) still get ranked and selected below.
+capability response the SAME DAY into its opportunity folder using
+**`capture/templates/14_sources_sought_response.md`** — under 200 words,
+answering only what the notice asks, in the notice's own words and
+order. No FAR 9.104-1 recital, no SAM-registration sentence, no reflex
+set-aside advocacy, and no credentials that do not bear on this scope
+(Andrew, 8/19). Download notice attachments and follow any prescribed
+format. Queue each as an Outlook draft when the connector is available;
+notify Andrew of ALL pending sends. Never send a generic blast — the
+8/17 batch sent one identical 118-word credential dump to a concrete
+notice, a bat-removal notice, a staffing notice, and a software
+subscription. Every response cites the notice's own scope language. Solicitations (biddable) still get ranked and selected below.
 **Volume mode is gated on `respond_recommended`, NOT on "survived the
 gate."** Those are different tests and conflating them is what sent three
 of the 18 responses in the 2026-08-17 batch to notices PRG could never
