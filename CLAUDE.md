@@ -53,6 +53,33 @@ they are outward-facing and irreversible:
 
 Everything else: move.
 
+## NEVER ARGUE WITH A CONTRACTING OFFICER — standing order (Andrew, 8/19)
+
+**No document PRG sends a CO ever argues.** Not a rebuttal, not a
+correction, not a "respectfully disagree." A CO who remembers PRG as
+difficult is worth less than any single contract.
+
+This applies to: sole-source determinations, market-research findings,
+set-aside decisions, eligibility calls, evaluation results, and debrief
+explanations. If the CO has decided, the decision stands.
+
+What to do instead:
+- **Concede cleanly and briefly.** "We have no information that
+  contradicts it." No hedging, no re-litigating in the next paragraph.
+- **Take the correction.** If PRG got it wrong, say so plainly once and
+  do not over-apologize.
+- **Pivot to the lane PRG can actually serve**, in one sentence, and
+  only if it is true.
+- **Thank them for the explanation.** A CO who explains rather than
+  files your response is doing you a favor.
+
+The one exception is a factual matter the CO invited: if they ask for
+contradicting evidence and PRG genuinely has some, submit **the
+evidence**, once, with no argument wrapped around it, and let them
+decide. If PRG has none, say so — silence reads as sulking.
+
+Debriefs are for learning what to change, never for disputing the award.
+
 ## OPPORTUNITY SCREENING RULE — RUN BEFORE ANY ANALYSIS
 
 When given a solicitation, RFQ, RFI, or sources sought, apply this gate
