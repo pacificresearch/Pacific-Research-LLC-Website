@@ -26,6 +26,7 @@ The gate's kill list IS the accumulated falsification record of "ANY."
 | 7 | 8/18 | VA GCP PWS 7.3.5/7.3.6 nearly missed: 10-yr monitoring + 5-yr federal per named monitor buried in quals section | Compliance-matrix rule: personnel-qualification sections get line-by-line extraction BEFORE staffing decisions; founder-as-key-person claims re-checked against every quals row |
 | 8 | 8/19 | Intl sweep: embassy commodity buys (vehicles, phones, parts) dominate volume but are pure resale; insurance requires underwriter licensure; A&E requires firm licensure | Intl gate: resale/underwriting/A&E auto-kills; matcher intl mode down-ranks "purchase/acquisition of" titles |
 | 9 | 8/19 | M365 connector flaps repeatedly; sends missed their window twice | Durable SEND_QUEUE.md pattern: every outbound queued in-repo; any session with Outlook processes queue FIRST |
+| 10 | 8/19 | MCRC ROM draft stated "completion within 2-3 weeks of award" with no crew under commitment (Andrew caught it) | Rule: pre-proposal communications state durations as "typically completed in X" market estimates; firm schedules ONLY at proposal, backed by a committed sub quote. Sub quotes (3) collected during PURSUE, before any bid |
 
 ## Standing experiment rules
 1. Every PASS records its kill criterion (one line) — that's a data point,
