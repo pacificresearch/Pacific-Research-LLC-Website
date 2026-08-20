@@ -1,4 +1,22 @@
 # PRG International Pipeline — live status board
+> **OWNERSHIP (Andrew, 8/19): a SEPARATE dedicated session owns all
+> international work. The domestic capture session does NOT work `intl/`
+> — no sweeps, no responses, no bids. Handoff state below is current as
+> of 8/19; international session takes it from here.**
+>
+> Handoff to the international session:
+> 1. INL Mexico (19AQMM26N0003): capability statement docx built
+>    (`03_response/`), Outlook draft created to ModrakER@state.gov —
+>    Andrew attaches the docx and sends. Due Aug 28, 4 PM CST.
+> 2. DoDEA Italy + Japan RFIs: attachments not yet downloaded; responses
+>    not yet built. Due Aug 28.
+> 3. Canberra U.S. Studies Conferences RFQ (19AS2026Q0031): beachhead
+>    bid candidate, due Sep 11. RFQ not yet downloaded.
+> 4. Bahrain curatorial (19BA3026Q0003): monitor for solicitation.
+> 5. Kickoff prompt with full system design: `capture/INTL_SYSTEM_PROMPT.md`.
+> 6. Email style rules (SDVOSB once, no em dashes, short/no fluff) and
+>    honesty rules apply identically — see capture/WORKFLOW.md.
+>
 > **Started 2026-08-19.** First sweep: 3,058 SAM notices (7 days) → 158
 > overseas place-of-performance → 103 gate survivors → shortlist below.
 
@@ -22,4 +40,4 @@ Naples DHA sole-source notices (intent to award), embassy commodity ITBs (vehicl
 
 ## Standing notes
 - Overseas State/DoD notices generally carry **no SDVOSB preference** — but INL Mexico and both DoDEA RFIs explicitly solicit SDVOSB interest; those responses directly feed set-aside decisions. Respond to every such poll.
-- SAM international sweep: rerun the 7-day overseas filter in each daily run (`ptype o,p,r,k,i` → PoP country ≠ USA → gate).
+- SAM international sweep (7-day overseas filter: `ptype o,p,r,k,i` → PoP country ≠ USA → gate) is run by the INTERNATIONAL session only. The domestic daily run skips it.
