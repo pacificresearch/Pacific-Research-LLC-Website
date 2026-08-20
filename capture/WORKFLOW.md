@@ -109,7 +109,13 @@ signatures in place (SF1449/SF33 blocks), submitted ahead of deadline
 with delivery confirmation saved to `01_solicitation/`.
 
 Email channel: all CO correspondence and email submissions go from
-**Andrew@pacificresearchllc.com (Outlook)**. Claude drafts the
+**Andrew@pacificresearchllc.com (Outlook)**.
+
+EMAIL STYLE (Andrew's standing orders): (1) SDVOSB stated ONCE per
+email, never spelled out. (2) NO em dashes, ever (8/19). (3) Short and
+to the point, no fluff: lead with the answer, one short paragraph per
+topic, cut pleasantries beyond one line. Applies to emails; proposal
+documents keep full professional prose. Claude drafts the
 submission email (subject line per solicitation instructions, attachments
 listed, professional cover text); Andrew reviews and sends. If the
 Microsoft 365 connector is linked, draft directly in Outlook; otherwise
