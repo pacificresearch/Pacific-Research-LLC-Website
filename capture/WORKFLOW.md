@@ -109,7 +109,17 @@ signatures in place (SF1449/SF33 blocks), submitted ahead of deadline
 with delivery confirmation saved to `01_solicitation/`.
 
 Email channel: all CO correspondence and email submissions go from
-**Andrew@pacificresearchllc.com (Outlook)**. Claude drafts the
+**Andrew@pacificresearchllc.com (Outlook)**.
+
+**Replies go ON the thread, never as a new message.** When a CO writes
+to PRG, reply into their conversation so the whole exchange stays in one
+place for them — search their message with `outlook_email_search`, then
+use `outlook_create_reply_draft` (or reply-all where others are copied),
+which sets the conversation id and reference headers. A fresh
+`outlook_send_mail` with "RE:" typed into the subject line looks like a
+reply but starts a second thread, and the CO now has two places to track
+one conversation. Only use `send_mail` to open a NEW conversation —
+first contact on a notice, or a submission. Claude drafts the
 submission email (subject line per solicitation instructions, attachments
 listed, professional cover text); Andrew reviews and sends. If the
 Microsoft 365 connector is linked, draft directly in Outlook; otherwise

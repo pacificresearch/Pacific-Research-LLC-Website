@@ -18,20 +18,45 @@ the run PREPARES those actions but never executes them.
 python3 samgov_opportunity_matcher.py --days 3 --limit 100 \
   > capture/reports/PRG_report_YYYY-MM-DD.md
 ```
+**Descriptions are hydrated automatically.** SAM's search endpoint
+returns a URL in place of the notice body for 100% of notices, so the
+run fetches each description before screening (cached across runs in
+`~/.prg_desc_cache.json`). If the hydration line reports 0 retrieved,
+the screen is running on titles only — STOP and fix it rather than
+trusting the output.
 (`SAM_API_KEY` env var overrides the built-in key.) Commit the report.
 Look back 3 days so weekend/holiday gaps self-heal; dedupe against
 notice IDs already present in `capture/reports/` and
 `capture/opportunities/`.
 
 ## 3. Screen and select — VOLUME MODE (Andrew's standing order 8/17)
-FIRST: for EVERY pre-RFP notice (sources sought / RFI / presolicitation)
-that survives the gate, draft a tailored capability response the SAME
-DAY into its opportunity folder (cover + capability + SDVOSB set-aside
-advocacy + FAR 9.104-1 + SAM confirmation; download notice attachments
-and follow any prescribed format). Queue each as an Outlook draft when
-the connector is available; notify Andrew of ALL pending sends. Never
-send a generic blast — every response cites the notice's own scope
-language. Solicitations (biddable) still get ranked and selected below.
+FIRST: for every pre-RFP notice (sources sought / RFI / presolicitation)
+the matcher marks **`respond_recommended: True`**, draft a tailored
+capability response the SAME DAY into its opportunity folder using
+**`capture/templates/14_sources_sought_response.md`** — under 200 words,
+answering only what the notice asks, in the notice's own words and
+order. No FAR 9.104-1 recital, no SAM-registration sentence, no reflex
+set-aside advocacy, and no credentials that do not bear on this scope
+(Andrew, 8/19). Download notice attachments and follow any prescribed
+format. Queue each as an Outlook draft when the connector is available;
+notify Andrew of ALL pending sends. Never send a generic blast — the
+8/17 batch sent one identical 118-word credential dump to a concrete
+notice, a bat-removal notice, a staffing notice, and a software
+subscription. Every response cites the notice's own scope language. Solicitations (biddable) still get ranked and selected below.
+**Volume mode is gated on `respond_recommended`, NOT on "survived the
+gate."** Those are different tests and conflating them is what sent three
+of the 18 responses in the 2026-08-17 batch to notices PRG could never
+win — including 36C26326Q1034, whose description opens "NOTICE OF INTENT
+TO AWARD SOLE SOURCE ... THIS NOTICE IS NOT A REQUEST FOR COMPETITIVE
+QUOTES." The contracting officer wrote back to correct us. A response
+sent into a sole-source or intent-to-award notice costs credibility with
+the exact CO we are trying to build a relationship with.
+
+Before any batch send, confirm for every notice: `respond_recommended`
+is True, `noncompetitive` is False, and the description was actually
+retrieved (see step 2 — a notice screened on its title alone has not
+been screened).
+
 - Apply the CLAUDE.md capture-v3 gate to every notice in the report.
 - Rank survivors by the report's weighted priority score, adjusted for:
   days of runway remaining, sub-$250K past-performance value, and
@@ -71,6 +96,10 @@ waiting on Andrew:
 Then one line each for backlog survivors and the PASS count. No filler.
 
 ## Standing boundaries
+- **Replying to a CO: use the reply tools, not `send_mail`.** Find their
+  message and reply into the conversation so the exchange stays threaded
+  on their end (`capture/WORKFLOW.md` Stage 2). `send_mail` with "RE:"
+  in the subject starts a second thread. New conversations only.
 - ⛔ NEVER auto-send email to a contracting officer, submit a quote, or
   publish a job posting to an external board. Prepare + notify only.
   The careers page ships only via draft PR that Andrew merges.

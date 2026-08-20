@@ -30,6 +30,56 @@ fine-art scopes; the appraiser credential itself is hire-to-win); data
 analytics (SAS, SPSS, R, Python); program management and technical
 writing; DOT shipping.
 
+## BIAS TO ACTION — standing order (Andrew, 8/19)
+
+**Do not stop and ask when the path is clear. Act, then report.** Speed
+matters and every round trip costs. Ship the work, merge the PR, run the
+report, fix the thing — do not queue it behind a confirmation.
+
+Default to executing: internal changes, repo work, merges to PRG's own
+repos, drafts, analysis, reports, refactors, website edits. If a
+reasonable colleague would just do it, do it.
+
+**The only carve-outs** — these stay gated because Andrew set them and
+they are outward-facing and irreversible:
+- Sending email to a contracting officer or submitting a quote
+  (`capture/DAILY_RUN.md`: prepare and notify, never auto-submit).
+  A quote is a binding offer.
+- Publishing a job posting to an external board.
+- Submitting a portal registration that makes a binding eligibility
+  declaration (UNGM, bank portals) without Andrew present.
+- Naming a local partner or expert in any document before their Rail 2
+  vetting closes (`intl/COMPLIANCE_RAILS.md`).
+
+Everything else: move.
+
+## NEVER ARGUE WITH A CONTRACTING OFFICER — standing order (Andrew, 8/19)
+
+**No document PRG sends a CO ever argues.** Not a rebuttal, not a
+correction, not a "respectfully disagree." A CO who remembers PRG as
+difficult is worth less than any single contract.
+
+This applies to: sole-source determinations, market-research findings,
+set-aside decisions, eligibility calls, evaluation results, and debrief
+explanations. If the CO has decided, the decision stands.
+
+What to do instead:
+- **Concede cleanly and briefly.** "We have no information that
+  contradicts it." No hedging, no re-litigating in the next paragraph.
+- **Take the correction.** If PRG got it wrong, say so plainly once and
+  do not over-apologize.
+- **Pivot to the lane PRG can actually serve**, in one sentence, and
+  only if it is true.
+- **Thank them for the explanation.** A CO who explains rather than
+  files your response is doing you a favor.
+
+The one exception is a factual matter the CO invited: if they ask for
+contradicting evidence and PRG genuinely has some, submit **the
+evidence**, once, with no argument wrapped around it, and let them
+decide. If PRG has none, say so — silence reads as sulking.
+
+Debriefs are for learning what to change, never for disputing the award.
+
 ## OPPORTUNITY SCREENING RULE — RUN BEFORE ANY ANALYSIS
 
 When given a solicitation, RFQ, RFI, or sources sought, apply this gate
@@ -122,6 +172,60 @@ Key rules (full detail in the workflow doc and `capture/templates/`):
 - On loss: `09_loss_debrief.md` — always request the debrief, file
   reusable content to the library.
 
+## INTERNATIONAL LANE — PRG International
+
+PRG runs a SECOND capture system for overseas work: **any** international
+contract, not healthcare-specific — embassy/consulate procurement,
+overseas DoD and State requirements, UN system tenders, development-bank
+assignments, foreign-affairs support, logistics, training, research,
+facilities, advisory. Same aggregation model, sourced locally: PRG primes
+and owns the contract; Andrew travels to post to source, vet, hire, and
+manage local experts and local firms. **Founder travel is a priced direct
+cost, never an overrun.**
+
+Everything lives in `intl/` and shares ONE library with the domestic
+system at `capture/library/`:
+
+- `intl/GATE.md` — the international screening gate. **Run it FIRST on
+  any overseas notice, before `capture/WORKFLOW.md`.**
+- `intl/WORKFLOW.md` — SCREEN → PURSUE → SUBMIT → MONITOR → WIN/LOSS
+- `intl/COMPLIANCE_RAILS.md` — the nine mandatory rails
+- `intl/PRICING.md` · `intl/SOURCES.md` · `intl/UNGM_REGISTRATION.md`
+- `intl/DAILY_RUN.md` — appends an INTERNATIONAL section to the same
+  morning report; one run, one notification, two lanes
+- `intl/PIPELINE.md` · `intl/experts/` · `intl/templates/`
+
+Three facts that override the domestic instincts — get these right:
+
+1. **SDVOSB overseas is DISCRETIONARY, not dead.** FAR 19.000(b)(1)(ii):
+   contracting officers *may* apply Part 19 outside the US, and overseas
+   awards count toward agency small-business goals. So on a U.S.
+   government overseas buy, **ask the CO to consider a set-aside** — that
+   is the cheapest real edge in this lane. In UN/multilateral/bank
+   procurement no US preference exists at all: SDVOSB is **one
+   credibility line**, never an entitlement.
+2. **UN business is capped at US $500,000 until PRG turns three.** UNGM
+   Level 2 (required above $500K) requires the company to have been
+   established a minimum of three years. Above that line it is an
+   eligibility PASS, not a judgment call.
+3. **Conflict zones are NOT a kill** (Andrew's standing decision 8/18 —
+   veteran, TCCC, accepts the risk). They require the mandatory six-line
+   RISK block and a higher margin band instead. **OFAC/sanctions IS a
+   kill, with no override.**
+
+Absolute honesty rule for this lane: never claim in-country presence, an
+office, a local entity, prior work in a country, or a language PRG does
+not have. Local partners supply presence and are **named as partners**.
+
+**One command runs the whole lane:** say **"Run International System"**
+(or `/run-international`). The skill at
+`.claude/skills/run-international/SKILL.md` executes SCREEN → GATE →
+DRAFT → PRICE → REPORT and stops at the ⛔ send gate with a summary.
+
+Screening tool: `python3 samgov_opportunity_matcher.py --intl` — overseas
+place of performance / international buyer only, domestic
+international-buyer penalty off, international kills on.
+
 ## Repository context
 
 - The SAM.gov screening tool lives on branch
@@ -129,3 +233,6 @@ Key rules (full detail in the workflow doc and `capture/templates/`):
   (`samgov_opportunity_matcher.py`, PR #1). Its capture-v3 gates, roles,
   and weighted priority score implement this rule; keep the two aligned
   when either changes.
+- The international lane (`intl/`, and the matcher's `--intl` mode)
+  implements `intl/GATE.md`; keep the gate doc and the matcher aligned
+  when either changes, same as the domestic pair.
