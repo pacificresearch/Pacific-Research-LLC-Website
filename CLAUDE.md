@@ -217,6 +217,11 @@ Absolute honesty rule for this lane: never claim in-country presence, an
 office, a local entity, prior work in a country, or a language PRG does
 not have. Local partners supply presence and are **named as partners**.
 
+**One command runs the whole lane:** say **"Run International System"**
+(or `/run-international`). The skill at
+`.claude/skills/run-international/SKILL.md` executes SCREEN → GATE →
+DRAFT → PRICE → REPORT and stops at the ⛔ send gate with a summary.
+
 Screening tool: `python3 samgov_opportunity_matcher.py --intl` — overseas
 place of performance / international buyer only, domestic
 international-buyer penalty off, international kills on.
