@@ -1,21 +1,19 @@
 # PENDING OUTBOUND — process FIRST in any session with Outlook access
 
-## INL Mexico RFI response (due Aug 28, 4:00 PM CST — HARD deadline)
-- To: ModrakER@state.gov
-- Subject (EXACT, per notice): 19AQMM26N0003: "Interdiction & Hidden Compartment Training"
-- Attachment (REQUIRED, single file):
-  `intl/opportunities/2026-08-28_INL-Mexico_19AQMM26N0003/03_response/PRG_Capability_Statement_19AQMM26N0003.docx`
-- Body (short cover, HTML):
-  "Dear Mr. Modrak,<br><br>Please find attached the capability statement of
-  Pacific Research Group LLC (UEI J585TLDV1CH1, CAGE 1Z9B6), an SBA-certified
-  SDVOSB, in response to Sources Sought 19AQMM26N0003. PRG confirms its
-  interest in this requirement and supports an SDVOSB set-aside determination.<br><br>
-  Respectfully,<br>Andrew O'Donnell<br>Managing Director<br>
-  Pacific Research Group LLC<br>UEI J585TLDV1CH1 · CAGE 1Z9B6<br>
-  Andrew@pacificresearchllc.com · (650) 213-2381"
-- If the Outlook tool cannot attach files: create a DRAFT with the body and
-  subject, then notify Andrew to attach the docx and press send (file is in
-  the repo path above; also emailable to himself from GitHub).
-- After sending: log timestamp in intl/PIPELINE.md, delete this file.
+## 1. MCRC ROM reply (M9549226SS001) — DRAFT READY, awaiting Andrew
+- Reply draft in Andrew's Drafts (to Endicott + Galloway, USMC MCRC),
+  in-thread on Jeff Endicott's 8/19 email. ROM $32K–$42K / $37K planning
+  figure, FFP, full SOW scope + assumptions + honest new-entrant
+  corporate-experience statement.
+- Andrew declined the automated send → HE reviews and presses Send (or
+  tells Claude to edit and send). RFI deadline: **Aug 24, 5 PM ET.**
 
-## Batch of 2026-08-17 — ✅ COMPLETE (all 18 sent 8/18 ~1:05 PM PT; CASS sent by Andrew 8/17)
+## 2. INL Mexico RFI (19AQMM26N0003) — DRAFT READY, needs manual attachment
+- Draft in Andrew's Drafts, to ModrakER@state.gov, exact subject per
+  notice. Outlook tools cannot attach files → Andrew attaches
+  `PRG_Capability_Statement_19AQMM26N0003.docx` (delivered in chat; also
+  at intl/opportunities/2026-08-28_INL-Mexico_19AQMM26N0003/03_response/),
+  deletes the [ATTACH] placeholder line, sends. Deadline: **Aug 28, 4 PM CST.**
+
+## Completed
+- 18-email batch: sent 8/18. CASS: sent by Andrew 8/17.
