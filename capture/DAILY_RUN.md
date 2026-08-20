@@ -57,6 +57,14 @@ language. Solicitations (biddable) still get ranked and selected below.
 - Commit everything to a branch `capture/YYYY-MM-DD-<notice-id>`, push,
   open a draft PR titled "Capture: <notice id> <short title>".
 
+## 4b. Learning loop (principles of science — Andrew's standing order 8/19)
+Open `capture/LEARNING_LOG.md`. Log every new kill pattern, pricing
+lesson, or process failure from this run as a row (observation → fix).
+If a kill criterion fired 3+ times cumulatively, propose the matcher
+filter that automates it. The hypothesis under test: PRG can profitably
+fulfill any contract that passes the gate — kills and losses refine the
+gate, not the ambition.
+
 ## 5. Update the pipeline board
 Refresh `capture/PIPELINE.md`: stages, deadlines, next actions, recently-done. This board is Andrew's single view of everything — keep it current and honest every run.
 

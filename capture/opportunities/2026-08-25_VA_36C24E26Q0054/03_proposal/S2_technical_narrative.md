@@ -1,4 +1,10 @@
 # SECTION 2 — TECHNICAL (master draft)
+<!-- SUPERSEDED 8/18: the authoritative version is docx/Section_2_Technical.docx
+     (+ Section_3_Redacted_Technical.docx), built from the rev 8-13 PWS:
+     Tasks 1/2/3 structure, SEVEN-BUSINESS-DAY reports (not 10 calendar),
+     PWS 7.3.5/7.3.6 quals gate (10 yr monitoring / 5 yr federal per named
+     monitor — Andrew is PM only, NOT a named monitor). Edit build.js, not
+     this file. -->>
 <!-- LIMIT: 10 pages incl. cover + TOC (1 pg each, zero narrative on either).
      12pt, 1" margins. NO PRICING ANYWHERE IN THIS DOCUMENT.
      Redacted twin (Section 3) = this document minus company name, logo,

@@ -1,23 +1,34 @@
 # PRG Capture Pipeline — live status board
-> **Last updated: 2026-08-17 (Sunday)**
+> **Last updated: 2026-08-18 (Monday)**
+
+## ✅ Send queue CLEARED (2026-08-18 ~1:05 PM PT)
+All 18 sources-sought/presolicitation responses SENT from
+Andrew@pacificresearchllc.com (timestamps in
+`capture/reports/ss_batch_2026-08-17.json`). CASS was sent by Andrew
+himself 8/17 evening. Sent-to-date total: 22 government responses
+(18 batch + CASS + JMC + NMRC RFI + VA intent-to-quote).
 
 ## 🎯 Active pursuits
 
 | # | Pursuit | Stage | Deadline | Next action | Owner |
 |---|---------|-------|----------|-------------|-------|
-| 1 | **36C24E26Q0054** — VA GCP CRQA Monitoring · SDVOSB set-aside · IDIQ $20K min/$2M ceiling | PURSUE — sections drafted; CO confirmed email submission ("Correct," 8/14); Section 6 = neutral strategy; quals corrected to coordinator-truth | **Quote due Mon Aug 25, 10:00 ET** | ⚠️ DECISION: Lead monitor = hired CCRA / Andrew+training / both (rec: both). Then: CCRA picks from 73 applicants, 4 JAMA citations, docx assembly (Claude, review by 8/20) | Andrew decides → Claude assembles |
-| 2 | **N323988871** — NMRC Fort Detrick BMET · $249.5K est / 30 mo | RFI SUBMITTED ✅ on time (8/14) | Watch SAM for the RFQ | Verify wage determination the day RFQ drops; BMET applicant screening | Claude watches |
+| 1 | **36C24E26Q0054** — VA GCP CRQA Monitoring · SDVOSB set-aside · IDIQ $20K min/$2M ceiling | SUBMIT-READY except hire-dependent fill-ins: all 11 section docx built (incl. Technical + Redacted Technical), Section 5 pricing workbook filled ($1.91M evaluated, $105/hr basis) | **Quote due Mon Aug 25, 10:00 ET** | ⛔ **PWS 7.3.5/7.3.6 gate (re-verified 8/18): EVERY named monitor needs 10+ yrs GCP monitoring incl. 5+ yrs federally funded, and supplies the 3 references. Andrew CANNOT be a named monitor — course cert doesn't cure a 10-year requirement. Hire selection = bid viability. No qualified monitor by ~8/22 → no-bid.** Andrew: pick monitor candidates (screen for 10yr/5yr/refs, not just CCRA), sign SF30s ×2, send 4 JAMA citations | Andrew decides → Claude assembles |
+| 2 | **N323988871** — NMRC Fort Detrick BMET · $249.5K est / 30 mo (SAT caps the WHOLE purchase order, not per-year — PWS §2.0 re-verified 8/18) | RFI SUBMITTED ✅ (8/14) | Watch SAM for the RFQ | Verify wage determination the day the RFQ drops; BMET hire ≤$85K or no-bid | Claude watches |
+
+## 📤 Outbound — all clear
+Nothing pending. Watch inboxes for CO replies to the 22 sent responses;
+route replies into the matching `capture/opportunities/` folder.
 
 ## 🔧 Pre-award rails (PREAWARD_READINESS.md)
-- SAM EBiz POC update — IN PROGRESS (Andrew, via update wizard)
-- PIEE: blocked on CAGE group — call help desk **866-618-5988** AFTER SAM update processes; registration saved
-- Tungsten/VA e-invoice portal — TODO (~20 min, any time)
+- SAM EBiz POC update — processing (Andrew)
+- PIEE: call help desk **866-618-5988** after SAM update processes
+- Tungsten/VA e-invoice portal — TODO (~20 min)
 - Payroll/insurance/QuickBooks — arrange-now, bind-at-award
 
 ## 📣 Recruiting
-- CRQA posting: **73+ applicants (Indeed)** — screen for CCRA holders (bid-critical if path A/C)
-- BMET posting: live on LinkedIn/Indeed/careers
-- Careers page LIVE on pacificresearchllc.com ✅
+- CRQA posting: 73+ Indeed applicants — **screening bar RAISED per PWS 7.3.5/7.3.6: CCRA alone is NOT enough; require 10+ yrs site monitoring, 5+ yrs federally funded (NIH/VA — commercial-at-VA doesn't count), able to provide 3 federal-monitoring references + trial-by-trial listing**
+- BMET posting: live (forum feedback: 80–90K is light for MD — accepted, loss-leader by design under the $250K SAT cap)
+- Careers page LIVE ✅
 
 ## 🗓️ Week of Aug 18
-Mon–Tue: monitor decision + CCRA shortlist + JAMA citations → Wed 8/20: full quote package for Andrew's review → Fri 8/22: final fixes → Sat–Sun 8/23–24: SUBMIT → Mon 8/25 10:00 ET deadline.
+Mon: Andrew reconnects M365 (2 min) → batch sends; Andrew screens applicants against the raised bar. Tue–Wed: monitor selection + contingent offer + their references/trial listing; JAMA citations. Wed 8/20: full package to Andrew. Fri 8/22: no-bid tripwire check. Sat–Sun 8/23–24: SUBMIT. Mon 8/25 10:00 ET deadline.
