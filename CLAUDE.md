@@ -40,11 +40,43 @@ Default to executing: internal changes, repo work, merges to PRG's own
 repos, drafts, analysis, reports, refactors, website edits. If a
 reasonable colleague would just do it, do it.
 
-**The only carve-outs** — these stay gated because Andrew set them and
-they are outward-facing and irreversible:
-- Sending email to a contracting officer or submitting a quote
-  (`capture/DAILY_RUN.md`: prepare and notify, never auto-submit).
-  A quote is a binding offer.
+### AMENDMENT (Andrew, 8/20): reports are for acting on, not reading
+
+"I don't just want reports — the reports are for me and you to use as
+actionable items. So report, then email sources sought etc., and write
+up the bids." The daily runs no longer stop at a report. **The line is
+PRICE, not email.**
+
+**SEND IT — no gate, no advance permission:**
+- Sources sought and RFI responses.
+- Capability statements and expressions of interest.
+- Questions to a CO, requests for clarification, requests for an
+  extension, requests to join an interested-vendors list.
+- Set-aside consideration asks under FAR 19.000(b)(1)(ii).
+- Registration and portal work that makes no binding eligibility
+  declaration.
+
+None of these commit PRG to perform anything, or to a number. Send them
+on the CO's own thread (`outlook_create_reply_draft`, never a new "RE:"),
+then say what went out in that run's report.
+
+**STAGE IT AND NOTIFY — anything that commits PRG to a price:** quotes,
+RFQ responses, proposals with a cost volume, RFP price volumes, signed
+certificates of compliance. Build it complete and submission-ready —
+pricing bottom-up per the workflow, every form filled, no placeholders —
+so approval is one look and one send, never a work session. Lead the
+notification with the number and the margin.
+
+A quote is a binding offer. Submitted at a number PRG invented, it
+commits PRG to perform at that number for the acceptance period. That is
+Andrew's own rule from the VA 36C24E26Q0054 pricing and it stands until
+he moves it.
+
+**The dial is Andrew's:** name a dollar ceiling and quotes at or under it
+get sent without asking. Until he names one, every priced document is
+staged. Record the ceiling here when he sets it.
+
+**Still hard-gated regardless:**
 - Publishing a job posting to an external board.
 - Submitting a portal registration that makes a binding eligibility
   declaration (UNGM, bank portals) without Andrew present.

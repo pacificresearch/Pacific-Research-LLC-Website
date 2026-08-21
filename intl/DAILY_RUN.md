@@ -98,7 +98,8 @@ reference the domestic run's message.
 PRG INTERNATIONAL — <date>
   Current intl pursuit: <title> (<buyer>, <country>) — deadline <local / ET>
     role · fulfillment model · margin band · registration held? Y/N
-  Sources-sought responses drafted: N (⛔ awaiting send)
+  Sources-sought / RFI responses SENT: N — <notice ids>
+  Staged awaiting approval: <quote, $amount, margin> (⛔ or none)
   REGISTER–PREPOSITION: N notices — blocked on <registration>
   Registration backlog: next up <X>, blocker <Y>
   PASS: N (top kill: <criterion>)
@@ -110,8 +111,16 @@ rather than manufacturing a pursuit to fill the message.
 
 ## Standing boundaries — same as domestic, plus
 
-- ⛔ Never auto-send to a contracting officer, a UN procurement officer,
-  or a local partner. Prepare and notify only.
+- **Non-binding correspondence goes out on its own** (`CLAUDE.md` BIAS
+  TO ACTION amendment, 8/20): sources sought and RFI responses,
+  capability statements, expressions of interest, questions to a CO or
+  UN procurement officer, and FAR 19.000(b)(1)(ii) set-aside asks. Send
+  on the recipient's own thread, then report what went out.
+- ⛔ Never auto-submit anything that commits PRG to a price — quotes,
+  RFQ responses, cost volumes, signed certificates. Stage them complete
+  and submission-ready and notify, leading with the number and margin.
+- ⛔ Never send anything at all to a prospective local partner before
+  their Rail 2 vetting closes.
 - ⛔ Never submit a portal registration on Andrew's behalf without him
   present — UNGM and bank registrations make binding eligibility
   declarations.
