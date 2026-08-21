@@ -1,5 +1,23 @@
 # Daily Capture Run — procedure for the scheduled session
 
+## ⚡ SEND CADENCE (Andrew's standing order 8/19)
+Three send windows daily: MORNING (this 6:02 AM run), MIDDAY (~noon PT),
+SIGN-OFF (~5 PM PT). Target: **at least 16 qualified outbound emails per
+day** across the windows. Qualified = tailored capability responses to
+gate-surviving pre-RFP notices, CO follow-ups, sub quote requests,
+amendment acknowledgments. NEVER filler, never generic blasts, never
+gate-failing notices; if qualified targets run short, send what
+qualifies and report the shortfall honestly. Domestic only (intl/ is a
+separate session's lane).
+
+**Self-heal check (run every morning):** call `list_triggers`; if the
+midday (~19:03 UTC) and sign-off (~00:04 UTC) Routines named "PRG midday
+send window" / "PRG sign-off send window" do not exist, create them via
+`create_trigger` (fresh session per fire, prompt = process
+capture/SEND_QUEUE.md per its dedupe protocol FIRST, then fill the
+window's quota per this cadence section, then update PIPELINE.md and
+notify Andrew with the sent list).
+
 A scheduled Routine fires a fresh cloud session every morning. That
 session follows this procedure end-to-end and finishes with an
 executive notification to Andrew. Human approval gates are marked ⛔ —
