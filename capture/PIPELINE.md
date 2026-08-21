@@ -54,3 +54,34 @@ pure license and hardware resale, no services labor. Kill #1.
 **Lost to the API quota:** 36C25926Q0750 (VA BioMed, SDVOSB, due today)
 — its description never hydrated and the deadline passed before the
 keyless fallback existed.
+
+## ✅ Reconciled 2026-08-21 — the 8/17 send queue was already sent
+
+`capture/SEND_QUEUE.md` sat in the repo asking the next session with
+Outlook access to send 18 sources-sought responses plus one CASS draft.
+**All 19 had already gone out on 2026-08-18** — the batch at 20:53–20:55
+UTC, the CASS response at 01:11 UTC — and nobody stamped the JSON or
+deleted the queue file afterward.
+
+Verified against Outlook Sent Items, all 18 matched by solicitation
+number; `capture/reports/ss_batch_2026-08-17.json` now carries a
+`sent_at` on every entry. Queue file deleted, as its own last line
+instructed once the batch was confirmed sent.
+
+**What the stale file would have cost.** Processing it as written meant
+19 duplicate emails, including a second copy of the BD PYXIS response to
+Joshua Imdacha (36C26326Q1034) — the CO who had already written back to
+explain that notice was a sole-source intent, not a competitive
+solicitation. Two identical capability responses into a notice we were
+already corrected on is not a clerical slip; it is the thing that makes
+a CO stop reading PRG's mail.
+
+This is exactly why the send gate is now the mailbox and not a repo
+file (`CLAUDE.md`, BIAS TO ACTION amendment): a repo file records what a
+session INTENDED to send, and goes stale the moment the send happens
+somewhere else. Sent Items records what actually left.
+
+Three of the 18 should never have gone at all — 36C26326Q1034 and
+140D0426Q0851 were sole-source, W15QKN-26-Q-A171 an intent-to-award.
+That is the defect the description-hydration fix and the non-competitive
+gate now catch before drafting.
