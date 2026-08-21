@@ -1,12 +1,21 @@
 # PRG International — live status board
-> **Last updated: 2026-08-18** · system stand-up. No pursuits yet — the
-> registration backlog below is the whole job this week.
+> **Last updated: 2026-08-21** · first live `--intl` run executed.
+> 65 notices screened, 2 responses SENT, 0 priced. Registration backlog
+> still gates the UN/bank lane.
 
 ## 🎯 Active pursuits
 
 | # | Pursuit | Country | Buyer regime | Stage | Deadline (local / ET) | Next action | Owner |
 |---|---------|---------|--------------|-------|----------------------|-------------|-------|
-| — | _none yet — first `--intl` run pending_ | | | | | | |
+| 1 | **19BA3026Q0003** — Professional Curatorial Supervision, *Hamad and the Pirates (1971)* exhibition, U.S. Embassy Manama | Bahrain | U.S. gov't overseas (State) | Presolicitation — interest sent, awaiting solicitation | Quotes due 2026-10-04 16:00 +03 (09:00 ET) | Watch for solicitation post + pre-quotation conference date; source curatorial personnel | Claude |
+| 2 | **191NLE26I0035** — INL Colombia AML / Crypto Currency Certification | Colombia | U.S. gov't overseas (State/INL) | Sources sought — response sent 2026-08-21 | Response closed 2026-08-21 12:00 ET | Await set-aside determination; identify accredited CAMS/ICA/CFCS partner **before** any solicitation | Claude |
+
+## 📤 Sent log
+
+| Date | Notice | Buyer | What went out | Sent to |
+|---|---|---|---|---|
+| 2026-08-21 | 191NLE26I0035 | State/INL — Colombia | Sources-sought response, 8 items answered, accreditation gap disclosed, set-aside question posed | Michele Coccovizzo (cc Jamillah Timmons) |
+| 2026-08-21 | 19BA3026Q0003 | State — Embassy Manama | Expression of interest + notification request + 2 scoping questions | Sean Daniels (cc Geji Joseph) |
 
 ## 🔑 Registration backlog — gates everything
 
@@ -43,6 +52,13 @@ Still needed: passport validity / current visas, travel windows, and the
 **LLC formation date** (sets the UNGM Level 2 eligibility date above).
 
 ## ✅ Recently done
+- 2026-08-21 — **First live `--intl` run.** 1,379 notices pulled → 65
+  overseas → 63 descriptions hydrated → 23 passed screen, 16 biddable.
+  The non-competitive gate flagged **28 of 65** (13 sole-source, 13
+  intent-to-award, 2 planning-only) — all of which would have screened
+  clean on titles alone before the hydration fix. Two responses sent.
+  No pursuit was priced: nothing biddable this window cleared the gate
+  with a scope PRG can honestly perform.
 - 2026-08-18 — International system designed and committed:
   `intl/` gate, workflow, sources, compliance rails, pricing, UNGM
   walkthrough, templates, expert roster; matcher `--intl` mode added.
