@@ -37,5 +37,15 @@ Mark the tracker's "Quote req sent" boxes and delete this section after sending.
   at intl/opportunities/2026-08-28_INL-Mexico_19AQMM26N0003/03_response/),
   deletes the [ATTACH] placeholder line, sends. Deadline: **Aug 28, 4 PM CST.**
 
+## 3. DoDEA RFI responses x2 (due Aug 28, 12:00 PM ET) — PDFs READY, need manual attachment
+- Email A to: shunika.crockett@dodea.edu, emani.gray@dodea.edu
+  Subject: Sources Sought DODEAHQ-SS-001 - DoDEA TMC Italy - SDVOSB Response of Pacific Research Group LLC
+  Attach: intl/opportunities/2026-08-28_DoDEA_Italy_TMC/03_response/PRG_Response_DODEAHQ-SS-001.pdf
+- Email B to: shunika.crockett@dodea.edu, michael.hosea@dodea.edu
+  Subject: Sources Sought DODEAHQ-SS-002 - DoDEA Pacific East Japan - SDVOSB Response of Pacific Research Group LLC
+  Attach: intl/opportunities/2026-08-28_DoDEA_Japan_FAM/03_response/PRG_Response_DODEAHQ-SS-002.pdf
+- Body (both, HTML): short cover: attached capability statement, PWS feedback, and ROM pricing per the notice; PRG (UEI J585TLDV1CH1, CAGE 1Z9B6), an SBA-certified SDVOSB, confirms interest and supports set-aside consideration. Signature block standard.
+- Outlook tools cannot attach: create DRAFTS with body+recipients, Andrew attaches PDFs (delivered in chat 8/21) and sends.
+
 ## Completed
 - 18-email batch: sent 8/18. CASS: sent by Andrew 8/17.
