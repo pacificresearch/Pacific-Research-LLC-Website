@@ -4638,7 +4638,8 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
         p.append('<div class="scroll"><table><thead><tr>'
                  '<th>Respond?</th><th>Type</th><th>Title</th><th>Agency</th>'
                  '<th>Set-Aside</th><th>Posted</th><th>Respond By</th>'
-                 '<th>Solicitation #</th></tr></thead><tbody>')
+                 '<th>Solicitation #</th><th>Send to (POC)</th>'
+                 '</tr></thead><tbody>')
         for r in engage[:25]:
             title = _html_escape(_clean(r["title"], 60))
             if _is_http(r["link"]):
@@ -4646,13 +4647,24 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
                          f'rel="noopener">{title}</a>')
             rec = ('<b style="color:#2E7D4F">YES — respond</b>'
                    if r.get("respond_recommended") else 'review')
+            # The response has to go somewhere. POC comes free with the search
+            # result — surfacing it here means the send step needs no extra
+            # API call, which matters because a large sweep can exhaust the
+            # daily quota before the send step ever runs.
+            poc = "<i>none in notice</i>"
+            if r.get("poc"):
+                poc = "<br>".join(
+                    _html_escape(" · ".join(
+                        b for b in (c.get("name"), c.get("email")) if b))
+                    for c in r["poc"][:2])
             p.append(f"<tr><td>{rec}</td>"
                      f"<td>{_html_escape(r['notice_type'])}</td>"
                      f"<td>{title}</td><td>{_html_escape(r['agency'])}</td>"
                      f"<td>{_html_escape(r['setaside'])}</td>"
                      f"<td class='num'>{_html_escape(r['posted'])}</td>"
                      f"<td>{str(r['response_deadline']).split('T')[0]}</td>"
-                     f"<td>{_html_escape(r['solicitation'])}</td></tr>")
+                     f"<td>{_html_escape(r['solicitation'])}</td>"
+                     f"<td>{poc}</td></tr>")
         p.append('</tbody></table></div>')
     else:
         p.append('<p class="empty">No fresh pre-RFP notices this window.</p>')
@@ -6811,9 +6823,17 @@ def main(argv=None):
 
     if _RUN_STATE["rate_limited"]:
         sys.stderr.write(
-            "\n*** NOTE: SAM.gov rate-limited this run — the results are "
-            "PARTIAL. Re-run later (or with a lower --limit) for full coverage. "
-            "A daily quota applies to each API key. ***\n"
+            "\n*** SAM.gov RATE-LIMITED this run — results are PARTIAL. ***\n"
+            "    Two consequences, both of which matter:\n"
+            "    1. Notices whose description did not hydrate were screened on\n"
+            "       TITLE ONLY. A sole-source or intent-to-award notice reads\n"
+            "       like ordinary competitive work from its title, so treat\n"
+            "       any un-hydrated survivor as unverified, not as a finding.\n"
+            "    2. The daily quota is shared with every other lookup, so a\n"
+            "       large sweep can leave nothing for follow-up calls. POCs\n"
+            "       are in the Engage table already — use those rather than\n"
+            "       re-querying the API.\n"
+            "    Re-run later, or with a lower --limit, for full coverage.\n"
         )
 
     if saved:
