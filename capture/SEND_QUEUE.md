@@ -12,7 +12,7 @@ Before sending ANY item below:
    another session claimed it: pull and re-check, do not send.
 4. After sending: mark "SENT <UTC time>", push immediately.
 
-## 0. MCRC sub quote requests — CLAIMED session-x15cat 2026-08-20T02:55Z (sending now)
+## 0. MCRC sub quote requests — UNCLAIMED (prior claim VOID: container restart before send; NOT sent as of 03:0xZ; Sent Items check confirmed nothing sent). Any session with Outlook: send per protocol.
 Send the quote-request email in
 `capture/opportunities/2026-08_MCRC_M9549226SS001/05_staffing/subcontractor_tracker.md`
 as THREE separate emails (same subject/body) to:
