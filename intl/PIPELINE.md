@@ -1,8 +1,10 @@
 # PRG International Pipeline — live status board
-> **OWNERSHIP (Andrew, 8/19): a SEPARATE dedicated session owns all
-> international work. The domestic capture session does NOT work `intl/`
-> — no sweeps, no responses, no bids. Handoff state below is current as
-> of 8/19; international session takes it from here.**
+> **OWNERSHIP (Andrew, 8/20 — supersedes 8/19): the MAIN system thread
+> (claude/system-design-discussion-x15cat) is the SOLE owner of BOTH
+> domestic and international work. Any other session touching either
+> lane must follow capture/SEND_QUEUE.md's dedupe protocol and stand
+> down if this thread has claimed an item. The 16/day send cadence
+> (capture/DAILY_RUN.md) covers both lanes.**
 >
 > Handoff to the international session:
 > 1. INL Mexico (19AQMM26N0003): capability statement docx built
