@@ -1,5 +1,15 @@
 # PENDING OUTBOUND — process FIRST in any session with Outlook access
 
+## 0. MCRC sub quote requests (Andrew approved "run and send" 8/19)
+Send the quote-request email in
+`capture/opportunities/2026-08_MCRC_M9549226SS001/05_staffing/subcontractor_tracker.md`
+as THREE separate emails (same subject/body) to:
+1. info@dbl-eagle.com  2. sales@biggp.com  3. info@mercuryecs.com
+Subject: Quote request: CAT6 port remediation, Quantico VA (government project)
+(4th sub, Fredericksburg Technology, has no public email: Andrew calls
+(540) 403-8324 or uses fxbgtech.com contact form.)
+Mark the tracker's "Quote req sent" boxes and delete this section after sending.
+
 ## 1. MCRC ROM reply (M9549226SS001) — DRAFT READY, awaiting Andrew
 - Reply draft in Andrew's Drafts (to Endicott + Galloway, USMC MCRC),
   in-thread on Jeff Endicott's 8/19 email. ROM $32K–$42K / $37K planning
