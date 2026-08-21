@@ -1,5 +1,17 @@
 # PENDING OUTBOUND — process FIRST in any session with Outlook access
 
+## ⚠️ DEDUPE PROTOCOL (MANDATORY — multiple sessions are active, Andrew 8/19)
+Before sending ANY item below:
+1. `git pull` this branch and re-read this file. If the item is marked
+   SENT or CLAIMED by another session within the last 30 min, SKIP it.
+2. Search Outlook SENT ITEMS for the item's exact subject line. If a
+   matching sent message exists, the item is already sent: mark it SENT
+   here (with timestamp found), push, and do NOT send again.
+3. To send: edit this file marking the item "CLAIMED <session> <UTC time>",
+   commit AND push BEFORE sending. If the push is rejected (conflict),
+   another session claimed it: pull and re-check, do not send.
+4. After sending: mark "SENT <UTC time>", push immediately.
+
 ## 0. MCRC sub quote requests (Andrew approved "run and send" 8/19)
 Send the quote-request email in
 `capture/opportunities/2026-08_MCRC_M9549226SS001/05_staffing/subcontractor_tracker.md`
