@@ -101,6 +101,32 @@ he moves it.
 get sent without asking. Until he names one, every priced document is
 staged. Record the ceiling here when he sets it.
 
+### DAILY SEND CADENCE (Andrew, 8/21): 4 + 4 + 4
+
+Work runs across the day, not in one burst. Three send blocks, four
+non-binding responses each:
+
+| Block | Fires (UTC) | Local (PT) | Does |
+|---|---|---|---|
+| MORNING | 13:00 domestic / 14:00 intl | 6–7 am | sweep SAM, screen, send 4 |
+| MIDDAY | 19:00 | 12 pm | send 4 from the morning report — **no re-sweep** |
+| SIGN-OFF | 00:00 | 5 pm | send 4, anything closing tomorrow FIRST |
+
+Only the morning block sweeps. SAM's keyed API has a daily quota that
+one full sweep nearly exhausts, so midday and sign-off work the
+morning's report and the open backlog instead.
+
+**The number is a target drawn from real supply, never a quota to fill.**
+If four notices do not genuinely qualify, send fewer and say why. Never
+pad a count with a notice PRG cannot honestly serve, and never respond
+to a sole-source or intent-to-award notice to make a number. The 8/17
+batch blasted 18 and put three into non-competitive notices; a CO wrote
+back to correct us. Four good responses beat twelve bad ones
+permanently, and a short day reported honestly is not a failure.
+
+The sign-off block closes the day with **DAY TOTAL: N of 12**, counted
+from Sent Items rather than from memory.
+
 **Still hard-gated regardless:**
 - Publishing a job posting to an external board.
 - Submitting a portal registration that makes a binding eligibility

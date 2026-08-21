@@ -1,5 +1,13 @@
 # Daily Capture Run — procedure for the scheduled session
 
+> **Send cadence (Andrew, 8/21): 4 + 4 + 4.** This file is the MORNING
+> block — the only one that sweeps SAM. Two send-only blocks follow it,
+> MIDDAY at 19:00 UTC and SIGN-OFF at 00:00 UTC, working this report and
+> the open backlog rather than re-sweeping (the keyed API's daily quota
+> does not survive three sweeps). Target four non-binding responses per
+> block, drawn from real supply — never padded. See `CLAUDE.md`, DAILY
+> SEND CADENCE.
+
 A scheduled Routine fires a fresh cloud session every morning. That
 session follows this procedure end-to-end and finishes with an
 executive notification to Andrew. Human approval gates are marked ⛔ —
