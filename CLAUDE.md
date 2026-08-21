@@ -191,8 +191,12 @@ system at `capture/library/`:
 - `intl/WORKFLOW.md` — SCREEN → PURSUE → SUBMIT → MONITOR → WIN/LOSS
 - `intl/COMPLIANCE_RAILS.md` — the nine mandatory rails
 - `intl/PRICING.md` · `intl/SOURCES.md` · `intl/UNGM_REGISTRATION.md`
-- `intl/DAILY_RUN.md` — appends an INTERNATIONAL section to the same
-  morning report; one run, one notification, two lanes
+- `intl/DAILY_RUN.md` — the international lane's OWN daily run. Andrew's
+  decision 8/20: the lanes run separately. Two Routines, two sessions,
+  two reports, two notifications — DOMESTIC fires 13:00 UTC into
+  `capture/reports/`, INTERNATIONAL fires 14:00 UTC into
+  `intl/reports/`. Neither crosses into the other's lane; they still
+  share ONE proposal library at `capture/library/`.
 - `intl/PIPELINE.md` · `intl/experts/` · `intl/templates/`
 
 Three facts that override the domestic instincts — get these right:
