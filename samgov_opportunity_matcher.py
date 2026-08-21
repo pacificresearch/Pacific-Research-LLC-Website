@@ -1286,6 +1286,52 @@ def _strip_html(raw):
     return re.sub(r"\s+", " ", txt).strip()
 
 
+_UI_POC = {}
+
+
+def _stash_ui_poc(notice_id, data):
+    """Keep any POC the UI endpoint hands back, keyed by notice id.
+
+    When the keyed API is exhausted the search results still carry POCs, but a
+    notice recovered only via the fallback would otherwise have none — and a
+    response with no address to send it to is not a response."""
+    poc = [{"name": p.get("fullName"), "email": p.get("email"),
+            "phone": p.get("phone"), "type": p.get("type")}
+           for p in (data.get("pointOfContact") or []) if p.get("email")]
+    if poc:
+        _UI_POC[notice_id] = poc
+
+
+def fetch_notice_ui(notice_id):
+    """Fetch one notice from sam.gov's own UI endpoint. No API key, no quota.
+
+    The keyed API (api.sam.gov) enforces a daily quota that a full sweep can
+    exhaust — and when it does, every follow-up lookup dies with it, including
+    the point-of-contact lookups the send step depends on. sam.gov's public UI
+    calls a different host that needs no key. It requires browser-ish headers
+    (a bare request gets 406) and it is undocumented, so treat it strictly as a
+    fallback: return None on any trouble and let the caller carry on.
+    """
+    if not notice_id:
+        return None
+    try:
+        resp = requests.get(
+            f"https://sam.gov/api/prod/opps/v2/opportunities/{notice_id}",
+            headers={
+                "Accept": "application/json, text/plain, */*",
+                "User-Agent": ("Mozilla/5.0 (X11; Linux x86_64) "
+                               "AppleWebKit/537.36 Chrome/126 Safari/537.36"),
+                "Origin": "https://sam.gov",
+                "Referer": "https://sam.gov/",
+            },
+            timeout=30)
+        if resp.status_code != 200:
+            return None
+        return resp.json().get("data2")
+    except Exception:
+        return None
+
+
 def fetch_description(opp, api_key):
     """Return the notice's real body text, fetching and caching as needed.
 
@@ -1303,6 +1349,16 @@ def fetch_description(opp, api_key):
                            timeout=20)
         if resp.status_code == 429:
             _RUN_STATE["rate_limited"] = True
+            # Quota is spent for the day. Fall back to the keyless UI endpoint
+            # rather than screening this notice on its title — a sole-source
+            # notice is indistinguishable from competitive work by title alone.
+            data = fetch_notice_ui(nid)
+            if data:
+                _stash_ui_poc(nid, data)
+                text = _strip_html(data.get("description") or "")[:20000]
+                if text:
+                    cache[nid] = text
+                    return text
             return ""
         resp.raise_for_status()
         try:
@@ -2599,6 +2655,10 @@ def _extract_poc(opp):
             "phone": (p.get("phone") or "").strip(),
             "type": (p.get("type") or "").strip(),
         })
+    if not any(c["email"] for c in out):
+        # Search result carried no usable address; use whatever the keyless UI
+        # fallback recovered during hydration.
+        out = _UI_POC.get(opp.get("noticeId")) or out
     return out
 
 

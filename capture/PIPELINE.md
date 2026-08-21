@@ -28,3 +28,29 @@
 
 ## 🗓️ Week of Aug 18
 Mon–Tue: monitor decision + CCRA shortlist + JAMA citations → Wed 8/20: full quote package for Andrew's review → Fri 8/22: final fixes → Sat–Sun 8/23–24: SUBMIT → Mon 8/25 10:00 ET deadline.
+
+## 📤 Sent log — 2026-08-21 (domestic)
+
+Non-binding correspondence, sent under the 8/20 amendment (`CLAUDE.md`
+BIAS TO ACTION). No priced document was sent; none was built.
+
+| Notice | Buyer | Scope | Sent to | Response due |
+|---|---|---|---|---|
+| 140G0226Q0150 | DOI | Oxford Instruments AZtec maintenance (H166) | Jennifer Rollin | 2026-08-21 12:00 MT — **made it with ~90 min to spare** |
+| 36C25026Q0907 | VA | J065 GE Telemetry & Physiology | Janel Tate-Montgomery | 2026-08-24 09:00 ET |
+| 36C261-27-AP-0240 | VA VISN 21 SF | Terumo System 1 heart-lung bypass maintenance — **SDVOSB set-aside under consideration** | Robert Clark | 2026-08-25 12:00 ET |
+| 75N98026Q01027SSN | DOI | Leica PM / service agreement (J066) | Yvette Sornberger | 2026-08-25 14:30 ET |
+| FTA Drug & Alcohol Compliance Audit Support | DOT/FTA | 49 CFR Part 40/655 grantee audits (NAICS 541611) | Cassandra Porter-Hickman, cc Crystal Zorich | 2026-09-08 17:00 ET |
+
+Every one disclosed plainly where PRG lacks OEM authorization rather
+than implying it. The Terumo response asks the one question that decides
+the competition: whether VA will require the servicing technician to
+hold OEM authorization — that requirement, not business size, sets how
+many SDVOSBs can actually compete.
+
+**PASS — NHGRI-08891** (Illumina DRAGEN throughput license + v4 server):
+pure license and hardware resale, no services labor. Kill #1.
+
+**Lost to the API quota:** 36C25926Q0750 (VA BioMed, SDVOSB, due today)
+— its description never hydrated and the deadline passed before the
+keyless fallback existed.
