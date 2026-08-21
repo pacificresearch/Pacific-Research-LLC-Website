@@ -47,5 +47,14 @@ Mark the tracker's "Quote req sent" boxes and delete this section after sending.
 - Body (both, HTML): short cover: attached capability statement, PWS feedback, and ROM pricing per the notice; PRG (UEI J585TLDV1CH1, CAGE 1Z9B6), an SBA-certified SDVOSB, confirms interest and supports set-aside consideration. Signature block standard.
 - Outlook tools cannot attach: create DRAFTS with body+recipients, Andrew attaches PDFs (delivered in chat 8/21) and sends.
 
+## 4. Canberra pre-quote conference link request (late but send ASAP)
+- To: cnbgsoprocurement@state.gov
+- Subject: RFQ 19AS2026Q0031 - Pre-Quotation Conference Link Request - Pacific Research Group LLC
+- Body (short): PRG (UEI J585TLDV1CH1, CAGE 1Z9B6), an SBA-certified SDVOSB,
+  intends to quote and respectfully requests the Teams link for the August 26
+  pre-quotation conference and any supplemental information, acknowledging the
+  request window has passed. Standard signature. No attachment needed — can
+  send fully automated.
+
 ## Completed
 - 18-email batch: sent 8/18. CASS: sent by Andrew 8/17.
