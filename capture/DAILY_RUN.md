@@ -78,6 +78,12 @@ been screened).
     capability statements, questions, clarification and extension
     requests, interested-vendor list requests, set-aside asks. Send on
     the CO's own thread, then report what went out. No advance approval.
+    **First check Sent Items** — `outlook_email_search(folderName="Sent
+    Items", query="<notice number>")`. Andrew runs other sessions and
+    the Routines fire into fresh ones; the shared mailbox is the only
+    ledger they all see. A hit means skip it and say so in the report,
+    never send a second copy. Search by notice number, not subject, and
+    look back an extra day (Sent Items filters on local time).
   - **⛔ Priced — STAGE IT.** Quote covers, RFQ responses, anything with
     a cost volume or a signed certificate of compliance. Save as an
     Outlook DRAFT (or `03_proposal/co_email_draft.md` if the connector

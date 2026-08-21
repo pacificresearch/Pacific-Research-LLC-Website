@@ -101,6 +101,21 @@ to the working branch.
 Andrew's 8/20 amendment (`CLAUDE.md` BIAS TO ACTION): the run does not
 stop at a report. **The line is price, not email.**
 
+**Check Sent Items first — every time, no exceptions.** Andrew runs more
+than one session, and the daily Routines fire into fresh sessions that
+cannot see this one. They all share one mailbox, so Sent Items is the
+only ledger that spans them:
+
+```
+outlook_email_search(folderName="Sent Items", query="<notice number>")
+```
+
+A hit means it already went — skip it, and say so in the report. Never
+send a second copy or a "following up" copy. Search by notice number
+rather than subject (another session will have worded its subject
+differently), and search back an extra day, since Sent Items filters on
+local time.
+
 **Send now, no approval:** sources sought and RFI responses, capability
 statements, expressions of interest, questions to a CO or UN procurement
 officer, FAR 19.000(b)(1)(ii) set-aside asks, and any non-binding

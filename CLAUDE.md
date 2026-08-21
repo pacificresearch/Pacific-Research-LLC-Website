@@ -60,6 +60,31 @@ None of these commit PRG to perform anything, or to a number. Send them
 on the CO's own thread (`outlook_create_reply_draft`, never a new "RE:"),
 then say what went out in that run's report.
 
+**CHECK SENT ITEMS BEFORE EVERY SEND — no exceptions.** Andrew runs more
+than one session against this repo, the two daily Routines fire into
+fresh sessions of their own, and none of them can see each other's work.
+They all send from ONE mailbox, so **Outlook Sent Items is the only
+shared ledger** — a repo file cannot do this job, because two sessions
+on two branches will not see each other's commits.
+
+Before sending anything to a buyer:
+
+```
+outlook_email_search(folderName="Sent Items", query="<notice number>")
+```
+
+A hit means the response already went — **skip it and say so in the
+report.** Do not send a second copy, a corrected copy, or a "following
+up on my earlier note" copy. A CO who gets the same capability response
+twice from one small business remembers PRG as careless, which costs
+more than the notice is worth.
+
+Search by the **notice number**, not the subject line — a second session
+will have worded its subject differently. When a notice has no number,
+search the buyer's email address instead. And note the date window:
+Sent Items filters on local time, so search back an extra day rather
+than missing a send made late the night before.
+
 **STAGE IT AND NOTIFY — anything that commits PRG to a price:** quotes,
 RFQ responses, proposals with a cost volume, RFP price volumes, signed
 certificates of compliance. Build it complete and submission-ready —

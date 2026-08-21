@@ -111,6 +111,12 @@ rather than manufacturing a pursuit to fill the message.
 
 ## Standing boundaries — same as domestic, plus
 
+- **Check Sent Items before every send.** Andrew runs other sessions and
+  both Routines fire into fresh ones; they share one mailbox, so
+  `outlook_email_search(folderName="Sent Items", query="<notice
+  number>")` is the only ledger that spans them. A hit means skip it and
+  say so in the report — never a second copy. Search by notice number,
+  not subject, and look back an extra day (local-time filtering).
 - **Non-binding correspondence goes out on its own** (`CLAUDE.md` BIAS
   TO ACTION amendment, 8/20): sources sought and RFI responses,
   capability statements, expressions of interest, questions to a CO or
