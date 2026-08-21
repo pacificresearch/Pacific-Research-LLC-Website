@@ -1,15 +1,27 @@
-# International daily run — addendum to `capture/DAILY_RUN.md`
+# International daily run — its own scheduled run
 
-The domestic daily run procedure is unchanged. This adds an
-**INTERNATIONAL** section to the same scheduled session and the same
-morning report. One run, one notification, two lanes — Andrew should
-never get two separate morning messages.
+**Andrew's decision, 8/20: the two lanes run SEPARATELY.** The
+international lane is its own Routine, its own session, its own report,
+and its own notification — not an addendum folded into the domestic
+morning message. Two runs, two reports, two notifications.
 
-Insert these steps into the domestic run at the points named.
+| Routine | Fires (UTC) | Scope | Report |
+|---|---|---|---|
+| PRG Daily Capture Run — DOMESTIC | 13:00 | domestic only | `capture/reports/` |
+| PRG Daily Capture Run — INTERNATIONAL | 14:00 | overseas only | `intl/reports/` |
+
+Neither run crosses into the other's lane. If an overseas notice shows
+up in the domestic pull, the domestic run leaves it alone; the
+international run picks it up from its own `--intl` sweep. The two lanes
+still share ONE proposal library at `capture/library/`.
+
+The international run's entry point is the `/run-international` skill
+(`.claude/skills/run-international/SKILL.md`), which executes the steps
+below. Follow this file directly if the skill is unavailable.
 
 ---
 
-## After domestic step 2 (generate the report)
+## Step 1 — generate the international report
 
 ```
 python3 samgov_opportunity_matcher.py --intl --days 7 --limit 100 --narrow \
@@ -36,7 +48,7 @@ kills. Commit the report. Dedupe against notice IDs already in
 If `api.sam.gov` is unreachable, the domestic run's STOP rule applies —
 notify, do not fabricate.
 
-## After domestic step 3 (screen and select)
+## Step 2 — screen and select
 
 Apply `intl/GATE.md` to every notice in the international report.
 
@@ -77,25 +89,44 @@ Report the top open registration and its blocker. Registrations gate
 the entire lane; a week of "no international opportunities" while UNGM
 sits unregistered is a self-inflicted result.
 
-## Notification — one section appended to the domestic message
+## Notification — this run's own message
+
+This run sends its own notification. Do not wait for, merge with, or
+reference the domestic run's message.
 
 ```
-INTERNATIONAL
+PRG INTERNATIONAL — <date>
   Current intl pursuit: <title> (<buyer>, <country>) — deadline <local / ET>
     role · fulfillment model · margin band · registration held? Y/N
-  Sources-sought responses drafted: N (⛔ awaiting send)
+  Sources-sought / RFI responses SENT: N — <notice ids>
+  Staged awaiting approval: <quote, $amount, margin> (⛔ or none)
   REGISTER–PREPOSITION: N notices — blocked on <registration>
   Registration backlog: next up <X>, blocker <Y>
   PASS: N (top kill: <criterion>)
 ```
 
-If there is nothing, say "INTERNATIONAL: nothing survived the gate;
-registration backlog next up <X>." That is a valid, cheap outcome.
+If there is nothing, say "Nothing survived the gate; registration
+backlog next up <X>." That is a valid, cheap outcome — report it plainly
+rather than manufacturing a pursuit to fill the message.
 
 ## Standing boundaries — same as domestic, plus
 
-- ⛔ Never auto-send to a contracting officer, a UN procurement officer,
-  or a local partner. Prepare and notify only.
+- **Check Sent Items before every send.** Andrew runs other sessions and
+  both Routines fire into fresh ones; they share one mailbox, so
+  `outlook_email_search(folderName="Sent Items", query="<notice
+  number>")` is the only ledger that spans them. A hit means skip it and
+  say so in the report — never a second copy. Search by notice number,
+  not subject, and look back an extra day (local-time filtering).
+- **Non-binding correspondence goes out on its own** (`CLAUDE.md` BIAS
+  TO ACTION amendment, 8/20): sources sought and RFI responses,
+  capability statements, expressions of interest, questions to a CO or
+  UN procurement officer, and FAR 19.000(b)(1)(ii) set-aside asks. Send
+  on the recipient's own thread, then report what went out.
+- ⛔ Never auto-submit anything that commits PRG to a price — quotes,
+  RFQ responses, cost volumes, signed certificates. Stage them complete
+  and submission-ready and notify, leading with the number and margin.
+- ⛔ Never send anything at all to a prospective local partner before
+  their Rail 2 vetting closes.
 - ⛔ Never submit a portal registration on Andrew's behalf without him
   present — UNGM and bank registrations make binding eligibility
   declarations.

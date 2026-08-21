@@ -1,5 +1,15 @@
 # PRG International — pricing model
 
+**The domestic wrap chain and the loss floor in `capture/PRICING.md`
+apply here too.** Base salary × 1.2348 ÷ 1,879 × 1.12 × 1.10, and no
+bid below the model's floor. This file adds what only the international
+lane carries: local-market labor, DSSR founder travel, security and life
+support, DBA insurance, withholding tax, and a country-risk margin
+adder ON TOP of the floor — never instead of it.
+
+**PRG does not perform at a loss (Andrew, 8/20).** Country risk raises
+the floor; it never lowers it.
+
 **Delegated authority (Andrew's standing order 8/17, extended to this
 lane):** Claude prices independently from data and presents the finished
 number with the package. Never block a bid waiting on pricing input.

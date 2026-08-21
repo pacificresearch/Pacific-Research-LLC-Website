@@ -40,11 +40,68 @@ Default to executing: internal changes, repo work, merges to PRG's own
 repos, drafts, analysis, reports, refactors, website edits. If a
 reasonable colleague would just do it, do it.
 
-**The only carve-outs** — these stay gated because Andrew set them and
-they are outward-facing and irreversible:
-- Sending email to a contracting officer or submitting a quote
-  (`capture/DAILY_RUN.md`: prepare and notify, never auto-submit).
-  A quote is a binding offer.
+### AMENDMENT (Andrew, 8/20): reports are for acting on, not reading
+
+"I don't just want reports — the reports are for me and you to use as
+actionable items. So report, then email sources sought etc., and write
+up the bids." The daily runs no longer stop at a report. **The line is
+PRICE, not email.**
+
+**SEND IT — no gate, no advance permission:**
+- Sources sought and RFI responses.
+- Capability statements and expressions of interest.
+- Questions to a CO, requests for clarification, requests for an
+  extension, requests to join an interested-vendors list.
+- Set-aside consideration asks under FAR 19.000(b)(1)(ii).
+- Registration and portal work that makes no binding eligibility
+  declaration.
+
+None of these commit PRG to perform anything, or to a number. Send them
+on the CO's own thread (`outlook_create_reply_draft`, never a new "RE:"),
+then say what went out in that run's report.
+
+**CHECK SENT ITEMS BEFORE EVERY SEND — no exceptions.** Andrew runs more
+than one session against this repo, the two daily Routines fire into
+fresh sessions of their own, and none of them can see each other's work.
+They all send from ONE mailbox, so **Outlook Sent Items is the only
+shared ledger** — a repo file cannot do this job, because two sessions
+on two branches will not see each other's commits.
+
+Before sending anything to a buyer:
+
+```
+outlook_email_search(folderName="Sent Items", query="<notice number>")
+```
+
+A hit means the response already went — **skip it and say so in the
+report.** Do not send a second copy, a corrected copy, or a "following
+up on my earlier note" copy. A CO who gets the same capability response
+twice from one small business remembers PRG as careless, which costs
+more than the notice is worth.
+
+Search by the **notice number**, not the subject line — a second session
+will have worded its subject differently. When a notice has no number,
+search the buyer's email address instead. And note the date window:
+Sent Items filters on local time, so search back an extra day rather
+than missing a send made late the night before.
+
+**STAGE IT AND NOTIFY — anything that commits PRG to a price:** quotes,
+RFQ responses, proposals with a cost volume, RFP price volumes, signed
+certificates of compliance. Build it complete and submission-ready —
+pricing bottom-up per the workflow, every form filled, no placeholders —
+so approval is one look and one send, never a work session. Lead the
+notification with the number and the margin.
+
+A quote is a binding offer. Submitted at a number PRG invented, it
+commits PRG to perform at that number for the acceptance period. That is
+Andrew's own rule from the VA 36C24E26Q0054 pricing and it stands until
+he moves it.
+
+**The dial is Andrew's:** name a dollar ceiling and quotes at or under it
+get sent without asking. Until he names one, every priced document is
+staged. Record the ceiling here when he sets it.
+
+**Still hard-gated regardless:**
 - Publishing a job posting to an external board.
 - Submitting a portal registration that makes a binding eligibility
   declaration (UNGM, bank portals) without Andrew present.
@@ -138,6 +195,16 @@ working capital, and margin instead of killing them.
 
 ### Analysis priorities for survivors
 
+**PRG DOES NOT PERFORM AT A LOSS (Andrew, 8/20).** Price is built per
+`capture/PRICING.md` — every rate traced to a wage determination, a
+signed quote, a GS grade/step, or BLS, never invented. Each fulfillment
+model has a **floor**, and a price below it is a **PASS**, not a thinner
+margin: founder-delivered 30%, professional services 22%, staffing 12%,
+value-added supply 8% (15% without a written price hold), trade-sub
+management 6% (15% without a firm sub quote valid past award). Report
+the no-bid plainly — walking away from unprofitable work is a good
+outcome.
+
 Estimated gross margin by fulfillment model (founder-delivered 40–60%,
 professional services 30–50%, staffing 15–30%, value-added supply
 10–20%, trade-sub management 8–15%), competitive field and whether the
@@ -191,8 +258,12 @@ system at `capture/library/`:
 - `intl/WORKFLOW.md` — SCREEN → PURSUE → SUBMIT → MONITOR → WIN/LOSS
 - `intl/COMPLIANCE_RAILS.md` — the nine mandatory rails
 - `intl/PRICING.md` · `intl/SOURCES.md` · `intl/UNGM_REGISTRATION.md`
-- `intl/DAILY_RUN.md` — appends an INTERNATIONAL section to the same
-  morning report; one run, one notification, two lanes
+- `intl/DAILY_RUN.md` — the international lane's OWN daily run. Andrew's
+  decision 8/20: the lanes run separately. Two Routines, two sessions,
+  two reports, two notifications — DOMESTIC fires 13:00 UTC into
+  `capture/reports/`, INTERNATIONAL fires 14:00 UTC into
+  `intl/reports/`. Neither crosses into the other's lane; they still
+  share ONE proposal library at `capture/library/`.
 - `intl/PIPELINE.md` · `intl/experts/` · `intl/templates/`
 
 Three facts that override the domestic instincts — get these right:
