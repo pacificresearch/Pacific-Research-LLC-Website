@@ -170,6 +170,16 @@ working capital, and margin instead of killing them.
 
 ### Analysis priorities for survivors
 
+**PRG DOES NOT PERFORM AT A LOSS (Andrew, 8/20).** Price is built per
+`capture/PRICING.md` — every rate traced to a wage determination, a
+signed quote, a GS grade/step, or BLS, never invented. Each fulfillment
+model has a **floor**, and a price below it is a **PASS**, not a thinner
+margin: founder-delivered 30%, professional services 22%, staffing 12%,
+value-added supply 8% (15% without a written price hold), trade-sub
+management 6% (15% without a firm sub quote valid past award). Report
+the no-bid plainly — walking away from unprofitable work is a good
+outcome.
+
 Estimated gross margin by fulfillment model (founder-delivered 40–60%,
 professional services 30–50%, staffing 15–30%, value-added supply
 10–20%, trade-sub management 8–15%), competitive field and whether the
