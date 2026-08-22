@@ -56,5 +56,12 @@ Mark the tracker's "Quote req sent" boxes and delete this section after sending.
   request window has passed. Standard signature. No attachment needed — can
   send fully automated.
 
+## 5. Canberra CO clarification question (no attachment — fully automatable)
+- To: cnbgsoprocurement@state.gov
+- Subject: RFQ 19AS2026Q0031 - Clarification Question - Pacific Research Group LLC
+- Body: per intl/opportunities/2026-09-11_Canberra_19AS2026Q0031/05_staffing/teaming_outreach.md
+## 6. Canberra teaming outreach x3 (verify org contact emails first, then send)
+- Per teaming_outreach.md: USSC, AIIA, ANU NSC — same body, adapted greeting
+
 ## Completed
 - 18-email batch: sent 8/18. CASS: sent by Andrew 8/17.
