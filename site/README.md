@@ -49,6 +49,29 @@ Lucide CDN.
    federal photography), drop files in `assets/` and reference them — keep the cool, professional cast
    described in the design system.
 
+## Talent pool (CV intake)
+
+The careers page carries a **talent pool** form at `/careers/#talent-pool` that accepts a CV file
+upload plus structured fields (discipline, years, clearance, work authorization, availability,
+mobility, credentials, veteran status, consent). Entry points: a link in the home-page hero, the
+talent-pool band directly under the hero trust bar, the careers hero CTA, the mobile drawer, and
+both footers.
+
+**How it delivers.** `main.js` POSTs the form as `multipart/form-data` to **Netlify Forms**
+(`name="talent-pool"`, `data-netlify="true"`, honeypot `bot-field`). If that POST fails for any
+reason, it falls back to a pre-filled `mailto:` with every field in the body and asks the visitor to
+attach the CV there — so no submission is lost if Forms is off or over quota.
+
+**One-time setup in Netlify:** enable **Forms** for the site (Site configuration → Forms), then add a
+notification to `contact@pacificresearchllc.com` so submissions land in the inbox. Uploaded files
+appear on each submission in the Netlify Forms dashboard. Free-tier limits are 100 submissions/month
+and 10 MB per upload; the form caps CVs at 8 MB client-side. To move off Netlify, point the form's
+`action` at Formspree/Basin — the JS needs no change.
+
+**Compliance note:** the form states that PRG will not name a candidate or submit a résumé in a
+proposal without written permission at bid time, and that submitting a CV is not an offer of
+employment. Keep that language if the form is rebuilt.
+
 ## SEO / metadata already included
 Title + meta description, canonical URL, Open Graph + Twitter cards, `theme-color`, favicon /
 apple-touch-icon, `robots.txt`, `sitemap.xml`, and Organization **JSON-LD** structured data.
