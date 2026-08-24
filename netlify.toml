@@ -1,0 +1,13 @@
+# Repo-root Netlify config for pacificresearchllc.com.
+#
+# The publishable website is site/ ONLY. Everything else in this repo —
+# capture/, intl/, the pipeline data, and the standing orders — is internal
+# and must never be served. Any deploy run from the repo root (Netlify CLI,
+# the Netlify MCP server, or a connected-repo build) reads this file and
+# publishes site/ alone.
+#
+# site/netlify.toml still carries publish = "." for deploys that upload the
+# site/ folder directly, such as scripts/deploy_site.sh.
+[build]
+  publish = "site"
+  command = ""
