@@ -43,6 +43,7 @@
     .hire-card [data-icon] svg{width:22px;height:22px}
     .hire-card h4{font-size:16.5px;font-weight:700;color:var(--fg-1);margin-top:12px}
     .hire-card p{font-size:14.5px;line-height:1.6;color:var(--fg-2);margin-top:8px}
+    .page-hero-ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}
   </style>
 </head>
 <body>
@@ -81,6 +82,7 @@
       <a href="../#about">About</a>
       <a href="../#contracting">Contracting</a>
       <a href="./">Careers</a>
+      <a href="#talent-pool">Talent Pool</a>
     </div>
   </div>
 
@@ -92,6 +94,12 @@
       <p>Pacific Research Group LLC staffs federal health-IT, clinical research, and healthcare
       operations contracts nationwide. Many positions are posted in advance of award and are
       contingent upon contract award — apply early and be first in line when the contract starts.</p>
+      <p>Don't see your role? Submit your CV to our talent pool and we'll match it against
+      solicitations as they come in.</p>
+      <div class="page-hero-ctas">
+        <a class="btn btn-cream lg" href="#talent-pool" data-icon="upload">Submit Your CV</a>
+        <a class="btn btn-outline-light lg" href="#positions" data-icon="briefcase">See Open Positions</a>
+      </div>
     </div>
   </section>
 
@@ -256,11 +264,170 @@
         <p>New roles are posted here as PRG pursues and wins federal contracts —
         often before award. Send your resume to
         <a href="mailto:contact@pacificresearchllc.com?subject=Resume%20for%20Future%20Openings">contact@pacificresearchllc.com</a>
-        and we'll reach out when a role matches your background. Veterans encouraged to apply.</p>
+        or use the talent pool form below, and we'll reach out when a role matches your background.
+        Veterans encouraged to apply.</p>
       </div>
       -->
 
       <!-- JOBS:END -->
+    </div>
+  </section>
+
+  <!-- ============================ TALENT POOL ============================ -->
+  <section class="section tint" id="talent-pool">
+    <div class="wrap">
+      <div class="talent-grid">
+        <div class="talent-info">
+          <span class="eyebrow">Talent Pool</span>
+          <h2 class="serif-h2" style="margin-top:16px">Submit your CV. Be on the team before the contract is awarded.</h2>
+          <p class="lead">Federal work moves on the government's clock, not ours. Pacific Research Group
+          screens solicitations daily and has to field a credentialed team fast &mdash; often inside the
+          proposal window. A CV already in our talent pool is the difference between being considered
+          and being missed.</p>
+
+          <ul class="talent-points">
+            <li><span class="tp-ic" data-icon="search"></span><span class="tp-t"><b>Matched against live
+            solicitations.</b> Your background is screened against requirements as they post &mdash; not
+            filed away until a job is advertised.</span></li>
+            <li><span class="tp-ic" data-icon="user-check"></span><span class="tp-t"><b>Named in proposals
+            only with your permission.</b> If a bid calls for a key-personnel r&eacute;sum&eacute; or a letter of
+            commitment, we ask you first, in writing, every time.</span></li>
+            <li><span class="tp-ic" data-icon="shield"></span><span class="tp-t"><b>Veteran-owned,
+            veteran-friendly.</b> PRG is an SBA-certified SDVOSB. We read military credentials correctly and
+            translate them fairly.</span></li>
+            <li><span class="tp-ic" data-icon="git-merge"></span><span class="tp-t"><b>All fulfillment
+            types.</b> W2, 1099, subcontract, and teaming-partner arrangements &mdash; domestic and
+            overseas.</span></li>
+          </ul>
+
+          <div class="talent-disciplines">
+            <div class="naics-head">Disciplines we staff</div>
+            <div class="tech-tags">
+              <span class="tag">Clinical Research</span><span class="tag">Regulatory &amp; GCP Monitoring</span>
+              <span class="tag">Clinical Data Management</span><span class="tag">Biomedical / HTM</span>
+              <span class="tag">Health IT &amp; EHR</span><span class="tag">Healthcare Operations</span>
+              <span class="tag">Nursing &amp; Allied Health</span><span class="tag">Program &amp; Project Management</span>
+              <span class="tag">Logistics &amp; Facilities</span><span class="tag">Skilled Trades</span>
+              <span class="tag">Linguists &amp; In-Country Experts</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <form id="talentForm" name="talent-pool" method="POST" action="/"
+                data-netlify="true" netlify-honeypot="bot-field"
+                enctype="multipart/form-data" novalidate>
+            <input type="hidden" name="form-name" value="talent-pool">
+            <p class="hp-field"><label>Leave this field empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+
+            <div class="fgrid">
+              <div class="field-group"><label for="t-name">Full name <span class="req">*</span></label>
+                <input class="field" id="t-name" name="name" required placeholder="Jane Q. Candidate"></div>
+              <div class="field-group"><label for="t-email">Email <span class="req">*</span></label>
+                <input class="field" id="t-email" name="email" type="email" required placeholder="you@example.com"></div>
+              <div class="field-group"><label for="t-phone">Phone</label>
+                <input class="field" id="t-phone" name="phone" type="tel" placeholder="(555) 555-5555"></div>
+              <div class="field-group"><label for="t-location">Location</label>
+                <input class="field" id="t-location" name="location" placeholder="City, State (or City, Country)"></div>
+
+              <div class="field-group"><label for="t-discipline">Primary discipline</label>
+                <select class="field" id="t-discipline" name="discipline">
+                  <option>Clinical Research (CRC / CRA / CRQA)</option>
+                  <option>Clinical Data Management / REDCap / CTMS</option>
+                  <option>Regulatory Affairs &amp; GCP Monitoring</option>
+                  <option>Biomedical Equipment / Healthcare Technology Management</option>
+                  <option>Health IT / EHR / Informatics</option>
+                  <option>Healthcare Operations &amp; Administration</option>
+                  <option>Nursing &amp; Allied Health</option>
+                  <option>Emergency Medical Services</option>
+                  <option>Program / Project Management</option>
+                  <option>Contracts, Pricing &amp; Compliance</option>
+                  <option>Logistics, Facilities &amp; Skilled Trades</option>
+                  <option>Linguist / In-Country Expert (International)</option>
+                  <option>Other</option>
+                </select></div>
+              <div class="field-group"><label for="t-years">Years of experience</label>
+                <select class="field" id="t-years" name="years">
+                  <option>0–2</option><option>3–5</option><option>6–10</option>
+                  <option>11–15</option><option>16+</option>
+                </select></div>
+
+              <div class="field-group"><label for="t-clearance">Security clearance</label>
+                <select class="field" id="t-clearance" name="clearance">
+                  <option>None</option><option>Eligible / able to obtain</option>
+                  <option>Public Trust</option><option>Secret</option>
+                  <option>Top Secret</option><option>TS/SCI</option>
+                  <option>Prior clearance (lapsed)</option>
+                </select></div>
+              <div class="field-group"><label for="t-auth">Work authorization</label>
+                <select class="field" id="t-auth" name="work_authorization">
+                  <option>U.S. citizen</option>
+                  <option>U.S. permanent resident</option>
+                  <option>Authorized to work in the U.S.</option>
+                  <option>Requires sponsorship</option>
+                  <option>Non-U.S. — available for overseas work</option>
+                </select></div>
+
+              <div class="field-group"><label for="t-availability">Availability</label>
+                <select class="field" id="t-availability" name="availability">
+                  <option>Immediately</option><option>2 weeks</option><option>30 days</option>
+                  <option>60+ days</option><option>Contingent-upon-award roles only</option>
+                </select></div>
+              <div class="field-group"><label for="t-mobility">Relocation &amp; travel</label>
+                <select class="field" id="t-mobility" name="mobility">
+                  <option>Open to relocation and travel</option>
+                  <option>Travel only (no relocation)</option>
+                  <option>Remote only</option>
+                  <option>Local / on-site only</option>
+                  <option>Open to OCONUS assignments</option>
+                </select></div>
+
+              <div class="field-group full"><label for="t-creds">Key credentials &amp; certifications</label>
+                <input class="field" id="t-creds" name="credentials" placeholder="e.g. ACRP-CP, CBET, RN, PMP, CCRA, CITI GCP, state license #"></div>
+              <div class="field-group full"><label for="t-link">LinkedIn or portfolio URL</label>
+                <input class="field" id="t-link" name="link" type="url" placeholder="https://linkedin.com/in/…"></div>
+
+              <div class="field-group full"><label for="t-cv">Upload your CV / r&eacute;sum&eacute;</label>
+                <input class="field file-field" id="t-cv" name="cv" type="file"
+                       accept=".pdf,.doc,.docx,.rtf,.txt,application/pdf">
+                <p class="form-note">PDF or Word, 8&nbsp;MB max. If the upload fails, we'll fall back to email and you can attach it there.</p></div>
+
+              <div class="field-group full"><label for="t-notes">Anything else we should know?</label>
+                <textarea class="field" id="t-notes" name="notes" placeholder="Contract types you're interested in, agencies you've supported, salary or rate expectations, geographic limits…"></textarea></div>
+
+              <div class="field-group full">
+                <label class="check-row"><input type="checkbox" id="t-veteran" name="veteran" value="Yes">
+                  <span>I am a veteran, active-duty service member, or military spouse <em>(voluntary)</em></span></label>
+                <label class="check-row"><input type="checkbox" id="t-consent" name="consent" value="Yes" required>
+                  <span>I consent to Pacific Research Group LLC retaining my CV in its talent pool and
+                  contacting me about contract opportunities. <span class="req">*</span></span></label>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary lg" data-icon="send" style="width:100%">Join the Talent Pool</button>
+            <p class="form-note">PRG will not submit your name or r&eacute;sum&eacute; in a proposal without your
+            written permission at the time of the bid. Submitting a CV does not create an offer of employment.
+            Pacific Research Group LLC is an equal opportunity employer.</p>
+          </form>
+
+          <div class="form-success hidden" id="talentSuccess">
+            <div class="sc" data-icon="check"></div>
+            <h3>You're in the talent pool</h3>
+            <p>Thank you &mdash; your CV is on file with Pacific Research Group LLC. We'll reach out when a
+            solicitation matches your background. Questions in the meantime:
+            <a href="mailto:contact@pacificresearchllc.com">contact@pacificresearchllc.com</a>.</p>
+          </div>
+
+          <div class="form-success hidden" id="talentFallback">
+            <div class="sc warn" data-icon="mail"></div>
+            <h3>Finish by email</h3>
+            <p>The upload didn't go through, so we've drafted the email for you instead. Your email client
+            should now be open with your details filled in &mdash; <b>attach your CV and hit send</b>. If it
+            didn't open, email <a href="mailto:contact@pacificresearchllc.com?subject=Talent%20Pool%20Submission">contact@pacificresearchllc.com</a>
+            with your CV attached.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -318,6 +485,7 @@
           <a href="../#approach">Technical Approach</a>
           <a href="../#contracting">Contracting</a>
           <a href="./">Careers</a>
+          <a href="#talent-pool">Talent Pool</a>
           <a href="../#contact">Contact</a>
         </div>
         <div class="footer-col">

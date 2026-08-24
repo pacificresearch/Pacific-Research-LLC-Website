@@ -158,6 +158,13 @@ h1,h2,h3,h4,p{margin:0}
 .leader-record .lr-t b{color:#fff;font-weight:700}
 .leader-record .lr-t i{font-style:italic}
 .leader-card p.leader-note{margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,.14);font-size:13px;line-height:1.6;color:rgba(255,255,255,.68)}
+.leader-creds{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,.14)}
+.leader-creds .lc-h{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sand-300);margin-bottom:10px}
+.leader-creds ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.leader-creds li{font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.78)}
+.leader-creds li b{color:#fff;font-weight:700}
+.leader-creds li span{display:block;font-size:11.5px;color:rgba(255,255,255,.55);margin-top:2px}
+@media(max-width:640px){.leader-creds{grid-template-columns:1fr}}
 @media(max-width:560px){
   .leader-record li{grid-template-columns:1fr;gap:4px}
   .leader-record .lr-n{font-size:24px}
@@ -260,3 +267,44 @@ textarea.field{resize:vertical;min-height:96px}
   .hero h1{font-size:38px}
   .stat .n{font-size:38px}
 }
+
+/* ============================================================ TALENT POOL */
+.hero-talent-link{display:inline-flex;align-items:center;gap:9px;margin-top:22px;font-size:14.5px;font-weight:600;color:var(--blue-300);border-bottom:1px solid rgba(143,196,238,.35);padding-bottom:3px;transition:color .14s var(--ease),border-color .14s var(--ease)}
+.hero-talent-link:hover{color:#fff;border-color:rgba(255,255,255,.7)}
+.hero-talent-link svg{width:16px;height:16px}
+
+.talent-band{background:var(--blue-50);border-bottom:1px solid var(--border-1);padding:44px 0}
+.talent-band .tb-inner{display:grid;grid-template-columns:52px 1fr auto;gap:26px;align-items:start}
+.talent-band .tb-ic{width:52px;height:52px;margin-top:22px;border-radius:13px;background:var(--navy-900);color:var(--sand-300);display:flex;align-items:center;justify-content:center}
+.talent-band .tb-ic svg{width:24px;height:24px}
+.talent-band h2{font-family:var(--font-display);font-size:29px;font-weight:600;color:var(--fg-1);letter-spacing:-.01em;margin:10px 0 0}
+.talent-band p{font-size:14.5px;line-height:1.6;color:var(--fg-2);margin-top:9px;max-width:78ch}
+.talent-band .tb-cta{display:flex;flex-direction:column;align-items:flex-end;gap:9px;padding-top:26px}
+.talent-band .tb-note{font-size:12px;color:var(--fg-3)}
+@media(max-width:960px){
+  .talent-band .tb-inner{grid-template-columns:1fr;gap:18px}
+  .talent-band .tb-cta{align-items:flex-start;padding-top:0}
+  .talent-band h2{font-size:25px}
+  .talent-band .tb-ic{margin-top:0}
+}
+
+.talent-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:56px;align-items:start}
+@media(max-width:960px){.talent-grid{grid-template-columns:1fr;gap:38px}}
+@media(min-width:961px){.talent-info{position:sticky;top:104px}}
+.talent-info .lead{font-size:16.5px;line-height:1.65;color:var(--fg-2);margin-top:16px}
+.talent-points{list-style:none;margin:26px 0 0;padding:0;display:grid;gap:16px}
+.talent-points li{display:flex;gap:13px;font-size:14.5px;line-height:1.6;color:var(--fg-2)}
+.talent-points li b{color:var(--fg-1)}
+.talent-points .tp-ic{flex:0 0 20px;display:flex;align-items:center;justify-content:center;height:23px}
+.talent-points .tp-ic svg{width:19px;height:19px;color:var(--accent)}
+.talent-disciplines{margin-top:30px}
+
+.req{color:var(--danger);font-weight:700}
+.file-field{padding:10px 13px;font-size:13.5px;background:var(--slate-50);cursor:pointer}
+.file-field::file-selector-button{font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--blue-700);background:#fff;border:1.5px solid var(--border-2);border-radius:var(--radius-sm);padding:7px 13px;margin-right:12px;cursor:pointer}
+.file-field::file-selector-button:hover{border-color:var(--blue-600);background:var(--blue-50)}
+.field-group label.check-row,.check-row{display:grid;grid-template-columns:18px 1fr;gap:11px;align-items:start;font-size:13.5px;font-weight:400;line-height:1.5;color:var(--fg-2);margin-bottom:12px;cursor:pointer}
+.check-row input{width:17px;height:17px;margin:2px 0 0;accent-color:var(--blue-600)}
+.check-row em{font-style:normal;color:var(--fg-3)}
+.hp-field{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.form-success .sc.warn{background:#FBF1DF;color:var(--warning)}
