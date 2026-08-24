@@ -97,7 +97,7 @@ h1,h2,h3,h4,p{margin:0}
 .hero-lead{font-size:18px;line-height:1.6;color:rgba(255,255,255,.8);max-width:42ch;margin:30px 0 30px}
 .hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
 .hero-emblem{display:flex;justify-content:center}
-.hero-emblem picture{display:block;width:100%;max-width:360px}
+.hero-emblem picture{display:block;width:100%;max-width:460px}
 .hero-emblem img{display:block;width:100%;height:auto;filter:drop-shadow(0 24px 48px rgba(0,0,0,.45))}
 .hero-stats{position:relative;z-index:2;max-width:var(--maxw);margin:64px auto 0;padding:0 32px}
 .hero-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;border-top:1px solid rgba(255,255,255,.14);padding:30px 0 72px}
