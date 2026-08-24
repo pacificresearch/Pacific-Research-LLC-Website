@@ -115,7 +115,10 @@ EMAIL STYLE (Andrew's standing orders): (1) SDVOSB stated ONCE per
 email, never spelled out. (2) NO em dashes, ever (8/19). (3) Short and
 to the point, no fluff: lead with the answer, one short paragraph per
 topic, cut pleasantries beyond one line. Applies to emails; proposal
-documents keep full professional prose. Claude drafts the
+documents keep full professional prose. (4) OUTLOOK ONLY (8/22): all
+outbound sends from Andrew@pacificresearchllc.com via Outlook. NO Gmail
+or other channels, ever, regardless of connector outages — queue and
+wait, or hand Andrew paste-ready text. Claude drafts the
 submission email (subject line per solicitation instructions, attachments
 listed, professional cover text); Andrew reviews and sends. If the
 Microsoft 365 connector is linked, draft directly in Outlook; otherwise

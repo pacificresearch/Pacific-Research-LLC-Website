@@ -1,4 +1,5 @@
 # PENDING OUTBOUND — process FIRST in any session with Outlook access
+# CHANNEL: OUTLOOK ONLY (Andrew 8/22). Never send this queue via Gmail or any other channel.
 
 ## ⚠️ DEDUPE PROTOCOL (MANDATORY — multiple sessions are active, Andrew 8/19)
 Before sending ANY item below:
