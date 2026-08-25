@@ -351,6 +351,59 @@ IC_ABBREV = OrderedDict([
     ("Office of Research on Women's Health", "ORWH"),
 ])
 
+# Eight of the 25 participating components publish no dollar figure at all —
+# their cap row reads "SBA Guideline". That is a real number, it just lives
+# somewhere else, and leaving it unresolved makes a third of the table
+# unusable for budgeting.
+#
+# The pipeline tries to read it live each run. sbir.gov blocks this network
+# (see sbir/SOURCES.md), so the fallback is a DATED, CITED figure that the
+# digest labels as needing re-verification rather than presenting as fresh.
+# Two independent NIH/SBA sources were checked on the verification date.
+SBA_GUIDELINE = {
+    "phase1": "$323,090",
+    "phase2": "$2,153,927",
+    "verified_on": "2026-08-25",
+    "sources": ("https://www.sbir.gov/about",
+                "https://seed.nih.gov/small-business-funding/"
+                "small-business-program-basics/understanding-sbir-sttr"),
+}
+SBA_URL = "https://www.sbir.gov/about"
+
+
+def sba_guideline():
+    """Try live, fall back to the dated constant. Returns (p1, p2, note)."""
+    try:
+        txt = _text(_http("GET", SBA_URL).text)
+        m1 = re.search(r"Phase\s*I\b[^$]{0,120}(\$\s?[\d,]{6,})", txt, re.I)
+        m2 = re.search(r"Phase\s*II\b[^$]{0,120}(\$\s?[\d,]{6,})", txt, re.I)
+        if m1 and m2:
+            p1 = m1.group(1).replace(" ", "")
+            p2 = m2.group(1).replace(" ", "")
+            LOG.ok("SBA budgetary guideline", 1, SBA_URL,
+                   "read live: %s Phase I / %s Phase II" % (p1, p2))
+            return p1, p2, "read live from %s this run" % SBA_URL
+    except (requests.RequestException, ValueError) as exc:
+        LOG.record("SBA budgetary guideline", "STALE",
+                   "could not read live (%s) — falling back to the figure "
+                   "verified %s against %s. The guideline is adjusted for "
+                   "inflation periodically; RE-VERIFY before budgeting."
+                   % (_detail(exc), SBA_GUIDELINE["verified_on"],
+                      " and ".join(SBA_GUIDELINE["sources"])), SBA_URL)
+    return (SBA_GUIDELINE["phase1"], SBA_GUIDELINE["phase2"],
+            "NOT read live this run; verified %s against %s — re-verify "
+            "before budgeting" % (SBA_GUIDELINE["verified_on"],
+                                  SBA_GUIDELINE["sources"][0]))
+
+
+def expand_cap(cap, p1, p2, which):
+    """Turn the literal string 'SBA Guideline' into the figure it stands for,
+    while keeping the announcement's own wording visible."""
+    if "sba guideline" in (cap or "").lower():
+        return "SBA guideline (%s)" % (p1 if which == 1 else p2)
+    return cap
+
+
 STTR_CODES = ("R41", "R42")
 SBIR_CODES = ("R43", "R44")
 
@@ -726,6 +779,15 @@ def probe_sam():
 # ---------------------------------------------------------------------------
 
 MONEY = re.compile(r"\$[\d,]+(?:\.\d{2})?")
+
+
+def as_ic_table(cached):
+    """The cache round-trips through JSON with sort_keys=True, which silently
+    re-alphabetises a dict and loses the announcement's own ordering. Tables
+    are therefore cached as ordered pairs and rebuilt here."""
+    if isinstance(cached, list):
+        return OrderedDict((k, tuple(v)) for k, v in cached)
+    return OrderedDict(cached or {})
 
 
 def parse_ic_budget_table(nofo_html):
@@ -1299,10 +1361,16 @@ def resolve_caps(opp, ic_table, table_url):
             break
     if full and full in ic_table:
         p1, p2 = ic_table[full]
-        opp["cap_phase1"], opp["cap_phase2"] = p1, p2
+        g1, g2, gnote = sba_guideline()
+        opp["cap_phase1"] = expand_cap(p1, g1, g2, 1)
+        opp["cap_phase2"] = expand_cap(p2, g1, g2, 2)
         opp["cap_source"] = table_url
         opp["cap_basis"] = ("%s row of the IC budget table in the parent "
-                            "announcement" % ab)
+                            "announcement%s" % (
+                                ab,
+                                ("; SBA guideline figure %s" % gnote)
+                                if "sba guideline" in (p1 + p2).lower()
+                                else ""))
         return
     if own:
         opp["cap_phase1"] = own.group(1)
@@ -1766,7 +1834,7 @@ def load_parent_context(force=False):
             "nofo_url": nofo_url,
             "close_date": hit.get("closeDate") or "",
             "due_dates": dues,
-            "ic_table": table,
+            "ic_table": [[k, list(v)] for k, v in table.items()],
             # Only the head is kept: it carries the Companion Funding
             # Opportunity block that derive_omnibus() reads. Caching the whole
             # 400KB announcement made the state file 200KB for no benefit.
@@ -1989,9 +2057,14 @@ def cmd_ic_table(args):
         print("    verified from: %s" % p["nofo_url"])
         print("    due dates parsed from the NOFO: %s"
               % (", ".join(p["due_dates"]) or "none"))
-        print("    %-72s %-16s %s" % ("IC", "Phase I", "Phase II"))
-        for name, (p1, p2) in p["ic_table"].items():
-            print("    %-72s %-16s %s" % (name[:72], p1, p2))
+        g1, g2, gnote = sba_guideline()
+        print("    SBA budgetary guideline: %s Phase I / %s Phase II (%s)"
+              % (g1, g2, gnote))
+        print("    %-72s %-24s %s" % ("IC", "Phase I", "Phase II"))
+        for name, (p1, p2) in as_ic_table(p["ic_table"]).items():
+            print("    %-72s %-24s %s" % (name[:72],
+                                          expand_cap(p1, g1, g2, 1),
+                                          expand_cap(p2, g1, g2, 2)))
     for key, row in LOG.rows.items():
         print("[%s] %s — %s" % (row["status"], key, row["detail"]))
     return 0
@@ -2195,8 +2268,11 @@ def cmd_institute_scan(args):
         return 1
     codes = list(STTR_CODES) if "102" in fon else list(SBIR_CODES)
     years = list(range(TODAY.year - 5, TODAY.year + 1))
+    g1, g2, gnote = sba_guideline()
     rows = []
-    for full, (p1, p2) in p["ic_table"].items():
+    for full, (raw_p1, raw_p2) in as_ic_table(p["ic_table"]).items():
+        p1 = expand_cap(raw_p1, g1, g2, 1)
+        p2 = expand_cap(raw_p2, g1, g2, 2)
         ab = IC_ABBREV.get(full)
         if not ab:
             continue
@@ -2246,8 +2322,10 @@ def cmd_institute_scan(args):
                                             max(years)))
     print("# Lane = the award title matches the same capability vocabulary "
           "Gate 3 scores against.")
+    print("# SBA budgetary guideline: %s Phase I / %s Phase II (%s)"
+          % (g1, g2, gnote))
     print()
-    hdr = ("%-7s %-14s %-14s %7s %6s %6s %6s %7s  %s"
+    hdr = ("%-7s %-26s %-26s %7s %6s %6s %6s %7s  %s"
            % ("IC", "Phase I", "Phase II", "projs", "firms", "top3%",
               "lane", "lane%", "ops/data/care"))
     print(hdr)
@@ -2256,11 +2334,11 @@ def cmd_institute_scan(args):
                                          -(x.get("cap1_num") or 0)))
     for r in ranked:
         if r.get("error"):
-            print("%-7s %-14s %-14s   RePORTER FAILED: %s"
+            print("%-7s %-26s %-26s   RePORTER FAILED: %s"
                   % (r["ic"], r["p1"], r["p2"], r["error"]))
             continue
         L = r["lanes"]
-        print("%-7s %-14s %-14s %7d %6d %5d%% %6d %6d%%  %d/%d/%d"
+        print("%-7s %-26s %-26s %7d %6d %5d%% %6d %6d%%  %d/%d/%d"
               % (r["ic"], r["p1"], r["p2"], r["n"], r["unique_firms"],
                  int(r["conc"] * 100), r["lane_total"],
                  int(r["lane_share"] * 100), L["trial-ops"],
@@ -2316,7 +2394,7 @@ def _years():
 def _table_for(opp, parents):
     fon = "PA-27-102" if opp["mechanism"] == "STTR" else "PA-27-100"
     p = parents.get(fon) or {}
-    return p.get("ic_table") or {}, p.get("nofo_url", "")
+    return as_ic_table(p.get("ic_table")), p.get("nofo_url", "")
 
 
 def main(argv=None):
