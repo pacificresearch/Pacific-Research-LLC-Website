@@ -1042,7 +1042,8 @@ def gate6_competition(opp, years):
         codes = list(SBIR_CODES)
     else:                        # dual SBIR/STTR notice — count both families
         codes = list(STTR_CODES) + list(SBIR_CODES)
-    results, err = fetch_reporter(terms, codes, years, ic=opp.get("ic_abbrev"))
+    raw, err = fetch_reporter(terms, codes, years, ic=opp.get("ic_abbrev"))
+    results = dedupe_projects(raw)
     if err:
         opp["competition"] = {"error": err}
         return True, "G6", ("RePORTER unavailable (%s) — crowding UNKNOWN, "
@@ -1065,6 +1066,7 @@ def gate6_competition(opp, years):
     concentration = (sum(n for _, n in top) / float(len(results))) if results else 0.0
     opp["competition"] = {
         "n_awards": len(results),
+        "n_rows": len(raw),
         "years": "FY%d-FY%d" % (min(years), max(years)),
         "top_firms": top,
         "concentration": round(concentration, 2),
@@ -1603,9 +1605,11 @@ def render_digest(survivors, killed, weekly, run_meta):
         else:
             firms = ", ".join("%s (%d)" % (n, c) for n, c in comp.get("top_firms") or []) or "none"
             pos = ", ".join("%s (%d)" % (n, c) for n, c in comp.get("program_officers") or []) or "none named"
-            A("- **Prior-award landscape**: %d %s award(s) %s, %s. Top firms: %s. "
+            A("- **Prior-award landscape**: %d distinct %s project(s) %s "
+              "(%d project-year rows), %s. Top firms: %s. "
               "Top-3 concentration %d%%."
               % (comp.get("n_awards", 0), o["mechanism"], comp.get("years", ""),
+                 comp.get("n_rows", 0),
                  o.get("crowding", ""), firms,
                  int(comp.get("concentration", 0) * 100)))
             A("- **Program officer(s)**: %s" % pos)
@@ -2099,6 +2103,198 @@ def _capless():
             and o["cap_source"] == "http://example/table")
 
 
+# ---------------------------------------------------------------------------
+# INSTITUTE SCAN — "which institute should PRG aim at?" Ranks every
+# participating component of a parent announcement by verified budget cap and
+# by how crowded and how PRG-shaped its actual STTR portfolio is.
+# ---------------------------------------------------------------------------
+
+# "PRG's lane" is not defined twice. The scan classifies each award with the
+# SAME fit vocabulary Gate 3 scores against, so the two can never drift apart
+# — if a term is added to FIT_TIER_A, the institute scan starts counting it.
+#
+# RePORTER's advanced_text_search is not used for this. operator="and" on a
+# six-word phrase matches nothing (0 of NCI's 250 STTR awards); operator="or"
+# matches almost everything (240 of 250). Neither number means anything. So
+# the portfolio is pulled once per IC and classified here.
+LANE_TIERS = OrderedDict([
+    ("trial-ops", FIT_TIER_A),
+    ("data/informatics", FIT_TIER_B),
+    ("care-delivery", FIT_TIER_C),
+])
+
+
+# RePORTER returns one row per project-YEAR: a Phase I, its Phase II, and each
+# non-competing continuation are separate rows with the same core number
+# (1R42AG094389-01, 5R42AG094389-02, ...). Counting those as separate awards
+# inflates a 40-project institute into 180 and makes every crowding read wrong.
+CORE_NUM = re.compile(r"[A-Z]?\d?([A-Z]\d{2}[A-Z]{2}\d{6})")
+
+
+def core_project(num):
+    m = CORE_NUM.search((num or "").upper())
+    return m.group(1) if m else (num or "")
+
+
+def dedupe_projects(results):
+    """One row per distinct project, keeping the largest award seen."""
+    best = OrderedDict()
+    for r in results:
+        key = core_project(r.get("project_num"))
+        cur = best.get(key)
+        if cur is None or (r.get("award_amount") or 0) > (cur.get("award_amount") or 0):
+            best[key] = r
+    return list(best.values())
+
+
+def classify_lane(title):
+    """Return the highest-tier lane this award title falls in, or None."""
+    low = (title or "").lower()
+    for lane, vocab in LANE_TIERS.items():
+        if any(_term_re(t).search(low) for t in vocab):
+            return lane
+    return None
+
+
+def _reporter_all(terms, codes, years, ic, cap=2000):
+    """Page RePORTER past its 500-record response limit."""
+    out, offset = [], 0
+    while offset < cap:
+        crit = {"fiscal_years": list(years), "activity_codes": list(codes),
+                "agencies": [ic]}
+        if terms:
+            crit["advanced_text_search"] = {
+                "operator": "and",
+                "search_field": "projecttitle,abstracttext,terms",
+                "search_text": terms}
+        body = {"criteria": crit, "include_fields": [
+            "ProjectNum", "ProjectTitle", "AwardAmount", "Organization",
+            "ProgramOfficers", "FiscalYear"], "limit": 500, "offset": offset}
+        try:
+            batch = (_http("POST", REPORTER, json=body).json()
+                     or {}).get("results") or []
+        except (requests.RequestException, ValueError) as exc:
+            return out, _detail(exc)
+        out.extend(batch)
+        if len(batch) < 500:
+            break
+        offset += 500
+        time.sleep(0.4)
+    return out, None
+
+
+def cmd_institute_scan(args):
+    parents = load_parent_context(force=args.refresh)
+    fon = (args.institute_scan or "PA-27-102").upper()
+    p = parents.get(fon)
+    if not p or not p.get("ic_table"):
+        print("Could not verify %s or its IC budget table this run. Nothing "
+              "is being estimated in its place." % fon)
+        for key, row in LOG.rows.items():
+            print("  [%s] %s — %s" % (row["status"], key, row["detail"]))
+        return 1
+    codes = list(STTR_CODES) if "102" in fon else list(SBIR_CODES)
+    years = list(range(TODAY.year - 5, TODAY.year + 1))
+    rows = []
+    for full, (p1, p2) in p["ic_table"].items():
+        ab = IC_ABBREV.get(full)
+        if not ab:
+            continue
+        raw, err = _reporter_all("", codes, years, ab)
+        awards = dedupe_projects(raw)
+        if err:
+            rows.append({"ic": ab, "full": full, "p1": p1, "p2": p2,
+                         "error": err})
+            continue
+        orgs, lanes, lane_pos, lane_firms = Counter(), Counter(), Counter(), Counter()
+        for r in awards:
+            nm = ((r.get("organization") or {}).get("org_name") or "").title()
+            if nm:
+                orgs[nm] += 1
+            lane = classify_lane(r.get("project_title"))
+            if not lane:
+                continue
+            lanes[lane] += 1
+            if nm:
+                lane_firms[nm] += 1
+            for po in (r.get("program_officers") or []):
+                who = re.sub(r"\s+", " ",
+                             (po.get("full_name") or "")).strip().title()
+                if who:
+                    lane_pos[who] += 1
+        top = orgs.most_common(3)
+        conc = (sum(n for _, n in top) / float(len(awards))) if awards else 0.0
+        lane_total = sum(lanes.values())
+        rows.append({
+            "ic": ab, "full": full, "p1": p1, "p2": p2, "n": len(awards),
+            "n_rows": len(raw),
+            "top": top, "conc": conc, "lanes": lanes, "lane_total": lane_total,
+            "lane_share": (lane_total / float(len(awards))) if awards else 0.0,
+            "pos": lane_pos.most_common(3),
+            "lane_firms": lane_firms.most_common(3),
+            "unique_firms": len(orgs),
+            "cap1_num": _cap_num(p1),
+        })
+        time.sleep(0.25)
+
+    print("# Institute scan — %s" % fon)
+    print("# %s" % p["title"])
+    print("# Caps verified from the announcement's own budget table: %s"
+          % p["nofo_url"])
+    print("# Portfolio: NIH RePORTER v2, activity %s, FY%d-FY%d, one query "
+          "per participating component." % ("/".join(codes), min(years),
+                                            max(years)))
+    print("# Lane = the award title matches the same capability vocabulary "
+          "Gate 3 scores against.")
+    print()
+    hdr = ("%-7s %-14s %-14s %7s %6s %6s %6s %7s  %s"
+           % ("IC", "Phase I", "Phase II", "projs", "firms", "top3%",
+              "lane", "lane%", "ops/data/care"))
+    print(hdr)
+    print("-" * len(hdr))
+    ranked = sorted(rows, key=lambda x: (-(x.get("lane_total") or 0),
+                                         -(x.get("cap1_num") or 0)))
+    for r in ranked:
+        if r.get("error"):
+            print("%-7s %-14s %-14s   RePORTER FAILED: %s"
+                  % (r["ic"], r["p1"], r["p2"], r["error"]))
+            continue
+        L = r["lanes"]
+        print("%-7s %-14s %-14s %7d %6d %5d%% %6d %6d%%  %d/%d/%d"
+              % (r["ic"], r["p1"], r["p2"], r["n"], r["unique_firms"],
+                 int(r["conc"] * 100), r["lane_total"],
+                 int(r["lane_share"] * 100), L["trial-ops"],
+                 L["data/informatics"], L["care-delivery"]))
+    print()
+    print("Top of the ranking, in detail:")
+    for r in ranked[:6]:
+        if r.get("error") or not r.get("lane_total"):
+            continue
+        print()
+        print("%s (%s) — Phase I %s / Phase II %s" % (r["ic"], r["full"],
+                                                      r["p1"], r["p2"]))
+        print("   portfolio : %d distinct STTR project(s) (%d RePORTER "
+              "project-year rows) across %d firm(s); top three hold %d%%"
+              % (r["n"], r["n_rows"], r["unique_firms"], int(r["conc"] * 100)))
+        print("   in lane   : %d (%d%% of the portfolio) — %s"
+              % (r["lane_total"], int(r["lane_share"] * 100),
+                 ", ".join("%s %d" % (k, v) for k, v in r["lanes"].items())))
+        print("   lane firms: %s" % (", ".join("%s (%d)" % (n, c)
+                                     for n, c in r["lane_firms"]) or "none"))
+        print("   lane PO(s): %s" % (", ".join("%s (%d)" % (n, c)
+                                     for n, c in r["pos"]) or "none named"))
+    print()
+    for key, row in LOG.rows.items():
+        if row["status"] != "OK":
+            print("[%s] %s — %s" % (row["status"], key, row["detail"]))
+    return 0
+
+
+def _cap_num(cap):
+    m = re.search(r"[\d,]{6,}", cap or "")
+    return int(m.group(0).replace(",", "")) if m else 0
+
+
 def cmd_selftest():
     bad = 0
     for label, fn in SELFTESTS:
@@ -2137,12 +2333,18 @@ def main(argv=None):
     ap.add_argument("--refresh", action="store_true",
                     help="bypass the parent-NOFO cache")
     ap.add_argument("--out", help="digest path (default sbir/reports/)")
+    ap.add_argument("--institute-scan", nargs="?", const="PA-27-102",
+                    metavar="FON",
+                    help="rank a parent announcement's participating "
+                         "institutes by verified cap and prior-award crowding")
     ap.add_argument("--selftest", action="store_true",
                     help="run the offline gate assertions and exit")
     args = ap.parse_args(argv)
 
     if args.selftest:
         return cmd_selftest()
+    if args.institute_scan:
+        return cmd_institute_scan(args)
     if args.ic_table:
         return cmd_ic_table(args)
     if args.explain:
