@@ -45,8 +45,9 @@ data from HERE, not from memory. Update this file when anything changes
 
 ## Compliance posture
 HIPAA · 21 CFR Part 11 · ICH GCP · OSHA · formal "Honest Broker" data
-governance · FedRAMP-aligned cloud delivery (AWS GovCloud / Azure
-Government) · PIV-card SSO integration experience
+governance · FedRAMP-aligned delivery posture (hosting authorization
+carried by named platform/CSP partners, not by PRG) · PIV/CAC personnel
+credentialing and site-access administration
 
 ## Platform experience
 Epic · Cerner · REDCap · OnCore CTMS · Medidata · ONC-certified EHR
