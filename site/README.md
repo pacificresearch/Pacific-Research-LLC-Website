@@ -1,6 +1,6 @@
 # pacificresearchllc.com — production website
 
-A fast, fully static, single-page site for **Pacific Research Group LLC** (SDVOSB federal health-IT
+A fast, fully static, single-page site for **Pacific Research Group LLC** (SDVOSB federal clinical research
 contractor). No build step, no framework, no server code — just HTML, CSS, vanilla JS, and image assets.
 Host it anywhere that serves static files.
 
