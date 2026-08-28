@@ -1286,6 +1286,52 @@ def _strip_html(raw):
     return re.sub(r"\s+", " ", txt).strip()
 
 
+_UI_POC = {}
+
+
+def _stash_ui_poc(notice_id, data):
+    """Keep any POC the UI endpoint hands back, keyed by notice id.
+
+    When the keyed API is exhausted the search results still carry POCs, but a
+    notice recovered only via the fallback would otherwise have none — and a
+    response with no address to send it to is not a response."""
+    poc = [{"name": p.get("fullName"), "email": p.get("email"),
+            "phone": p.get("phone"), "type": p.get("type")}
+           for p in (data.get("pointOfContact") or []) if p.get("email")]
+    if poc:
+        _UI_POC[notice_id] = poc
+
+
+def fetch_notice_ui(notice_id):
+    """Fetch one notice from sam.gov's own UI endpoint. No API key, no quota.
+
+    The keyed API (api.sam.gov) enforces a daily quota that a full sweep can
+    exhaust — and when it does, every follow-up lookup dies with it, including
+    the point-of-contact lookups the send step depends on. sam.gov's public UI
+    calls a different host that needs no key. It requires browser-ish headers
+    (a bare request gets 406) and it is undocumented, so treat it strictly as a
+    fallback: return None on any trouble and let the caller carry on.
+    """
+    if not notice_id:
+        return None
+    try:
+        resp = requests.get(
+            f"https://sam.gov/api/prod/opps/v2/opportunities/{notice_id}",
+            headers={
+                "Accept": "application/json, text/plain, */*",
+                "User-Agent": ("Mozilla/5.0 (X11; Linux x86_64) "
+                               "AppleWebKit/537.36 Chrome/126 Safari/537.36"),
+                "Origin": "https://sam.gov",
+                "Referer": "https://sam.gov/",
+            },
+            timeout=30)
+        if resp.status_code != 200:
+            return None
+        return resp.json().get("data2")
+    except Exception:
+        return None
+
+
 def fetch_description(opp, api_key):
     """Return the notice's real body text, fetching and caching as needed.
 
@@ -1303,6 +1349,16 @@ def fetch_description(opp, api_key):
                            timeout=20)
         if resp.status_code == 429:
             _RUN_STATE["rate_limited"] = True
+            # Quota is spent for the day. Fall back to the keyless UI endpoint
+            # rather than screening this notice on its title — a sole-source
+            # notice is indistinguishable from competitive work by title alone.
+            data = fetch_notice_ui(nid)
+            if data:
+                _stash_ui_poc(nid, data)
+                text = _strip_html(data.get("description") or "")[:20000]
+                if text:
+                    cache[nid] = text
+                    return text
             return ""
         resp.raise_for_status()
         try:
@@ -2599,6 +2655,10 @@ def _extract_poc(opp):
             "phone": (p.get("phone") or "").strip(),
             "type": (p.get("type") or "").strip(),
         })
+    if not any(c["email"] for c in out):
+        # Search result carried no usable address; use whatever the keyless UI
+        # fallback recovered during hydration.
+        out = _UI_POC.get(opp.get("noticeId")) or out
     return out
 
 
@@ -4638,7 +4698,8 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
         p.append('<div class="scroll"><table><thead><tr>'
                  '<th>Respond?</th><th>Type</th><th>Title</th><th>Agency</th>'
                  '<th>Set-Aside</th><th>Posted</th><th>Respond By</th>'
-                 '<th>Solicitation #</th></tr></thead><tbody>')
+                 '<th>Solicitation #</th><th>Send to (POC)</th>'
+                 '</tr></thead><tbody>')
         for r in engage[:25]:
             title = _html_escape(_clean(r["title"], 60))
             if _is_http(r["link"]):
@@ -4646,13 +4707,24 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
                          f'rel="noopener">{title}</a>')
             rec = ('<b style="color:#2E7D4F">YES — respond</b>'
                    if r.get("respond_recommended") else 'review')
+            # The response has to go somewhere. POC comes free with the search
+            # result — surfacing it here means the send step needs no extra
+            # API call, which matters because a large sweep can exhaust the
+            # daily quota before the send step ever runs.
+            poc = "<i>none in notice</i>"
+            if r.get("poc"):
+                poc = "<br>".join(
+                    _html_escape(" · ".join(
+                        b for b in (c.get("name"), c.get("email")) if b))
+                    for c in r["poc"][:2])
             p.append(f"<tr><td>{rec}</td>"
                      f"<td>{_html_escape(r['notice_type'])}</td>"
                      f"<td>{title}</td><td>{_html_escape(r['agency'])}</td>"
                      f"<td>{_html_escape(r['setaside'])}</td>"
                      f"<td class='num'>{_html_escape(r['posted'])}</td>"
                      f"<td>{str(r['response_deadline']).split('T')[0]}</td>"
-                     f"<td>{_html_escape(r['solicitation'])}</td></tr>")
+                     f"<td>{_html_escape(r['solicitation'])}</td>"
+                     f"<td>{poc}</td></tr>")
         p.append('</tbody></table></div>')
     else:
         p.append('<p class="empty">No fresh pre-RFP notices this window.</p>')
@@ -6811,9 +6883,17 @@ def main(argv=None):
 
     if _RUN_STATE["rate_limited"]:
         sys.stderr.write(
-            "\n*** NOTE: SAM.gov rate-limited this run — the results are "
-            "PARTIAL. Re-run later (or with a lower --limit) for full coverage. "
-            "A daily quota applies to each API key. ***\n"
+            "\n*** SAM.gov RATE-LIMITED this run — results are PARTIAL. ***\n"
+            "    Two consequences, both of which matter:\n"
+            "    1. Notices whose description did not hydrate were screened on\n"
+            "       TITLE ONLY. A sole-source or intent-to-award notice reads\n"
+            "       like ordinary competitive work from its title, so treat\n"
+            "       any un-hydrated survivor as unverified, not as a finding.\n"
+            "    2. The daily quota is shared with every other lookup, so a\n"
+            "       large sweep can leave nothing for follow-up calls. POCs\n"
+            "       are in the Engage table already — use those rather than\n"
+            "       re-querying the API.\n"
+            "    Re-run later, or with a lower --limit, for full coverage.\n"
         )
 
     if saved:

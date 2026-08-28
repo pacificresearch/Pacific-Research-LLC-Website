@@ -1,5 +1,13 @@
 # Daily Capture Run — procedure for the scheduled session
 
+> **Send cadence (Andrew, 8/21): 4 + 4 + 4.** This file is the MORNING
+> block — the only one that sweeps SAM. Two send-only blocks follow it,
+> MIDDAY at 19:00 UTC and SIGN-OFF at 00:00 UTC, working this report and
+> the open backlog rather than re-sweeping (the keyed API's daily quota
+> does not survive three sweeps). Target four non-binding responses per
+> block, drawn from real supply — never padded. See `CLAUDE.md`, DAILY
+> SEND CADENCE.
+
 A scheduled Routine fires a fresh cloud session every morning. That
 session follows this procedure end-to-end and finishes with an
 executive notification to Andrew. Human approval gates are marked ⛔ —
@@ -70,11 +78,26 @@ been screened).
 - Pull attachments from SAM if reachable; build the compliance matrix
   as far as the available documents allow.
 - Draft proposal skeleton docs from `capture/library/`.
-- Draft the CO email (RFI response, question submission, or quote cover
-  — whatever the notice stage calls for), addressed to the CO of
-  record, from Andrew@pacificresearchllc.com. If the Microsoft 365
-  connector is available, save it as an Outlook DRAFT; otherwise write
-  it to `03_proposal/co_email_draft.md`. ⛔ Andrew reviews and sends.
+- Write the CO email, addressed to the CO of record, from
+  Andrew@pacificresearchllc.com. **What happens next depends on whether
+  it commits PRG to a price** (`CLAUDE.md` BIAS TO ACTION amendment,
+  8/20):
+  - **Non-binding — SEND IT.** Sources sought and RFI responses,
+    capability statements, questions, clarification and extension
+    requests, interested-vendor list requests, set-aside asks. Send on
+    the CO's own thread, then report what went out. No advance approval.
+    **First check Sent Items** — `outlook_email_search(folderName="Sent
+    Items", query="<notice number>")`. Andrew runs other sessions and
+    the Routines fire into fresh ones; the shared mailbox is the only
+    ledger they all see. A hit means skip it and say so in the report,
+    never send a second copy. Search by notice number, not subject, and
+    look back an extra day (Sent Items filters on local time).
+  - **⛔ Priced — STAGE IT.** Quote covers, RFQ responses, anything with
+    a cost volume or a signed certificate of compliance. Save as an
+    Outlook DRAFT (or `03_proposal/co_email_draft.md` if the connector
+    is unavailable), complete and submission-ready with every form
+    filled and no placeholders, and notify Andrew leading with the
+    number and the margin. A quote is a binding offer.
 - If fulfillment needs hires: generate contingent job postings + the
   careers-page snippet per `05_job_posting_contingent.md`, insert into
   `site/careers/index.html`. LinkedIn/Indeed paste text goes in
@@ -88,9 +111,11 @@ Refresh `capture/PIPELINE.md`: stages, deadlines, next actions, recently-done. T
 ## 6. Notify (the run's final message — reaches Andrew by push + email)
 Lead with: **CURRENT CONTRACT UNDER CONSIDERATION: <title> (<notice
 id>)** — agency, response deadline, pursuit role, fulfillment model,
-estimated value/margin band. Then, as a short checklist, the ⛔ actions
-waiting on Andrew:
-1. Send the drafted CO email (link/location of draft)
+estimated value/margin band. Then **SENT TODAY** — one line per piece of
+non-binding correspondence that actually went out (notice id, CO, what
+it was). Then, as a short checklist, the ⛔ actions still waiting on
+Andrew:
+1. Approve and send the staged quote — lead with the number and margin
 2. Post the prepared LinkedIn/Indeed text
 3. Approve/adjust anything flagged in the compliance matrix
 Then one line each for backlog survivors and the PASS count. No filler.
@@ -100,9 +125,13 @@ Then one line each for backlog survivors and the PASS count. No filler.
   message and reply into the conversation so the exchange stays threaded
   on their end (`capture/WORKFLOW.md` Stage 2). `send_mail` with "RE:"
   in the subject starts a second thread. New conversations only.
-- ⛔ NEVER auto-send email to a contracting officer, submit a quote, or
-  publish a job posting to an external board. Prepare + notify only.
-  The careers page ships only via draft PR that Andrew merges.
+- **Non-binding CO correspondence goes out on its own** — sources
+  sought, RFIs, capability statements, questions, set-aside asks. Send
+  them, then report them.
+- ⛔ NEVER auto-submit a quote, an RFQ response, or anything else that
+  commits PRG to a price, and NEVER publish a job posting to an external
+  board. Stage those complete and notify. The careers page ships only
+  via draft PR that Andrew merges.
 - Amendments/updates on opportunities already in `capture/opportunities/`
   take priority over new selections — check them first (step 3).
 - One selected contract at a time unless Andrew has said otherwise in
