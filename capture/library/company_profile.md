@@ -45,13 +45,11 @@ data from HERE, not from memory. Update this file when anything changes
 
 ## Compliance posture
 HIPAA · 21 CFR Part 11 · ICH GCP · OSHA · formal "Honest Broker" data
-governance · FedRAMP-aligned delivery posture (hosting authorization
-carried by named platform/CSP partners, not by PRG) · PIV/CAC personnel
-credentialing and site-access administration
+governance · PIV/CAC personnel credentialing and site-access
+administration
 
 ## Platform experience
-Epic · Cerner · REDCap · OnCore CTMS · Medidata · ONC-certified EHR
-partners · SAS/SPSS/R/Python
+Epic · Cerner · REDCap · OnCore CTMS · Medidata · SAS/SPSS/R/Python
 
 ## Founder (Managing Director)
 U.S. military veteran; biomedical engineering systems (AAMI CBET, USAF
@@ -62,10 +60,12 @@ major pharmaceutical clinical systems. Full credential map in CLAUDE.md;
 resume variants in `resumes/`.
 
 ## Delivery model (limitations-on-subcontracting posture)
-PRG partners with ONC-certified health-IT platform vendors and licensed
-trade/staffing partners for specialized delivery while retaining
-clinical data managers, project leadership, QC, and training staff
-internally — meeting Limitations on Subcontracting requirements.
+PRG is structured to prime federal health requirements and staff them
+on award: Managing Director oversight of clinical operations, data
+management, and training, with qualified personnel recruited against
+each specific requirement, and commercial platform vendors where a
+solicitation calls for one. Staffing plans are built to satisfy
+Limitations on Subcontracting for each requirement pursued.
 
 ## Not held (screening relevance)
 No bonding capacity · no FCL · no GSA schedule (yet) · not 8(a)/HUBZone/
