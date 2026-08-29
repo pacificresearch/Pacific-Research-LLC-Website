@@ -1,0 +1,103 @@
+name: SBIR/STTR digest
+
+# The digest arrives; Andrew does not poll it.
+#
+# Mondays 06:12 America/Los_Angeles = 13:12 UTC (PDT) — off the hour on
+# purpose, so this job is not queued alongside every other :00 cron.
+# NIH posts to the Guide through the week, so a Monday sweep catches the
+# prior week whole.
+
+on:
+  schedule:
+    - cron: "12 13 * * 1"
+  workflow_dispatch:
+    inputs:
+      all:
+        description: "Include UNCHANGED rows (ignore the seen-list)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: sbir-sttr-digest
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install --quiet requests
+
+      # Gate assertions run BEFORE the sweep. A scoring regression that
+      # silently mis-ranks is worse than a job that fails loudly, and all
+      # 15 assertions are offline so this costs nothing.
+      - name: Self-test the gate logic
+        run: python3 sbir_sttr_pipeline.py --selftest
+
+      - name: Run the pipeline
+        id: run
+        env:
+          SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+          SIMPLER_GRANTS_API_KEY: ${{ secrets.SIMPLER_GRANTS_API_KEY }}
+        run: |
+          set -o pipefail
+          ARGS=""
+          if [ "${{ inputs.all }}" = "true" ]; then ARGS="--all"; fi
+          python3 sbir_sttr_pipeline.py $ARGS > /tmp/digest.md
+          DIGEST="sbir/reports/PRG_SBIR_digest_$(date -u +%F).md"
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          # Survivor count drives whether an issue is worth opening.
+          N=$(grep -c '^### [0-9]' "$DIGEST" || true)
+          echo "survivors=$N" >> "$GITHUB_OUTPUT"
+          # A sweep with holes is flagged in the issue title, not buried.
+          if grep -q 'This sweep is incomplete' "$DIGEST"; then
+            echo "incomplete=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "incomplete=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit the digest and the seen-list
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sbir/reports sbir/state/seen.json
+          if git diff --cached --quiet; then
+            echo "Nothing changed this run."
+            exit 0
+          fi
+          git commit -m "SBIR/STTR digest $(date -u +%F) (${{ steps.run.outputs.survivors }} survivor(s))"
+          for i in 1 2 3 4; do
+            git push && break
+            echo "push failed, retrying in $((2**i))s"
+            sleep $((2**i))
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          done
+
+      # Only open an issue when there is something to act on. A quiet week
+      # should be quiet — but an incomplete sweep is never quiet, because a
+      # missing source is the one thing that could be hiding the answer.
+      - name: Open the digest issue
+        if: steps.run.outputs.survivors != '0' || steps.run.outputs.incomplete == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="SBIR/STTR digest $(date -u +%F) — ${{ steps.run.outputs.survivors }} survivor(s)"
+          if [ "${{ steps.run.outputs.incomplete }}" = "true" ]; then
+            TITLE="$TITLE [INCOMPLETE SWEEP]"
+          fi
+          # Issue bodies cap at 65536 bytes; the digest can exceed that.
+          head -c 60000 "${{ steps.run.outputs.digest }}" > /tmp/body.md
+          printf '\n\n---\n\nFull digest: `%s`\n' "${{ steps.run.outputs.digest }}" >> /tmp/body.md
+          gh issue create --title "$TITLE" --body-file /tmp/body.md --label sbir || \
+            gh issue create --title "$TITLE" --body-file /tmp/body.md

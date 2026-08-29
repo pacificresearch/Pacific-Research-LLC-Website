@@ -226,6 +226,72 @@ Screening tool: `python3 samgov_opportunity_matcher.py --intl` — overseas
 place of performance / international buyer only, domestic
 international-buyer penalty off, international kills on.
 
+## SBIR/STTR LANE — PRG research grants
+
+PRG runs a THIRD capture system for small-business R&D grants. This one
+does not follow the aggregation model: an STTR is not a contract PRG
+primes and subcontracts out, it is a research award with a named PD/PI,
+a mandatory 40/30 work split with a partnering research institution, and
+an IP allocation agreement to negotiate. Different gate, different
+clock, different documents. **Do not run the capture-v3 gate against an
+SBIR/STTR announcement, or this gate against a solicitation.**
+
+Everything lives in `sbir/` and shares the library at `capture/library/`:
+
+- `sbir/GATE.md` — the six-gate screen. **Run it FIRST on any SBIR/STTR
+  notice.**
+- `sbir/PROFILE.md` — the company/operator profile every fit score is
+  measured against
+- `sbir/WORKFLOW.md` — SCREEN → VERIFY → ENGAGE → PARTNER → SUBMIT →
+  MONITOR → WIN/LOSS
+- `sbir/SOURCES.md` · `sbir/PIPELINE.md` · `sbir/reports/`
+
+Four facts that override the contract-lane instincts:
+
+1. **STTR by default; SBIR is the exception.** SBIR requires the PD/PI
+   to be **primarily employed** by the small business at award and
+   throughout. Andrew is job searching, so PRG cannot satisfy that.
+   STTR lets the PD/PI sit at the partnering institution on a formal
+   commitment to PRG — no salary required — at >=10% effort. Surface an
+   SBIR only where the work is genuinely solo-operator-shaped, and
+   always with the employment conflict named in the row.
+2. **SDVOSB is worth almost nothing here.** NIH SBIR/STTR has no veteran
+   set-aside and no veteran evaluation preference. One line of
+   credibility, the same as in the international lane. Any application
+   that leans on it is misreading the program.
+3. **Finding the parent announcements is not the task.** PA-27-100
+   (SBIR) and PA-27-102 (STTR) are omnibus and always open. The real
+   targets are NOSIs, institute-specific PAs/PARs, RFAs with set-aside
+   money, contract-based topics, and mechanisms with a **restricted
+   eligibility field** — a notice only first-time PIs may enter thins
+   the field more than any topical advantage PRG could build.
+4. **Budget caps are not uniform under one parent.** They run from the
+   bare SBA guideline to $700K Phase I / $3M Phase II depending on the
+   institute. Surface the cap for the *specific* institute, every time.
+
+Absolute honesty rule for this lane: never claim a laboratory, a
+clinical site, a patient population, a dataset, or IP that PRG does not
+have — and **never name a Stanford investigator, department, or center
+as a partner in any document before they have agreed in writing** (same
+rail as `intl/COMPLIANCE_RAILS.md` Rail 2). The partner map says who PRG
+would *ask*.
+
+**Never invent an announcement number, a deadline, or a budget cap.**
+Each is verified against a primary source in the same run and printed
+with the URL it came from; anything unverified says so. And when a
+source fails, the digest names it — four of nine sources are routinely
+unavailable, so a partial sweep must never read as a complete one.
+
+**One command runs the whole lane:** say **"Run SBIR System"** (or
+`/run-sbir`). The skill at `.claude/skills/run-sbir/SKILL.md` executes
+SELFTEST → SWEEP → GATE → VERIFY → REPORT and stops at the ⛔ engagement
+gate: no email to a program officer, no contact with a prospective
+academic partner, no submission, without Andrew.
+
+Screening tool: `python3 sbir_sttr_pipeline.py` (add `--institute-scan`
+to rank institutes, `--explain FON` for a single gate trace,
+`--ic-table` for the verified budget caps).
+
 ## Repository context
 
 - The SAM.gov screening tool lives on branch
@@ -236,3 +302,8 @@ international-buyer penalty off, international kills on.
 - The international lane (`intl/`, and the matcher's `--intl` mode)
   implements `intl/GATE.md`; keep the gate doc and the matcher aligned
   when either changes, same as the domestic pair.
+- The SBIR/STTR lane (`sbir/`, `sbir_sttr_pipeline.py`) implements
+  `sbir/GATE.md` and scores against `sbir/PROFILE.md`; keep all three
+  aligned when any changes, same as the other two pairs. The pipeline's
+  own `--selftest` asserts the gate logic offline and runs in CI before
+  every scheduled sweep.
