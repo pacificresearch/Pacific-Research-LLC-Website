@@ -103,8 +103,16 @@ Applications are due **5:00 PM local time of the applicant
 organization** on the due date.
 
 Reuse from `capture/library/` where a variant exists — the company
-profile, past performance, and the capability language are shared with
-the contract lane. File improvements back after every submission.
+profile, key personnel experience, and the capability language are
+shared with the contract lane. File improvements back after every
+submission.
+
+**PRG has no entity past performance, and none is claimed.** In federal
+contracting that term means contracts the entity itself performed; PRG
+was formed in March 2026 and has none. Pre-formation work is the
+Managing Director's and is labelled **key personnel experience** — the
+same standard `PRG_Website_Cleanup.md` §7 applies to the site. An NIH
+biosketch and any facilities or capability statement follow it too.
 
 ## 6. MONITOR
 
