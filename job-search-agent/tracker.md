@@ -125,6 +125,10 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-09-01 | Project Manager, Operational Excellence | LifeStance Health | Remote, US | https://careers.lifestance.com/jobs/corporate-roles/us/remote/project-manager-operational-excellence/ | ready to apply |
 | 2026-09-01 | Senior Officer, Program Operations | Save the Children International | Remote, Global | https://www.savethechildren.net/careers/ | ready to apply |
 | 2026-09-01 | Operations Manager | Harriett Buhai Center for Family Law | Los Angeles, CA | https://www.idealist.org/en/nonprofit-job/42329f448ca34df79bb45bab896b5661-operations-manager-harriett-buhai-center-for-family-law-los-angeles | ready to apply |
+| 2026-09-01 | Manager, Process Improvement & Operational Excellence | Molina Healthcare | Remote, US | https://careers.molinahealthcare.com/job/united-states/manager-process-improvement-and-operational-excellence-remote/21726/94487290592 | ready to apply |
+| 2026-09-01 | Quality Improvement Manager | Eisner Health | Los Angeles, CA (Hybrid) | https://www.linkedin.com/jobs/view/quality-improvement-manager-at-eisner-health-4446262625 | ready to apply |
+| 2026-09-01 | Clinical Documentation Integrity Specialist | UnitedHealth Group | Los Angeles, CA | https://careers.unitedhealthgroup.com/job/los-angeles/clinical-documentation-integrity-specialist-onsite-los-angeles/34088/99367325504 | ready to apply |
+| 2026-09-01 | Program Officer, Humanitarian Response | World Relief | Remote, US | https://www.glassdoor.com/job-listing/program-officer-humanitarian-response-2025834-world-relief-JV_KO0,45_KE46,58.htm | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -135,6 +139,16 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-21 | Associate Director, OPEN Learner Engagement | FHI 360 | Requires 10+ yrs online-education program mgmt + LMS/CoP portfolio |
 | 2026-08-13 | Associate Medical Director / Medical Monitor | Puma Biotechnology | Requires MD/DO credential not held (education: MA International Studies, BA Classics) |
 | 2026-08-20 | Executive Director, Clinical Research Office | Children's Hospital Los Angeles | Requires 10+ years progressively responsible clinical research management (has ~4.5 years Stanford CRC + multidisciplinary background) |
+
+## Cycle 39 notes (2026-09-01 batch-39)
+
+- Tool access: WebSearch used for job discovery with ROTATED keyword terms ("clinical compliance officer" OR "data integrity specialist"; "humanitarian operations officer" OR "global programs coordinator"; "research administration director" OR "quality improvement manager"); ground truth facts from repo (AGENT_PROMPT.md) for screening/tailoring.
+- Job market searches identified specific active hiring: Molina Healthcare (manager, process improvement positions remote, $90K–$120K healthcare operations), Eisner Health (quality improvement manager hybrid Los Angeles, healthcare quality/compliance), UnitedHealth Group (clinical documentation integrity specialist Los Angeles, healthcare data/compliance), World Relief (program officer humanitarian response remote, international emergency operations).
+- 4 packages produced: Molina Healthcare Manager, Process Improvement & Operational Excellence (Pillar 3, $90K–$120K healthcare operations), Eisner Health Quality Improvement Manager (Pillar 3, hybrid LA healthcare quality), UnitedHealth Group Clinical Documentation Integrity Specialist (Pillar 1, Los Angeles healthcare data integrity), World Relief Program Officer, Humanitarian Response (Pillar 2, remote humanitarian operations).
+- Deduplication: All 4 company+title pairs verified as NEW (zero dedupes against cycles 1–38). Molina Healthcare had prior role (Director of Clinical Operations, 2026-07-30) but Manager, Process Improvement is different title/team. Eisner Health, UnitedHealth Group (CDI Specialist), and World Relief entirely new.
+- Hard skip gates: 0 (no roles disqualified).
+- Total packaged across all cycles: 131 roles (4 cycle 1 + 3 each cycles 2–25 + 3 cycle 26 + 2 cycle 27 + 3 cycle 28 + 6 cycle 29 + 5 cycle 30 + 4 cycle 31 + 4 cycle 32 + 4 cycle 33 + 4 cycle 34 + 4 cycle 35 + 4 cycle 38 + 4 cycle 39).
+- Career breadth and specialization: Cycle 39 expands healthcare operations excellence at major managed care (Molina from federal operations + healthcare technology management), healthcare quality improvement at community health center (Eisner from clinical research quality/regulatory compliance foundation), clinical documentation integrity at integrated health system (UnitedHealth from EDC/data quality expertise), and humanitarian emergency response at established NGO (World Relief from Operation Allies Welcome + MA International Studies foundation). Portfolio now spans: entry coordinator ($28K) → director ($289.8K) → specialized senior scientist ($267K) → operations management ($180K) → health outcomes analytics ($75–$169K) → behavioral health operations ($82–$118K) → international humanitarian operations ($65–$95K) → nonprofit operations management ($65–$85K) → healthcare quality improvement ($90–$120K) → clinical data integrity ($45–$90K) → humanitarian emergency response (varied), representing comprehensive advancement across clinical research, healthcare operations, healthcare quality/compliance, international development, and humanitarian response sectors.
 
 ## Cycle 30 notes (2026-08-18 batch-30)
 
