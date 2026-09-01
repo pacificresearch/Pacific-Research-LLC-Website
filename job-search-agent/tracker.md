@@ -132,6 +132,10 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-09-01 | Clinical Research Scientist | Lumos Pharma | Remote, US | https://www.theladders.com/job/clinical-research-scientist-lumos-pharma-llc-virtual-travel_84432767 | ready to apply |
 | 2026-09-01 | Senior Program Coordinator, Outreach & Health Equity | Preeclampsia Foundation | Remote | https://jobs.flnonprofits.org/job/606/senior-program-coordinator-outreach-health-equity/ | ready to apply |
 | 2026-09-01 | Program Officer | Rx Foundation | Remote, US | https://www.rxfoundation.org/were-hiring-program-officer/ | ready to apply |
+| 2026-08-31 | Sr Regulatory Affairs Specialist (Remote) | Medtronic | Remote | https://careers.medtronic.com/ | ready to apply |
+| 2026-08-31 | Clinical Data Analyst | Optum | Remote, US | https://builtin.com/job/healthcare-analyst-remote-nationwide/9488652 | ready to apply |
+| 2026-08-31 | Program Officer, Global Health Programs Management and Special Projects | PATH | Remote, US | https://path.wd1.myworkdayjobs.com/en-US/External/job/Program-Officer--Global-Health-Programs-Management-and-Special-Project_JR2740 | ready to apply |
+| 2026-08-31 | Clinical Program Director of Health Technology Innovation | UnitedHealth Group | Remote (Minnetonka, MN-based) | https://careers.unitedhealthgroup.com/job/minnetonka/clinical-program-director-of-health-technology-innovation-remote/34088/93766421072 | ready to apply |
 
 ## Screened & skipped (gate fired)
 
