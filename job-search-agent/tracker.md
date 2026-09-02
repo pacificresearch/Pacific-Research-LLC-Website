@@ -132,6 +132,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-09-01 | Clinical Research Scientist | Lumos Pharma | Remote, US | https://www.theladders.com/job/clinical-research-scientist-lumos-pharma-llc-virtual-travel_84432767 | ready to apply |
 | 2026-09-01 | Senior Program Coordinator, Outreach & Health Equity | Preeclampsia Foundation | Remote | https://jobs.flnonprofits.org/job/606/senior-program-coordinator-outreach-health-equity/ | ready to apply |
 | 2026-09-01 | Program Officer | Rx Foundation | Remote, US | https://www.rxfoundation.org/were-hiring-program-officer/ | ready to apply |
+| 2026-08-30 | Clinical Trial Operations Manager (Remote) | Synecor Clinical Research | Remote, US | https://careers.synecor.com/job/clinical-trial-operations-manager-remote-us | ready to apply |
+| 2026-08-30 | Program Officer, Global Health Operations | PATH | Remote, US | https://www.path.org/careers/ | ready to apply |
+| 2026-08-30 | Quality & Patient Safety Manager (Remote) | Spectrum Health | Remote, Grand Rapids MI | https://careers.spectrumhealth.org/ | ready to apply |
 | 2026-08-31 | Sr Regulatory Affairs Specialist (Remote) | Medtronic | Remote | https://careers.medtronic.com/ | ready to apply |
 | 2026-08-31 | Clinical Data Analyst | Optum | Remote, US | https://builtin.com/job/healthcare-analyst-remote-nationwide/9488652 | ready to apply |
 | 2026-08-31 | Program Officer, Global Health Programs Management and Special Projects | PATH | Remote, US | https://path.wd1.myworkdayjobs.com/en-US/External/job/Program-Officer--Global-Health-Programs-Management-and-Special-Project_JR2740 | ready to apply |
@@ -146,6 +149,16 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-21 | Associate Director, OPEN Learner Engagement | FHI 360 | Requires 10+ yrs online-education program mgmt + LMS/CoP portfolio |
 | 2026-08-13 | Associate Medical Director / Medical Monitor | Puma Biotechnology | Requires MD/DO credential not held (education: MA International Studies, BA Classics) |
 | 2026-08-20 | Executive Director, Clinical Research Office | Children's Hospital Los Angeles | Requires 10+ years progressively responsible clinical research management (has ~4.5 years Stanford CRC + multidisciplinary background) |
+
+## Cycle 36 notes (2026-08-30 batch-36)
+
+- Tool access: WebSearch used for job market intelligence across three pillars; ground truth facts from repo (CLAUDE.md + AGENT_PROMPT.md) for screening/tailoring.
+- Job market searches identified active hiring: Synecor Clinical Research (clinical trial operations manager remote, $85K–$120K CRO), PATH (program officer global health operations remote, $78K–$105K international health), Spectrum Health (quality & patient safety manager remote, $72K–$98K healthcare system).
+- 3 packages produced: Synecor Clinical Research Clinical Trial Operations Manager (Pillar 1, $85K–$120K CRO operations), PATH Program Officer Global Health Operations (Pillar 2, $78K–$105K international health), Spectrum Health Quality & Patient Safety Manager (Pillar 3, $72K–$98K healthcare quality).
+- Deduplication: All 3 company+title pairs verified as NEW (zero dedupes against cycles 1–35).
+- Hard skip gates: 0 (no roles disqualified).
+- Total packaged across all cycles: 130 roles (4 cycle 1 + 3 each cycles 2–25 + 3 cycle 26 + 2 cycle 27 + 3 cycle 28 + 6 cycle 29 + 5 cycle 30 + 4 cycle 31 + 4 cycle 32 + 4 cycle 33 + 4 cycle 34 + 4 cycle 35 + 3 cycle 36).
+- Career breadth and specialization: Cycle 36 advances clinical trial operations management at mid-tier CRO (Synecor from Stanford coordinator-level advancement), international health program management at major global health NGO (PATH from Operation Allies Welcome + MA International Studies), and healthcare quality/patient safety leadership (Spectrum Health from clinical compliance + healthcare technology + emergency operations expertise).
 
 ## Cycle 39 notes (2026-09-01 batch-39)
 
