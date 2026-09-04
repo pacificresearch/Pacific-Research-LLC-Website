@@ -177,6 +177,7 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-09-04 | Global Program Director | A Fresh Chapter | Calabasas, CA (Remote) | https://www.idealist.org/en/nonprofit-job/884f3e7883d041d8b24e43a9ad2832bf-global-program-director-a-fresh-chapter-calabasas | ready to apply |
 | 2026-09-04 | Executive Director | MiMentor | Los Angeles, CA (Remote) | https://www.idealist.org/en/nonprofit-job/e0dcb91e856f4141a3c86aa46c858c9e-executive-director-californialos-angeles-arearemote-mimentor-los-angeles | ready to apply |
 | 2026-09-04 | International Partnership Coordinator | Development Without Borders Consulting | Remote, US | https://www.devex.com/jobs/partnership-development-advisor-1358243 | ready to apply |
+| 2026-09-04 | Senior Operations Director | Youth Organize! California | Los Angeles, CA | https://www.idealist.org/en/nonprofit-job/c53c393c65dd4f34bb21e8152177f417-senior-operations-director-youth-organize-california-los-angeles | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -187,6 +188,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-07-21 | Associate Director, OPEN Learner Engagement | FHI 360 | Requires 10+ yrs online-education program mgmt + LMS/CoP portfolio |
 | 2026-08-13 | Associate Medical Director / Medical Monitor | Puma Biotechnology | Requires MD/DO credential not held (education: MA International Studies, BA Classics) |
 | 2026-08-20 | Executive Director, Clinical Research Office | Children's Hospital Los Angeles | Requires 10+ years progressively responsible clinical research management (has ~4.5 years Stanford CRC + multidisciplinary background) |
+| 2026-09-04 | Health Economics & Outcomes Research Sr Manager, Obesity | Amgen | Requires doctorate degree not held (MA International Studies, BA Classics only) |
+| 2026-09-04 | Chief Financial Officer | Baby2Baby | Requires CPA or MBA Finance credential not held |
+| 2026-09-04 | Director of Finance & Operations | California Latinas for Reproductive Justice | Requires CPA or MBA Finance credential not held; posting potentially expired (application deadline April 6, 2026) |
 
 ## Cycle 36 notes (2026-08-30 batch-36)
 
@@ -640,3 +644,13 @@ Dedupe key: company + title. Never re-package a listed job.
   always labeled at that exact level.
 - Confirm target locations: currently searching Los Angeles, CA + Remote US.
 - **Build federal-format resume:** For USAJOBS applications (0601 series and other federal roles). Standard format: hours per week, full supervisor contact/phone, GS grade, agency-specific details. Build once, reuse for all federal applications.
+
+## Cycle 51 notes (2026-09-04 batch-51)
+
+- Tool access: WebSearch used for job discovery with ROTATED keyword terms (Pillar 1: "health equity analyst" OR "outcomes research manager"; Pillar 2: "development strategy consultant" OR "global affairs specialist"; Pillar 3: "nonprofit CFO" OR "operations executive"); ground truth facts from repo (CLAUDE.md + AGENT_PROMPT.md) for screening/tailoring (Indeed MCP unavailable, WebFetch gated by authentication; fallback per protocol).
+- Job market searches identified specific active hiring: Amgen (HEOR Sr Manager Obesity $160K–$216K but doctorate requirement), Cedars-Sinai (health equity data analyst already packaged Cycle 38), Baby2Baby (CFO $unknown but CPA/MBA requirement), California Latinas (Director Finance & Operations $90K–$95K CPA/MBA requirement), Youth Organize! California (Senior Operations Director $95K–$115K nonprofit operations), plus market intelligence on 3,260 remote strategy consultant positions ($140K avg), 202 international development program officer positions, 124 nonprofit CFO positions in LA ($272K avg salary).
+- 1 package produced: Youth Organize! California Senior Operations Director (Pillar 3, $95K–$115K nonprofit operations leadership from Operation Allies Welcome federal emergency response + USAF multidisciplinary team management).
+- Deduplication: Cedars-Sinai duplicate confirmed (already packaged Cycle 38); MiMentor confirmed duplicate from Cycle 45. Youth Organize! California verified as NEW company+title combination (not previously tracked).
+- Hard skip gates: 3 (Amgen HEOR Sr Manager: doctorate requirement not held; Baby2Baby CFO: CPA/MBA Finance not held; California Latinas Director Finance & Operations: CPA/MBA Finance not held). Cycle 46 notes explicitly documented "Nonprofit CFO: requires CPA or MBA Finance background not in ground truth" as hard gate; same gate applied Cycle 51 to all CFO/finance director roles.
+- Total packaged across all cycles: 174 roles (4 cycle 1 + 3 each cycles 2–25 + 3 cycle 26 + 2 cycle 27 + 3 cycle 28 + 6 cycle 29 + 5 cycle 30 + 4 cycle 31 + 4 cycle 32 + 4 cycle 33 + 4 cycle 34 + 4 cycle 35 + 4 cycle 38 + 4 cycle 39 + 3 cycle 40 + 2 cycle 43 + 3 cycle 44 + 4 cycle 41 + 4 cycle 42 + 4 cycle 45 + 3 cycle 46 + 5 cycle 47 + 5 cycle 48 + 5 cycle 50 + 1 cycle 51).
+- Career breadth and specialization: Cycle 51 reinforces nonprofit operations executive tier advancement (Youth Organize! California from Operation Allies Welcome federal emergency response leadership + USAF multidisciplinary team management + humanities-informed program management foundation with BA Classics), expanding operations leadership pathways into mission-driven advocacy sector. Portfolio continues: entry coordinator ($28K) → director ($289.8K) → specialized senior scientist ($267K) → nonprofit operations leadership ($95K–$115K), with emerging pattern of operations excellence roles ($82K–$135K) across healthcare, nonprofit, and humanitarian response sectors. Market intelligence shows consulting sector downturn (25% decline YoY per Devex 2026 trends) and hard credential gates on CFO tier (CPA/MBA Finance requirements); Cycle 51 strategy pivoted to operations executive (non-finance) tier with successful candidate identification.
