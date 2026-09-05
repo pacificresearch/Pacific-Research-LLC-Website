@@ -199,6 +199,10 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-09-03 | Manager, Field Compliance, International | International Medical Corps | Remote, US | https://www.devex.com/jobs/manager-field-compliance-intl-1290389 | ready to apply |
 | 2026-09-03 | Senior Operations Analyst, Legal, Risk & Compliance | Tides | San Francisco, CA (Remote-friendly) | https://jobs.ashbyhq.com/tides/dbfead30-8607-4f49-8705-80ad9597cc92 | ready to apply |
 | 2026-09-03 | Remote Nonprofit Financial Controller | Center for Disaster Philanthropy | Washington, DC (Remote) | https://www.idealist.org/en/nonprofit-job/ca92726778e24ef39a9f2310e9b60829-remote-nonprofit-financial-controller-center-for-disaster-philanthrophy-washington | ready to apply |
+| 2026-09-05 | Epidemiologist, Infectious Diseases Control | World Health Organization (WHO) | Remote, Geneva-based | https://careers.who.int/careersection/ex/jobdetail.ftl?job=2409335 | ready to apply |
+| 2026-09-05 | Senior Research Manager, Elimination & Eradication | Bill & Melinda Gates Foundation | Remote, US | https://jobs.femtechinsider.com/companies/bill-melinda-gates-foundation-3/jobs/82763390-senior-research-manager-elimination-eradication | ready to apply |
+| 2026-09-05 | State Policy & Advocacy Manager | Susan G. Komen | Remote / Nashville, TN or Atlanta, GA | https://pac.org/job/state-policy-advocacy-manager-remote | ready to apply |
+| 2026-09-05 | Consultant 2026 Start Date | The Bridgespan Group | Remote-based (Boston / D.C. or New York) | https://talents.vaia.com/companies/the-bridgespan-group/consultant-2026-start-date-boston-d-c-32090496/ | ready to apply |
 
 ## Screened & skipped (gate fired)
 
