@@ -226,6 +226,8 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-09-09 | Global Clinical Trial Manager | ICON Clinical Research | Remote, US | https://careers.iconplc.com/job/global-clinical-trial-manager-in-remote-jid-27495 | ready to apply |
 | 2026-09-09 | Senior Clinical Trial Manager | Parexel International | United States, Remote | https://jobs.parexel.com/en/job/united-states/senior-clinical-trial-manager/877/93993637104 | ready to apply |
 | 2026-09-09 | Program Director I - Health Programs | FHI 360 | US Remote, DC-based | https://fhi.wd1.myworkdayjobs.com/FHI_360_External_Career_Portal/job/US-REMOTE-DC/Program-Director-I---Health-Programs_Requisition-2026201128-1/apply | ready to apply |
+| 2026-09-09 | Clinical Development Director, Early Development Oncology | Amgen | Remote, US | https://careers.amgen.com/en/job/washington-d-c/clinical-development-director-early-development-oncology/87/99737628672 | ready to apply |
+| 2026-09-09 | Chief Operating Officer | The Health and Reentry Project (HARP) | Remote, US | https://apply.workable.com/health-and-reentry-project/j/ABF13F5398/ | ready to apply |
 
 ## Screened & skipped (gate fired)
 
