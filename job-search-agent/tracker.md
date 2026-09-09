@@ -231,6 +231,7 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-09-09 | Program Director, Global Health | USAID Programs | Remote, US | https://www.devex.com/jobs/usaid-program-director-731776 | ready to apply |
 | 2026-09-09 | Director, Clinical Operations | ACCESS TELECARE | Remote, US | https://www.tealhq.com/job/director-clinical-operations_7ea1ae44c27e09e99c9f8ecb696d8d98ca469 | ready to apply |
 | 2026-09-09 | Health Scientist Administrator (Program Officer) | National Institutes of Health (NIH) | Remote, US | https://www.usajobs.gov/job/870714000 | ready to apply |
+| 2026-09-09 | Senior Director, Clinical Development Medical Director (Chronic Weight Management) | Amgen | Remote, US | https://careers.amgen.com/en/job/washington-d-c/senior-director-clinical-development-medical-director-chronic-weight-management/87/96843254304 | ready to apply |
 
 ## Screened & skipped (gate fired)
 
