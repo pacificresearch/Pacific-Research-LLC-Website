@@ -223,6 +223,8 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-09-09 | Senior Clinical Trial Manager (CTM) | Praxis Precision Medicines, Inc. | Remote, US | https://job-boards.greenhouse.io/praxisprecisionmedicines/jobs/5175151008 | ready to apply |
 | 2026-09-09 | Associate Clinical Trial Project Manager | Medrio | Remote, US | https://job-boards.greenhouse.io/medrio/jobs/8480641002 | ready to apply |
 | 2026-09-09 | Humanitarian Program Coordinator | Relief International | Remote / Field-Based | https://www.devex.com/jobs/humanitarian-program-coordinator-669653 | ready to apply |
+| 2026-09-09 | Global Clinical Trial Manager | ICON Clinical Research | Remote, US | https://careers.iconplc.com/job/global-clinical-trial-manager-in-remote-jid-27495 | ready to apply |
+| 2026-09-09 | Senior Clinical Trial Manager | Parexel International | United States, Remote | https://jobs.parexel.com/en/job/united-states/senior-clinical-trial-manager/877/93993637104 | ready to apply |
 
 ## Screened & skipped (gate fired)
 
