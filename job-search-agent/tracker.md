@@ -220,6 +220,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-09-06 | Clinical Trial Operations Manager | Synecor Clinical Research | Remote, US | https://careers.synecor.com/job/clinical-trial-operations-manager-remote-us | ready to apply |
 | 2026-09-06 | Director of Community Engagement & Partnership | International Medical Corps (IMC) | Remote, US | https://www.devex.com/jobs/director-measurement-evaluation-1452301 | ready to apply |
 | 2026-09-06 | Nonprofit Strategy & Development Director | California Community Foundation | Remote / Los Angeles, CA | https://www.calfund.org/careers | ready to apply |
+| 2026-09-09 | Senior Clinical Trial Manager (CTM) | Praxis Precision Medicines, Inc. | Remote, US | https://job-boards.greenhouse.io/praxisprecisionmedicines/jobs/5175151008 | ready to apply |
+| 2026-09-09 | Associate Clinical Trial Project Manager | Medrio | Remote, US | https://job-boards.greenhouse.io/medrio/jobs/8480641002 | ready to apply |
+| 2026-09-09 | Humanitarian Program Coordinator | Relief International | Remote / Field-Based | https://www.devex.com/jobs/humanitarian-program-coordinator-669653 | ready to apply |
 
 ## Screened & skipped (gate fired)
 
