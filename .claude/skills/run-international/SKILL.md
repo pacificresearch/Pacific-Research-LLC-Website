@@ -5,7 +5,7 @@ description: Run the full PRG International capture cycle end to end — screen 
 
 # Run International System
 
-One command, the whole cycle: **SCREEN → GATE → DRAFT → PRICE → REPORT → ⛔ SEND GATE.**
+One command, the whole cycle: **SCREEN → GATE → DRAFT → PRICE → SEND → REPORT.**
 
 Work through it in order. Do not ask permission between steps — Andrew's
 bias-to-action standing order applies (`CLAUDE.md`). The only stop is
@@ -96,32 +96,60 @@ Refresh `intl/PIPELINE.md`: active pursuits, registration backlog and
 its blockers, roster counts, recently done. Commit everything and push
 to the working branch.
 
-## 7. ⛔ SEND GATE — stop here
+## 7. SEND, THEN REPORT
 
-Report to Andrew and stop. Do not send.
+Andrew's 8/20 amendment (`CLAUDE.md` BIAS TO ACTION): the run does not
+stop at a report. **The line is price, not email.**
 
-Sending to a contracting officer is one of the four carve-outs Andrew
-set (`CLAUDE.md`), because a quote is a binding offer and a response is
-outward-facing. Present:
+**Check Sent Items first — every time, no exceptions.** Andrew runs more
+than one session, and the daily Routines fire into fresh sessions that
+cannot see this one. They all share one mailbox, so Sent Items is the
+only ledger that spans them:
 
 ```
-INTERNATIONAL RUN — <date>
+outlook_email_search(folderName="Sent Items", query="<notice number>")
+```
+
+A hit means it already went — skip it, and say so in the report. Never
+send a second copy or a "following up" copy. Search by notice number
+rather than subject (another session will have worded its subject
+differently), and search back an extra day, since Sent Items filters on
+local time.
+
+**Send now, no approval:** sources sought and RFI responses, capability
+statements, expressions of interest, questions to a CO or UN procurement
+officer, FAR 19.000(b)(1)(ii) set-aside asks, and any non-binding
+registration correspondence. Reply on the recipient's own thread with
+`outlook_create_reply_draft` when answering something they wrote;
+`outlook_send_mail` only to open a genuinely new conversation. Never
+`send_mail` with "RE:" — it looks like a reply and starts a second
+thread. Mark each one sent in the batch record.
+
+**⛔ Stage, do not send:** anything committing PRG to a price — quotes,
+RFQ responses, cost volumes, signed certificates of compliance. Build it
+complete and submission-ready, every form filled, no placeholders, so
+Andrew's approval is one look and one send. Save as an Outlook draft and
+put a copy in the opportunity folder.
+
+**⛔ Also still gated:** external job-board postings, binding portal
+registrations (UNGM, bank), and naming any local partner or expert
+before their Rail 2 vetting closes.
+
+Then report:
+
+```
+PRG INTERNATIONAL — <date>
   Screened: N notices → M international → K survivors
-  Responses drafted: N  (⛔ awaiting your go)
-    <sol> — <buyer, country> — <deadline local / ET>
-  Biddable priced: N — <sol>, <price>, <margin>
+  SENT: N
+    <sol> — <buyer, country> — <what went out> — <deadline local / ET>
+  ⛔ STAGED, awaiting your go: <sol>, <price>, <margin>
   REGISTER–PREPOSITION: N — blocked on <registration>
   PASS: N (top kill: <criterion>)
   Registration backlog: next <X>, blocker <Y>
 ```
 
-**On "send":** reply on the CO's own thread with
-`outlook_create_reply_draft` when responding to something they wrote;
-`outlook_send_mail` only to open a new conversation. Never `send_mail`
-with "RE:" — it looks like a reply and starts a second thread.
-
-Then mark sent in the batch record, update the board, and confirm the
-full sent list.
+If Andrew has recorded a dollar ceiling in `CLAUDE.md`, quotes at or
+under it are sent rather than staged, and reported under SENT.
 
 ---
 
