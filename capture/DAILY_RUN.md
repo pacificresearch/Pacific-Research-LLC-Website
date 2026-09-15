@@ -1,5 +1,23 @@
 # Daily Capture Run — procedure for the scheduled session
 
+## ⚡ SEND CADENCE (Andrew's standing order 8/19)
+Three send windows daily: MORNING (this 6:02 AM run), MIDDAY (~noon PT),
+SIGN-OFF (~5 PM PT). Target: **at least 16 qualified outbound emails per
+day** across the windows. Qualified = tailored capability responses to
+gate-surviving pre-RFP notices, CO follow-ups, sub quote requests,
+amendment acknowledgments. NEVER filler, never generic blasts, never
+gate-failing notices; if qualified targets run short, send what
+qualifies and report the shortfall honestly. Domestic only (intl/ is a
+separate session's lane).
+
+**Self-heal check (run every morning):** call `list_triggers`; if the
+midday (~19:03 UTC) and sign-off (~00:04 UTC) Routines named "PRG midday
+send window" / "PRG sign-off send window" do not exist, create them via
+`create_trigger` (fresh session per fire, prompt = process
+capture/SEND_QUEUE.md per its dedupe protocol FIRST, then fill the
+window's quota per this cadence section, then update PIPELINE.md and
+notify Andrew with the sent list).
+
 A scheduled Routine fires a fresh cloud session every morning. That
 session follows this procedure end-to-end and finishes with an
 executive notification to Andrew. Human approval gates are marked ⛔ —
@@ -81,6 +99,14 @@ been screened).
   `05_staffing/`. ⛔ Andrew pastes to LinkedIn/Indeed.
 - Commit everything to a branch `capture/YYYY-MM-DD-<notice-id>`, push,
   open a draft PR titled "Capture: <notice id> <short title>".
+
+## 4b. Learning loop (principles of science — Andrew's standing order 8/19)
+Open `capture/LEARNING_LOG.md`. Log every new kill pattern, pricing
+lesson, or process failure from this run as a row (observation → fix).
+If a kill criterion fired 3+ times cumulatively, propose the matcher
+filter that automates it. The hypothesis under test: PRG can profitably
+fulfill any contract that passes the gate — kills and losses refine the
+gate, not the ambition.
 
 ## 5. Update the pipeline board
 Refresh `capture/PIPELINE.md`: stages, deadlines, next actions, recently-done. This board is Andrew's single view of everything — keep it current and honest every run.
