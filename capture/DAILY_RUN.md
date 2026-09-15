@@ -1,5 +1,16 @@
 # Daily Capture Run — procedure for the scheduled session
 
+## 🧾 ARTIFACT RULE (Andrew, 9/15 — a run that leaves no trace FAILED)
+Every run MUST land its artifacts where the next session can see them:
+commit the day's report + PIPELINE refresh, push to a branch named
+`capture/daily-YYYY-MM-DD` (or `intl/daily-YYYY-MM-DD`), open a PR to
+main, and MERGE it before finishing (mcp github merge_pull_request —
+sessions can merge their own run PRs). If pushing or merging fails,
+the run's final notification to Andrew MUST begin "RUN FAILED —
+artifacts not landed" and say exactly which step failed. A SUCCEEDED
+Routine status with no merged artifacts is a silent failure; the
+send blocks depend on today's committed report existing on main.
+
 ## ⚡ SEND CADENCE (Andrew's standing order 8/19)
 Three send windows daily: MORNING (this 6:02 AM run), MIDDAY (~noon PT),
 SIGN-OFF (~5 PM PT). Target: **at least 16 qualified outbound emails per
