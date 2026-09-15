@@ -1,14 +1,18 @@
 # PENDING OUTBOUND — process FIRST in any session with Outlook access
+# CHANNEL: OUTLOOK ONLY (Andrew 8/22). Never send via Gmail or any other channel.
 
-## Batch: 2026-08-17 sources-sought responses (Andrew approved: "send")
-- Payloads: `capture/reports/ss_batch_2026-08-17.json` — 18 emails,
-  each with to/subject/body (HTML, final, style-checked: SDVOSB once).
-  Send each via Outlook send_mail from Andrew@pacificresearchllc.com.
-- Plus: Outlook draft "Sources Sought PANMCC26-P-000-051729 — CASS"
-  (in Andrew's Drafts) — RESTYLE FIRST (SDVOSB once, not spelled out;
-  drop the spelled-out line from signature) via update_draft, THEN send.
-- Already sent (do NOT resend): W911S026RJPSS (JMC, 8/17), NMRC RFI
-  N323988871 (8/14), VA intent-to-quote 36C24E26Q0054 (8/14).
-- After sending: mark each with sent-timestamp in the JSON, update
-  PIPELINE.md, notify Andrew with the full sent list. Delete this file
-  once the batch is confirmed sent.
+## ⚠️ DEDUPE PROTOCOL (MANDATORY — multiple sessions may be active)
+Before sending ANY item: (1) git pull and re-read this file — skip items
+marked SENT or CLAIMED <30 min ago; (2) search Outlook SENT ITEMS for the
+exact subject — if found, mark SENT here and do NOT resend; (3) claim by
+editing this file (CLAIMED <session> <UTC>), commit AND push BEFORE
+sending — a rejected push means another session claimed it; (4) after
+sending mark SENT <UTC> and push.
+
+## Queue: EMPTY (pruned 2026-09-15)
+All August items expired unsent during the connector outage and were
+REMOVED so no session emails a dead notice: MCRC ROM (due 8/24), INL
+Mexico (8/28), DoDEA Italy/Japan (8/28), Canberra link/question/teaming
+(RFQ closed 9/11), MCRC sub quotes (RFI closed 8/24). Post-mortems belong
+in capture/LEARNING_LOG.md; expired-pursuit folders keep their content as
+library material. New outbound items are appended below by any session.

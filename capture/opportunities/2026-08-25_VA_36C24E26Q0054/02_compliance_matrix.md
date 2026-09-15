@@ -28,6 +28,14 @@
 | B6 | Staffing Plan (separate section) | Founder + bench + 30-day surge process | OPEN |
 | B7 | GFP Plan (Section 4) | Address government-furnished property handling | OPEN |
 | B8 | References familiarity: ICH E6(R2), 45 CFR 46, 38 CFR 16, 21 CFR 312/812, VHA directives, CSP/SMART SOPs | Cite in technical + training records | OPEN |
+| B9 | **PWS 7.3.5 — EACH named monitor: 10+ years GCP clinical-trial monitoring of research sites, documented in CV** | ⛔ BID GATE: only a hired senior CRQA can satisfy — Andrew CANNOT be a named monitor (honesty rule + fails 10-yr req outright; course cert irrelevant) | OPEN — HIRE-DEPENDENT |
+| B10 | **PWS 7.3.6 — EACH named monitor: 5+ years GCP monitoring/auditing of FEDERALLY FUNDED research (commercial sponsor at a VA site does NOT count); 7.3.6.1 trial-by-trial listing (sponsor, # sites, visit frequency, duration, CRO noted)** | Hired monitor supplies listing | OPEN — HIRE-DEPENDENT |
+| B11 | **PWS 7.3.6.2 + Att.2 §VI + Q&A #11 — at least three (3) references for the monitor's federal GCP monitoring experience; only first 3 accepted; Gov contacts refs directly, no narratives** | References come from the HIRED monitor's own engagements — NOT PRG entity history, NOT Stanford | OPEN — HIRE-DEPENDENT |
+| B12 | PWS 7.3.7 — medical record/chart review experience in CV, naming EHR systems + access tools (VA EHR experience called out) | Hired monitor CV | OPEN |
+| B13 | PWS 7.3.8 — MS Office + Adobe skills demonstrated by example in CV | CV language | OPEN |
+| B14 | **PWS 5.1.5.2 (rev 8-13) — visit report + Summary for Investigator due within SEVEN BUSINESS DAYS of last day on site** (earlier draft said 10 calendar days — superseded) | QA Plan + narrative updated to 7 business days | OPEN |
+| B15 | PWS 5.3.8 — Sponsor's Designated Representative (SDR) duties under PQS CLIN | Narrative covers | OPEN |
+| B16 | PWS 8.7 — NACI background investigation per monitor (~$230, contractor cost) | Priced into overhead | OPEN |
 
 ## C. Price (Section 5)
 | # | Item | Status |

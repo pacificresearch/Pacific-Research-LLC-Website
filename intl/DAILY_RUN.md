@@ -1,5 +1,36 @@
 # International daily run — addendum to `capture/DAILY_RUN.md`
 
+## 🩺 STEP 0 — SELF-TEST (run before anything else; Andrew's order 9/15)
+The system must never rot silently again. Check, in order:
+1. **Heartbeat**: read `capture/HEALTH.md` on main. If the newest
+   successful-run date is more than 2 days old, the system has been
+   failing — the notification to Andrew MUST lead with
+   "⚠️ SYSTEM DEGRADED since <date>" and the failing check.
+2. **SAM**: api.sam.gov reachable (one cheap query). Fail → notify:
+   "network policy blocks api.sam.gov" + where to fix.
+3. **Outlook**: Microsoft 365 tools available (ToolSearch for
+   outlook_send_mail). Fail → the run still sweeps/screens/stages, but
+   the notification MUST lead with: "⚠️ OUTLOOK DISCONNECTED — nothing
+   can send. Fix: claude.ai/settings/connectors → Microsoft 365 →
+   Disconnect → Connect fresh as Andrew@pacificresearchllc.com,
+   accepting every permission screen."
+4. **Queue**: capture/SEND_QUEUE.md parses; any item older than its
+   deadline is pruned with a note, never sent.
+At run end, update `capture/HEALTH.md` (via the ARTIFACT RULE PR):
+date, each check ✅/❌, emails sent count, report path. HEALTH.md is
+the heartbeat every later session trusts.
+
+## 🧾 ARTIFACT RULE (Andrew, 9/15 — a run that leaves no trace FAILED)
+Every run MUST land its artifacts where the next session can see them:
+commit the day's report + PIPELINE refresh, push to a branch named
+`capture/daily-YYYY-MM-DD` (or `intl/daily-YYYY-MM-DD`), open a PR to
+main, and MERGE it before finishing (mcp github merge_pull_request —
+sessions can merge their own run PRs). If pushing or merging fails,
+the run's final notification to Andrew MUST begin "RUN FAILED —
+artifacts not landed" and say exactly which step failed. A SUCCEEDED
+Routine status with no merged artifacts is a silent failure; the
+send blocks depend on today's committed report existing on main.
+
 The domestic daily run procedure is unchanged. This adds an
 **INTERNATIONAL** section to the same scheduled session and the same
 morning report. One run, one notification, two lanes — Andrew should

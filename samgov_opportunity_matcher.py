@@ -1202,6 +1202,11 @@ def _is_http(url):
     return bool(url) and str(url).lower().startswith(("http://", "https://"))
 
 
+def _redact_key(text):
+    """Strip the api_key value from any string destined for logs/reports."""
+    return re.sub(r'api_key=[^&\s"]+', 'api_key=REDACTED', text)
+
+
 def _http_retry(fn, *args, **kwargs):
     """Call requests.get/post with a short timeout, limited retries, and a
     CIRCUIT BREAKER. Without the breaker a dead network makes every one of
@@ -1371,7 +1376,16 @@ def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
     collected = []
     try:
         while True:
-            resp = _http_retry(requests.get, API_URL, params=params, timeout=30)
+            # Retry transient server errors (5xx) here: _http_retry only
+            # retries connection/timeout failures, and a single 502 from
+            # SAM's gateway must not silently erase a whole NAICS from the
+            # report (learning log #12).
+            resp = None
+            for attempt in range(3):
+                resp = _http_retry(requests.get, API_URL, params=params, timeout=30)
+                if resp.status_code < 500:
+                    break
+                time.sleep(1.5 * (attempt + 1))
             if resp.status_code == 429:
                 _RUN_STATE["rate_limited"] = True
                 sys.stderr.write(
@@ -1390,13 +1404,19 @@ def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
             if not batch or params["offset"] >= total or params["offset"] >= limit:
                 break
     except requests.exceptions.HTTPError as exc:
+        _RUN_STATE.setdefault("failed_codes", []).append(f"{code_param}={code}")
         sys.stderr.write(
-            f"WARNING: HTTP error querying {code_param} {code}: {exc}\n"
+            f"WARNING: HTTP error querying {code_param} {code}: "
+            f"{_redact_key(str(exc))}\n"
             f"         Response: {getattr(exc.response, 'text', '')[:300]}\n"
+            f"         COVERAGE INCOMPLETE for {code} — treat as FAILED, "
+            f"not zero records.\n"
         )
     except requests.exceptions.RequestException as exc:
+        _RUN_STATE.setdefault("failed_codes", []).append(f"{code_param}={code}")
         sys.stderr.write(
-            f"WARNING: Network error querying {code_param} {code}: {exc}\n"
+            f"WARNING: Network error querying {code_param} {code}: "
+            f"{_redact_key(str(exc))}\n"
         )
     except ValueError as exc:  # JSON decode error
         sys.stderr.write(
@@ -6814,6 +6834,16 @@ def main(argv=None):
             "\n*** NOTE: SAM.gov rate-limited this run — the results are "
             "PARTIAL. Re-run later (or with a lower --limit) for full coverage. "
             "A daily quota applies to each API key. ***\n"
+        )
+
+    if _RUN_STATE.get("failed_codes"):
+        codes = ", ".join(_RUN_STATE["failed_codes"])
+        sys.stderr.write(
+            f"\n*** COVERAGE INCOMPLETE: {len(_RUN_STATE['failed_codes'])} "
+            f"code(s) FAILED after retries ({codes}). These are NOT zero-"
+            f"result codes — opportunities in them were not screened this "
+            f"run. RE-RUN with --only-codes for the failed codes (or a full "
+            f"re-run) before treating this report as complete. ***\n"
         )
 
     if saved:

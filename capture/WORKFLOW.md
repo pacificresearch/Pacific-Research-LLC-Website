@@ -111,6 +111,15 @@ with delivery confirmation saved to `01_solicitation/`.
 Email channel: all CO correspondence and email submissions go from
 **Andrew@pacificresearchllc.com (Outlook)**.
 
+EMAIL STYLE (Andrew's standing orders): (1) SDVOSB stated ONCE per
+email, never spelled out. (2) NO em dashes, ever (8/19). (3) Short and
+to the point, no fluff: lead with the answer, one short paragraph per
+topic, cut pleasantries beyond one line. Applies to emails; proposal
+documents keep full professional prose. (4) OUTLOOK ONLY (8/22): all
+outbound sends from Andrew@pacificresearchllc.com via Outlook. NO Gmail
+or other channels, ever, regardless of connector outages — queue and
+wait, or hand Andrew paste-ready text.
+
 **Replies go ON the thread, never as a new message.** When a CO writes
 to PRG, reply into their conversation so the whole exchange stays in one
 place for them — search their message with `outlook_email_search`, then
