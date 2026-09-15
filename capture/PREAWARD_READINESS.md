@@ -64,8 +64,32 @@ Center.
   capture/library/resumes/.
 - ✅ Recruiting pipeline live (careers page, Indeed, LinkedIn).
 
+## 5. Reusable assets — BUILT, no award needed ✅
+These exist now and are tailored per contract rather than written at
+award. Built 2026-08-18.
+- ✅ `templates/10_contract_diff_checklist.md` — award vs. quote, 28 rows
+- ✅ `templates/11_kickoff_request_email.md` — week-1 CO/COR kickoff
+- ✅ `templates/12_invoice_and_los_tracker.md` — invoice fields + the
+      50% limitation-on-subcontracting evidence table
+- ✅ `templates/13_progress_report_and_transmittal.md` — periodic report
+      + deliverable transmittal
+- ✅ `library/boilerplate/qc_plan_skeleton.md` — doubles as the Draft QA
+      Plan in technical volumes and the live post-award QC plan
+- ✅ `library/boilerplate/company_data_block.md` — paste-ready identity
+- ✅ `library/past_performance/README.md` — CPARS-style record format +
+      the monthly filing habit
+- ✅ `library/partners/README.md` — warm list; flags similarly-situated
+      SDVOSB status, which decides whether a partner helps or hurts LoS
+
 ## Sequence check
-Everything in §1–2 is doable before ANY award with zero downside.
-§3 items cost nothing to arrange and only bind/spend at award.
+Everything in §1–2 is doable before ANY award with zero downside, and
+§1 is the binding constraint: **an award you cannot invoice against is a
+working-capital problem you inflicted on yourself.** §3 items cost
+nothing to arrange and only bind/spend at award. §5 is already done.
+
+What genuinely CANNOT be pre-done: reading and diffing the actual award,
+seeding the calendar from real dates, background investigations (they
+need a contract to initiate and are usually the longest pole), badging
+and site access, and executing subcontracts.
 Result: award notice → same-week performance start, invoices flowing
 the first eligible day.

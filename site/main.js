@@ -83,4 +83,83 @@
       if (success) { success.classList.remove("hidden"); mountIcons(); }
     });
   }
+
+  // ---- Talent pool form ----------------------------------------------------
+  // Primary path: POST the multipart form (CV file included) to Netlify Forms.
+  // Fallback: if that fails for any reason, hand the visitor a pre-filled
+  // mailto so the submission still reaches PRG — they attach the CV there.
+  var talentForm = document.getElementById("talentForm");
+  var talentSuccess = document.getElementById("talentSuccess");
+  var talentFallback = document.getElementById("talentFallback");
+  var MAX_CV_BYTES = 8 * 1024 * 1024;
+
+  function talentMailto(fd) {
+    function g(k) { return (fd.get(k) || "").toString().trim() || "\u2014"; }
+    var subject = "Talent Pool Submission \u2014 " + g("name") + " (" + g("discipline") + ")";
+    var body =
+      "TALENT POOL SUBMISSION\n" +
+      "Please attach your CV to this email before sending.\n\n" +
+      "Name: " + g("name") + "\n" +
+      "Email: " + g("email") + "\n" +
+      "Phone: " + g("phone") + "\n" +
+      "Location: " + g("location") + "\n" +
+      "Primary discipline: " + g("discipline") + "\n" +
+      "Years of experience: " + g("years") + "\n" +
+      "Security clearance: " + g("clearance") + "\n" +
+      "Work authorization: " + g("work_authorization") + "\n" +
+      "Availability: " + g("availability") + "\n" +
+      "Relocation & travel: " + g("mobility") + "\n" +
+      "Credentials: " + g("credentials") + "\n" +
+      "LinkedIn / portfolio: " + g("link") + "\n" +
+      "Veteran / military spouse: " + (fd.get("veteran") ? "Yes" : "Not stated") + "\n" +
+      "Consent to retention & contact: " + (fd.get("consent") ? "Yes" : "No") + "\n\n" +
+      "Notes:\n" + g("notes") + "\n";
+    return "mailto:" + RECIPIENT +
+      "?subject=" + encodeURIComponent(subject) +
+      "&body=" + encodeURIComponent(body);
+  }
+
+  function showTalentResult(el) {
+    talentForm.classList.add("hidden");
+    if (el) { el.classList.remove("hidden"); mountIcons(); }
+  }
+
+  if (talentForm) {
+    talentForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var name = (talentForm.elements.name.value || "").trim();
+      var email = (talentForm.elements.email.value || "").trim();
+      var consent = talentForm.elements.consent.checked;
+      if (!name) { talentForm.querySelector("#t-name").focus(); return; }
+      if (!email) { talentForm.querySelector("#t-email").focus(); return; }
+      if (!consent) { talentForm.querySelector("#t-consent").focus(); return; }
+
+      var fd = new FormData(talentForm);
+      var cv = talentForm.elements.cv.files[0];
+      if (cv && cv.size > MAX_CV_BYTES) {
+        window.alert("That CV is larger than 8 MB. Please upload a smaller file, " +
+                     "or submit without it and email the CV to " + RECIPIENT + ".");
+        return;
+      }
+
+      var btn = talentForm.querySelector('button[type="submit"]');
+      if (btn) { btn.disabled = true; btn.textContent = "Sending\u2026"; }
+
+      var done = false;
+      function finish(ok) {
+        if (done) return;
+        done = true;
+        if (ok) { showTalentResult(talentSuccess); }
+        else {
+          try { window.location.href = talentMailto(fd); } catch (err) { /* no-op */ }
+          showTalentResult(talentFallback);
+        }
+      }
+
+      if (!window.fetch) { finish(false); return; }
+      fetch(talentForm.getAttribute("action") || "/", { method: "POST", body: fd })
+        .then(function (res) { finish(res.ok); })
+        .catch(function () { finish(false); });
+    });
+  }
 })();

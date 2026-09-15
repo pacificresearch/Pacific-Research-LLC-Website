@@ -19,6 +19,13 @@ himself 8/17 evening. Sent-to-date total: 22 government responses
 Nothing pending. Watch inboxes for CO replies to the 22 sent responses;
 route replies into the matching `capture/opportunities/` folder.
 
+## ✅ Closed out
+- **36C26326Q1034** — VA NCO 23, BD Pyxis (CATO). CO confirmed sole
+  source to CareFusion Solutions; notice description opens "NOTICE OF
+  INTENT TO AWARD SOLE SOURCE." PRG conceded and withdrew (reply sent
+  8/19). **Not pursuable.** Exposed the description-hydration defect —
+  the matcher had been screening titles, not scopes; fixed 8/19.
+
 ## 🔧 Pre-award rails (PREAWARD_READINESS.md)
 - SAM EBiz POC update — processing (Andrew)
 - PIEE: call help desk **866-618-5988** after SAM update processes
