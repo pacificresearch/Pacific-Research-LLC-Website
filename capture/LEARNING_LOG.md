@@ -28,6 +28,9 @@ The gate's kill list IS the accumulated falsification record of "ANY."
 | 9 | 8/19 | M365 connector flaps repeatedly; sends missed their window twice | Durable SEND_QUEUE.md pattern: every outbound queued in-repo; any session with Outlook processes queue FIRST |
 | 10 | 8/19 | MCRC ROM draft stated "completion within 2-3 weeks of award" with no crew under commitment (Andrew caught it) | Rule: pre-proposal communications state durations as "typically completed in X" market estimates; firm schedules ONLY at proposal, backed by a committed sub quote. Sub quotes (3) collected during PURSUE, before any bid |
 
+| 11 | 9/15 | Scheduled runs reported SUCCEEDED for weeks while producing NO artifacts (no reports on main since 8/18; PIPELINE stale at 8/17); root cause: PR #13 never merged, so fresh sessions ran the obsolete main-branch system | Rules: (a) merge ops changes to MAIN same day — scheduled sessions only see main; (b) every scheduled run MUST commit its report + pipeline refresh, and a run without artifacts is a FAILED run regardless of status; (c) any session auditing the system checks last artifact date first |
+| 12 | 9/15 | Matcher recorded a 502 gateway error as "0 records" for NAICS 561720 — silent coverage loss presented as a clean report (Andrew caught it) | Matcher fixed: 5xx retried 3x with backoff; unrecoverable failures tracked as FAILED codes with a COVERAGE INCOMPLETE banner, never zero; api_key redacted from all error output |
+
 ## Standing experiment rules
 1. Every PASS records its kill criterion (one line) — that's a data point,
    not paperwork.
