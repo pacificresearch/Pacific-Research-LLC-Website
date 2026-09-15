@@ -67,22 +67,43 @@ jobs:
             echo "incomplete=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Commit the digest and the seen-list
+      # ARTIFACT RULE (Andrew, 9/15): a run that leaves no trace FAILED.
+      # The old version of this step retried the push four times and then
+      # fell through silently — a green job with no digest on main, which is
+      # the exact silent failure that order was written against.
+      - name: Land the digest and the seen-list (ARTIFACT RULE)
+        id: land
         run: |
+          set -euo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add sbir/reports sbir/state/seen.json
+
+          # HEALTH.md heartbeat: every scheduled run appends its line, so a
+          # later session can see this lane is alive rather than assuming it.
+          HOLES="${{ steps.run.outputs.incomplete }}"
+          SRC="✅"; [ "$HOLES" = "true" ] && SRC="⚠️ partial"
+          printf '| %s | sbir weekly digest | %s | n/a | 0 | yes | %s survivor(s), digest %s |\n' \
+            "$(date -u +%F)" "$SRC" \
+            "${{ steps.run.outputs.survivors }}" \
+            "${{ steps.run.outputs.digest }}" >> capture/HEALTH.md
+
+          git add sbir/reports sbir/state/seen.json capture/HEALTH.md
           if git diff --cached --quiet; then
-            echo "Nothing changed this run."
-            exit 0
+            echo "Nothing changed this run." && exit 0
           fi
           git commit -m "SBIR/STTR digest $(date -u +%F) (${{ steps.run.outputs.survivors }} survivor(s))"
+
+          LANDED=false
           for i in 1 2 3 4; do
-            git push && break
+            if git push; then LANDED=true; break; fi
             echo "push failed, retrying in $((2**i))s"
             sleep $((2**i))
             git pull --rebase origin "${GITHUB_REF_NAME}" || true
           done
+          if [ "$LANDED" != "true" ]; then
+            echo "::error title=RUN FAILED — artifacts not landed::The SBIR/STTR digest was generated but could not be pushed to ${GITHUB_REF_NAME} after 4 attempts. Per the ARTIFACT RULE a run that leaves no trace FAILED; do not treat this run as complete."
+            exit 1
+          fi
 
       # Only open an issue when there is something to act on. A quiet week
       # should be quiet — but an incomplete sweep is never quiet, because a

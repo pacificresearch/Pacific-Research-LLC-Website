@@ -435,8 +435,11 @@ class SourceLog(object):
         self.rows = OrderedDict()
 
     def record(self, key, status, detail, url="", count=None):
-        self.rows[key] = {"status": status, "detail": detail, "url": url,
-                          "count": count}
+        # Redact at the boundary too: every source-health line is rendered
+        # into the committed digest and the issue body, and a caller that
+        # interpolates a URL by hand must not be able to leak a key.
+        self.rows[key] = {"status": status, "detail": redact(detail),
+                          "url": redact(url), "count": count}
 
     def ok(self, key, count, url, note=""):
         state = "OK" if count else "EMPTY"
@@ -482,11 +485,26 @@ def _http(method, url, **kw):
     raise last
 
 
+# A requests ConnectionError/ProxyError embeds the full request URL, query
+# string and all. The SAM.gov probe puts api_key in that query string, so an
+# unredacted exception string carries the live key straight into the digest —
+# which this pipeline COMMITS to the repo and pastes into a GitHub issue.
+# Redact before any exception text becomes report text. (Same defect the
+# SAM matcher fixed in _redact_key; this lane writes to a file, so it is
+# worse here.)
+SECRET_QS = re.compile(r"(api_key|apikey|key|token|X-Auth)=[^&\s\"']+", re.I)
+
+
+def redact(text):
+    return SECRET_QS.sub(lambda m: m.group(0).split("=")[0] + "=REDACTED",
+                         str(text))
+
+
 def _detail(exc):
     resp = getattr(exc, "response", None)
     if resp is not None:
         return "HTTP %d %s" % (resp.status_code, resp.reason or "")
-    return type(exc).__name__ + ": " + str(exc)[:160]
+    return redact(type(exc).__name__ + ": " + str(exc)[:300])[:200]
 
 
 def _json_or_die(resp):
@@ -2147,18 +2165,55 @@ SELFTESTS = [
          "Companion Funding Opportunity PA-27-100 , R43 / R44 ... "
          "PA-27-101 , R44 ... PAR-27-098 , SB1 Commercialization"}})
      == {"PA-27-100", "PA-27-101", "PA-27-102", "PAR-27-098"}),
+    # These two fixtures MUST be built relative to today. The first version
+    # hardcoded September 05, 2026 and passed until that date went by, then
+    # failed on the calendar rather than on the behaviour under test — which
+    # is precedence (the NOFO's cycle table beats grants.gov responseDate),
+    # not whether a particular date is still in the future.
     ("grants.gov responseDate never overrides the NOFO's own cycle table",
      lambda: _dues_from(
-         "Application Due Dates September 05, 2026 * January 05, 2027 * "
-         "All applications are due by 5:00 PM",
-         {"responseDate": "Apr 05, 2029 12:00:00 AM EDT"}, "N", "F")[0][0]
-     == "2026-09-05"),
+         "Application Due Dates %s %s All applications are due by 5:00 PM"
+         % (_future_date(30), _future_date(150)),
+         {"responseDate": _future_stamp(1200)}, "N", "F")[0][0]
+     == _future_iso(30)),
     ("responseDate is still the fallback when there is no cycle table",
-     lambda: _dues_from("", {"responseDate": "Jan 05, 2027 12:00:00 AM EST"},
-                        "", "F")[0] == ["2027-01-05"]),
+     lambda: _dues_from("", {"responseDate": _future_stamp(200)},
+                        "", "F")[0] == [_future_iso(200)]),
     ("an unresolved IC yields a verified range, never a guessed institute",
      lambda: _capless()),
+    ("an api_key never reaches the digest through an exception string",
+     lambda: "SAM-SECRET" not in redact(
+         "ProxyError: Max retries exceeded with url: "
+         "/opportunities/v2/search?api_key=SAM-SECRET-abc123&limit=1")),
+    ("redaction keeps the parameter name so the error stays diagnosable",
+     lambda: "api_key=REDACTED" in redact("...?api_key=SAM-SECRET-abc&x=1")),
+    ("the source-health table redacts on the way in",
+     lambda: _redacts_at_boundary()),
 ]
+
+
+def _redacts_at_boundary():
+    log = SourceLog()
+    log.fail("probe", "ProxyError url: /v2/search?api_key=SAM-LIVE-999",
+             "https://api.sam.gov/v2/search?api_key=SAM-LIVE-999")
+    row = log.rows["probe"]
+    return ("SAM-LIVE-999" not in row["detail"]
+            and "SAM-LIVE-999" not in row["url"])
+
+
+def _future_iso(days):
+    return (TODAY + dt.timedelta(days=days)).isoformat()
+
+
+def _future_date(days):
+    """'September 05, 2026' form, always in the future."""
+    return (TODAY + dt.timedelta(days=days)).strftime("%B %d, %Y")
+
+
+def _future_stamp(days):
+    """grants.gov responseDate form, always in the future."""
+    return (TODAY + dt.timedelta(days=days)).strftime(
+        "%b %d, %Y 12:00:00 AM EDT")
 
 
 def _probe(scope):

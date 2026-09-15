@@ -140,3 +140,22 @@ the digest and the updated seen-list, and opens a GitHub issue when
 something NEW or CHANGED clears the gates — so the digest arrives rather
 than needing to be polled. It runs `--selftest` first and fails the job
 if the gate assertions break, so a scoring regression is loud.
+
+It also obeys the two standing orders that govern every scheduled run in
+this repo (`capture/DAILY_RUN.md`, Andrew 9/15):
+
+- **ARTIFACT RULE — a run that leaves no trace FAILED.** If the digest
+  cannot be pushed, the job exits non-zero with "RUN FAILED — artifacts
+  not landed" rather than reporting green with nothing on main. A
+  succeeded run with no committed digest is a silent failure.
+- **Heartbeat.** Each run appends its line to `capture/HEALTH.md` — date,
+  source health, survivor count, digest path — so a later session can see
+  this lane is alive instead of assuming it. Note the 2-day staleness
+  alarm in that file is calibrated to the *daily* runs; this lane is
+  weekly, so read its line against a 7-day cadence.
+
+**No secret reaches a report.** Error text from a failed source is
+redacted before it becomes digest text — a requests connection error
+embeds the full request URL, and the SAM.gov probe puts `api_key` in that
+query string. The digest is committed and pasted into an issue, so an
+unredacted exception would publish a live key. `--selftest` asserts this.
