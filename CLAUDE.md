@@ -226,6 +226,36 @@ Screening tool: `python3 samgov_opportunity_matcher.py --intl` — overseas
 place of performance / international buyer only, domestic
 international-buyer penalty off, international kills on.
 
+## PROPERTY LANE — weekly 2–4 unit acquisition screen (Andrew, 9/16)
+
+A third system, personal-investment rather than contracting: find the
+best duplex/triplex/fourplex in the US for **pure cash flow** (≤ $400K,
+$75K preferred / $200K max down, conventional investor financing, VA
+entitlement preserved — never modelled), in markets with credible
+appreciation catalysts. Everything lives in `property/`:
+
+- `property/README.md` — architecture; `property/config.yaml` — every
+  assumption (rates, expenses, insurance table, tax rule notes, targets)
+- `property/main.py` — the run; `property/WEEKLY_RUN.md` — the procedure
+  (self-test, artifact rule, research step, notify)
+- `property/research/markets/<cbsa>.yaml` — the verified qualitative
+  layer (catalysts, incentives, landlord law, tax rules) with a source
+  URL on every item; the code never invents these
+- `property/PIPELINE.md` · `property/HEALTH.md` · `property/reports/`
+
+**One command:** say **"Run Property System"** (or `/run-property`). The
+skill at `.claude/skills/run-property/SKILL.md` runs SELF-TEST → STAGE 1
+→ STAGE 2 → RESEARCH → BOARD → LAND → NOTIFY.
+
+Rules that override instinct in this lane: UNKNOWN beats a guess (no
+invented rents, taxes, insurance, crime, programs, projects); the current
+owner's tax bill is never the post-purchase bill; a per-unit rent AVM is
+never silently multiplied by unit count; one-time relocation money is
+never NOI; a great return with poor data confidence never outranks a
+verified one without the difference shown. Gated (prepare + notify only):
+contacting listing agents/lenders, submitting offers, incentive
+applications.
+
 ## Repository context
 
 - The SAM.gov screening tool lives on branch

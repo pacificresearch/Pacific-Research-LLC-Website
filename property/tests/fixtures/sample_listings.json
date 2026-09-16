@@ -1,0 +1,65 @@
+{
+  "_note": "SYNTHETIC listings for pipeline testing. Addresses, prices, rents and tax records are invented and clearly labelled FIXTURE. Never report these as real.",
+  "listings": [
+    {"id": "FIXTURE-FW-4PLEX", "formattedAddress": "100 Fixture Ave, Fort Wayne, IN 46802", "addressLine1": "100 Fixture Ave", "city": "Fort Wayne", "state": "IN", "zipCode": "46802", "county": "Allen",
+     "latitude": 41.08, "longitude": -85.14, "propertyType": "Multi-Family", "bedrooms": 8, "bathrooms": 4, "squareFootage": 3600, "yearBuilt": 1925, "price": 289000, "status": "Active",
+     "listedDate": "2026-08-20T00:00:00Z", "lastSeenDate": "2026-09-14T00:00:00Z", "daysOnMarket": 27, "mlsName": "IRMLS", "mlsNumber": "FIX-0001", "listingAgent": {"name": "Fixture Agent", "phone": "000-000-0000"},
+     "unitCount": 4, "_cbsa": "23060", "description": "Fully occupied 4-unit, separate electric meters, owner pays water/sewer. Pro forma rents $850/unit.",
+     "_fixture_record": {"id": "FIXTURE-FW-4PLEX", "yearBuilt": 1925, "squareFootage": 3600, "features": {"unitCount": 4, "heatingType": "Forced Air", "roofType": "Asphalt"}, "ownerOccupied": false,
+       "taxAssessments": {"2023": {"year": 2023, "value": 182000}, "2024": {"year": 2024, "value": 196000}, "2025": {"year": 2025, "value": 205000}},
+       "propertyTaxes": {"2023": {"year": 2023, "total": 3560}, "2024": {"year": 2024, "total": 3890}, "2025": {"year": 2025, "total": 4100}},
+       "history": {"2019-05-01": {"event": "Sale", "price": 165000}}},
+     "_fixture_comps": [
+       {"id": "c1", "address": "110 Fixture Ave Unit A", "price": 825, "bedrooms": 2, "bathrooms": 1, "square_footage": 850, "property_type": "Multi-Family", "distance_miles": 0.2, "days_old": 12, "source": "fixture"},
+       {"id": "c2", "address": "220 Fixture St", "price": 875, "bedrooms": 2, "bathrooms": 1, "square_footage": 900, "property_type": "Multi-Family", "distance_miles": 0.5, "days_old": 30, "source": "fixture"},
+       {"id": "c3", "address": "330 Fixture Blvd", "price": 795, "bedrooms": 2, "bathrooms": 1, "square_footage": 800, "property_type": "Apartment", "distance_miles": 0.7, "days_old": 45, "source": "fixture"},
+       {"id": "c4", "address": "440 Fixture Ln", "price": 900, "bedrooms": 2, "bathrooms": 1, "square_footage": 950, "property_type": "Multi-Family", "distance_miles": 0.9, "days_old": 60, "source": "fixture"},
+       {"id": "c5", "address": "550 Fixture Ct", "price": 850, "bedrooms": 2, "bathrooms": 1, "square_footage": 880, "property_type": "Multi-Family", "distance_miles": 0.4, "days_old": 20, "source": "fixture"},
+       {"id": "c6", "address": "660 Fixture Way", "price": 940, "bedrooms": 2, "bathrooms": 1.5, "square_footage": 1000, "property_type": "Apartment", "distance_miles": 0.8, "days_old": 75, "source": "fixture"},
+       {"id": "c7", "address": "770 Fixture Dr", "price": 780, "bedrooms": 2, "bathrooms": 1, "square_footage": 780, "property_type": "Multi-Family", "distance_miles": 0.95, "days_old": 88, "source": "fixture"},
+       {"id": "c8", "address": "880 Fixture Pl", "price": 860, "bedrooms": 2, "bathrooms": 1, "square_footage": 870, "property_type": "Multi-Family", "distance_miles": 0.6, "days_old": 10, "source": "fixture"},
+       {"id": "c9", "address": "990 Fixture Rd", "price": 1450, "bedrooms": 3, "bathrooms": 2, "square_footage": 1400, "property_type": "Single Family", "distance_miles": 0.3, "days_old": 15, "source": "fixture"}
+     ]},
+    {"id": "FIXTURE-TOL-DUPLEX", "formattedAddress": "200 Fixture St, Toledo, OH 43604", "addressLine1": "200 Fixture St", "city": "Toledo", "state": "OH", "zipCode": "43604", "county": "Lucas",
+     "latitude": 41.65, "longitude": -83.54, "propertyType": "Multi-Family", "bedrooms": 5, "bathrooms": 2, "squareFootage": 2200, "yearBuilt": 1910, "price": 119000, "status": "Active",
+     "listedDate": "2026-09-01T00:00:00Z", "lastSeenDate": "2026-09-15T00:00:00Z", "daysOnMarket": 15, "mlsName": "NORIS", "mlsNumber": "FIX-0002",
+     "unitCount": 2, "_cbsa": "45780", "description": "Duplex, needs work, sold as-is. One unit vacant. Knob and tube in attic.",
+     "_fixture_record": {"id": "FIXTURE-TOL-DUPLEX", "yearBuilt": 1910, "features": {"unitCount": 2}, "taxAssessments": {"2024": {"year": 2024, "value": 31500}}, "propertyTaxes": {"2024": {"year": 2024, "total": 2150}}},
+     "_fixture_comps": [
+       {"id": "t1", "address": "210 Fixture St", "price": 900, "bedrooms": 2, "square_footage": 1000, "property_type": "Multi-Family", "distance_miles": 0.3, "days_old": 20, "source": "fixture"},
+       {"id": "t2", "address": "215 Fixture St", "price": 1050, "bedrooms": 3, "square_footage": 1200, "property_type": "Multi-Family", "distance_miles": 0.4, "days_old": 40, "source": "fixture"},
+       {"id": "t3", "address": "300 Fixture Ave", "price": 850, "bedrooms": 2, "square_footage": 900, "property_type": "Apartment", "distance_miles": 1.4, "days_old": 100, "source": "fixture"},
+       {"id": "t4", "address": "310 Fixture Ave", "price": 975, "bedrooms": 2, "square_footage": 950, "property_type": "Multi-Family", "distance_miles": 1.8, "days_old": 150, "source": "fixture"}
+     ]},
+    {"id": "FIXTURE-HSV-TRIPLEX", "formattedAddress": "300 Fixture Cir, Huntsville, AL 35801", "addressLine1": "300 Fixture Cir", "city": "Huntsville", "state": "AL", "zipCode": "35801", "county": "Madison",
+     "latitude": 34.73, "longitude": -86.58, "propertyType": "Multi-Family", "bedrooms": 6, "bathrooms": 3, "squareFootage": 3000, "yearBuilt": 1972, "price": 385000, "status": "Active",
+     "listedDate": "2026-07-15T00:00:00Z", "lastSeenDate": "2026-09-15T00:00:00Z", "daysOnMarket": 63, "mlsName": "ValleyMLS", "mlsNumber": "FIX-0003",
+     "unitCount": 3, "_cbsa": "26620", "description": "Triplex near Redstone. Tenants month to month.",
+     "_fixture_record": {"id": "FIXTURE-HSV-TRIPLEX", "yearBuilt": 1972, "features": {"unitCount": 3}, "ownerOccupied": true, "taxAssessments": {"2025": {"year": 2025, "value": 32000}}, "propertyTaxes": {"2025": {"year": 2025, "total": 1850}}},
+     "_fixture_comps": [
+       {"id": "h1", "address": "301 Fixture Cir", "price": 1250, "bedrooms": 2, "square_footage": 1000, "property_type": "Multi-Family", "distance_miles": 0.2, "days_old": 25, "source": "fixture"},
+       {"id": "h2", "address": "305 Fixture Cir", "price": 1300, "bedrooms": 2, "square_footage": 1050, "property_type": "Apartment", "distance_miles": 0.5, "days_old": 35, "source": "fixture"},
+       {"id": "h3", "address": "400 Fixture Pkwy", "price": 1195, "bedrooms": 2, "square_footage": 980, "property_type": "Multi-Family", "distance_miles": 0.8, "days_old": 50, "source": "fixture"},
+       {"id": "h4", "address": "410 Fixture Pkwy", "price": 1350, "bedrooms": 2, "square_footage": 1100, "property_type": "Multi-Family", "distance_miles": 0.9, "days_old": 70, "source": "fixture"},
+       {"id": "h5", "address": "500 Fixture Ter", "price": 1275, "bedrooms": 2, "square_footage": 1020, "property_type": "Multi-Family", "distance_miles": 0.6, "days_old": 15, "source": "fixture"}
+     ]},
+    {"id": "FIXTURE-ODE-4PLEX", "formattedAddress": "400 Fixture Loop, Odessa, TX 79761", "addressLine1": "400 Fixture Loop", "city": "Odessa", "state": "TX", "zipCode": "79761", "county": "Ector",
+     "latitude": 31.85, "longitude": -102.37, "propertyType": "Multi-Family", "bedrooms": 8, "bathrooms": 4, "squareFootage": 3200, "yearBuilt": 1982, "price": 340000, "status": "Active",
+     "listedDate": "2026-08-30T00:00:00Z", "lastSeenDate": "2026-09-15T00:00:00Z", "daysOnMarket": 17, "mlsName": "PBBOR", "mlsNumber": "FIX-0004",
+     "unitCount": 4, "_cbsa": "36220",
+     "_fixture_record": {"id": "FIXTURE-ODE-4PLEX", "yearBuilt": 1982, "features": {"unitCount": 4}, "taxAssessments": {"2025": {"year": 2025, "value": 298000}}, "propertyTaxes": {"2025": {"year": 2025, "total": 6900}}},
+     "_fixture_comps": [
+       {"id": "o1", "address": "401 Fixture Loop", "price": 1150, "bedrooms": 2, "square_footage": 800, "property_type": "Multi-Family", "distance_miles": 0.3, "days_old": 10, "source": "fixture"},
+       {"id": "o2", "address": "405 Fixture Loop", "price": 1225, "bedrooms": 2, "square_footage": 820, "property_type": "Multi-Family", "distance_miles": 0.4, "days_old": 22, "source": "fixture"},
+       {"id": "o3", "address": "500 Fixture Ave", "price": 1100, "bedrooms": 2, "square_footage": 790, "property_type": "Apartment", "distance_miles": 0.7, "days_old": 41, "source": "fixture"},
+       {"id": "o4", "address": "510 Fixture Ave", "price": 1300, "bedrooms": 2, "square_footage": 850, "property_type": "Multi-Family", "distance_miles": 0.9, "days_old": 60, "source": "fixture"},
+       {"id": "o5", "address": "520 Fixture Ave", "price": 1175, "bedrooms": 2, "square_footage": 810, "property_type": "Multi-Family", "distance_miles": 0.5, "days_old": 33, "source": "fixture"},
+       {"id": "o6", "address": "530 Fixture Ave", "price": 1250, "bedrooms": 2, "square_footage": 830, "property_type": "Multi-Family", "distance_miles": 0.8, "days_old": 80, "source": "fixture"}
+     ]},
+    {"id": "FIXTURE-NOUNITS", "formattedAddress": "500 Fixture Rd, Memphis, TN 38104", "addressLine1": "500 Fixture Rd", "city": "Memphis", "state": "TN", "zipCode": "38104", "county": "Shelby",
+     "latitude": 35.13, "longitude": -90.0, "propertyType": "Multi-Family", "bedrooms": 7, "bathrooms": 3, "squareFootage": 2900, "yearBuilt": 1955, "price": 210000, "status": "Active",
+     "listedDate": "2026-09-10T00:00:00Z", "lastSeenDate": "2026-09-15T00:00:00Z", "daysOnMarket": 6, "mlsName": "MAAR", "mlsNumber": "FIX-0005", "_cbsa": "32820",
+     "_fixture_comps": []},
+    {"id": "FIXTURE-OVERPRICE", "formattedAddress": "600 Fixture Ct, Milwaukee, WI 53204", "city": "Milwaukee", "state": "WI", "zipCode": "53204", "propertyType": "Multi-Family", "bedrooms": 4, "price": 425000, "status": "Active", "_cbsa": "33340"}
+  ]
+}
