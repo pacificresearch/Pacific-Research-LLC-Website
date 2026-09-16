@@ -1,3 +1,10 @@
 __pycache__/
 *.pyc
 .netlify/
+
+# property screener
+property/.env
+.env
+property/cache/*.sqlite
+property/cache/*.sqlite-journal
+property/output/

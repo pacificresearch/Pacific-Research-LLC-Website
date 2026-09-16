@@ -1,0 +1,65 @@
+# research/markets/<cbsa>.yaml — copy, rename to the CBSA code, fill ONLY what a source supports.
+cbsa: "00000"
+name: "City, ST"
+retrieved_at: "YYYY-MM-DD"
+cities: ["City"]                 # RentCast city search terms (defaults to CBSA name)
+single_employer_dependence: false
+energy_boom_watch: false
+risks: []                        # short strings, e.g. "single-employer (Redstone) concentration"
+major_employers: []              # ["Employer (sector, ~jobs) — source URL"]
+state_income_tax: ""             # e.g. "flat 3.05% (IN DOR)"; TX/TN/FL etc. auto 'none'
+cost_of_living: ""               # only from a reliable index with URL
+
+catalysts:                       # each needs company/agency, $, jobs, dates, status, source_url
+  - name: ""
+    company: ""
+    sector: ""                   # energy | semiconductor | battery | data_center | defense | aerospace | biotech | manufacturing | logistics | hospital | federal | university | transport | other
+    investment_usd: 0
+    jobs: 0
+    avg_wage: null
+    announced: ""                # YYYY-MM
+    start: ""
+    completion: ""
+    status: announced            # announced | under_construction | completed | speculative | cancelled
+    source_url: ""
+    verified: false
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: ""
+    dollar_value: 0
+    cash_or_noncash: cash
+    eligibility: ""
+    minimum_income: ""
+    employment_requirement: ""
+    home_purchase_requirement: ""
+    residency_requirement: ""
+    minimum_stay: ""
+    application_deadline: ""
+    funding_availability: ""
+    source_url: ""
+    verified: false
+
+landlord_law:
+  verified: false
+  rent_control: ""               # "no (state preemption, KRS ...)" / "yes: ..."
+  just_cause_eviction: ""
+  eviction_timeline_days: null
+  rental_licensing: ""           # "yes — $X/unit/yr, City ordinance §..."
+  rental_license_fee_annual: null
+  inspection_frequency: ""
+  lead_rules: ""
+  certificate_of_occupancy_rules: ""
+  security_deposit_limits: ""
+  local_landlord_taxes_fees: ""
+  utility_obligations: ""
+  sources: []
+
+tax_rules:
+  verified: false
+  post_sale_treatment: ""        # what the county actually does after a sale
+  risk: ""                       # LOW | MEDIUM | HIGH
+  assessor_url: ""
+  treasurer_url: ""
+  source_url: ""
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}
