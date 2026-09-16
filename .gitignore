@@ -7,3 +7,4 @@ property/.env
 .env
 property/cache/*.sqlite
 property/cache/*.sqlite-journal
+property/output/
