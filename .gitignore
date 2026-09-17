@@ -1,5 +1,6 @@
 __pycache__/
 *.pyc
+sbir/state/nofo_cache.json
 .netlify/
 
 # property screener
