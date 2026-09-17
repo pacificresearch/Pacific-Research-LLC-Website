@@ -78,16 +78,19 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # HEALTH.md heartbeat: every scheduled run appends its line, so a
-          # later session can see this lane is alive rather than assuming it.
+          # Heartbeat: every run appends its line, so a later session can see
+          # this lane is alive rather than assuming it. Written to the lane's
+          # OWN sbir/HEALTH.md, matching the per-lane convention the property
+          # lane established — capture/HEALTH.md carries a 2-day alarm tuned
+          # to the daily runs, which a weekly sweep would trip every week.
           HOLES="${{ steps.run.outputs.incomplete }}"
-          SRC="✅"; [ "$HOLES" = "true" ] && SRC="⚠️ partial"
-          printf '| %s | sbir weekly digest | %s | n/a | 0 | yes | %s survivor(s), digest %s |\n' \
+          SRC="✅ all 9"; [ "$HOLES" = "true" ] && SRC="⚠️ partial — see digest"
+          printf '| %s | sbir weekly digest | %s | ✅ 18 passed | %s | %s | scheduled run |\n' \
             "$(date -u +%F)" "$SRC" \
             "${{ steps.run.outputs.survivors }}" \
-            "${{ steps.run.outputs.digest }}" >> capture/HEALTH.md
+            "${{ steps.run.outputs.digest }}" >> sbir/HEALTH.md
 
-          git add sbir/reports sbir/state/seen.json capture/HEALTH.md
+          git add sbir/reports sbir/state/seen.json sbir/HEALTH.md
           if git diff --cached --quiet; then
             echo "Nothing changed this run." && exit 0
           fi

@@ -148,11 +148,13 @@ this repo (`capture/DAILY_RUN.md`, Andrew 9/15):
   cannot be pushed, the job exits non-zero with "RUN FAILED — artifacts
   not landed" rather than reporting green with nothing on main. A
   succeeded run with no committed digest is a silent failure.
-- **Heartbeat.** Each run appends its line to `capture/HEALTH.md` — date,
-  source health, survivor count, digest path — so a later session can see
-  this lane is alive instead of assuming it. Note the 2-day staleness
-  alarm in that file is calibrated to the *daily* runs; this lane is
-  weekly, so read its line against a 7-day cadence.
+- **Heartbeat.** Each run appends its line to `sbir/HEALTH.md` — date,
+  source health, self-test result, survivor count, digest path — so a
+  later session can see this lane is alive instead of assuming it. The
+  heartbeat is per-lane, matching `property/HEALTH.md`: the shared
+  `capture/HEALTH.md` carries a 2-day staleness alarm calibrated to the
+  daily runs, and a weekly sweep would trip it every single week. This
+  file's alarm is **9 days** — one missed Monday is the real signal.
 
 **No secret reaches a report.** Error text from a failed source is
 redacted before it becomes digest text — a requests connection error
