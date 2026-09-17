@@ -2,3 +2,10 @@ __pycache__/
 *.pyc
 sbir/state/nofo_cache.json
 .netlify/
+
+# property screener
+property/.env
+.env
+property/cache/*.sqlite
+property/cache/*.sqlite-journal
+property/output/

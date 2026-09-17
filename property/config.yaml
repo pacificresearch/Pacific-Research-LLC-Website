@@ -1,0 +1,317 @@
+# PRG Property Acquisition Screener — all assumptions live here.
+# Nothing in this file is a lender quote, an insurance quote, or a tax bill.
+# Every value is ASSUMED unless the run replaces it with verified data.
+
+run:
+  cadence: weekly
+  cache_db: property/cache/prg_property.sqlite
+  report_dir: property/output
+  cache_ttl_hours:                # SQLite cache refresh rules
+    census: 720        # economic data: monthly
+    bls: 720
+    fhfa: 2160         # quarterly release
+    permits: 720
+    fred: 720
+    rentcast_listings: 24        # listings: daily
+    rentcast_property: 720       # property records: 30 days
+    rentcast_avm: 168
+    rentcast_comps: 168          # rental comps: 7 days
+    brave: 336                   # web catalyst research: 14 days
+  stage1_markets_out: 30         # ~20–30 markets go to Stage 2 (14 seed CBSAs are always in)
+  stage1_universe_min_pop: 150000   # enough 2-4 unit inventory and resale liquidity; Odessa/Midland clear it
+  stage1_universe_max_pop: 4000000
+
+capital:
+  price_ceiling: 400000
+  preferred_down_payment: 75000
+  max_down_payment: 200000
+  down_payment_pcts: [0.25, 0.30, 0.35, 0.40, 0.50]   # 25% is baseline
+  baseline_down_payment_pct: 0.25
+
+financing:                       # ASSUMED — NOT a lender quote
+  amortization_years: 30
+  interest_rate: 0.075
+  interest_only_months: 0
+  va_loan: false                 # preserve VA entitlement; never modelled here
+  rate_sensitivity: [0.065, 0.070, 0.075, 0.080, 0.085]
+  lender_reserve_months_piti: 6  # typical investor DSCR/conventional ask; ASSUMED
+
+acquisition_costs:               # ASSUMED, shown separately from down payment
+  closing_cost_pct_of_price: 0.03
+  immediate_rehab_default: 0     # never assumed unless evidence; flagged for inspection
+  rehab_range_if_unknown: [5000, 25000]   # per building, shown as a RANGE, not added silently
+  lease_up_cost_per_vacant_unit: 1500     # turnover + marketing, ASSUMED
+  operating_reserve_months_opex: 3
+
+income:
+  vacancy_pct: 0.05
+  credit_loss_pct: 0.01
+  other_income_annual: 0
+
+expenses:                        # baseline; market overrides below
+  management_pct_of_collected: 0.08
+  repairs_pct_of_gsr: 0.05
+  capex_pct_of_gsr: 0.05
+  capex_pct_of_gsr_pre_1960: 0.07      # older stock: more capex, disclosed
+  capex_pct_of_gsr_pre_1940: 0.08
+  utilities_per_unit_month:          # only applied when owner pays (default: owner pays water/sewer/trash on 2-4s; ASSUMED)
+    water: 45
+    sewer: 40
+    trash: 25
+    electric: 0                       # tenant-paid unless master-metered (flag)
+    gas: 0
+  common_area_electric_month: 25
+  landscaping_month: 60
+  snow_removal_month_where_relevant: 40
+  pest_control_month: 25
+  rental_licensing_annual_default: 100    # replaced by verified city fee when researched
+  inspection_fees_annual_default: 0
+  lead_compliance_annual_pre_1978: 150    # inspection/cert amortized; ASSUMED
+  other_recurring_annual: 0
+  snow_states: [WI, OH, PA, IN, KY, MI, MN, IL, NY, MO, IA, NE, KS, CO, UT, ID, MT, WY, ND, SD, VT, NH, ME, MA, CT, RI, NJ]
+
+market_overrides: {}             # e.g. { "23060": { management_pct_of_collected: 0.10 } }
+
+insurance:                       # ESTIMATED landlord (DP-3 / commercial residential) cost. Never a quote.
+  # Annual premium estimated as max(per_unit_minimum, rate_per_1000_value * replacement proxy).
+  # Replacement proxy = max(asking price, sqft * rebuild_cost_per_sqft).
+  rebuild_cost_per_sqft: 140
+  sensitivity: [1.00, 1.25, 1.50]
+  default_rate_per_1000: 7.0
+  default_per_unit_minimum: 1100
+  state_rate_per_1000:           # hazard-tiered landlord rates; ESTIMATED
+    FL: 16.0
+    LA: 15.0
+    TX: 11.0
+    OK: 12.0
+    MS: 11.0
+    AL: 9.5
+    KS: 10.0
+    NE: 9.5
+    AR: 9.0
+    MO: 8.5
+    TN: 8.0
+    GA: 8.0
+    SC: 8.5
+    NC: 7.5
+    KY: 7.5
+    CO: 9.0
+    CA: 9.0
+    IN: 6.5
+    OH: 6.0
+    WI: 5.5
+    PA: 6.5
+    MI: 6.5
+    IL: 6.5
+    IA: 7.0
+    MN: 7.0
+    NY: 7.0
+    WV: 6.0
+    VA: 6.0
+    MD: 6.5
+    UT: 5.5
+    ID: 5.5
+    NM: 7.5
+    AZ: 7.0
+    NV: 6.5
+
+hazards_by_state:                # physical hazard flags (reference; NOT insurance cost). Verify parcel-level flood via FEMA NFHL.
+  TX: [wind, hail, tornado, hurricane_coastal, flood, extreme_heat]
+  OK: [tornado, hail, wind, earthquake_induced]
+  KS: [tornado, hail, wind]
+  NE: [tornado, hail, wind]
+  AL: [tornado, hurricane_coastal, wind, hail, flood]
+  TN: [tornado, flood, earthquake_nmsz_west]
+  AR: [tornado, flood, earthquake_nmsz_ne, hail]
+  MS: [tornado, hurricane_coastal, flood]
+  LA: [hurricane, flood, wind]
+  FL: [hurricane, flood, wind, sinkhole]
+  MO: [tornado, hail, flood, earthquake_nmsz_se]
+  KY: [tornado, flood, earthquake_nmsz_west]
+  IN: [tornado, flood, hail]
+  OH: [tornado, flood, winter]
+  WI: [winter, flood, hail]
+  PA: [flood, winter]
+  MI: [winter, flood]
+  IL: [tornado, hail, flood, winter]
+  GA: [tornado, hurricane_coastal, flood]
+  SC: [hurricane, flood, earthquake_charleston]
+  NC: [hurricane, flood]
+  CA: [earthquake, wildfire]
+  CO: [hail, wildfire]
+  AZ: [extreme_heat, wildfire]
+  NM: [wildfire]
+  UT: [earthquake]
+  ID: [wildfire]
+  NV: [extreme_heat, earthquake]
+
+property_taxes:
+  post_sale_reassessment_notes:  # REFERENCE NOTES — verify with the county for every finalist. Unknown state => UNKNOWN.
+    IN:
+      treatment: "Annual trending assessment; sale does not directly trigger reassessment, but a non-homestead 2-4 unit loses the 1% homestead cap and is capped at 2% of gross assessed value (rental residential). Model taxes at 2% cap ceiling if current owner is owner-occupied."
+      risk: MEDIUM
+      source: "https://www.in.gov/dlgf/"
+    AL:
+      treatment: "Class III (owner-occupied, 10% assessment ratio) becomes Class II (20% ratio) when investor-owned. Tax bill can roughly double versus an owner-occupied seller's bill."
+      risk: HIGH
+      source: "https://www.revenue.alabama.gov/property-tax/"
+    TN:
+      treatment: "County reappraisal on 4-6 year cycles; sale does not trigger reassessment. Residential assessed at 25% of appraised value. Rate changes at reappraisal are revenue-neutral by law (certified tax rate)."
+      risk: LOW
+      source: "https://comptroller.tn.gov/office-functions/pa.html"
+    AR:
+      treatment: "Amendment 79 limits annual increases (5% non-homestead) but the cap resets to full assessed value on change of ownership. Expect post-sale assessment to step up to 20% of market value."
+      risk: HIGH
+      source: "https://www.arkansasassessment.com/"
+    KY:
+      treatment: "PVA assesses at fair cash value annually; a recent sale price is used as evidence of value. Expect reassessment toward purchase price."
+      risk: MEDIUM
+      source: "https://revenue.ky.gov/Property/Pages/default.aspx"
+    WI:
+      treatment: "Municipal assessors revalue periodically; recent sale prices are primary evidence. Milwaukee reassesses citywide most years."
+      risk: MEDIUM
+      source: "https://www.revenue.wi.gov/Pages/Individuals/prop-tax.aspx"
+    OH:
+      treatment: "Sexennial reappraisal + triennial update; sale does not automatically reassess, but school districts may file Board of Revision complaints on recent sales (HB 126 narrowed this to sales at least 10% and $500K above assessed value)."
+      risk: LOW
+      source: "https://tax.ohio.gov/individual/resources/real-property"
+    PA:
+      treatment: "Philadelphia OPA reassesses citywide (annually in recent cycles); sale does not itself trigger reassessment. Outside Philadelphia, county base-year systems can leave sale prices untouched for years."
+      risk: MEDIUM
+      source: "https://www.phila.gov/departments/office-of-property-assessment/"
+    TX:
+      treatment: "Annual appraisal at market value; sale price is used. Non-homestead residential under $5M has a temporary 20% annual cap (2024-2026 pilot). No homestead exemption on investment property; total rates often 2%+ in the Permian Basin."
+      risk: HIGH
+      source: "https://comptroller.texas.gov/taxes/property-tax/"
+    MI:
+      treatment: "Taxable value 'uncaps' to State Equalized Value (50% of market) in the year after transfer. Post-sale bill can be far above the seller's."
+      risk: HIGH
+      source: "https://www.michigan.gov/taxes/property"
+    CA:
+      treatment: "Prop 13: reassessed to purchase price on transfer; ~1% base plus local."
+      risk: HIGH
+      source: "https://www.boe.ca.gov/proptaxes/proptax.htm"
+    FL:
+      treatment: "Non-homestead 10% cap resets on change of ownership; reassessed to just value the January after sale."
+      risk: HIGH
+      source: "https://floridarevenue.com/property/"
+    GA:
+      treatment: "County annual assessment at 40% of fair market value; sale price typically used the following year."
+      risk: MEDIUM
+      source: "https://dor.georgia.gov/property-tax"
+    MO:
+      treatment: "Biennial reassessment (odd years) at 19% of market; sale does not itself trigger."
+      risk: LOW
+      source: "https://dor.mo.gov/taxation/individual/general/property.html"
+    OK:
+      treatment: "5% annual cap on fair cash value increases resets on transfer of title."
+      risk: HIGH
+      source: "https://oklahoma.gov/tax/individuals/ad-valorem.html"
+    SC:
+      treatment: "Assessable transfer of interest: reassessed to market on sale; non-owner-occupied assessed at 6% (vs 4% owner-occupied) — investor tax bill can be ~2.5x the seller's."
+      risk: HIGH
+      source: "https://dor.sc.gov/tax/property"
+    NC:
+      treatment: "County revaluation every 4-8 years; sale does not trigger reassessment."
+      risk: LOW
+      source: "https://www.ncdor.gov/taxes-forms/property-tax"
+    IL:
+      treatment: "Triennial/quadrennial reassessment by township; sale used as evidence. Cook County very high effective rates on rentals."
+      risk: MEDIUM
+      source: "https://tax.illinois.gov/localgovernments/property.html"
+    IA:
+      treatment: "Biennial reassessment at market; state rollback applies to residential class including 2-4 units."
+      risk: LOW
+      source: "https://tax.iowa.gov/iowa-property-tax-overview"
+    MS:
+      treatment: "Class I (owner-occupied, 10%) becomes Class II (15%) for investor-owned; homestead credit lost."
+      risk: HIGH
+      source: "https://www.dor.ms.gov/property"
+    LA:
+      treatment: "Quadrennial reassessment at 10% of market; homestead exemption lost on investor purchase."
+      risk: MEDIUM
+      source: "https://revenue.louisiana.gov/"
+    WV:
+      treatment: "Annual assessment at 60% of market; Class III/IV (non-owner-occupied) taxed at double the Class II rate."
+      risk: HIGH
+      source: "https://tax.wv.gov/Business/PropertyTax/Pages/PropertyTax.aspx"
+    NY:
+      treatment: "Varies by municipality; many upstate cities use fractional/base-year assessments with infrequent revaluation."
+      risk: MEDIUM
+      source: "https://www.tax.ny.gov/pit/property/"
+    MN:
+      treatment: "Annual assessment at market; non-homestead residential 2-3 unit class rates higher than homestead."
+      risk: MEDIUM
+      source: "https://www.revenue.state.mn.us/property-tax"
+    NE:
+      treatment: "Annual assessment at 100% of market; sale used as evidence."
+      risk: MEDIUM
+      source: "https://revenue.nebraska.gov/PAD"
+    KS:
+      treatment: "Annual assessment at market; residential at 11.5% ratio."
+      risk: MEDIUM
+      source: "https://www.ksrevenue.gov/pvd.html"
+
+rent_analysis:
+  comp_radius_miles: [1.0, 2.0, 3.0]
+  comp_max_age_days: [90, 180, 365]
+  min_comps_for_grade: {A: 8, B: 5, C: 3}
+  rent_to_price_targets: {prefer: 0.010, strong: 0.012, exceptional: 0.014}
+  early_filter_min_rent_to_price: 0.0085   # below this a listing is only enriched if an exception flag applies
+
+targets:
+  economic_cap_rate: {prefer: 0.09, strong: 0.10}
+  cash_on_cash: {prefer: 0.12, strong: 0.15}
+  economic_dscr: {prefer: 1.25, strong: 1.40}
+  monthly_cash_flow: {prefer: 800, strong: 1200, exceptional: 1500}
+
+stress:
+  downside: {rent_mult: 0.90, vacancy_pct: 0.10, insurance_mult: 1.25, maintenance_mult: 1.25, tax_mult: 1.10}
+  severe:   {one_unit_vacant_months: 12, insurance_mult: 1.50, maintenance_mult: 1.50, tax_mult: 1.15}
+  upside:   {use_market_high_rent: true, vacancy_pct: 0.05, verified_rent_increase_only: true}
+
+ranking_e_weights:               # per the brief; component scores are shown so the ranking is auditable
+  cash_flow_economics: 0.45
+  capital_efficiency: 0.15
+  appreciation_catalysts: 0.15
+  downside_property_risk: 0.10
+  rent_employment_fundamentals: 0.10
+  relocation_living_economics: 0.05
+
+api_budget:                      # conserve paid calls
+  rentcast_max_calls_per_run: 45          # free tier is 50/month — raise when on a paid plan
+  rentcast_listing_pages_per_market: 1    # 500 listings per page
+  rentcast_max_enrich_properties: 12
+  brave_max_calls_per_run: 60
+  bls_max_queries_per_run: 20             # unregistered limit is 25/day
+
+seed_markets:                    # always included in Stage 2 regardless of Stage 1 score
+  - {city: "Fort Wayne", state: IN, cbsa: "23060"}
+  - {city: "Huntsville", state: AL, cbsa: "26620"}
+  - {city: "Chattanooga", state: TN, cbsa: "16860"}
+  - {city: "Memphis", state: TN, cbsa: "32820"}
+  - {city: "Montgomery", state: AL, cbsa: "33860"}
+  - {city: "Little Rock", state: AR, cbsa: "30780"}
+  - {city: "West Memphis", state: AR, cbsa: "32820"}
+  - {city: "Louisville", state: KY, cbsa: "31140"}
+  - {city: "Milwaukee", state: WI, cbsa: "33340"}
+  - {city: "Toledo", state: OH, cbsa: "45780"}
+  - {city: "Cleveland", state: OH, cbsa: "17410"}   # 2023 delineation (formerly 17460 Cleveland-Elyria)
+  - {city: "Philadelphia", state: PA, cbsa: "37980"}
+  - {city: "Midland", state: TX, cbsa: "33260"}
+  - {city: "Odessa", state: TX, cbsa: "36220"}
+  - {city: "Springdale", state: AR, cbsa: "22220"}
+  - {city: "Fayetteville", state: AR, cbsa: "22220"}
+
+market_screen_weights:           # Stage 1 score components (percentile-ranked 0-1 across the universe).
+  rent_to_value: 0.25            # Zillow ZORI*12 / ZHVI (metro); ACS rent/value when a Census key exists
+  affordability: 0.10            # metro typical home value vs the $400K ceiling
+  insurance_cost: 0.10           # state landlord-insurance rate tier (config insurance table); lower is better
+  small_multifamily_stock: 0.10  # share of housing units in 2-4 unit structures (ACS; needs CENSUS_API_KEY)
+  population_growth: 0.10        # Census PEP 2020->2024
+  net_migration: 0.10            # Census PEP domestic net migration per 1,000 residents (2022-2024 avg)
+  income_growth: 0.05            # ACS (needs CENSUS_API_KEY)
+  unemployment: 0.10             # BLS LAUS latest metro rate; lower is better
+  hpi_momentum: 0.05             # FHFA 3y CAGR; moderate scores best, overheated penalized
+  vacancy: 0.05                  # ACS gross vacancy (needs CENSUS_API_KEY); lower is better
+  # components with no data across the universe are dropped and the remaining weights renormalized
