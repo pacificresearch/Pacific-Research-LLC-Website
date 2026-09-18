@@ -130,3 +130,15 @@ is a faithful summary of it and sufficient for truth-checking.
 - Direct Facts Used: […]
 - Inferences Applied: […]
 ---
+
+## Report generation (post-cycle)
+
+After saving the batch file and pushing to git, generate a cycle report artifact:
+1. Title: `Job Search Cycle [N] — [YYYY-MM-DD]`
+2. Content: cycle summary with jobs found, packages created, skipped entries with gate rationale
+3. Include: apply links and tailored summaries for all packaged roles
+4. Publish as Artifact (HTML report), auto-opens for review
+5. Update master dashboard index with cycle entry
+6. Link cycle report from tracker.md batch entry
+
+This ensures visibility: each completed cycle publishes a report, master index rolls forward, and all work is tracked and retrievable.
