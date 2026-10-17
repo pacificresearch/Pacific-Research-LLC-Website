@@ -268,6 +268,7 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-10-15 | Clinical Trial Manager | Medilink Therapeutics | Remote, US | https://to.indeed.com/aalhc49h64mj | ready to apply |
 | 2026-10-17 | Senior Clinical Trial Manager | Vera Therapeutics | Remote, US | https://to.indeed.com/aavdvwclfdch | ready to apply |
 | 2026-10-17 | Clinical Program Manager | IQVIA | Parsippany-Troy Hills, NJ | https://to.indeed.com/aaxtppwynqh4 | ready to apply |
+| 2026-10-17 | Sr. Clinical Research Associate | Karius | Redwood City, CA | https://to.indeed.com/aaj8cl92hzyd | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -283,6 +284,8 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-09-04 | Director of Finance & Operations | California Latinas for Reproductive Justice | Requires CPA or MBA Finance credential not held; posting potentially expired (application deadline April 6, 2026) |
 | 2026-10-17 | Clinical Quality Operations Manager | Merck | Requires 8+ years pharma/clinical quality specialist experience (CAPA/RCA, inspection management); Andrew has 4+ yr clinical research + healthcare ops but not 8-yr pharma quality focus |
 | 2026-10-17 | Senior Clinical Trial Manager | Newave Pharmaceuticals | Requires 3+ years sponsor-side CRO oversight on EU studies + oncology/hematology therapeutic area; Andrew lacks sponsor-side CRO management depth and specialty therapeutics experience |
+| 2026-10-17 | Associate Director, Clinical Operations | Alterome Therapeutics | Requires ~10 years clinical research + 3-4 years recent sponsor-side direct site management experience; Andrew has 4 years total clinical research (below 10-year gate) |
+| 2026-10-17 | Senior CRA Cardiovascular Bilingual | Merck | Requires fluent Spanish (verbal & written); Andrew has Limited Working Proficiency; role emphasizes South Florida bilingual patient population and 65-75% travel with Spanish-speaking sites |
 
 ## Cycle 36 notes (2026-08-30 batch-36)
 
