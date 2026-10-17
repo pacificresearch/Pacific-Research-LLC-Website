@@ -266,6 +266,8 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-10-15 | Clinical Study Manager | IUVO Bioscience Operations | Remote, US | https://to.indeed.com/aapljjzdq8hr | ready to apply |
 | 2026-10-15 | Clinical Research Coordinator I | University of Alabama, Birmingham | Birmingham, AL | https://to.indeed.com/aa6rmhd4pjqd | ready to apply |
 | 2026-10-15 | Clinical Trial Manager | Medilink Therapeutics | Remote, US | https://to.indeed.com/aalhc49h64mj | ready to apply |
+| 2026-10-17 | Senior Clinical Trial Manager | Vera Therapeutics | Remote, US | https://to.indeed.com/aavdvwclfdch | ready to apply |
+| 2026-10-17 | Clinical Program Manager | IQVIA | Parsippany-Troy Hills, NJ | https://to.indeed.com/aaxtppwynqh4 | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -279,6 +281,8 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-09-04 | Health Economics & Outcomes Research Sr Manager, Obesity | Amgen | Requires doctorate degree not held (MA International Studies, BA Classics only) |
 | 2026-09-04 | Chief Financial Officer | Baby2Baby | Requires CPA or MBA Finance credential not held |
 | 2026-09-04 | Director of Finance & Operations | California Latinas for Reproductive Justice | Requires CPA or MBA Finance credential not held; posting potentially expired (application deadline April 6, 2026) |
+| 2026-10-17 | Clinical Quality Operations Manager | Merck | Requires 8+ years pharma/clinical quality specialist experience (CAPA/RCA, inspection management); Andrew has 4+ yr clinical research + healthcare ops but not 8-yr pharma quality focus |
+| 2026-10-17 | Senior Clinical Trial Manager | Newave Pharmaceuticals | Requires 3+ years sponsor-side CRO oversight on EU studies + oncology/hematology therapeutic area; Andrew lacks sponsor-side CRO management depth and specialty therapeutics experience |
 
 ## Cycle 36 notes (2026-08-30 batch-36)
 
