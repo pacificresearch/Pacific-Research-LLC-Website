@@ -271,6 +271,9 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-10-17 | Sr. Clinical Research Associate | Karius | Redwood City, CA | https://to.indeed.com/aaj8cl92hzyd | ready to apply |
 | 2026-10-17 | Clinical Research Coordinator I - Endocrinology | Emory University | Atlanta, GA | https://to.indeed.com/aafz9xl8qjxv | ready to apply |
 | 2026-10-17 | Clinical Research Coordinator I - Public Health (NIEHS Superfund) | Emory University | Atlanta, GA | https://to.indeed.com/aatdy8kjr8xl | ready to apply |
+| 2026-10-18 | Senior Clinical Research Associate | AtriCure | Mason, OH | https://to.indeed.com/aarhnvt9gmlv | ready to apply |
+| 2026-10-18 | Manager, Clinical Operations | ICON plc | Blue Bell, PA | https://to.indeed.com/aa9sqsxvkntw | ready to apply |
+| 2026-10-18 | Program Operations Specialist | Johns Hopkins University | Baltimore, MD | https://to.indeed.com/aaklcr9vwnrr | ready to apply |
 
 ## Screened & skipped (gate fired)
 
@@ -289,6 +292,7 @@ Dedupe key: company + title. Never re-package a listed job.
 | 2026-10-17 | Associate Director, Clinical Operations | Alterome Therapeutics | Requires ~10 years clinical research + 3-4 years recent sponsor-side direct site management experience; Andrew has 4 years total clinical research (below 10-year gate) |
 | 2026-10-17 | Senior CRA Cardiovascular Bilingual | Merck | Requires fluent Spanish (verbal & written); Andrew has Limited Working Proficiency; role emphasizes South Florida bilingual patient population and 65-75% travel with Spanish-speaking sites |
 | 2026-10-17 | Senior Clinical Research Associate | Everest Clinical Research | Requires 6+ years clinical trial monitoring experience; Andrew has 4 years (below gate); CRA-level independent site portfolio management required |
+| 2026-10-18 | Administrative Manager Intermediate Healthcare | University of Michigan | Requires 5+ years healthcare revenue cycle/billing/finance; Andrew has 4+ yr clinical research ops (different domain, no revenue cycle/billing expertise) |
 
 ## Cycle 36 notes (2026-08-30 batch-36)
 
