@@ -1,5 +1,10 @@
 # Daily Capture Run — procedure for the scheduled session
 
+> **CADENCE (Andrew, 2026-10-21): this run fires TWICE A WEEK, Monday and
+> Thursday (13:00 UTC domestic, 14:00 UTC international), not daily.
+> Look back 4 days so nothing posted between runs is missed. The two send
+> blocks fire the same days. "Daily" below is historical wording.**
+
 ## 🩺 STEP 0 — SELF-TEST (run before anything else; Andrew's order 9/15)
 The system must never rot silently again. Check, in order:
 1. **Heartbeat**: read `capture/HEALTH.md` on main. If the newest
@@ -64,7 +69,7 @@ the run PREPARES those actions but never executes them.
 
 ## 2. Generate the report
 ```
-python3 samgov_opportunity_matcher.py --days 3 --limit 100 \
+python3 samgov_opportunity_matcher.py --days 4 --limit 100 \
   > capture/reports/PRG_report_YYYY-MM-DD.md
 ```
 **Descriptions are hydrated automatically.** SAM's search endpoint

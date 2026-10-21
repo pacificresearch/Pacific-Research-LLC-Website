@@ -31,6 +31,8 @@ The gate's kill list IS the accumulated falsification record of "ANY."
 | 11 | 9/15 | Scheduled runs reported SUCCEEDED for weeks while producing NO artifacts (no reports on main since 8/18; PIPELINE stale at 8/17); root cause: PR #13 never merged, so fresh sessions ran the obsolete main-branch system | Rules: (a) merge ops changes to MAIN same day — scheduled sessions only see main; (b) every scheduled run MUST commit its report + pipeline refresh, and a run without artifacts is a FAILED run regardless of status; (c) any session auditing the system checks last artifact date first |
 | 12 | 9/15 | Matcher recorded a 502 gateway error as "0 records" for NAICS 561720 — silent coverage loss presented as a clean report (Andrew caught it) | Matcher fixed: 5xx retried 3x with backoff; unrecoverable failures tracked as FAILED codes with a COVERAGE INCOMPLETE banner, never zero; api_key redacted from all error output |
 
+| 13 | 10/21 | Daily runs reported SUCCEEDED Sept–Oct but finished in ~1 min and landed nothing; root cause: environment egress policy blocks api.sam.gov and sam.gov (HTTP 403 at CONNECT), so step 1 VERIFY stops every run. Watchdog never checked the network itself. | Watchdog now runs a live curl against api.sam.gov as check #1 and names the fix (claude.ai Settings > Capabilities > allowed domains). A run under 2 min is treated as a failed run. Cadence reduced to Mon/Thu per Andrew. |
+
 ## Standing experiment rules
 1. Every PASS records its kill criterion (one line) — that's a data point,
    not paperwork.
