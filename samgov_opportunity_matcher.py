@@ -63,7 +63,7 @@ except ImportError:  # pragma: no cover
 # API access. Prefer the environment variable so the key is not committed to
 # history, but fall back to the value provided for turnkey execution.
 API_KEY = os.environ.get(
-    "SAM_API_KEY", "SAM-a87c1f1f-af4a-4e49-b2cd-7e21b68022a2"
+    "SAM_API_KEY", "SAM-216eed32-d400-463e-83ce-606c02d02ccf"
 )
 
 # SAM.gov Opportunities API (v2 is the current GA endpoint; v1 is deprecated).
