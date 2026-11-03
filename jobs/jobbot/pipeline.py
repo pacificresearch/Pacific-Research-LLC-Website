@@ -36,18 +36,38 @@ def qualify(rescore: bool = False, use_semantic: bool | None = None) -> dict:
     # semantic refinement for the top N per category that passed deterministic screening
     use_semantic = cfg["semantic"]["enabled"] if use_semantic is None else use_semantic
     if use_semantic and semantic.available():
+        # Review until every job that could make today's shortlist has been reviewed (review can lower a
+        # score, which promotes unreviewed jobs; keep going until the top 2x quota is all reviewed).
+        from concurrent.futures import ThreadPoolExecutor
         ev = evidence_lines(pr)
+        cap = cfg["semantic"].get("max_calls_per_category", 60)
+        prior = {r["job_id"]: json.loads(r["semantic"]) for r in db.connect().execute(
+            "SELECT job_id, semantic FROM assessments WHERE semantic IS NOT NULL")}
         for cat in ("A", "B", "C"):
-            pool = sorted([x for x in scored if x[4]["category"] == cat and x[3]["eligibility"] != "fail"],
-                          key=lambda x: -x[4]["score"])[: cfg["semantic"]["top_n_per_category"]]
-            for i, (aid, st, job, el, sc) in enumerate(pool):
-                sem = semantic.assess(job, ev, cfg["semantic"]["timeout_seconds"])
-                if sem:
-                    sc2, el2 = semantic.blend(sc, sem, el)
+            need = 2 * cfg["quotas"].get(cat, 10)
+            calls = 0
+            while calls < cap:
+                live = sorted([x for x in scored if x[4]["category"] == cat and x[3]["eligibility"] != "fail"
+                               and x[4]["score"] >= cfg["min_score"] - 5], key=lambda x: -x[4]["score"])[:need]
+                todo = [x for x in live if not x[4].get("semantic")]
+                if not todo:
+                    break
+                todo = todo[: min(len(todo), cap - calls, 10)]
+                cached = [x for x in todo if x[2]["id"] in prior]
+                fresh = [x for x in todo if x[2]["id"] not in prior]
+                with ThreadPoolExecutor(max_workers=cfg["semantic"].get("workers", 5)) as ex:
+                    sems = list(ex.map(lambda x: semantic.assess(x[2], ev, cfg["semantic"]["timeout_seconds"]), fresh))
+                calls += len(fresh)
+                for item, sem in list(zip(fresh, sems)) + [(x, prior[x[2]["id"]]) for x in cached]:
+                    aid, st, job, el, sc = item
+                    if not sem:
+                        sem = {"qualifications_fit": sc["subscores"]["fit"], "interview_likelihood":
+                               sc["subscores"]["interview"], "mandatory_requirements": [], "emphasize": [],
+                               "one_line_rationale": "semantic review unavailable", "failed": True}
+                    sc2, el2 = semantic.blend(sc, sem, el) if not sem.get("failed") else (dict(sc), el)
                     sc2["semantic"] = sem
-                    idx = scored.index(pool[i])
-                    scored[idx] = (aid, st, job, el2, sc2)
-                    stats["semantic"] += 1
+                    scored[scored.index(item)] = (aid, st, job, el2, sc2)
+                    stats["semantic"] += 0 if sem.get("failed") else 1
     for aid, st, job, el, sc in scored:
         db.save_assessment(job["id"], {**sc, **el, "semantic": sc.get("semantic")})
         if st == "DISCOVERED":
@@ -75,8 +95,14 @@ def shortlist(quotas: dict | None = None) -> dict[str, list]:
     quotas = quotas or cfg["quotas"]
     out = {}
     for cat, n in quotas.items():
+        from datetime import datetime, timedelta, timezone
+        recent = (datetime.now(timezone.utc) - timedelta(days=3)).isoformat()
+        # prepared work still in flight counts against today's quota (incl. manual Workday packets you
+        # haven't filed yet), so parking an application never makes the system prepare more behind it
         rows = [r for r in db.pipeline_rows(category=cat, limit=2000)
-                if r["status"] in ("QUALIFIED", "MATERIALS_READY", "AWAITING_APPROVAL")]
+                if r["status"] in ("QUALIFIED", "MATERIALS_READY", "AWAITING_APPROVAL")
+                or (r["status"] == "NEEDS_HUMAN_ACTION" and r["updated_at"] >= recent)
+                or (r["status"] in ("SUBMITTED", "CONFIRMATION_PENDING") and (r["submitted_at"] or r["updated_at"]) >= db.today())]
         picked, per_emp = [], {}
         for r in rows:
             if per_emp.get(r["employer"], 0) >= cfg["max_per_employer_per_day"]:
@@ -89,16 +115,18 @@ def shortlist(quotas: dict | None = None) -> dict[str, list]:
     return out
 
 
-def prepare(app_ids: list[int], polish: bool = False) -> dict:
+def prepare(app_ids: list[int], polish: bool = False, regenerate: bool = False) -> dict:
     """Phase 3: build tailored resume (+ cover letter when warranted) -> MATERIALS_READY -> AWAITING_APPROVAL."""
     stats = {"prepared": 0, "errors": {}}
     for aid in app_ids:
         a = db.app(aid)
-        if a["status"] not in ("QUALIFIED", "MATERIALS_READY"):
-            continue
+        ok = ("QUALIFIED", "MATERIALS_READY") + (("AWAITING_APPROVAL", "NEEDS_HUMAN_ACTION") if regenerate else ())
+        if a["status"] not in ok or (regenerate and a["approved_at"]):
+            continue  # never swap materials under an approval you already gave
         job = dict(db.job(a["job_id"]))
         s = db.connect().execute("SELECT * FROM assessments WHERE job_id=?", (job["id"],)).fetchone()
-        fam = s["family"]
+        from .job_scoring import family_for
+        fam = family_for(job, a["category"])
         sem = json.loads(s["semantic"]) if s["semantic"] else {}
         emph = sem.get("emphasize", [])
         try:
@@ -113,6 +141,9 @@ def prepare(app_ids: list[int], polish: bool = False) -> dict:
         if cov:
             fields.update(cover_path=cov["pdf"], cover_sha=cov["sha256"])
         db.update_app(aid, **fields, notes=f"cover letter: {why}" + (f" ({cov['words']} words, {cov['method']})" if cov else ""))
+        if a["status"] in ("AWAITING_APPROVAL", "NEEDS_HUMAN_ACTION"):
+            stats["prepared"] += 1  # regenerated in place; status unchanged
+            continue
         if a["status"] == "QUALIFIED":
             db.transition(aid, "MATERIALS_READY", f"resume family={fam}; cover={'yes' if cov else 'no'}")
         db.transition(aid, "AWAITING_APPROVAL", "review mode: materials ready for your approval")

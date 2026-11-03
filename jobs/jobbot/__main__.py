@@ -16,10 +16,11 @@ def main(argv=None):
     d = sub.add_parser("discover"); d.add_argument("--only", nargs="*")
     q = sub.add_parser("qualify"); q.add_argument("--rescore", action="store_true"); q.add_argument("--no-semantic", action="store_true")
     sub.add_parser("shortlist")
-    p = sub.add_parser("prepare"); p.add_argument("ids", nargs="*", type=int); p.add_argument("--polish", action="store_true")
+    p = sub.add_parser("prepare"); p.add_argument("ids", nargs="*", type=int); p.add_argument("--polish", action="store_true"); p.add_argument("--regenerate", action="store_true")
     r = sub.add_parser("review", help="prefill (no submit) in a visible browser"); r.add_argument("ids", nargs="+", type=int)
     r.add_argument("--headless", action="store_true"); r.add_argument("--wait-human", type=int, default=0)
     a = sub.add_parser("approve"); a.add_argument("ids", nargs="+", type=int)
+    pm = sub.add_parser("promote", help="prepare a below-threshold job you want to consider"); pm.add_argument("ids", nargs="+", type=int)
     rj = sub.add_parser("reject"); rj.add_argument("ids", nargs="+", type=int); rj.add_argument("--reason", default="not a fit")
     s = sub.add_parser("submit", help="submit APPROVED applications"); s.add_argument("ids", nargs="*", type=int)
     s.add_argument("--headless", action="store_true"); s.add_argument("--wait-human", type=int, default=120)
@@ -73,7 +74,7 @@ def main(argv=None):
     elif args.cmd == "prepare":
         from . import pipeline
         ids = args.ids or [r["id"] for rows in pipeline.shortlist().values() for r in rows if r["status"] == "QUALIFIED"]
-        out(pipeline.prepare(ids, polish=args.polish))
+        out(pipeline.prepare(ids, polish=args.polish, regenerate=args.regenerate))
     elif args.cmd == "review":
         from .application_executor import execute
         out([execute(i, "review", headless=args.headless, wait_human_seconds=args.wait_human) for i in args.ids])
@@ -82,6 +83,11 @@ def main(argv=None):
         for i in args.ids:
             approval_queue.approve(i)
         out(f"approved {args.ids}")
+    elif args.cmd == "promote":
+        from . import approval_queue
+        for i in args.ids:
+            approval_queue.promote(i)
+        out(f"promoted {args.ids} — run `prepare {' '.join(map(str, args.ids))}`")
     elif args.cmd == "reject":
         from . import approval_queue
         for i in args.ids:

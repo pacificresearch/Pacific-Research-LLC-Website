@@ -13,7 +13,7 @@ import re
 # order matters: first match wins
 SENSITIVE = [
     ("sms_consent", r"consent to (receiv|be contacted)|text messag|\bsms\b"),
-    ("requires_sponsorship", r"sponsor|visa|h-?1b|immigration status"),
+    ("requires_sponsorship", r"sponsorship|\bvisa\b|h-?1b|immigration status|sponsor (you|your|an? (employment|work))"),
     ("legally_authorized_us", r"(legally )?(authori[sz]ed|eligible|permitted) to work|work authori[sz]ation|right to work"),
     ("us_citizen", r"\bcitizen(ship)?\b|\bnationality\b"),
     ("security_clearance", r"clearance"),
@@ -26,6 +26,8 @@ SENSITIVE = [
     ("criminal_history", r"criminal|convict|felony|misdemeanor|offen[cs]e|background check"),
     ("age_18_or_over", r"18 years|age of 18|\bover 18\b|date of birth|\bbirth\b"),
     ("willing_to_relocate", r"relocat"),
+    ("willing_onsite", r"willing to (be|work) (on-?site|in (the )?office)|not a remote position|commute to"),
+    ("years_clinical_research", r"years of (\w+ )?experience .*(clinical (research|trials?)|crc\b)"),
     ("salary_expectation", r"salary|compensation|pay (expectation|requirement)|desired pay|expected pay"),
     ("education_dates", r"(start|end) date (month|year)|graduation (date|year)|dates? attended"),
     ("start_date", r"start date|available to start|availability|notice period|when can you start"),
@@ -53,6 +55,7 @@ ROUTINE = [
     ("current_employer", r"current (company|employer)|^company$|most recent employer"),
     ("current_title", r"current (job )?title|most recent title"),
     ("how_did_you_hear", r"how did you (hear|learn|find)|source|referr?al source|where did you"),
+    ("education_level", r"highest (level of )?(education|degree)"),
     ("resume", r"resume|\bcv\b|curriculum"),
     ("cover_letter", r"cover letter|motivation letter|letter of interest"),
 ]
@@ -69,8 +72,21 @@ VALIDATION_RX = re.compile(r"(is|are) required|this field is required|please (en
 
 
 def classify(label: str) -> tuple[str, str]:
-    """-> (kind, key): kind in {'sensitive','routine','unknown'}"""
-    l = " ".join((label or "").lower().split())
+    """-> (kind, key): kind in {'sensitive','routine','unknown'}
+
+    The question stem decides; parenthetical help text ("Answer Yes if your visa...") only breaks ties.
+    """
+    full = " ".join((label or "").lower().split())
+    stem = re.sub(r"\([^)]*\)?", " ", full)
+    stem = re.split(r"(?<=\?)\s", stem)[0]
+    for cand in (stem, full):
+        k = _classify(cand)
+        if k[0] != "unknown":
+            return k
+    return "unknown", ""
+
+
+def _classify(l: str) -> tuple[str, str]:
     l = re.sub(r"[\s*✱:]+$", "", l)  # required-field markers
     for key, rx in SENSITIVE:
         if re.search(rx, l):

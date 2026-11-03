@@ -19,6 +19,14 @@ def approve(app_id: int, note: str = "") -> None:
         db.transition(app_id, "AWAITING_APPROVAL", "approved after human action")
 
 
+def promote(app_id: int, note: str = "near-miss promoted for your decision") -> None:
+    """Move a below-threshold (SCREENED) job into preparation. It stays below the auto-submit bar."""
+    a = db.app(app_id)
+    if a["status"] != "SCREENED":
+        raise ValueError(f"app {app_id} is {a['status']}; only SCREENED (below threshold) jobs can be promoted")
+    db.transition(app_id, "QUALIFIED", f"promoted: {note}")
+
+
 def reject(app_id: int, reason: str = "rejected by you") -> None:
     db.transition(app_id, "REJECTED", f"you: {reason}")
 

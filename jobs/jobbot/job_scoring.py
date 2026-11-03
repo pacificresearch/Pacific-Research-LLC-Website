@@ -34,12 +34,31 @@ SENIORITY = [
 ]
 
 
+INTL_SCOPE = re.compile(r"global health|international development|humanitarian|country office|low- and middle-income|"
+                        r"\blmics?\b|usaid|overseas|field office|in-country|international (programs?|operations|travel)|"
+                        r"emergency response|refugee|resettlement|migration")
+DOMAIN = re.compile(r"health|clinical|medical|biomed|bio\w*|pharma|patient|life science|device|research|trial|"
+                    r"public|humanitarian|global|hospital|care\b|disease|vaccine|lab|diagnostic|therapeut|science|"
+                    r"defense|federal|government|army|navy|air force|va\b|dod")
+
+
+def domain_relevant(job: dict) -> bool:
+    """A non-clinical title only counts as 'fit' when the work itself is health/research/federal-health."""
+    t = job["title"].lower()
+    if DOMAIN.search(t):
+        return True
+    d = (job.get("description") or "").lower()[:6000]
+    return len(re.findall(r"clinical|patient|health|medical|biomedical|trial|research", d)) >= 8
+
+
 def categorize(job: dict, terms: dict) -> str:
     t = job["title"].lower()
     emp = job["employer"].lower()
     intl_emp = any(x in emp for x in terms.get("international_employers", []))
     if job.get("country") not in ("united states", "") or intl_emp:
         return "C"
+    if len(INTL_SCOPE.findall((job["title"] + " " + (job.get("description") or "")[:8000]).lower())) >= 3:
+        return "C"  # US-based role with meaningful international responsibilities
     if re.search(r"clinical (research|trial|study|operations|project)|\bcra\b|clinical monitor|study start|"
                  r"site (activation|management)|research (operations|program) manager|ecoa|eclinical", t):
         return "A"
@@ -47,13 +66,15 @@ def categorize(job: dict, terms: dict) -> str:
 
 
 def family_for(job: dict, category: str) -> str:
-    t = (job["title"] + " " + (job.get("description") or "")[:3000]).lower()
+    t = (job["title"] + " " + (job.get("description") or "")[:6000]).lower()
     if category == "A":
         return "clinical"
     if category == "C":
         return "international"
-    if re.search(r"global health|humanitarian|international|refugee|migration", t):
+    if len(INTL_SCOPE.findall(t)) >= 2:
         return "international"
+    if len(re.findall(r"clinical (trial|research|stud|site|operations)|\bsite\b|protocol|\bgcp\b|investigator|enrollment", t)) >= 6:
+        return "clinical"
     return "program"
 
 
@@ -92,6 +113,11 @@ def score(job: dict, elig: dict, cfg: dict, terms: dict, tiers: dict, evidence_l
         fit += 8
     if re.search(r"biomedical|medical device|healthcare technology|equipment", text) and category != "A":
         fit += 5
+    if not domain_relevant(job):
+        fit *= 0.55  # generic PM/ops roles outside health/research/federal-health are not a fit
+    if re.search(r"\b(sales|marketing|human resources|hr\b|payroll|it infrastructure|infrastructure modernization|"
+                 r"real estate|facilities|legal)\b", title):
+        fit *= 0.6
     fit = min(fit, 100)
 
     # --- interview likelihood

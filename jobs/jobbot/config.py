@@ -66,7 +66,8 @@ DEFAULTS: dict = {
     },
     "employers": {"include": [], "exclude": []},
     "rate_limit_seconds": 1.5,
-    "semantic": {"enabled": True, "top_n_per_category": 25, "timeout_seconds": 180},
+    "semantic": {"enabled": True, "top_n_per_category": 25, "max_calls_per_category": 60, "workers": 5,
+                 "timeout_seconds": 180},
     "notify": {"ntfy_url": None},
 }
 

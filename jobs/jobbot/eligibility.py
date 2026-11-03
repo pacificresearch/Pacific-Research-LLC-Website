@@ -96,7 +96,8 @@ def screen(job: dict, facts: dict) -> dict:
         elif re.search(r"visa sponsorship|relocation (package|support|assistance)|we sponsor", low):
             add("work_authorization", "review", "outside US; sponsorship/relocation mentioned — confirm")
         else:
-            add("work_authorization", "review", f"located in {job.get('country')}; work permit not addressed")
+            add("work_authorization", "review", f"located in {job.get('country')}; local hire likely — a U.S. citizen "
+                "would need a work permit the posting does not offer")
 
     # 3. mandatory foreign language ----------------------------------------------------
     for s in sents:
@@ -180,6 +181,28 @@ def screen(job: dict, facts: dict) -> dict:
     if re.search(r"clinical trial manager|\bctm\b|clinical study manager", t) and \
             re.search(r"(cro|sponsor|pharma\w*|biotech\w*)[- ]side|global trial|study management experience", low):
         add("specialized_experience", "review", "CTM role may require sponsor/CRO study-management experience")
+
+    # 8. application deadline already passed (dead timeline) ----------------------------
+    from datetime import date, datetime
+    m = re.search(r"(?:apply by|deadline(?: to apply)?|closing date|close date|applications? (?:due|close[sd]?))"
+                  r"[^.\n]{0,40}?((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.? \d{1,2}(?:st|nd|rd|th)?,? \d{4}"
+                  r"|\d{4}-\d{2}-\d{2})", low)
+    if m:
+        raw = re.sub(r"(st|nd|rd|th),?", "", m.group(1)).replace(",", "").replace(".", "")
+        dl = None
+        for fmt in ("%B %d %Y", "%b %d %Y", "%Y-%m-%d"):
+            try:
+                dl = datetime.strptime(raw.title() if fmt != "%Y-%m-%d" else raw, fmt).date()
+                break
+            except ValueError:
+                continue
+        if dl and dl < date.today():
+            soft = re.search(r"(may|will) continue to be accepted|until (the position is )?filled|best consideration|"
+                             r"first consideration", low)
+            add("deadline", "review" if soft else "fail",
+                f"application deadline {dl.isoformat()} has passed" + (" (rolling after)" if soft else ""), m.group(0))
+        elif dl and (dl - date.today()).days <= 2:
+            add("deadline", "note", f"deadline {dl.isoformat()} — apply today")
 
     outcome = "pass"
     if any(r["outcome"] == "fail" for r in reasons):

@@ -40,6 +40,13 @@ def metrics() -> dict:
 def daily_report(run_stats: dict | None = None) -> str:
     cfg = load_config()
     m = metrics()
+    run_stats = dict(run_stats or {})
+    if not run_stats:  # standalone report: use the most recent run that did discovery/qualification
+        for r in db.connect().execute("SELECT stats FROM runs WHERE stats IS NOT NULL ORDER BY id DESC LIMIT 10"):
+            st = json.loads(r["stats"])
+            for k in ("discovery", "qualify"):
+                if isinstance(st.get(k), dict) and (st[k].get("fetched") or st[k].get("screened")) and k not in run_stats:
+                    run_stats[k] = st[k]
     run_stats = run_stats or {}
     q = cfg["quotas"]
     lines = [f"# Job application report — {date.today().isoformat()}", "",

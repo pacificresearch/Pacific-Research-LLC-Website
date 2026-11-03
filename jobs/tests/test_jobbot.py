@@ -245,6 +245,30 @@ class ApprovalAndEmail(unittest.TestCase):
         self.assertEqual(email_monitor.ingest({"message_id": "m2"}), {"duplicate": True})
 
 
+class Guards(unittest.TestCase):
+    def test_classification_edge_cases(self):
+        from jobbot.application_executor.guards import classify, match_option
+        self.assertEqual(classify("Have you managed sponsor-initiated clinical trials?*")[0], "unknown")
+        self.assertEqual(classify("Will you require visa sponsorship?")[1], "requires_sponsorship")
+        self.assertEqual(classify("Full name ✱")[1], "full_name")
+        self.assertEqual(classify("Start date month*")[1], "education_dates")
+        self.assertEqual(classify("Do you consent to receiving text messages?")[1], "sms_consent")
+        self.assertEqual(classify("I certify the information is true and correct")[1], "attestation")
+        self.assertEqual(match_option("No", ["Select...", "Yes", "No"]), "No")
+        self.assertIsNone(match_option("Maybe", ["Yes", "No"]))
+
+    def test_routes(self):
+        from jobbot.application_executor import route
+        self.assertEqual(route({"apply_url": "https://wd1.myworkdaysite.com/recruiting/x/y/job/z/apply"}), "workday")
+        self.assertEqual(route({"apply_url": "https://jobs.lever.co/a/b/apply"}), "lever")
+        self.assertEqual(route({"apply_url": "https://www.linkedin.com/jobs/view/1"}), "linkedin")
+
+    def test_deadline(self):
+        r = eligibility.screen({"title": "x", "description": "Applications close on January 5, 2026.",
+                                "country": "united states"}, FACTS)
+        self.assertEqual(r["eligibility"], "fail")
+
+
 class Executor(unittest.TestCase):
     """Drives local HTML forms with the real Playwright code path."""
 

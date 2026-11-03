@@ -28,7 +28,9 @@ FOCUS = [
     (r"decentralized|remote trial|dct|virtual trial", "decentralized and hybrid trial delivery"),
     (r"infectious|vaccine|covid|antiviral", "infectious disease research"),
     (r"study start.?up|site activation", "study start-up and site activation"),
-    (r"monitor", "site monitoring and data quality"),
+    (r"site monitoring|monitoring visit|clinical monitor|\bcra\b", "site monitoring and data quality"),
+    (r"laborator|\blabs?\b|central lab|bioanalytic", "laboratory project delivery"),
+    (r"site (operations|network|management)|research site", "research site operations"),
     (r"medical device|biomedical|medtech", "medical technology programs"),
     (r"humanitarian|refugee|emergency|crisis", "humanitarian health operations"),
     (r"global health|international|country office", "global health programs"),
@@ -75,8 +77,17 @@ def _mission_sentence(job: dict) -> str | None:
 def compose(job: dict, family: str, emphasize: list[str] | None = None) -> str:
     pr = profile()
     jt = f"{job['title']} {job.get('description', '')}".lower()
-    pts = sorted(pr["cover_points"], key=lambda p: -(sum(2 for t in p["tags"] if t in jt)
-                                                     + (3 if p["id"] in (emphasize or []) else 0)))
+    prior = {"clinical": {"cp.activ6": 5, "cp.data": 3, "cp.oaw": 1},
+             "program": {"cp.prg": 3, "cp.oaw": 3, "cp.usaf": 3, "cp.activ6": 2},
+             "international": {"cp.oaw": 5, "cp.activ6": 2, "cp.usaf": 1}}[family]
+    sem_map = {"su.": "cp.activ6", "oaw.": "cp.oaw", "usaf.": "cp.usaf", "prg.": "cp.prg"}
+    emph_cp = {v for e in (emphasize or [])[:3] for k, v in sem_map.items() if e.startswith(k)}
+
+    def weight(p):
+        hits = sum(2 for t in p["tags"] if re.search(rf"\b{re.escape(t)}\b", jt))
+        return hits + prior.get(p["id"], 0) + (3 if p["id"] in emph_cp else 0)
+
+    pts = sorted(pr["cover_points"], key=lambda p: -weight(p))
     chosen = [p for p in pts if p["id"] not in ("cp.pubs", "cp.ma")][:2]
     extra = []
     if any(p["id"] == "cp.activ6" for p in chosen):

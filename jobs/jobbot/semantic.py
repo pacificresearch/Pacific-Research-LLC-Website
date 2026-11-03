@@ -24,7 +24,7 @@ Return ONLY a JSON object, no prose, with exactly these keys:
   "emphasize": ["evidence ids most relevant to this posting, best first, max 6"],
   "one_line_rationale": "..."}}
 
-Rules: a requirement is mandatory only if the posting marks it required/minimum/must. Site-based clinical
+Rules: always say "the candidate"; never use gendered pronouns. A requirement is mandatory only if the posting marks it required/minimum/must. Site-based clinical
 research coordination is NOT sponsor/CRO monitoring experience. Founder/Managing Director of a new
 firm (2026-present) is real experience but not years of people management at scale.
 

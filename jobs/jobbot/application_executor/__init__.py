@@ -52,7 +52,7 @@ def route(job: dict) -> str:
         return "lever"
     if "ashbyhq.com" in url:
         return "ashby"
-    if "myworkdayjobs.com" in url:
+    if "myworkdayjobs.com" in url or "myworkdaysite.com" in url:
         return "workday"
     if "usajobs.gov" in url:
         return "usajobs"
@@ -159,7 +159,8 @@ def execute(app_id: int, mode: str = "review", headless: bool = False, wait_huma
             db.transition(app_id, target, "needs you: " + "; ".join(b.reasons)[:400],
                           needs_action=json.dumps({"type": "questions", "items": b.reasons}))
         else:
-            db.update_app(app_id, needs_action=json.dumps({"type": "questions", "items": b.reasons}))
+            db.update_app(app_id, needs_action=json.dumps({"type": "questions", "items": b.reasons}),
+                          status_reason="needs you: " + "; ".join(b.reasons)[:400])
         return {"app": app_id, "outcome": "needs_human", "reasons": b.reasons}
     except Exception as ex:
         log.exception("executor error app %s", app_id)

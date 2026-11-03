@@ -97,6 +97,7 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
                "referred_by_employee": ans.get("referred_by_employee")}
     edu = (pr.get("education_structured") or [{}])[0]
     routine.update({k: edu.get(k) for k in ("school", "degree", "discipline") if edu.get(k)})
+    routine["education_level"] = edu.get("degree")
     actions, blockers = [], []
     cover_txt = None
     if app_row["cover_path"]:

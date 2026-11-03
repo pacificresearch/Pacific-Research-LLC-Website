@@ -62,6 +62,7 @@ async function load(){S=await (await fetch('/api/summary')).json();
   const mat=(r.resume_path?`<a href="/file?p=${encodeURIComponent(r.resume_path)}" target=_blank>resume (${esc(r.resume_family)})</a>`:'')+(r.cover_path?` · <a href="/file?p=${encodeURIComponent(r.cover_path)}" target=_blank>cover</a>`:'');
   const act=r.status=='AWAITING_APPROVAL'?(r.approved_at?'<span class=ok>approved ✓</span> ':`<button class=p onclick="post('/api/approve',{id:${r.id}})">Approve</button> `)+`<button class=d onclick="post('/api/reject',{id:${r.id},reason:prompt('Reason?')||'not a fit'})">Reject</button>`
    :r.status=='NEEDS_HUMAN_ACTION'?`<button onclick="post('/api/manual',{id:${r.id},confirmation:prompt('Confirmation number / email subject')})">I applied — record it</button> <button onclick="post('/api/approve',{id:${r.id}})">Resolved → approve</button>`
+   :r.status=='SCREENED'?`<button onclick="post('/api/promote',{id:${r.id}})">Promote</button>`
    :r.status=='QUALIFIED'?`<button class=d onclick="post('/api/reject',{id:${r.id},reason:'not interested'})">Skip</button>`:'';
   let reasons='';try{const rs=JSON.parse(r.eligibility_reasons||'[]').filter(x=>x.outcome!='pass');if(rs.length)reasons='<details><summary class=r>'+rs.length+' checks</summary>'+rs.map(x=>`<div class=r>${esc(x.check)}: ${esc(x.outcome)} — ${esc(x.detail)}</div>`).join('')+'</details>'}catch(e){}
   return `<tr><td>${r.id}</td><td><b>${r.score??''}</b><div class="r ${el}">${esc(r.eligibility||'')} · conf ${r.confidence??''}</div></td><td>${esc(r.category)}</td>
@@ -156,6 +157,8 @@ class H(BaseHTTPRequestHandler):
         try:
             if p == "/api/approve":
                 approval_queue.approve(int(body["id"]))
+            elif p == "/api/promote":
+                approval_queue.promote(int(body["id"]))
             elif p == "/api/reject":
                 approval_queue.reject(int(body["id"]), body.get("reason") or "rejected")
             elif p == "/api/manual":
