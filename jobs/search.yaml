@@ -1,0 +1,95 @@
+# Search vocabulary. Regexes are matched against the lowercased job title.
+# Discovery keeps a posting only if an include pattern matches and no exclude does.
+
+include_title_patterns:
+  # Category A — clinical research (beyond entry level)
+  - 'clinical (research|trial|study|project|program|operations?|ops)'
+  - '\bclinical research associate\b|\bcra\b|\bsr\.? cra\b|clinical monitor'
+  - 'clinical (trial|study|project) (manager|lead|leader|director)'
+  - 'research (operations|program|project) (manager|director|lead|administrator)'
+  - 'research (manager|administrator)'
+  - '(senior|sr\.?|lead|supervis\w*) clinical research coordinator'
+  - 'clinical research (supervisor|manager|program|quality|compliance|director)'
+  - 'study start.?up|site (activation|start.?up|management|relationship)'
+  - 'ecoa|ecoa|eclinical|clinical (systems|data) (manager|lead)'
+  - 'decentralized|patient recruitment (manager|lead)'
+  # Category B — best overall fit
+  - '(global|public|population) health'
+  - 'health security|biosecurity|biodefense|pandemic|preparedness|emergency (management|response|preparedness)'
+  - '(healthcare|health|biomedical|medical technology|medical device|life sciences?|clinical) program'
+  - '(healthcare|health|biomedical|clinical|research|scientific|medical) operations'
+  - 'program manager|program management|programme manager|programme officer|program officer|program director'
+  - 'project manager|project management'
+  - 'technical program manager'
+  - 'partnership|alliance manager|strategic (partnerships|initiatives)'
+  - 'business development.*(health|clinical|life|federal|government)|capture manager'
+  - 'humanitarian|relief|refugee|migration health|resettlement'
+  - 'operations manager|operations director|director of operations'
+  - 'healthcare technology|htm\b|biomedical (equipment|engineering) manager|clinical engineering manager'
+  - 'health policy|policy analyst'
+  - 'federal|government (program|project)'
+  - 'implementation (manager|lead)|deployment (manager|lead)'
+  # Category C — international (most international titles also hit the above)
+  - 'country (director|manager|representative)|deputy chief of party|chief of party'
+  - 'health (officer|specialist|coordinator|adviser|advisor)'
+  - 'medical (coordinator|logistics|logistician)|health logistics|supply chain.*health'
+  - 'monitoring.*evaluation|\bmeal\b|m&e'
+
+exclude_title_patterns:
+  - '\bintern(ship)?\b|\bstudent\b|\bfellowship\b|\bpostdoc'
+  - 'software engineer|\bdeveloper\b|\bsre\b|machine learning engineer|data engineer|devops'
+  - 'sales (representative|rep|executive)|account (executive|manager)|territory|key account'
+  - '\brn\b|\bnurse\b|nursing|physician|\bmd\b|pharmacist|surgeon|therapist|dentist|veterinar|psychiatrist|nephrologist|\w+ologist\b|phlebotom'
+  - 'scientist(?!.*program)|chemist|biologist|lab(oratory)? technician'
+  - 'vice president|\bvp\b|chief (?!of party)|\bsvp\b|\bevp\b|head of'
+  - 'mechanic|driver|warehouse|janitor|custodian|cook|cashier'
+  - 'accountant|payroll|tax |auditor(?!.*clinical)'
+  - 'medical writer|regulatory writer|biostatistician|statistical programmer'
+
+workday_queries:
+  - clinical trial manager
+  - clinical research associate
+  - clinical project manager
+  - clinical operations manager
+  - clinical study manager
+  - program manager health
+  - global health
+  - clinical research manager
+
+usajobs_queries:
+  - clinical research
+  - health program manager
+  - biomedical
+  - health security
+  - public health program
+
+# Family/category lexicons used for scoring (lowercase substrings)
+category_keywords:
+  A: [clinical research, clinical trial, clinical study, clinical operations, cra, monitoring visit, site management,
+      protocol, gcp, ich, irb, edc, ctms, enrollment, recruitment, sponsor, cro, investigator, study start, tmf,
+      decentralized, dct, ecoa, epro, econsent, redcap, oncore, medidata, rave, infectious disease, nih]
+  B: [program management, project management, stakeholder, cross-functional, budget, federal, government,
+      partnership, strategy, operations, medical device, biomedical, healthcare technology, health security,
+      biosecurity, preparedness, vendor, contract, procurement, risk, milestones, kpi, implementation,
+      business development, capture, dod, va, hhs, darpa, barda, cdc]
+  C: [global health, international, humanitarian, country office, field, low- and middle-income, lmic, usaid,
+      un agency, unicef, who, refugee, migration, emergency response, capacity building, ngo, donor,
+      multilateral, cross-cultural, travel, overseas, latin america, brazil, africa, asia]
+
+international_employers:
+  - world health organization
+  - icrc
+  - international committee of the red cross
+  - ifrc
+  - united nations
+  - unicef
+  - unops
+  - undp
+  - iom
+  - international organization for migration
+  - international rescue committee
+  - path
+  - fhi 360
+  - jhpiego
+  - clinton health access initiative
+  - partners in health

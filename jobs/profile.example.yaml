@@ -1,0 +1,113 @@
+# Example profile (fictional). Copy to $JOBBOT_HOME/profile.yaml and replace with YOUR documented facts.
+# Every bullet must come from your real CV. approved_answers null = the executor stops and asks you.
+contact:
+  name: Jordan Example
+  location: Irvine, CA
+  email: jordan@example.com
+  phone: 555-0100
+  linkedin: linkedin.com/in/example
+facts:
+  citizenships:
+  - united states
+  clearance: none
+  languages:
+    english: native
+  licenses:
+  - acrp-cp
+  degrees:
+  - ba
+  years_professional: 5
+  sponsor_monitoring_years: 0
+headlines:
+  clinical: CLINICAL RESEARCH PROFESSIONAL
+  program: PROGRAM MANAGER
+  international: GLOBAL HEALTH PROGRAM OFFICER
+summaries:
+  clinical: Replace with your own documented summary for the clinical family.
+  program: Replace with your own documented summary for the program family.
+  international: Replace with your own documented summary for the international family.
+experience:
+- id: job1
+  title: Clinical Research Coordinator
+  org: Example University
+  location: Irvine, CA
+  dates: Jan 2021 - Present
+  bullets:
+  - id: job1.enroll
+    tags:
+    - enrollment
+    - recruitment
+    - clinical trials
+    text: Coordinated enrollment for 300 participants across 3 trials.
+    variants:
+      program: Coordinated cross-functional enrollment operations for 300 participants across 3 trials.
+  - id: job1.data
+    tags:
+    - redcap
+    - data quality
+    text: Maintained REDCap databases with 95% on-time query resolution.
+skills:
+  clinical:
+  - Clinical Trial Management
+  - REDCap
+  program:
+  - Project Management
+  leadership:
+  - Training
+  data:
+  - Excel
+  tools:
+  - Teams
+certifications:
+- ACRP-CP
+publications: []
+education:
+- BA, Biology | Example State University
+field_experience: ''
+cover_points:
+- id: cp.activ6
+  tags:
+  - clinical
+  text: I coordinated enrollment for 300 participants across 3 trials.
+- id: cp.oaw
+  tags:
+  - operations
+  text: I maintained 95% on-time query resolution.
+- id: cp.pubs
+  tags: []
+  text: x
+- id: cp.ma
+  tags: []
+  text: x
+- id: cp.usaf
+  tags: []
+  text: x
+- id: cp.data
+  tags: []
+  text: x
+- id: cp.prg
+  tags: []
+  text: x
+approved_answers:
+  legally_authorized_us: null
+  requires_sponsorship: null
+  us_citizen: null
+  veteran_status: null
+  disability_status: null
+  gender: null
+  race_ethnicity: null
+  hispanic_latino: null
+  sexual_orientation: null
+  criminal_history: null
+  security_clearance: null
+  willing_to_relocate: null
+  salary_expectation_rule: null
+  start_date: null
+  how_did_you_hear: null
+  previously_employed_here: null
+  age_18_or_over: null
+  can_travel_percent: null
+  current_employer: null
+  current_title: null
+  website: null
+approved_attestations: []
