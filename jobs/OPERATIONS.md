@@ -41,8 +41,9 @@
 - Configured as `answer_policy` in `profile.yaml`.
 
 ### Employer portal accounts
-- Accounts are created with `account_email` (pacificresearchglobal@gmail.com, the inbox jobbot can verify
-  through the Gmail connector). Each portal gets a unique 16-character password, the same strength as
+- Resumes and applications show your contact email (aodhan.o@outlook.com), and you watch that inbox for
+  recruiter replies yourself. Portal accounts and verification links use `account_email`
+  (pacificresearchglobal@gmail.com), the inbox jobbot can read through the Gmail connector, or IMAP on your Mac. Each portal gets a unique 16-character password, the same strength as
   Chrome's "suggest strong password".
 - Passwords live in your Mac's Keychain (`pip install keyring`) or `data/credentials.json` (0600, gitignored).
 - `python -m jobbot export-passwords` writes a Chrome import CSV. Import it at passwords.google.com →
