@@ -36,7 +36,7 @@ SCAN_JS = r"""
     const fs = el.closest('fieldset'); if (fs && fs.querySelector('legend')) return txt(fs.querySelector('legend'));
     const grp = el.closest('[class*="question"], [class*="field"], [class*="application-question"], li, .form-group');
     if (grp) { const l = grp.querySelector('label, .label, .application-label, [class*="label"]'); if (l && txt(l)) return txt(l); }
-    return el.getAttribute('placeholder') || el.name || '';
+    return '';
   };
   const out = []; let i = 0; const radios = {};
   for (const el of document.querySelectorAll('input, select, textarea')) {
@@ -57,7 +57,9 @@ SCAN_JS = r"""
       out.push({idx: i++, type, name: el.name, label: single, required: el.required, options: []}); continue;
     }
     el.setAttribute('data-jobbot-idx', String(i));
-    const f = {idx: i++, type, name: el.name || el.id, label: labelOf(el),
+    let lab = labelOf(el);
+    if (!lab || /^type your response$/i.test(lab)) lab = questionOf(el) || el.getAttribute('placeholder') || el.name || '';
+    const f = {idx: i++, type, name: el.name || el.id, label: lab,
                required: el.required || el.getAttribute('aria-required') === 'true' || /\*\s*$/.test(labelOf(el)),
                options: type.startsWith('select') ? [...el.options].map(o => o.text.trim()) : [],
                value: type === 'file' ? '' : (el.value || '')};
@@ -103,8 +105,12 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
     policy = pr.get("answer_policy", {"skip_optional": True, "decline_disclosures": True})
     approved_att = set(pr.get("approved_attestations", []) or [])
     first, last = c["name"].split()[0], c["name"].split()[-1]
+    addr = pr.get("address") or {}
+    st = {"california": "CA"}.get((addr.get("state") or "").lower(), addr.get("state") or "")
+    city_state = f"{addr['city']}, {st}" if addr.get("city") else c["location"]
     routine = {"first_name": first, "last_name": last, "full_name": c["name"], "email": c["email"],
-               "phone": c["phone"], "location": c["location"],
+               "phone": c["phone"], "location": city_state,
+               "home_address": f"{addr.get('line1')}, {addr.get('city')}, {st} {addr.get('postal_code')}" if addr.get("line1") else None,
                "linkedin": c["linkedin"] if c["linkedin"].startswith("http") else "https://www." + c["linkedin"].removeprefix("www."),
                "website": ans.get("website"), "current_employer": ans.get("current_employer"),
                "current_title": ans.get("current_title"), "how_did_you_hear": ans.get("how_did_you_hear"),
@@ -215,9 +221,22 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
             else:
                 actions.append({**act, "value": str(val)})
             continue
-        # unknown question
+        # unknown question: answer from the evidence library when the CV settles it, else ask Andrew
         if req:
-            blockers.append(f"custom question needs your answer: '{label[:200]}'")
+            from ...evidence_answers import answer as evidence_answer
+            val = evidence_answer(label, f.get("options", []), job)
+            if val is None:
+                blockers.append(f"custom question needs your answer: '{label[:200]}'")
+            elif f["type"] in ("select-one", "radio"):
+                opt = match_option(val, f.get("options", []))
+                if opt:
+                    actions.append({**act, "option": opt, "kind": "evidence"})
+                else:
+                    blockers.append(f"evidence answer '{val}' matches no option for '{label[:80]}'")
+            elif f["type"] in ("text", "textarea", "search", "number"):
+                actions.append({**act, "value": val, "kind": "evidence"})
+            else:
+                blockers.append(f"custom question needs your answer: '{label[:200]}'")
     if not any(a.get("file") == app_row["resume_path"] for a in actions):
         blockers.append("no resume upload field found")
     return actions, blockers

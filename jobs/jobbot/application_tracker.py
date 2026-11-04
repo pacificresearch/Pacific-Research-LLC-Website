@@ -298,7 +298,9 @@ def finish_attempt(attempt_id: int, outcome: str, error: str | None = None, evid
 
 
 def ever_clicked_submit(app_id: int) -> bool:
-    r = connect().execute("SELECT 1 FROM attempts WHERE application_id=? AND submit_clicked=1", (app_id,)).fetchone()
+    # a click the form itself rejected (validation errors / CAPTCHA shown, page never left the form) did not submit
+    r = connect().execute("SELECT 1 FROM attempts WHERE application_id=? AND submit_clicked=1 AND "
+                          "COALESCE(outcome,'') NOT IN ('validation_error','captcha','email_code')", (app_id,)).fetchone()
     return r is not None
 
 

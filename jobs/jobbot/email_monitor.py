@@ -151,3 +151,32 @@ def followup_drafts(days_after: int = 10) -> list[str]:
             db.update_app(r["id"], follow_up_date=db.today())
             out.append(str(f))
     return out
+
+
+def fetch_security_code(max_age_minutes: int = 15) -> str | None:
+    """Latest ATS security code (Greenhouse etc.) from the IMAP inbox, if IMAP is configured."""
+    host, user, pw = (os.environ.get(k) for k in ("JOBBOT_IMAP_HOST", "JOBBOT_IMAP_USER", "JOBBOT_IMAP_PASSWORD"))
+    if not (host and user and pw):
+        return None
+    try:
+        with imaplib.IMAP4_SSL(host) as M:
+            M.login(user, pw)
+            M.select("INBOX", readonly=True)
+            _, ids = M.search(None, '(SUBJECT "security code")')
+            for num in reversed(ids[0].split()[-5:]):
+                _, data = M.fetch(num, "(BODY.PEEK[])")
+                m = email.message_from_bytes(data[0][1])
+                from email.utils import parsedate_to_datetime
+                from datetime import datetime, timezone
+                if (datetime.now(timezone.utc) - parsedate_to_datetime(m["Date"])).total_seconds() > max_age_minutes * 60:
+                    continue
+                body = ""
+                for part in m.walk():
+                    if part.get_content_type() in ("text/plain", "text/html"):
+                        body += part.get_payload(decode=True).decode(part.get_content_charset() or "utf-8", "replace")
+                c = re.search(r"\b([A-Za-z0-9]{8})\b(?=[^A-Za-z0-9]*(?:</|\n|$))", body)
+                if c:
+                    return c.group(1)
+    except Exception:
+        return None
+    return None

@@ -143,6 +143,10 @@ def execute(app_id: int, mode: str = "review", headless: bool = False, wait_huma
             db.transition(app_id, "NEEDS_HUMAN_ACTION", f"form rejected the submission: {result['text'][:300]}",
                           needs_action=json.dumps({"type": "validation", "detail": result["text"][:500],
                                                    "url": page.url}))
+        elif result["state"] == "email_code":
+            db.transition(app_id, "NEEDS_HUMAN_ACTION", "employer emailed a security code to the application email; "
+                          "not submitted — retry when the code can be read",
+                          needs_action=json.dumps({"type": "email_code", "url": page.url}))
         elif result["state"] == "captcha":
             db.transition(app_id, "NEEDS_HUMAN_ACTION", "human verification appeared at submit — not bypassed",
                           needs_action=json.dumps({"type": "captcha", "url": page.url}))
@@ -178,6 +182,31 @@ def execute(app_id: int, mode: str = "review", headless: bool = False, wait_huma
             pass
 
 
+def _wait_for_code(page, evid: Path, wait_seconds: int):
+    """Greenhouse-style emailed security code. The code is read from the inbox by IMAP (on your Mac) or
+    written to $JOBBOT_HOME/verification_code.txt by a Claude session that read it through the Gmail
+    connector. Typed into the form, then the form is re-submitted. Never guessed."""
+    import time
+    from ..email_monitor import fetch_security_code
+    f = path("verification_code.txt")
+    deadline = time.time() + max(wait_seconds, 0)
+    while True:
+        code = fetch_security_code() or (f.read_text().strip() if f.exists() else None)
+        if code:
+            f.unlink(missing_ok=True)
+            boxes = page.locator("input[maxlength='1']")
+            if boxes.count() >= len(code):
+                for k, ch in enumerate(code):
+                    boxes.nth(k).fill(ch)
+            else:
+                page.locator("input[name*='code'], input[id*='code']").first.fill(code)
+            page.locator("button[type=submit], button:has-text('Submit')").first.click()
+            return code
+        if time.time() >= deadline:
+            return None
+        time.sleep(10)
+
+
 def verify(page, evid: Path, wait_human_seconds: int = 0) -> dict:
     from .adapters.base import captcha_visible
     deadline_ms = 25000 + wait_human_seconds * 1000
@@ -190,6 +219,12 @@ def verify(page, evid: Path, wait_human_seconds: int = 0) -> dict:
             page.screenshot(path=str(evid / "confirmation.png"), full_page=True)
             m = CONFIRM_RX.search(body)
             return {"state": "confirmed", "text": (m.group(0) if m else page.url) + f" | url={page.url}"}
+        if re.search(r"verification code was sent|enter the \d+-character code|security code", body, re.I):
+            code = _wait_for_code(page, evid, wait_human_seconds)
+            if code is None:
+                page.screenshot(path=str(evid / "email_code.png"), full_page=True)
+                return {"state": "email_code", "text": "employer emailed a security code; not submitted"}
+            continue
         if captcha_visible(page):
             if wait_human_seconds and waited < deadline_ms:
                 continue  # a person at the keyboard may solve it; we never do

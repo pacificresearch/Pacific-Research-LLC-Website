@@ -190,48 +190,64 @@ def parse_dates(dates: str) -> tuple[tuple[int, int] | None, tuple[int, int] | N
     return start, end, current
 
 
+def _date_value(sec) -> tuple[str, str]:
+    mi = sec.locator("[data-automation-id='dateSectionMonth-input']")
+    yi = sec.locator("[data-automation-id='dateSectionYear-input']")
+    return (mi.first.get_attribute("aria-valuenow") or mi.first.input_value() if mi.count() else "",
+            yi.first.get_attribute("aria-valuenow") or yi.first.input_value() if yi.count() else "")
+
+
 def _fill_date(sec, mm_yy):
+    """Workday MM/YYYY widget: focus the month and type MMYYYY (it auto-advances); retype if a wrong value is saved."""
     if not mm_yy or not sec.count():
         return
     m, y = mm_yy
+    cur_m, cur_y = _date_value(sec)
+    if cur_m and cur_y and int(cur_m) == m and int(cur_y) == y:
+        return
     mi = sec.locator("[data-automation-id='dateSectionMonth-input']")
-    yi = sec.locator("[data-automation-id='dateSectionYear-input']")
-    if mi.count():
-        mi.first.click()
-        mi.first.type(f"{m:02d}")
-    if yi.count():
-        yi.first.click()
-        yi.first.type(str(y))
+    target = mi.first if mi.count() else sec.locator("input").first
+    disp = sec.locator("[data-automation-id='dateSectionMonth-display']")
+    try:
+        (disp.first if disp.count() else target).scroll_into_view_if_needed(timeout=5000)
+        (disp.first if disp.count() else target).click(timeout=5000)
+    except Exception:
+        target.evaluate("e => { e.scrollIntoView({block: 'center'}); e.focus(); }")
+    target.page.keyboard.type(f"{m:02d}{y}", delay=60)
 
 
 def fill_work_experience(page, pr, log) -> list[str]:
-    """Enter every role from the evidence library (title, employer, location, dates) — CV facts only."""
-    sec = page.locator("[data-automation-id='workExperienceSection'], [aria-labelledby*='Work-Experience']").first
-    if not sec.count():
-        return []
-    have = sec.locator("[data-automation-id='formField-jobTitle']").count()
+    """Enter every role from the evidence library (title, employer, location, dates) — CV facts only.
+
+    Live layout (Workday 2026): 'Work Experience [Add]', 'Education [Add]', 'Websites [Add]' in that order;
+    the first add-button belongs to Work Experience. Each entry panel holds formField-jobTitle / companyName /
+    location / currentlyWorkHere / startDate / endDate (endDate disappears when 'currently work here' is
+    checked), so every field is located INSIDE its own entry panel, never by page-wide index.
+    """
     roles = pr["experience"]
+    titles = page.locator("[data-automation-id='formField-jobTitle']")
     for k, role in enumerate(roles):
-        if k >= have:
-            add = sec.locator("[data-automation-id='Add'], [data-automation-id='Add Another'], button:has-text('Add')")
-            if not add.count():
-                return [f"cannot add work-experience entry for {role['org']}"]
-            add.last.click()
-            page.wait_for_timeout(1200)
-        entry = sec.locator("[data-automation-id='formField-jobTitle']").nth(k).locator("xpath=ancestor::*[.//*[@data-automation-id='formField-companyName']][1]")
+        if titles.count() <= k:
+            page.locator("[data-automation-id='add-button']").first.click()
+            page.wait_for_timeout(1500)
+            if titles.count() <= k:
+                return [f"could not add work-experience entry for {role['org']}"]
+        entry = titles.nth(k).locator("xpath=ancestor::div[.//*[@data-automation-id='formField-startDate']][1]")
+        f = lambda fid: entry.locator(f"[data-automation-id='formField-{fid}']").first  # noqa: E731
         start, end, current = parse_dates(role["dates"])
         for fid, val in (("jobTitle", role["title"]), ("companyName", role["org"]), ("location", role.get("location", ""))):
-            f = entry.locator(f"[data-automation-id='formField-{fid}'] input")
-            if f.count() and val and not f.first.input_value():
-                f.first.fill(val)
-        cw = entry.locator("[data-automation-id='formField-currentlyWorkHere'] input[type=checkbox]")
-        if current and cw.count() and not cw.first.is_checked():
-            cw.first.check(force=True)
-        _fill_date(entry.locator("[data-automation-id='formField-startDate']"), start)
+            box = f(fid).locator("input")
+            if box.count() and val and box.first.input_value() != val:
+                box.first.fill(val)
+        cw = f("currentlyWorkHere").locator("input[type=checkbox]")
+        if cw.count() and cw.first.is_checked() != current:
+            cw.first.set_checked(current, force=True)
+            page.wait_for_timeout(500)
+        _fill_date(f("startDate"), start)
         if not current:
-            _fill_date(entry.locator("[data-automation-id='formField-endDate']"), end)
-        log.append({"label": "Work experience", "key": "experience", "value": f"{role['title']} @ {role['org']} ({role['dates']})",
-                    "ok": True})
+            _fill_date(f("endDate"), end)
+        log.append({"label": "Work experience", "key": "experience",
+                    "value": f"{role['title']} @ {role['org']} ({role['dates']})", "ok": True})
     return []
 
 
@@ -306,6 +322,9 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     sec.fill(str(val))
             continue
         val = _value_for(key, label, f, job, pr)
+        if val in (None, "") and kind == "unknown":
+            from ...evidence_answers import answer as evidence_answer
+            val = evidence_answer(label, f.get("options", []), job)
         if val in (None, ""):
             blockers.append(f"{'custom question' if kind == 'unknown' else (key or 'field').replace('_', ' ')} "
                             f"needs your answer: '{label[:160]}'")
@@ -381,6 +400,9 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
         page.locator(A("pageFooterNextButton")).click(timeout=60000)
         page.wait_for_timeout(6000)
         errs = page.locator(A("errorMessage")).all_inner_texts()
+        if not errs and "errors found" in page.inner_text("body").lower():
+            errs = [e for e in page.locator("[data-automation-id='errorBanner'], [role='alert']").all_inner_texts() if e.strip()] \
+                or ["Workday reported 'Errors Found' on this step"]
         if errs and _step(page) == step:
             raise Blocked([f"[{step}] Workday validation: {e[:160]}" for e in errs[:6]])
     raise Blocked(["Workday flow did not reach Review within 10 steps"])
