@@ -380,8 +380,7 @@ class Executor(unittest.TestCase):
                  '<label for="why">Why do you want to work at Acme? *</label><textarea id="why" name="q10" required></textarea>')
         state, reasons = self._run(extra, answers={"legally_authorized_us": "Yes", "requires_sponsorship": "No"})
         self.assertEqual(state, "blocked")
-        self.assertTrue(any("attestation" in r for r in reasons))
-        self.assertTrue(any("custom question" in r for r in reasons))
+        self.assertTrue(any("attestation" in r for r in reasons))  # motivation Qs are now answered cover-letter style
 
     def test_captcha_is_not_bypassed(self):
         extra = '<iframe src="https://hcaptcha.com/challenge" style="width:300px;height:150px"></iframe>'

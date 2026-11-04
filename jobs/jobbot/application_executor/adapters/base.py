@@ -112,6 +112,7 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
                "email": pr.get("application_email") or c["email"],
                "phone": c["phone"], "location": city_state,
                "home_address": f"{addr.get('line1')}, {addr.get('city')}, {st} {addr.get('postal_code')}" if addr.get("line1") else None,
+               "addr_city": addr.get("city"), "addr_state": addr.get("state"), "addr_zip": addr.get("postal_code"),
                "linkedin": c["linkedin"] if c["linkedin"].startswith("http") else "https://www." + c["linkedin"].removeprefix("www."),
                "website": ans.get("website"), "current_employer": ans.get("current_employer"),
                "current_title": ans.get("current_title"), "how_did_you_hear": ans.get("how_did_you_hear"),
@@ -176,6 +177,8 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
             if key == "resume":
                 continue
             val = routine.get(key)
+            if key == "home_address" and re.search(r"\b1\b|line", label, re.I):
+                val = addr.get("line1") or val  # split address form: street line only
             if val:
                 if f["type"] in ("select-one", "radio"):
                     opt = match_option(val, f.get("options", []))

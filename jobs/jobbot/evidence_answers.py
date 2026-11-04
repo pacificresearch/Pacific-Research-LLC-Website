@@ -21,12 +21,14 @@ import yaml
 from .config import home
 from .evidence import evidence_lines, fact_guard
 
-OUT_OF_SCOPE = re.compile(r"relative|family member|conflict of interest|outside employment|acknowledg|attest|certif|"
-                          r"agree|consent|signature|felony|convict|criminal|disabilit|veteran|gender|race|ethnic|"
-                          r"sponsor|visa|authori[sz]ed|citizen|clearance|salary|compensation|pay|currently live|"
-                          r"reside|commute|relocat|start date|notice|referr|how did you hear|age|birth|drug|"
-                          r"background check|non-?compete|excite|why (do|are|would) you|interest(ed|s)? (in|you)|"
-                          r"motivat|passion|attract|what draws|tell us about yourself|cover letter|anything else", re.I)
+OUT_OF_SCOPE = re.compile(r"\b(relatives?|family members?|conflicts? of interest|outside employment|acknowledg\w*|attest\w*|"
+                          r"certif(y|ication)|agree|consent|signature|felony|convict\w*|criminal|disabilit\w*|veteran|"
+                          r"gender|race|ethnic\w*|sponsor(ship)?|visa|authori[sz]ed|citizen\w*|clearance|salary|"
+                          r"compensation|pay|currently live|reside|commute|relocat\w*|start date|notice period|referr\w*|"
+                          r"how did you hear|age|birth|drug|background check|non-?compete|tell us about yourself|"
+                          r"anything else)\b", re.I)
+MOTIVATION = re.compile(r"excite|why (do|are|would) you|interest(ed|s)? (in|you)|motivat|passion|attract|what draws|"
+                        r"why this (role|company|position)", re.I)
 RESIDENCE = re.compile(r"(currently )?(live|reside|located|based) in (the )?([a-z .,'-]+?)(\?|\*|$)", re.I)
 BAY = {"san francisco bay area", "bay area", "san francisco"}
 SOCAL = {"southern california", "orange county", "los angeles", "socal", "california", "greater los angeles"}
@@ -86,11 +88,15 @@ def answer(question: str, options: list[str], job: dict, timeout: int = 120) -> 
     res = residence_answer(q, profile())
     if res:
         return res
-    if not q or OUT_OF_SCOPE.search(q):
-        return None
     key = _norm(q)
     c = cache()
     hit = c.get(key)
+    if hit and hit.get("override") is not None:
+        return hit["override"]  # Andrew's own answer always wins
+    if MOTIVATION.search(q):
+        return motivation_answer(job)
+    if not q or OUT_OF_SCOPE.search(q):
+        return None
     yesno = re.match(r"^(do|does|did|have|has|are|is|can|will|would|were)\b", q, re.I)
     if hit and hit.get("override") is not None:
         return hit["override"]
@@ -132,3 +138,19 @@ def answer(question: str, options: list[str], job: dict, timeout: int = 120) -> 
               "employer_first_seen": job.get("employer", ""), "override": None}
     _save(c)
     return ans if ok else None
+
+
+def motivation_answer(job: dict) -> str | None:
+    """'Why this role?' answered like the cover letter: posting focus <-> documented experience. No invented
+    personal enthusiasm or connection; fact-guarded."""
+    from .cover_letter_builder import _focus
+    from .evidence import profile
+    focus = _focus(job)
+    pr = profile()
+    jt = f"{job.get('title', '')} {job.get('description', '')}".lower()
+    pts = sorted(pr["cover_points"], key=lambda p: -sum(2 for t in p["tags"] if t in jt))
+    pts = [p for p in pts if p["id"] not in ("cp.pubs", "cp.ma")][:1]
+    text = (f"The role's emphasis on {focus} lines up directly with my experience. " + (pts[0]["text"] if pts else "")).strip()
+    if len(text) > 600 or fact_guard(text, job.get("description", "")):
+        return None
+    return text
