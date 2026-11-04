@@ -269,6 +269,33 @@ class Guards(unittest.TestCase):
         self.assertEqual(r["eligibility"], "fail")
 
 
+class CredentialsAndHarvest(unittest.TestCase):
+    def test_password_strength_and_storage(self):
+        from jobbot import credentials
+        pw = credentials.generate_password()
+        self.assertEqual(len(pw), 16)
+        self.assertTrue(any(c.isupper() for c in pw) and any(c.islower() for c in pw) and any(c.isdigit() for c in pw))
+        self.assertTrue(any(c in credentials.SYMBOLS for c in pw))
+        c1, new1 = credentials.get_or_create("https://acme.wd1.myworkdayjobs.com/x/job/1", "a@example.com")
+        c2, new2 = credentials.get_or_create("https://acme.wd1.myworkdayjobs.com/other", "a@example.com")
+        self.assertTrue(new1)
+        self.assertFalse(new2)
+        self.assertEqual(c1["password"], c2["password"])  # one account per portal host
+        f = credentials._file()
+        self.assertEqual(oct(f.stat().st_mode)[-3:], "600")
+        csvp = credentials.export_chrome_csv()
+        self.assertIn("name,url,username,password,note", open(csvp).read())
+
+    def test_parse_board_urls(self):
+        from jobbot.job_discovery.web_search import parse
+        self.assertEqual(parse("https://job-boards.greenhouse.io/pfm/jobs/1")["slug"], "pfm")
+        self.assertEqual(parse("https://jobs.lever.co/alimentiv-2/abc")["slug"], "alimentiv-2")
+        self.assertIsNone(parse("https://jobs.lever.co/jobgether/abc"))  # aggregator
+        wd = parse("https://georgetown.wd1.myworkdayjobs.com/en-US/Georgetown_Admin_Careers/job/x")
+        self.assertEqual((wd["tenant"], wd["wd"], wd["site"]), ("georgetown", "wd1", "Georgetown_Admin_Careers"))
+        self.assertIsNone(parse("https://www.careerbuilder.com/job/x"))
+
+
 class Executor(unittest.TestCase):
     """Drives local HTML forms with the real Playwright code path."""
 
@@ -334,6 +361,7 @@ class Executor(unittest.TestCase):
         state, vals = self._run(answers={"legally_authorized_us": "Yes", "requires_sponsorship": "No"})
         self.assertEqual(state, "filled")
         self.assertEqual(vals["first_name"], "Jordan")
+        self.assertNotIn("how_did_you_hear", vals)  # optional
         self.assertEqual(vals["legally_authorized_us"], "Yes")
         self.assertTrue(vals["resume"].startswith("<file:"))
 
@@ -352,14 +380,23 @@ class Executor(unittest.TestCase):
         self.assertEqual(state, "blocked")
         self.assertTrue(any("CAPTCHA" in r for r in reasons))
 
-    def test_eeo_requires_explicit_preference(self):
-        extra = ('<label for="g">Gender</label><select id="g" name="eeo_gender"><option>Select</option><option>Male</option>'
-                 '<option>Female</option><option>Decline to self-identify</option></select>')
-        state, reasons = self._run(extra, answers={"legally_authorized_us": "Yes", "requires_sponsorship": "No"})
+    def test_optional_disclosures_skipped_required_declined(self):
+        ok = {"legally_authorized_us": "Yes", "requires_sponsorship": "No"}
+        opt = ('<label for="g">Gender</label><select id="g" name="eeo_gender"><option>Select</option><option>Male</option>'
+               '<option>Female</option><option>Decline to self-identify</option></select>')
+        state, vals = self._run(opt, answers=ok)
+        self.assertEqual(state, "filled")
+        self.assertNotIn("gender", vals)  # optional -> left blank
+        self.assertNotIn("linkedin", vals)  # optional non-core field -> skipped
+        req = ('<label for="v">Veteran status *</label><select id="v" name="vet" required><option>Select</option>'
+               '<option>I am a protected veteran</option><option>I am not a protected veteran</option>'
+               '<option>I don\'t wish to answer</option></select>')
+        state, vals = self._run(req, answers=ok)
+        self.assertEqual(vals["veteran_status"], "I don't wish to answer")
+        nodecl = ('<label for="d">Disability *</label><select id="d" name="dis" required><option>Select</option>'
+                  '<option>Yes</option><option>No</option></select>')
+        state, reasons = self._run(nodecl, answers=ok)
         self.assertEqual(state, "blocked")
-        state, vals = self._run(extra, answers={"legally_authorized_us": "Yes", "requires_sponsorship": "No",
-                                                "gender": "Decline to self-identify"})
-        self.assertEqual(vals["gender"], "Decline to self-identify")
 
 
 if __name__ == "__main__":

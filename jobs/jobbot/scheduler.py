@@ -81,6 +81,9 @@ def run_daily(submit: bool = True, headless: bool = True, use_semantic: bool | N
                 stats["paused"] = True
             else:
                 if discover:
+                    from .job_discovery import web_search
+                    if datetime.now().weekday() in (0, 3):  # Mon/Thu: grow the employer registry via web search
+                        phase("web_search", lambda: web_search.harvest(web_search.search_with_claude()))
                     phase("discovery", job_discovery.run)
                 phase("qualify", lambda: pipeline.qualify(use_semantic=use_semantic))
                 sl = pipeline.shortlist()

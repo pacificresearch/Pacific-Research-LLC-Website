@@ -32,6 +32,33 @@
    wake if the Mac was asleep). Keep secrets in `~/.zshenv` or launchd `EnvironmentVariables`,
    never in the repo.
 
+### Standing answer policy (Andrew, 11/4)
+- **Optional questions are skipped.** Only required fields are filled, plus resume, cover letter and core contact fields.
+- **Required voluntary disclosures** (veteran, disability, gender, race/ethnicity, orientation): the system
+  selects the "I don't wish to answer / Decline to self-identify" option. If a form has no decline option,
+  the application stops for you. On the Workday disability form (CC-305), jobbot types your name and
+  today's date next to the decline answer.
+- Configured as `answer_policy` in `profile.yaml`.
+
+### Employer portal accounts
+- Accounts are created with `account_email` (pacificresearchglobal@gmail.com, the inbox jobbot can verify
+  through the Gmail connector). Each portal gets a unique 16-character password, the same strength as
+  Chrome's "suggest strong password".
+- Passwords live in your Mac's Keychain (`pip install keyring`) or `data/credentials.json` (0600, gitignored).
+- `python -m jobbot export-passwords` writes a Chrome import CSV. Import it at passwords.google.com →
+  Settings → Import Passwords so every account syncs to Chrome, then delete the CSV.
+- Creating an account accepts the portal's applicant-privacy box, under your instruction to create logins.
+  Every other attestation still needs your per-text approval.
+- Workday is automated (account → My Information → My Experience → Questions → Disclosures →
+  Self-Identify → Review); it stops at Review until you approve.
+
+### Web-search discovery
+- On Mondays and Thursdays the daily run searches the web (through `claude -p` WebSearch) for employer job
+  boards on Greenhouse, Lever, Ashby, Workday and SmartRecruiters, checks each board is relevant, and
+  adds it to `data/employers_discovered.yaml`. From then on the board is read every day through its
+  official feed. Aggregators that re-post other companies' jobs (Jobgether etc.) are excluded.
+- Manual run: `python -m jobbot harvest --search`, or `python -m jobbot harvest urls.txt`.
+
 ## 2. Daily operation (≈10 minutes of your time)
 
 The morning run does discovery (incremental, about 50 employer feeds, 12 in parallel), then
@@ -70,7 +97,8 @@ CONFIRMATION_PENDING until email or you confirm it.
 | Channel | Discovery | Submission |
 |---|---|---|
 | Greenhouse / Lever / Ashby boards | automated (official public APIs) | **automated**, with guards |
-| Workday (IQVIA, ICON, Parexel, Syneos, Fortrea, PPD, pharma, medtech, Leidos, Booz Allen, GDIT, CACI, FHI 360, PATH) | automated | **manual-assisted**: per-employer account + email verification; packet prepared |
+| Workday (IQVIA, ICON, Parexel, Syneos, Fortrea, PPD, pharma, medtech, Leidos, Booz Allen, GDIT, CACI, FHI 360, PATH) | automated | **automated**: creates the account, signs in, works through each step and stops at Review. Email-verification tenants pause until the link is clicked. |
+| Boards found by web search | automated (Mon/Thu) | per their ATS (above) |
 | USAJOBS | automated with free API key | manual (Login.gov); packet prepared |
 | UN Careers / Inspira | adapter (CDN may block datacenter IPs; home networks usually fine) | manual (PHP form) |
 | Indeed | via Claude connector import | manual (Indeed prohibits automation) |

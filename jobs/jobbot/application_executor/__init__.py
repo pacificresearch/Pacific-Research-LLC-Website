@@ -26,10 +26,8 @@ from .guards import CONFIRM_RX, VALIDATION_RX
 
 log = logging.getLogger("jobbot.executor")
 
-AUTOMATABLE = {"greenhouse", "lever", "ashby"}
+AUTOMATABLE = {"greenhouse", "lever", "ashby", "workday"}
 MANUAL_REASONS = {
-    "workday": "Workday requires an employer-specific account (email verification + password) — sign in once "
-               "in the jobbot browser, then complete with the prepared packet",
     "usajobs": "USAJOBS applications are filed through Login.gov/USAJOBS — use the prepared federal packet",
     "inspira": "UN Inspira requires your account and Personal History Profile — use the prepared cover letter",
     "smartrecruiters": "SmartRecruiters forms vary by employer and often require an account — assisted mode",

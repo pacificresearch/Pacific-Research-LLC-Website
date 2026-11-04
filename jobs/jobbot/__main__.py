@@ -29,6 +29,9 @@ def main(argv=None):
     rd.add_argument("--headed", action="store_true"); rd.add_argument("--no-discover", action="store_true")
     im = sub.add_parser("import", help="import jobs JSON [{employer,title,location,description,job_url,apply_url}]"); im.add_argument("file"); im.add_argument("--source", default="import")
     au = sub.add_parser("add-url", help="add one posting you found (e.g. on LinkedIn)"); au.add_argument("url"); au.add_argument("--employer", required=True); au.add_argument("--title", required=True); au.add_argument("--location", default="")
+    hv = sub.add_parser("harvest", help="add employer boards from search-result URLs (file, one per line)"); hv.add_argument("file", nargs="?")
+    hv.add_argument("--search", action="store_true", help="run the web searches through `claude -p` first")
+    sub.add_parser("export-passwords", help="write a Chrome/Google Password Manager import CSV")
     ie = sub.add_parser("import-emails"); ie.add_argument("file")
     sub.add_parser("poll-email")
     sub.add_parser("report")
@@ -115,6 +118,15 @@ def main(argv=None):
         from . import job_discovery
         out(job_discovery.import_records([{"employer": args.employer, "title": args.title, "location": args.location,
                                             "job_url": args.url, "apply_url": args.url}], source="manual"))
+    elif args.cmd == "harvest":
+        from .job_discovery import web_search
+        urls = open(args.file).read().split() if args.file else []
+        if args.search:
+            urls += web_search.search_with_claude()
+        out(web_search.harvest(urls))
+    elif args.cmd == "export-passwords":
+        from . import credentials
+        out(f"wrote {credentials.export_chrome_csv()} — import at passwords.google.com > Settings > Import, then delete it")
     elif args.cmd == "import-emails":
         from . import email_monitor
         out(email_monitor.import_file(args.file))

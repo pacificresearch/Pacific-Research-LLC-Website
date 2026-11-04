@@ -111,3 +111,5 @@ approved_answers:
   current_title: null
   website: null
 approved_attestations: []
+answer_policy: {skip_optional: true, decline_disclosures: true}
+account_email: jordan@example.com

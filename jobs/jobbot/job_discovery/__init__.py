@@ -46,7 +46,8 @@ def run(only: list[str] | None = None, limit_employers: int | None = None) -> di
     terms = search_terms()
     excluded = {e.lower() for e in cfg["employers"].get("exclude", [])}
     stats = {"fetched": 0, "relevant": 0, "new": 0, "dupes": 0, "closed": 0, "errors": {}}
-    entries = [e for e in reg.get("employers", []) if e.get("enabled", True)]
+    from .web_search import load_discovered
+    entries = [e for e in reg.get("employers", []) + load_discovered() if e.get("enabled", True)]
     for extra in cfg["employers"].get("include", []):
         if isinstance(extra, dict):
             entries.append(extra)

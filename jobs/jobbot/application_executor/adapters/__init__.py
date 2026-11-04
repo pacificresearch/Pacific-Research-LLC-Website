@@ -1,6 +1,6 @@
-from . import ashby, greenhouse, lever
+from . import ashby, greenhouse, lever, workday
 
-_REG = {"greenhouse": greenhouse, "lever": lever, "ashby": ashby}
+_REG = {"greenhouse": greenhouse, "lever": lever, "ashby": ashby, "workday": workday}
 
 
 def get(kind: str):

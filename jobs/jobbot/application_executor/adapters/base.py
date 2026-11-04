@@ -84,8 +84,23 @@ def scan(page) -> list[dict]:
     return page.evaluate(SCAN_JS)
 
 
+# Andrew's standing policy (11/4): skip every optional question; when a voluntary-disclosure
+# question is REQUIRED, choose the "I don't wish to disclose" option. Never pick a substantive answer.
+CORE_FIELDS = {"first_name", "last_name", "full_name", "email", "phone"}
+DECLINE_KEYS = {"veteran_status", "disability_status", "gender", "race_ethnicity", "hispanic_latino",
+                "sexual_orientation"}
+DECLINE_RX = re.compile(r"decline|do(n'?t| not) (wish|want|care) to|prefer not|choose not|not (to )?(answer|disclose|"
+                        r"self[- ]identify|specified)|i do not want to answer|rather not", re.I)
+
+
+def decline_option(options: list[str]) -> str | None:
+    c = [o for o in options if DECLINE_RX.search(o or "")]
+    return c[0] if len(c) >= 1 else None
+
+
 def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[list[dict], list[str]]:
     c, ans = pr["contact"], pr.get("approved_answers", {}) or {}
+    policy = pr.get("answer_policy", {"skip_optional": True, "decline_disclosures": True})
     approved_att = set(pr.get("approved_attestations", []) or [])
     first, last = c["name"].split()[0], c["name"].split()[-1]
     routine = {"first_name": first, "last_name": last, "full_name": c["name"], "email": c["email"],
@@ -113,6 +128,22 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
         kind, key = classify(label)
         req = bool(f.get("required"))
         act = {"idx": f["idx"], "type": f["type"], "label": label[:160], "kind": kind, "key": key}
+        if policy.get("skip_optional", True) and not req and f["type"] != "file" and \
+                not (kind == "routine" and key in CORE_FIELDS) and key != "cover_letter":
+            continue  # optional question: left blank by policy
+        if key in DECLINE_KEYS and policy.get("decline_disclosures", True):
+            if f["type"] in ("select-one", "radio") or f.get("options"):
+                opt = decline_option(f.get("options", []))
+                if opt:
+                    actions.append({**act, "option": opt})
+                else:
+                    blockers.append(f"required {key.replace('_', ' ')} has no 'decline to disclose' option: "
+                                    f"{f.get('options', [])[:6]}")
+            elif f["type"] in ("text", "search") or f.get("role") == "combobox":
+                actions.append({**act, "value": "I don't wish to answer"})  # typeahead picker
+            else:
+                blockers.append(f"required {key.replace('_', ' ')} in unexpected format: '{label[:80]}'")
+            continue
         if f["type"] == "file":
             nm = (f.get("name") or "").lower()
             if kind == "unknown" and "cover" in nm:
