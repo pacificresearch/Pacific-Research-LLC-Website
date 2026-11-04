@@ -108,7 +108,8 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
     addr = pr.get("address") or {}
     st = {"california": "CA"}.get((addr.get("state") or "").lower(), addr.get("state") or "")
     city_state = f"{addr['city']}, {st}" if addr.get("city") else c["location"]
-    routine = {"first_name": first, "last_name": last, "full_name": c["name"], "email": c["email"],
+    routine = {"first_name": first, "last_name": last, "full_name": c["name"],
+               "email": pr.get("application_email") or c["email"],
                "phone": c["phone"], "location": city_state,
                "home_address": f"{addr.get('line1')}, {addr.get('city')}, {st} {addr.get('postal_code')}" if addr.get("line1") else None,
                "linkedin": c["linkedin"] if c["linkedin"].startswith("http") else "https://www." + c["linkedin"].removeprefix("www."),
@@ -189,6 +190,17 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
             elif req:
                 blockers.append(f"required field has no approved value: '{label[:100]}'")
             continue
+        if kind == "sensitive" and key == "e_signature":
+            if policy.get("e_sign_when_all_answers_from_profile"):
+                if f["type"] in ("text", "textarea"):
+                    actions.append({**act, "value": c["name"]})
+                elif f["type"] == "checkbox":
+                    actions.append({**act, "check": True})
+                else:
+                    blockers.append(f"e-signature in unexpected format: '{label[:80]}'")
+            elif req:
+                blockers.append(f"e-signature needs your approval: '{label[:120]}'")
+            continue
         if kind == "sensitive":
             if key == "attestation":
                 aid = attestation_id(label)
@@ -264,11 +276,27 @@ def fill(page, actions: list[dict]) -> list[dict]:
                 page.locator(sel).check(force=True)
             elif "value" in a:
                 el = page.locator(sel)
-                el.fill(a["value"])
                 if el.get_attribute("role") == "combobox" or el.get_attribute("aria-autocomplete"):
-                    page.wait_for_timeout(700)
-                    page.keyboard.press("ArrowDown")
-                    page.keyboard.press("Enter")
+                    want = a["value"]
+                    typed = want.replace(", CA", ", California") if a.get("key") == "location" else want
+                    el.fill("")
+                    el.type(typed, delay=40)
+                    page.wait_for_timeout(2500)  # suggestion list (e.g. Google Places) loads async
+                    opts = page.locator("[role='option']")
+                    texts = [opts.nth(k).inner_text().strip() for k in range(min(opts.count(), 15))]
+                    first = typed.split(",")[0].strip().lower()
+                    pick = next((k for k, t in enumerate(texts) if t.lower().startswith(first)), None)
+                    if pick is None:
+                        pick = next((k for k, t in enumerate(texts) if first in t.lower()), None)
+                    if pick is not None:
+                        opts.nth(pick).click()
+                        a = dict(a, value=texts[pick])
+                    else:
+                        page.keyboard.press("ArrowDown")
+                        page.keyboard.press("Enter")
+                    page.wait_for_timeout(500)
+                else:
+                    el.fill(a["value"])
             log.append({"label": a["label"], "key": a["key"], "kind": a["kind"],
                         "value": "<file:" + Path(a["file"]).name + ">" if a.get("file") else
                         a.get("option") or ("<checked>" if a.get("check") else

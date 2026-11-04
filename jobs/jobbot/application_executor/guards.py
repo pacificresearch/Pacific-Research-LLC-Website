@@ -12,6 +12,10 @@ import re
 
 # order matters: first match wins
 SENSITIVE = [
+    ("e_signature", r"applicant.?s statement|statement (&|and) acknowledg|type your (full )?(legal )?name (above |below )?to (agree|acknowledge|sign)|"
+                    r"electronic (name|signature)|e-?signature|sign(ature)? by typing"),
+    ("relatives_here", r"relatives?|family members? (who )?(currently )?(work|employed)"),
+    ("licensed_hcp", r"health ?care professionals?|\bhcps?\b"),
     ("sms_consent", r"consent to (receiv|be contacted)|text messag|\bsms\b"),
     ("requires_sponsorship", r"sponsorship|\bvisa\b|h-?1b|immigration status|sponsor (you|your|an? (employment|work))"),
     ("legally_authorized_us", r"(legally )?(authori[sz]ed|eligible|permitted) to work|work authori[sz]ation|right to work"),
