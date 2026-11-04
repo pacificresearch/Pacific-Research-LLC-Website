@@ -54,7 +54,7 @@ SCAN_JS = r"""
       }
       el.setAttribute('data-jobbot-idx', String(i));
       const single = !q || q === optLabel ? optLabel : (optLabel && optLabel.length > 25 ? optLabel : q + ' — ' + optLabel);
-      out.push({idx: i++, type, name: el.name, label: single, required: el.required, options: []}); continue;
+      out.push({idx: i++, type, name: el.name, label: single, required: el.required || /\*\s*$/.test(q) || el.getAttribute('aria-required') === 'true', options: []}); continue;
     }
     el.setAttribute('data-jobbot-idx', String(i));
     let lab = labelOf(el);
@@ -88,7 +88,7 @@ def scan(page) -> list[dict]:
 
 # Andrew's standing policy (11/4): skip every optional question; when a voluntary-disclosure
 # question is REQUIRED, choose the "I don't wish to disclose" option. Never pick a substantive answer.
-CORE_FIELDS = {"first_name", "last_name", "full_name", "email", "phone"}
+CORE_FIELDS = {"first_name", "last_name", "full_name", "email", "phone", "country"}
 DECLINE_KEYS = {"veteran_status", "disability_status", "gender", "race_ethnicity", "hispanic_latino",
                 "sexual_orientation"}
 DECLINE_RX = re.compile(r"decline|do(n'?t| not) (wish|want|care) to|prefer not|choose not|not (to )?(answer|disclose|"
