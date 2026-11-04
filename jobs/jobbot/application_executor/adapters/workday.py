@@ -108,13 +108,25 @@ def _choose_listbox(page, field, option_text):
     return pick, texts
 
 
+OPT = "[data-automation-id='activeListContainer'] [data-automation-id='promptOption']"
+
+
+def _open_options(page):
+    loc = page.locator(OPT)
+    seen, texts = set(), []
+    for k in range(min(loc.count(), 80)):
+        t = loc.nth(k).inner_text().strip()
+        if t and t not in seen and loc.nth(k).is_visible():
+            seen.add(t)
+            texts.append(t)
+    return texts
+
+
 def _choose_multiselect(page, field, text):
     inp = field.locator("input").first
-    inp.fill(text)
-    inp.press("Enter")
+    inp.click()
     page.wait_for_timeout(1200)
-    opts = page.locator("[data-automation-id='promptOption'], [role='option']")
-    texts = [opts.nth(k).inner_text().strip() for k in range(min(opts.count(), 40))]
+    texts = _open_options(page)  # options shown for THIS field only (scoped to the active popup)
     pick = match_option(text, texts) or (texts[0] if len(texts) == 1 else None)
     if not pick and re.search(r"website|career", text, re.I):  # "How did you hear": company site wording varies
         pick = next((t for t in texts if re.search(r"(company|corporate|career).*(site|website|page)|careers? (site|page|website)|"
@@ -122,8 +134,19 @@ def _choose_multiselect(page, field, text):
     if not pick:
         page.keyboard.press("Escape")
         return None, texts
-    page.locator("[data-automation-id='promptOption'], [role='option']", has_text=pick).first.click()
-    page.wait_for_timeout(600)
+    page.locator(OPT, has_text=pick).first.click()
+    page.wait_for_timeout(1200)
+    sub = [t for t in _open_options(page) if t != pick]
+    if sub and not field.locator("[data-automation-id='selectedItem']").count():
+        # hierarchical prompt (e.g. Website -> specific site): take the employer's own careers site
+        nxt = next((t for t in sub if re.search(r"career|company|corporate|website", t, re.I)), sub[0] if len(sub) == 1 else None)
+        if not nxt:
+            page.keyboard.press("Escape")
+            return None, sub
+        page.locator(OPT, has_text=nxt).first.click()
+        page.wait_for_timeout(800)
+        pick = f"{pick} > {nxt}"
+    page.keyboard.press("Escape")
     return pick, texts
 
 
@@ -145,8 +168,71 @@ def _value_for(key, label, f, job, pr):
     if key == "salary_expectation":
         return salary_answer(ans.get("salary_expectation_rule"), job)
     if key == "previously_employed_here" or re.search(r"previously (worked|been employed)|worked for .* before", label, re.I):
-        return ans.get("previously_employed_here")
+        prior = [p.lower() for p in pr.get("prior_employers", [])]
+        return "Yes" if any(p in job["employer"].lower() for p in prior) else ans.get("previously_employed_here")
     return ans.get(key)
+
+
+MONTHS = {m: i for i, m in enumerate(["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov",
+                                      "dec"], 1)}
+
+
+def parse_dates(dates: str) -> tuple[tuple[int, int] | None, tuple[int, int] | None, bool]:
+    """'Nov 2021 - Feb 2026' -> ((11, 2021), (2, 2026), False); '... - Present' -> current=True."""
+    parts = re.split(r"\s*[-–]\s*", dates.strip())
+
+    def one(x):
+        m = re.match(r"([A-Za-z]{3})[a-z]*\.?\s+(\d{4})", x.strip())
+        return (MONTHS[m.group(1).lower()], int(m.group(2))) if m else None
+    start = one(parts[0]) if parts else None
+    current = len(parts) > 1 and parts[1].lower().startswith("present")
+    end = None if current or len(parts) < 2 else one(parts[1])
+    return start, end, current
+
+
+def _fill_date(sec, mm_yy):
+    if not mm_yy or not sec.count():
+        return
+    m, y = mm_yy
+    mi = sec.locator("[data-automation-id='dateSectionMonth-input']")
+    yi = sec.locator("[data-automation-id='dateSectionYear-input']")
+    if mi.count():
+        mi.first.click()
+        mi.first.type(f"{m:02d}")
+    if yi.count():
+        yi.first.click()
+        yi.first.type(str(y))
+
+
+def fill_work_experience(page, pr, log) -> list[str]:
+    """Enter every role from the evidence library (title, employer, location, dates) — CV facts only."""
+    sec = page.locator("[data-automation-id='workExperienceSection'], [aria-labelledby*='Work-Experience']").first
+    if not sec.count():
+        return []
+    have = sec.locator("[data-automation-id='formField-jobTitle']").count()
+    roles = pr["experience"]
+    for k, role in enumerate(roles):
+        if k >= have:
+            add = sec.locator("[data-automation-id='Add'], [data-automation-id='Add Another'], button:has-text('Add')")
+            if not add.count():
+                return [f"cannot add work-experience entry for {role['org']}"]
+            add.last.click()
+            page.wait_for_timeout(1200)
+        entry = sec.locator("[data-automation-id='formField-jobTitle']").nth(k).locator("xpath=ancestor::*[.//*[@data-automation-id='formField-companyName']][1]")
+        start, end, current = parse_dates(role["dates"])
+        for fid, val in (("jobTitle", role["title"]), ("companyName", role["org"]), ("location", role.get("location", ""))):
+            f = entry.locator(f"[data-automation-id='formField-{fid}'] input")
+            if f.count() and val and not f.first.input_value():
+                f.first.fill(val)
+        cw = entry.locator("[data-automation-id='formField-currentlyWorkHere'] input[type=checkbox]")
+        if current and cw.count() and not cw.first.is_checked():
+            cw.first.check(force=True)
+        _fill_date(entry.locator("[data-automation-id='formField-startDate']"), start)
+        if not current:
+            _fill_date(entry.locator("[data-automation-id='formField-endDate']"), end)
+        log.append({"label": "Work experience", "key": "experience", "value": f"{role['title']} @ {role['org']} ({role['dates']})",
+                    "ok": True})
+    return []
 
 
 def fill_step(page, job, pr, app_row, log) -> list[str]:
@@ -154,15 +240,21 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
     blockers = []
     approved_att = set(pr.get("approved_attestations", []) or [])
     step = _step(page)
-    # resume upload lives on My Experience
-    up = page.locator(A("file-upload-input-ref"))
-    if up.count() and not page.locator(A("file-upload-successful")).count():
-        up.first.set_input_files(app_row["resume_path"])
-        page.wait_for_timeout(5000)
-        log.append({"label": "Resume upload", "key": "resume", "value": "<file:resume.pdf>", "ok": True})
+    # resume upload + work history live on My Experience
+    if "Experience" in step:
+        up = page.locator("input[type=file]")
+        if up.count() and not page.locator(A("file-upload-successful")).count():
+            up.first.set_input_files(app_row["resume_path"])
+            page.wait_for_timeout(6000)  # Workday parses the resume and may prefill work history
+            log.append({"label": "Resume upload", "key": "resume", "value": "<file:resume.pdf>", "ok": True})
+        blockers += fill_work_experience(page, pr, log)
     fields = page.evaluate(FIELDS_JS)
     for f in fields:
         label = f["label"].rstrip("*").strip()
+        if "Experience" in step and (f["id"] in ("jobTitle", "companyName", "location", "startDate", "endDate",
+                                                 "currentlyWorkHere", "roleDescription")
+                                     or f["type"] == "other" and "upload" in label.lower()):
+            continue  # handled by fill_work_experience / resume upload above
         kind, key = classify(label)
         req = f["required"]
         loc = page.locator(f"[data-jobbot-wd='{f['i']}']")
@@ -262,16 +354,32 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
             sign_in_or_create(page, url, pr, log)
         except WorkdayError as ex:
             raise Blocked([str(ex)])
-    for _ in range(10):
+    retries = 0
+    for _ in range(12):
+        if "something went wrong" in page.inner_text("body").lower():
+            if retries >= 1:
+                raise Blocked(["Workday returned 'Something went wrong' twice — paused to protect the account; "
+                               "retry later from your Mac (home connection)"])
+            retries += 1
+            page.wait_for_timeout(15000)
+            page.reload(wait_until="networkidle")
+            page.wait_for_timeout(4000)
+            continue
         step = _step(page)
         if step.startswith("Review"):
             return log
+        import os
+        if os.environ.get("JOBBOT_WD_DUMP"):
+            dump = page.evaluate("()=>[...document.querySelectorAll('[data-automation-id]')].filter(e=>e.offsetParent||e.type==='file')"
+                                 ".map(e=>e.getAttribute('data-automation-id')+'|'+e.tagName+'|'+(e.type||'')+'|'"
+                                 "+(e.innerText||e.value||'').trim().slice(0,50).replace(/\\n/g,' '))")
+            (evid / f"dump_{re.sub(r'[^A-Za-z]+', '_', step)}.txt").write_text("\n".join(dump))
         blockers = fill_step(page, job, pr, app_row, log)
         page.screenshot(path=str(evid / f"wd_{re.sub(r'[^A-Za-z]+', '_', step)}.png"), full_page=True)
         if blockers:
             raise Blocked([f"[{step}] {b}" for b in blockers])
-        page.click(A("pageFooterNextButton"))
-        page.wait_for_timeout(4500)
+        page.locator(A("pageFooterNextButton")).click(timeout=60000)
+        page.wait_for_timeout(6000)
         errs = page.locator(A("errorMessage")).all_inner_texts()
         if errs and _step(page) == step:
             raise Blocked([f"[{step}] Workday validation: {e[:160]}" for e in errs[:6]])

@@ -60,7 +60,10 @@ def screen(job: dict, facts: dict) -> dict:
             if "public trust" in l and obtain:
                 add("clearance", "pass", "public trust obtainable (US citizen)", s)
             elif obtain and not re.search(r"\bactive\b|\bcurrent\b", l):
-                add("clearance", "review", "clearance must be obtained after hire — confirm eligibility", s)
+                if facts.get("clearance_history"):
+                    add("clearance", "pass", f"obtainable after hire; previously held {facts['clearance_history']}", s)
+                else:
+                    add("clearance", "review", "clearance must be obtained after hire — confirm eligibility", s)
             elif active and clearance in ("none", "", "unknown"):
                 add("clearance", "fail", "active clearance required; profile lists none", s)
             break

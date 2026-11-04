@@ -197,6 +197,9 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
                     blockers.append(f"licensing question: '{label[:120]}'")
                 continue
             val = salary_answer(ans.get("salary_expectation_rule"), job) if key == "salary_expectation" else ans.get(key)
+            if key == "previously_employed_here" and any(p.lower() in job["employer"].lower()
+                                                         for p in pr.get("prior_employers", [])):
+                val = "Yes"
             if val is None:
                 if req or f["type"] in ("select-one", "radio"):
                     blockers.append(f"{key.replace('_', ' ')} not approved: '{label[:120]}'")

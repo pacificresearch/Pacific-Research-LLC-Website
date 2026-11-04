@@ -166,7 +166,11 @@ class Scoring(unittest.TestCase):
         self.assertEqual(job_scoring.categorize(c, terms), "C")
         el = {"eligibility": "pass", "eligibility_reasons": []}
         sa = job_scoring.score(a, el, cfg, terms, {}, set())
-        self.assertEqual(sa["subscores"]["geo"], 100)
+        self.assertEqual(sa["subscores"]["geo"], 82)  # major city (remote > hybrid > major cities)
+        r = job_scoring.score(normalize(raw(sid="r", location="Remote")), el, cfg, terms, {}, set())
+        h = job_scoring.score(normalize(raw(sid="h", location="Boston, MA (Hybrid)")), el, cfg, terms, {}, set())
+        self.assertGreater(r["subscores"]["geo"], h["subscores"]["geo"])
+        self.assertGreater(h["subscores"]["geo"], sa["subscores"]["geo"])
         self.assertEqual(sa["salary"]["label"], "estimated")
 
     def test_weights_sum(self):
@@ -285,6 +289,11 @@ class CredentialsAndHarvest(unittest.TestCase):
         self.assertEqual(oct(f.stat().st_mode)[-3:], "600")
         csvp = credentials.export_chrome_csv()
         self.assertIn("name,url,username,password,note", open(csvp).read())
+
+    def test_workday_dates(self):
+        from jobbot.application_executor.adapters.workday import parse_dates
+        self.assertEqual(parse_dates("Nov 2021 - Feb 2026"), ((11, 2021), (2, 2026), False))
+        self.assertEqual(parse_dates("Mar 2026 - Present"), ((3, 2026), None, True))
 
     def test_parse_board_urls(self):
         from jobbot.job_discovery.web_search import parse

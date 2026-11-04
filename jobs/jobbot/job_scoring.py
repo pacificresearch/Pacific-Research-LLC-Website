@@ -162,21 +162,26 @@ def score(job: dict, elig: dict, cfg: dict, terms: dict, tiers: dict, evidence_l
     # --- employer quality
     employer = {1: 90, 2: 75, 3: 60}.get(tiers.get(job["employer"], 3), 60)
 
-    # --- geography
+    # --- geography: Andrew 11/4 — remote first, then hybrid, then major cities
     loc = (job.get("location") or "").lower()
+    head = (job["title"] + " " + loc + " " + (job.get("description") or "")[:1500]).lower()
     g = cfg["geography"]
-    geo = g["other_us_score"]
     if intl:
         geo = g["international"]["default"]
         for k, v in g["international"]["preferred"].items():
             if k in loc or k == (job.get("country") or ""):
                 geo = v
                 break
+        if job.get("remote"):
+            geo = max(geo, 90)
+    elif job.get("remote") and not re.search(r"\bhybrid\b", loc):
+        geo = g.get("remote_score", 100)
+    elif re.search(r"\bhybrid\b", head):
+        geo = g.get("hybrid_score", 92)
+    elif any(c in loc for c in g.get("major_cities", [])):
+        geo = g.get("major_city_score", 82)
     else:
-        for tier in g["tiers"]:
-            if any(m in loc for m in tier["match"]) or (tier["name"] == "Remote US" and job.get("remote")):
-                geo = max(geo, tier["score"])
-
+        geo = g["other_us_score"]
     sub = {"fit": round(fit), "interview": round(interview), "comp": round(comp), "advancement": round(advancement),
            "employer": employer, "geo": geo}
     total = sum(WEIGHTS[k] * v for k, v in sub.items())

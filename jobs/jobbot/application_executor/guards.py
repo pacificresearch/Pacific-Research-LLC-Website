@@ -16,6 +16,7 @@ SENSITIVE = [
     ("requires_sponsorship", r"sponsorship|\bvisa\b|h-?1b|immigration status|sponsor (you|your|an? (employment|work))"),
     ("legally_authorized_us", r"(legally )?(authori[sz]ed|eligible|permitted) to work|work authori[sz]ation|right to work"),
     ("us_citizen", r"\bcitizen(ship)?\b|\bnationality\b"),
+    ("ever_held_clearance", r"(ever|previously|have you) (held|had|been granted).*clearance|clearance.*(ever|previous|history)"),
     ("security_clearance", r"clearance"),
     ("veteran_status", r"veteran|military (service|spouse)|armed forces|uniformed service"),
     ("disability_status", r"disabilit"),
@@ -126,6 +127,12 @@ def match_option(answer: str, options: list[str]) -> str | None:
 def salary_answer(rule: str | None, job: dict) -> str | None:
     if not rule:
         return None
+    m = re.fullmatch(r"advertised_midpoint_min:(\d+)", rule)
+    if m:  # midpoint of the posted range, never below the floor; floor when no range is posted
+        floor = int(m.group(1))
+        lo, hi = job.get("salary_min"), job.get("salary_max")
+        mid = (lo + hi) / 2 if lo and hi and job.get("salary_label") == "advertised" else 0
+        return f"{max(round(mid, -3), floor):,.0f}"
     if rule == "advertised_midpoint":
         lo, hi = job.get("salary_min"), job.get("salary_max")
         if lo and hi and job.get("salary_label") == "advertised":
