@@ -94,12 +94,46 @@ def sign_in_or_create(page, url, pr, log):
                 "ok": True})
 
 
+def _all_listbox_texts(page) -> list[str]:
+    """Workday listboxes are virtualized: scroll the open list to collect every option."""
+    seen: list[str] = []
+    lb = page.locator("[role='listbox']:visible").last
+    for _ in range(25):
+        for t in page.locator("[role='option']:visible").all_inner_texts():
+            t = t.strip()
+            if t and t not in seen:
+                seen.append(t)
+        try:
+            at_end = lb.evaluate("e => { const b = e.scrollTop; e.scrollTop += Math.max(200, e.clientHeight); "
+                                 "return e.scrollTop === b; }")
+        except Exception:
+            break
+        page.wait_for_timeout(200)
+        if at_end:
+            break
+    try:
+        lb.evaluate("e => e.scrollTop = 0")
+    except Exception:
+        pass
+    return seen
+
+
 def _choose_listbox(page, field, option_text):
     field.locator("button[aria-haspopup='listbox']").click()
     page.wait_for_timeout(600)
-    opts = page.locator("[role='option']")
-    texts = [opts.nth(k).inner_text().strip() for k in range(opts.count())]
+    texts = _all_listbox_texts(page)
     pick = option_text if option_text in texts else match_option(option_text, texts)
+    if pick:  # bring it into view in the virtualized list before clicking
+        lb = page.locator("[role='listbox']:visible").last
+        for _ in range(25):
+            o = page.get_by_role("option", name=pick, exact=True)
+            if o.count() and o.first.is_visible():
+                break
+            try:
+                lb.evaluate("e => e.scrollTop += Math.max(200, e.clientHeight)")
+            except Exception:
+                break
+            page.wait_for_timeout(150)
     if not pick:
         page.keyboard.press("Escape")
         return None, texts
@@ -129,6 +163,15 @@ def _choose_multiselect(page, field, text):
     page.wait_for_timeout(1200)
     texts = _open_options(page)  # options shown for THIS field only (scoped to the active popup)
     pick = match_option(text, texts) or (texts[0] if len(texts) == 1 else None)
+    if not pick and not re.search(r"website|career", text, re.I):  # long lists (field of study, skills): type to filter
+        inp.fill(text)
+        inp.press("Enter")
+        page.wait_for_timeout(1500)
+        more = _open_options(page)
+        if more:
+            texts = more
+            pick = match_option(text, texts) or next((t for t in texts if text.lower() in t.lower()), None) \
+                or (texts[0] if len(texts) == 1 else None)
     if not pick and re.search(r"website|career", text, re.I) and not any(
             re.search(r"(company|corporate|career).*(site|website|page)|careers? (site|page|website)|website", t, re.I)
             for t in texts):
@@ -392,6 +435,19 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 sec = loc.locator(f"[data-automation-id='dateSection{part}-input']")
                 if sec.count():
                     sec.fill(str(val))
+            continue
+        if f["id"] == "skills" or re.search(r"type to add skills|^skills$", label, re.I):
+            added = 0
+            for sk in ["Clinical Trial Management", "Good Clinical Practice (GCP)", "Project Management", "REDCap"]:
+                try:
+                    pk, _ = _choose_multiselect(page, loc, sk)
+                    added += bool(pk)
+                except Exception:
+                    pass
+                if added >= 3:
+                    break
+            if not added and req:
+                blockers.append("skills field: could not add any skill")
             continue
         val = _value_for(key, label, f, job, pr)
         if key == "salary_expectation" and val and re.search(r"currency", label, re.I) and "USD" not in str(val):
