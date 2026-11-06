@@ -634,6 +634,9 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
                                  "+(e.innerText||e.value||'').trim().slice(0,50).replace(/\\n/g,' '))")
             (evid / f"dump_{re.sub(r'[^A-Za-z]+', '_', step)}.txt").write_text("\n".join(dump))
         blockers = fill_step(page, job, pr, app_row, log)
+        if not blockers:  # answers can reveal follow-up questions (e.g. "If yes, please specify"): second pass
+            page.wait_for_timeout(800)
+            blockers = fill_step(page, job, pr, app_row, log)
         page.screenshot(path=str(evid / f"wd_{re.sub(r'[^A-Za-z]+', '_', step)}.png"), full_page=True)
         if blockers:
             raise Blocked([f"[{step}] {b}" for b in blockers])
