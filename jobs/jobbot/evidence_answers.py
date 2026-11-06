@@ -93,8 +93,8 @@ def answer(question: str, options: list[str], job: dict, timeout: int = 120) -> 
     hit = c.get(key)
     if hit and hit.get("override") is not None:
         return hit["override"]  # Andrew's own answer always wins
-    if MOTIVATION.search(q):
-        return motivation_answer(job)
+    if MOTIVATION.search(q) and not [o for o in options if o and not re.match(r"^(select|please select|select one|--)", o, re.I)]:
+        return motivation_answer(job)  # free-text only; never pasted into a choice list
     if not q or OUT_OF_SCOPE.search(q):
         return None
     yesno = re.match(r"^(do|does|did|have|has|are|is|can|will|would|were)\b", q, re.I)

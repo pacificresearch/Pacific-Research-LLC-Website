@@ -14,6 +14,9 @@ import re
 SENSITIVE = [
     ("debarment", r"debarred|debarment|excluded.*federal|ineligible to participate in federal|oig exclusion|"
                   r"sanctioned by (the )?(fda|oig|hhs)"),
+    ("contact_method", r"preferred (method|mode|way) of (communication|contact)|how (should|would you like) (we|us to) contact"),
+    ("future_opportunities", r"(interested in|like to) (hear|be contacted|be considered|learn) (about|for) (other|future|contract|additional)|"
+                             r"if not selected.*(interested|consider)|talent (community|pool)"),
     ("noncompete", r"non[- ]?compet|non[- ]?solicit|restrictive covenant"),
     ("work_auth_type", r"what (type|kind) of (valid )?(work )?authori[sz]ation|^(current )?(work authori[sz]ation|immigration) (type|status)\b"),
     ("e_signature", r"applicant.?s statement|statement (&|and) acknowledg|type your (full )?(legal )?name (above |below )?to (agree|acknowledge|sign)|"
