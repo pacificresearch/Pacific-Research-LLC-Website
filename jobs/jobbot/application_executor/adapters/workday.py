@@ -140,6 +140,21 @@ def _choose_multiselect(page, field, text):
             if more:
                 texts = more
                 break
+    if not pick and re.search(r"website|career", text, re.I):
+        # Andrew 11/6: source "can be anything — click whatever is easiest". Prefer site/job-board wording; never an
+        # option that asserts something untrue (referral, recruiter contact, current worker) or needs follow-ups.
+        unsafe = re.compile(r"referr|employee|recruiter|contingent|worker|agency|campus|university|fair|event|"
+                            r"intern|former|current|other \(please|specify", re.I)
+        prefs = [r"(company|corporate|career).*(site|website|page)|careers? (site|page|website)|website",
+                 r"job board|indeed|linkedin|internet|online|search engine|glassdoor|social"]
+        for rx in prefs:
+            pick = next((t for t in texts if re.search(rx, t, re.I) and not unsafe.search(t)), None)
+            if pick:
+                break
+        if not pick:
+            pick = next((t for t in texts if not unsafe.search(t)), None)
+    if False:  # legacy branch kept for readability
+        pass
     if not pick and re.search(r"website|career", text, re.I):  # "How did you hear": company site wording varies
         pick = next((t for t in texts if re.search(r"(company|corporate|career).*(site|website|page)|careers? (site|page|website)|"
                                                     r"^website$|company website", t, re.I)), None)
