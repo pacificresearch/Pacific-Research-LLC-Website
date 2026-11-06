@@ -305,6 +305,18 @@ def fill(page, actions: list[dict]) -> list[dict]:
                     if not opts.count():
                         opts = page.locator("[role='listbox']:visible [role='option']")
                     texts = [opts.nth(k).inner_text().strip() for k in range(min(opts.count(), 25))]
+                    if not texts:  # typed text filtered everything out: open the unfiltered list instead
+                        el.fill("")
+                        el.press("ArrowDown")
+                        page.wait_for_timeout(1200)
+                        opts = page.locator(f"[id='{ctl}'] [role='option']") if ctl else page.locator("[role='listbox']:visible [role='option']")
+                        if not opts.count():
+                            opts = page.locator("[role='listbox']:visible [role='option']")
+                        texts = [opts.nth(k).inner_text().strip() for k in range(min(opts.count(), 40))]
+                        if a.get("key") == "work_auth_type" and texts:
+                            hit = next((t for t in texts if re.search(r"\bcitizen\b", t, re.I) and not re.search(r"non|not", t, re.I)), None)
+                            if hit:
+                                want = hit
                     first = typed.split(",")[0].strip().lower()
                     pick = next((k for k, t in enumerate(texts) if t.lower().startswith(first)), None)
                     if pick is None:
