@@ -155,6 +155,15 @@ def execute(app_id: int, mode: str = "review", headless: bool = False, wait_huma
         return {"app": app_id, "outcome": result["state"], "evidence": str(evid)}
     except Blocked as b:
         db.finish_attempt(attempt, "blocked", error="; ".join(b.reasons), evidence_dir=str(evid))
+        if any(r.startswith("POSTING CLOSED") for r in b.reasons):
+            with db.tx() as con:
+                con.execute("UPDATE jobs SET active=0 WHERE id=?", (job["id"],))
+            cur = db.app(app_id)["status"]
+            if cur == "SUBMITTING":
+                db.transition(app_id, "FAILED", "posting closed")
+                cur = "FAILED"
+            db.transition(app_id, "REJECTED", "posting closed by employer")
+            return {"app": app_id, "outcome": "posting_closed"}
         cur = db.app(app_id)["status"]
         target = "NEEDS_HUMAN_ACTION"
         if cur != target:

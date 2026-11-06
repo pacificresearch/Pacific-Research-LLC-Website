@@ -367,6 +367,10 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
     except Exception:
         pass
     page.wait_for_timeout(2000)
+    body = page.inner_text("body").lower()
+    if re.search(r"page you are looking for doesn.t exist|no longer (available|accepting)|position has been filled|"
+                 r"job (posting )?(is )?(closed|expired)|this job is no longer", body):
+        raise Blocked(["POSTING CLOSED: the employer page says this job no longer exists"])
     _accept_cookies(page)
     if not page.locator(A("applyManually")).count() and page.locator(A("adventureButton")).count():
         page.locator(A("adventureButton")).first.click()  # job page -> "Apply" -> start-your-application page
