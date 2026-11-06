@@ -438,12 +438,26 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             continue
         if f["id"] == "skills" or re.search(r"type to add skills|^skills$", label, re.I):
             added = 0
-            for sk in ["Clinical Trial Management", "Good Clinical Practice (GCP)", "Project Management", "REDCap"]:
+            for sk in ["Clinical Trials", "Project Management", "Good Clinical Practice", "REDCap", "Clinical Research"]:
                 try:
-                    pk, _ = _choose_multiselect(page, loc, sk)
-                    added += bool(pk)
+                    before = loc.locator("[data-automation-id='selectedItem']").count()
+                    inp = loc.locator("input").first
+                    inp.click()
+                    inp.fill(sk)
+                    inp.press("Enter")
+                    page.wait_for_timeout(1800)
+                    cands = _open_options(page)
+                    pick = next((t for t in cands if t.lower() == sk.lower()), None) or \
+                        next((t for t in cands if sk.lower() in t.lower()), None) or (cands[0] if cands else None)
+                    if pick:
+                        page.locator(OPT).filter(has_text=re.compile(rf"^\s*{re.escape(pick)}\s*$")).first.click()
+                        page.wait_for_timeout(900)
+                    page.keyboard.press("Escape")
+                    if loc.locator("[data-automation-id='selectedItem']").count() > before:
+                        added += 1
+                        log.append({"label": "Skills", "key": "skills", "value": pick, "ok": True})
                 except Exception:
-                    pass
+                    page.keyboard.press("Escape")
                 if added >= 3:
                     break
             if not added and req:
@@ -574,6 +588,9 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
         if not errs and "errors found" in page.inner_text("body").lower():
             errs = [e for e in page.locator("[data-automation-id='errorBanner'], [role='alert']").all_inner_texts() if e.strip()] \
                 or ["Workday reported 'Errors Found' on this step"]
+        errs = [e for e in errs if not re.search(r"successfully (uploaded|saved)", e, re.I)]
+        if not errs and "errors found" in page.inner_text("body").lower():
+            errs = ["Workday reported 'Errors Found' on this step (see screenshot)"]
         if errs and _step(page) == step:
             raise Blocked([f"[{step}] Workday validation: {e[:160]}" for e in errs[:6]])
     raise Blocked(["Workday flow did not reach Review within 10 steps"])
