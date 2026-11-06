@@ -135,10 +135,13 @@ def _choose_multiselect(page, field, text):
     if not pick:
         page.keyboard.press("Escape")
         return None, texts
-    page.locator(OPT, has_text=pick).first.click()
-    page.wait_for_timeout(1200)
-    sub = [t for t in _open_options(page) if t != pick]
-    if sub and not field.locator("[data-automation-id='selectedItem']").count():
+    exact = page.locator(OPT).filter(has_text=re.compile(rf"^\s*{re.escape(pick)}\s*$"))
+    (exact.first if exact.count() else page.locator(OPT, has_text=pick).first).click()
+    page.wait_for_timeout(1500)
+    now = _open_options(page)
+    selected = field.locator("[data-automation-id='selectedItem']").count() > 0
+    sub = [t for t in now if t != pick] if (now and set(now) != set(texts)) else []  # sub-menu only if the list CHANGED
+    if sub and not selected:
         # hierarchical prompt (e.g. Website -> specific site): take the employer's own careers site
         nxt = next((t for t in sub if re.search(r"career|company|corporate|website", t, re.I)), sub[0] if len(sub) == 1 else None)
         if not nxt:
