@@ -451,8 +451,11 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             if bad:
                 f["value"] = "" if not loc.locator("[data-automation-id='selectedItem']").count() else f["value"]
         if f["value"] and f["type"] in ("select", "text", "multiselect") and f["value"] not in ("Select One",
-                                                                                               "0 items selected"):
+                                                                                               "0 items selected") \
+                and kind != "sensitive" and not re.search(r"authori|sponsor|citizen|visa|eligib", label, re.I):
             continue  # Workday prefilled it (from the account or resume parse)
+        # sensitive answers are NEVER trusted from a saved draft or resume parse: always re-answered from the
+        # approved profile (or blocked) - a stale 'Yes' to foreign work authorization went out this way (11/6)
         # voluntary disclosures -> decline when required
         if key in DECLINE_KEYS or re.search(r"disabilit|veteran|gender|ethnic|race", label, re.I):
             if not req:
