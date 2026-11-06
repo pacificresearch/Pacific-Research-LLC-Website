@@ -33,7 +33,8 @@ SENSITIVE = [
     ("truth_certification", r"certify .{0,40}(truthful|true|accurate|correct|complete)|(truthful|true and (correct|complete)).{0,30}certif"),
     ("sms_consent", r"consent to (receiv|be contacted)|text messag|\bsms\b"),
     ("requires_sponsorship", r"sponsorship|\bvisa\b|h-?1b|immigration status|sponsor (you|your|an? (employment|work))"),
-    ("legally_authorized_us", r"(legally )?(authori[sz]ed|eligible|permitted) to work|work authori[sz]ation|right to work"),
+    ("legally_authorized_us", r"(legally )?(authori[sz]ed|eligible|permitted) to work|work authori[sz]ation|right to work|"
+                              r"(legal )?(authori[sz]ation|eligibility|permission) to (work|be employed)"),
     ("us_citizen", r"\bcitizen(ship)?\b|\bnationality\b"),
     ("ever_held_clearance", r"(ever|previously|have you) (held|had|been granted).*clearance|clearance.*(ever|previous|history)"),
     ("security_clearance", r"clearance"),
@@ -106,11 +107,16 @@ def classify(label: str) -> tuple[str, str]:
     full = " ".join((label or "").lower().split())
     stem = re.sub(r"\([^)]*\)?", " ", full)
     stem = re.split(r"(?<=\?)\s", stem)[0]
-    for cand in (stem, full):
-        k = _classify(cand)
-        if k[0] != "unknown":
-            return k
-    return "unknown", ""
+    k = _classify(stem)
+    if k[0] != "unknown":
+        return k
+    k = _classify(full)
+    # help text alone must never turn an authorization question into a sponsorship one (or vice versa):
+    # if the stem talks about authorization/sponsorship but did not classify, ask the human
+    if k[1] in ("requires_sponsorship", "legally_authorized_us", "us_citizen", "visa_status_na", "work_auth_type") \
+            and re.search(r"authori[sz]|sponsor|eligib|permit|right to work", stem):
+        return "sensitive", "unclear_work_auth"
+    return k
 
 
 def _classify(l: str) -> tuple[str, str]:
@@ -122,6 +128,57 @@ def _classify(l: str) -> tuple[str, str]:
         if re.search(rx, l):
             return "routine", key
     return "unknown", ""
+
+
+WORK_AUTH_KEYS = ("legally_authorized_us", "requires_sponsorship", "us_citizen", "visa_status_na", "work_auth_type")
+US_RX = re.compile(r"\b(united states|u\.?s\.?a?\.?|america)\b", re.I)
+COUNTRY_RX = re.compile(r"\b(canada|mexico|brazil|argentina|chile|peru|colombia|united kingdom|\buk\b|england|ireland|"
+                        r"germany|france|spain|italy|netherlands|belgium|switzerland|poland|india|china|japan|"
+                        r"singapore|australia|new zealand|philippines|south africa|israel|eu\b|european union|"
+                        r"europe|kenya|nigeria|uae|saudi)", re.I)
+JOB_COUNTRY_RX = re.compile(r"(country|location) (in )?(which|where) (this|the) (position|role|job) (is|will be) "
+                            r"(located|posted|based)|this country|the country of (employment|the position)", re.I)
+US_STATES = ("alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida|georgia|hawaii|idaho|"
+             "illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|"
+             "mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|"
+             "north carolina|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|"
+             "south dakota|tennessee|texas|utah|vermont|virginia|washington|west virginia|wisconsin|wyoming|"
+             r"\b(al|ak|az|ar|ca|co|ct|de|fl|ga|hi|id|il|in|ia|ks|ky|la|me|md|ma|mi|mn|ms|mo|mt|ne|nv|nh|nj|nm|ny|"
+             r"nc|nd|oh|ok|or|pa|ri|sc|sd|tn|tx|ut|vt|va|wa|wv|wi|wy|dc)\b|\busa?\b|united states|remote,? us")
+
+
+def job_in_us(job: dict | None) -> bool | None:
+    """True/False when the posting's country is known, None when it is not."""
+    job = job or {}
+    country = (job.get("country") or "").strip().lower()
+    if country:
+        return country in ("united states", "us", "usa", "united states of america")
+    loc = (job.get("location") or "").lower()
+    if COUNTRY_RX.search(loc) or COUNTRY_RX.search(job.get("title") or ""):
+        return False
+    if re.search(US_STATES, loc):
+        return True
+    return None
+
+
+def scope_work_auth(key: str, label: str, job: dict | None) -> str:
+    """The approved work-authorization answers are about the UNITED STATES. Use them only when the question is
+    about the US; a question about another country (named, or 'the country where this position is located' for a
+    non-US / unknown-location job) gets its own key with no approved answer, so it stops for a human."""
+    if key not in WORK_AUTH_KEYS:
+        return key
+    text = " ".join((label or "").split())
+    stem = re.sub(r"\([^)]*\)?", " ", text)
+    if COUNTRY_RX.search(stem):
+        return key + "_foreign"
+    if US_RX.search(stem):
+        return key
+    if JOB_COUNTRY_RX.search(stem) or not re.search(r"\bu\.?s\b", text, re.I):
+        in_us = job_in_us(job)
+        if in_us is True:
+            return key
+        return key + ("_foreign" if in_us is False else "_unknown_country")
+    return key
 
 
 def attestation_id(label: str) -> str:

@@ -409,5 +409,31 @@ class Executor(unittest.TestCase):
         self.assertEqual(state, "blocked")
 
 
+class WorkAuthClassifyTest(unittest.TestCase):
+    def test_work_authorization_not_misread_as_sponsorship(self):
+        from jobbot.application_executor.guards import classify
+        q = ("Do you currently have legal authorization to work for any employer in the United States? (For example but "
+             "not limited to: US Citizen, Green Card Holder, Employer Sponsored Visa Holder, EAD Card Holder)")
+        assert classify(q) == ("sensitive", "legally_authorized_us")
+        q2 = ("In the future will you request or require BMS sponsorship for employment-based immigration support? "
+              "(For example but not limited to: H-1B, STEM OPT, EAD, TN Visa)")
+        assert classify(q2) == ("sensitive", "requires_sponsorship")
+
+    def test_work_authorization_scoped_to_us(self):
+        from jobbot.application_executor.guards import scope_work_auth as sc
+        us, br, unk = {"country": "united states"}, {"country": "brazil", "location": "BRA-Remote"}, {"country": "", "location": ""}
+        # Syneos #166 (Canada) and #956 (Brazil): must never reuse the US "Yes"
+        self.assertEqual(sc("legally_authorized_us", "Are you legally authorized to work in Canada?", unk), "legally_authorized_us_foreign")
+        self.assertEqual(sc("legally_authorized_us", "Are you legally authorized to work in the country in which this "
+                            "position is located?", br), "legally_authorized_us_foreign")
+        self.assertEqual(sc("requires_sponsorship", "Will you require sponsorship for employment visa status?", unk),
+                         "requires_sponsorship_unknown_country")
+        self.assertEqual(sc("legally_authorized_us", "Are you legally authorized to work in the country in which this "
+                            "position is posted?", us), "legally_authorized_us")
+        self.assertEqual(sc("legally_authorized_us", "Are you legally authorized to work for this Company in the US?", unk),
+                         "legally_authorized_us")
+        self.assertEqual(sc("salary_expectation", "Desired salary in Canada", unk), "salary_expectation")
+
+
 if __name__ == "__main__":
     unittest.main()

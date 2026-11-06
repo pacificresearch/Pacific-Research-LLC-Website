@@ -18,7 +18,7 @@ import re
 from datetime import date
 
 from ... import credentials
-from ..guards import attestation_id, classify, match_option, salary_answer
+from ..guards import attestation_id, classify, match_option, salary_answer, scope_work_auth
 from .base import CORE_FIELDS, DECLINE_KEYS, DECLINE_RX, captcha_visible
 
 A = lambda aid: f"[data-automation-id='{aid}']"  # noqa: E731
@@ -380,6 +380,7 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                                      or f["type"] == "other" and "upload" in label.lower()):
             continue  # handled by fill_work_experience / resume upload above
         kind, key = classify(label)
+        key = scope_work_auth(key, label, job)
         req = f["required"]
         loc = page.locator(f"[data-jobbot-wd='{f['i']}']")
         if f["value"] and f["type"] in ("select", "text", "multiselect") and f["value"] not in ("Select One",

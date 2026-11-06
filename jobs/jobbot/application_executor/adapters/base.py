@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from ..guards import CAPTCHA_SELECTORS, attestation_id, classify, match_option, salary_answer
+from ..guards import CAPTCHA_SELECTORS, attestation_id, classify, match_option, salary_answer, scope_work_auth
 
 SCAN_JS = r"""
 () => {
@@ -135,6 +135,7 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
                     label = label.replace(o, " ")
             label = " ".join(label.split())
         kind, key = classify(label)
+        key = scope_work_auth(key, label, job)
         req = bool(f.get("required"))
         act = {"idx": f["idx"], "type": f["type"], "label": label[:160], "kind": kind, "key": key}
         if policy.get("skip_optional", True) and not req and f["type"] != "file" and \
