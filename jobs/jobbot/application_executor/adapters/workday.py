@@ -248,6 +248,8 @@ def _value_for(key, label, f, job, pr):
                   "fieldOfStudy": edu.get("discipline"), "fieldsOfStudy": edu.get("discipline")})
     if f["id"] in by_id:
         return by_id[f["id"]]
+    if key == "education_level":
+        return edu.get("degree")
     if key in ("school", "degree", "discipline"):
         return {"school": edu.get("school"), "degree": edu.get("degree"), "discipline": edu.get("discipline")}[key]
     if key in ("first_name", "last_name", "full_name", "email", "phone"):
@@ -490,7 +492,7 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
         try:
             if f["type"] == "select":
                 cands = [str(val)]
-                if f["id"] == "degree" or key == "degree":
+                if f["id"] == "degree" or key in ("degree", "education_level"):
                     cands = ["Master of Arts", "Master's Degree", "Masters Degree", "Masters", "Master's", "Master",
                              "MA", "M.A.", "Graduate Degree", str(val)]
                 pick = opts = None

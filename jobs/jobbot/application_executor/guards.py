@@ -12,8 +12,10 @@ import re
 
 # order matters: first match wins
 SENSITIVE = [
+    ("offer_factors", r"factors .{0,40}should consider|anything (else )?we should (know|consider) (about|regarding) (an )?offer"),
     ("debarment", r"debarred|debarment|excluded.*federal|ineligible to participate in federal|oig exclusion|"
-                  r"sanctioned by (the )?(fda|oig|hhs)"),
+                  r"sanctioned by (the )?(fda|oig|hhs)|list of excluded|\boig\b|disqualified or restricted by the (fda|hhs)|"
+                  r"receiving investigational (drugs|products)"),
     ("contact_method", r"preferred (method|mode|way) of (communication|contact)|how (should|would you like) (we|us to) contact"),
     ("future_opportunities", r"(interested in|like to) (hear|be contacted|be considered|learn) (about|for) (other|future|contract|additional)|"
                              r"if not selected.*(interested|consider)|talent (community|pool)"),
