@@ -12,7 +12,9 @@ import re
 
 # order matters: first match wins
 SENSITIVE = [
-    ("noncompete", r"non-?compete|non-?solicit"),
+    ("debarment", r"debarred|debarment|excluded.*federal|ineligible to participate in federal|oig exclusion|"
+                  r"sanctioned by (the )?(fda|oig|hhs)"),
+    ("noncompete", r"non-?compet|non-?solicit|restrictive covenant"),
     ("work_auth_type", r"what (type|kind) of (valid )?(work )?authori[sz]ation|^(current )?(work authori[sz]ation|immigration) (type|status)\b"),
     ("e_signature", r"applicant.?s statement|statement (&|and) acknowledg|type your (full )?(legal )?name (above |below )?to (agree|acknowledge|sign)|"
                     r"electronic (name|signature)|e-?signature|sign(ature)? by typing"),
@@ -31,7 +33,7 @@ SENSITIVE = [
     ("sexual_orientation", r"sexual orientation|transgender|lgbt"),
     ("gender", r"\bgender\b|\bsex\b|pronoun"),
     ("criminal_history", r"criminal|convict|felony|misdemeanor|offen[cs]e|background check"),
-    ("age_18_or_over", r"18 years|age of 18|\bover 18\b|date of birth|\bbirth\b"),
+    ("age_18_or_over", r"18 years|age of 18|\bover 18\b|date of birth|\bbirth\b|minimum age"),
     ("willing_to_relocate", r"relocat"),
     ("willing_onsite", r"willing to (be|work) (on-?site|in (the )?office)|not a remote position|commute to"),
     ("years_clinical_research", r"years of (\w+ )?experience .*(clinical (research|trials?)|crc\b)"),
