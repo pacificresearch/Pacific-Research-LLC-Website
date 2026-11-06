@@ -500,6 +500,23 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     pick, opts = _choose_listbox(page, loc, cand)
                     if pick:
                         break
+                if not pick:  # virtualized list: type-ahead with the keyboard, then confirm what it landed on
+                    btn = loc.locator("button[aria-haspopup='listbox']").first
+                    for cand in cands:
+                        try:
+                            page.keyboard.press("Escape")
+                            btn.click()
+                            page.wait_for_timeout(400)
+                            page.keyboard.type(cand.split()[0][:6], delay=90)
+                            page.wait_for_timeout(500)
+                            page.keyboard.press("Enter")
+                            page.wait_for_timeout(600)
+                            shown = btn.inner_text().strip()
+                            if shown and shown != "Select One" and match_option(cand, [shown]):
+                                pick = shown
+                                break
+                        except Exception:
+                            continue
                 if pick:  # verify the widget now shows the choice; Workday occasionally drops a click
                     ok_shown = False
                     for _ in range(3):
