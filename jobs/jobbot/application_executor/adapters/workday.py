@@ -508,8 +508,11 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             if f["type"] == "select":
                 cands = [str(val)]
                 if f["id"] == "degree" or key in ("degree", "education_level"):
-                    cands = ["Master of Arts", "Master's Degree", "Masters Degree", "Masters", "Master's", "Master",
-                             "MA", "M.A.", "Graduate Degree", str(val)]
+                    cands = ["Master of Arts", "Master's Degree", "Masters Degree", "Master Degree", "Masters", "Master's",
+                             "Master", "MA", "M.A.", "Graduate Degree", str(val)]
+                elif f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline":
+                    # closest truthful entries for an MA in International Studies; "Other" is always true
+                    cands = [str(val), "International Relations", "International Affairs", "Global Studies", "Other"]
                 pick = opts = None
                 for cand in cands:
                     pick, opts = _choose_listbox(page, loc, cand)
