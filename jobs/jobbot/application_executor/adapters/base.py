@@ -93,7 +93,7 @@ DECLINE_KEYS = {"veteran_status", "disability_status", "gender", "race_ethnicity
                 "sexual_orientation"}
 DECLINE_RX = re.compile(r"decline|do(n'?t| not) (wish|want|care) to|prefer not|choose not|not (to )?(answer|disclose|"
                         r"self[- ]identify|specified|declared|provided)|undeclared|i do not want to answer|rather not|"
-                        r"no answer|withhold", re.I)
+                        r"no answer|withhold|undisclosed|not disclosed", re.I)
 
 
 def decline_option(options: list[str]) -> str | None:

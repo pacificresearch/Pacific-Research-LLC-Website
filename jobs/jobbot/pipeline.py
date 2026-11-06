@@ -103,6 +103,14 @@ def shortlist(quotas: dict | None = None) -> dict[str, list]:
                 if r["status"] in ("QUALIFIED", "MATERIALS_READY", "AWAITING_APPROVAL")
                 or (r["status"] == "NEEDS_HUMAN_ACTION" and r["updated_at"] >= recent)
                 or (r["status"] in ("SUBMITTED", "CONFIRMATION_PENDING") and (r["submitted_at"] or r["updated_at"]) >= db.today())]
+        # Andrew 11/6 "more remote and international": remote roles move up within each category
+        def _rank(r):
+            try:
+                geo = (json.loads(r["subscores"] or "{}") or {}).get("geo", 80)
+            except Exception:
+                geo = 80
+            return (r["score"] or 0) + max(0, geo - 80) * 0.3  # remote (100) +6, hybrid (92) +3.6
+        rows.sort(key=_rank, reverse=True)
         picked, per_emp = [], {}
         for r in rows:
             if per_emp.get(r["employer"], 0) >= cfg["max_per_employer_per_day"]:

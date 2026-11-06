@@ -44,6 +44,17 @@ SEARCH_QUERIES = [
     '"clinical trial manager" remote greenhouse OR lever',
     '"global health program manager" careers',
     '"medical device" "program manager" Irvine careers',
+    # Andrew 11/6: more remote and international
+    'site:job-boards.greenhouse.io "clinical trial manager" remote',
+    'site:jobs.lever.co "clinical project manager" remote',
+    'site:myworkdayjobs.com "clinical operations" "remote"',
+    'site:myworkdayjobs.com "global health" "program manager"',
+    'site:myworkdayjobs.com "international programs" manager',
+    'site:job-boards.greenhouse.io "global health"',
+    'site:jobs.lever.co "international development"',
+    '"global clinical operations" manager remote careers',
+    '"humanitarian" "program manager" health careers greenhouse OR lever OR workday',
+    '"global health security" program manager careers',
 ]
 
 PATTERNS = [
