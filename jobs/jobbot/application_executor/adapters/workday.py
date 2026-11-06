@@ -417,6 +417,14 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
         page.wait_for_timeout(3500)
     if captcha_visible(page):
         raise Blocked(["human verification (CAPTCHA) on the Workday sign-in — not bypassed"])
+    # some tenants first show "Sign in with Google / Sign in with email"
+    em = page.get_by_role("button", name=re.compile(r"sign in with email", re.I))
+    if em.count() and not page.locator(A("password")).count():
+        em.first.click()
+        page.wait_for_timeout(2500)
+        if not credentials.get(url) and page.locator(A("createAccountLink")).count():
+            page.click(A("createAccountLink"))
+            page.wait_for_timeout(2500)
     if page.locator(A("email")).count() and page.locator(A("password")).count():
         try:
             sign_in_or_create(page, url, pr, log)
