@@ -580,10 +580,11 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 blockers.append(f"attestation needs your explicit approval [{aid}]: '{label[:200]}'")
             continue
         # self-identification form signature (CC-305): name + today's date, only alongside a decline answer
-        if re.search(r"^name$|your name", label, re.I) and "Self Identify" in step:
+        if re.search(r"^name$|your name|full name|signature|sign here|signed", label, re.I) and \
+                ("Self Identify" in step or "Disclosure" in step) and f["type"] in ("text", "textarea", "other"):
             loc.locator("input").first.fill(pr["contact"]["name"])
             continue
-        if f["type"] == "date" and "Self Identify" in step:
+        if f["type"] == "date" and ("Self Identify" in step or "Disclosure" in step):
             t = date.today()
             mi = loc.locator("[data-automation-id='dateSectionMonth-input']")
             want = (str(t.month), str(t.day), str(t.year))
