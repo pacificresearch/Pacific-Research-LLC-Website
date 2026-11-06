@@ -604,8 +604,20 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                         loc.locator("[data-automation-id='dateSectionMonth-display'], [data-automation-id='dateInputWrapper']").first.click(timeout=5000)
                     except Exception:
                         break
-                page.keyboard.press("Control+A")
-                page.keyboard.type(f"{t.month:02d}{t.day:02d}{t.year}", delay=60)
+                # each section separately (some tenants do not auto-advance), clearing what is there first
+                for part, val in (("Month", f"{t.month:02d}"), ("Day", f"{t.day:02d}"), ("Year", str(t.year))):
+                    sec = loc.locator(f"[data-automation-id='dateSection{part}-input']").first
+                    try:
+                        sec.click(force=True, timeout=5000)
+                        for _b in range(4):
+                            page.keyboard.press("Backspace")
+                        page.keyboard.type(val, delay=80)
+                    except Exception:
+                        try:
+                            sec.fill(val)
+                        except Exception:
+                            pass
+                page.keyboard.press("Tab")
                 page.wait_for_timeout(500)
                 got = tuple(str(int(loc.locator(f"[data-automation-id='dateSection{p}-input']").first.input_value() or 0))
                             for p in ("Month", "Day", "Year"))
