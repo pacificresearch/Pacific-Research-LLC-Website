@@ -563,8 +563,17 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             pol = pr.get("answer_policy") or {}
             if aid in approved_att or (req and pol.get("accept_consents") and is_plain_consent(label)):
                 try:
-                    _tick(page, loc)
-                    log.append({"label": label, "key": "attestation", "value": f"<checked {aid}>", "ok": True})
+                    if f["type"] == "select":  # consent rendered as a Yes/No dropdown (BD)
+                        pick = None
+                        for cand in ("Yes", "I consent", "I agree", "Agree", "Accept"):
+                            pick, _o = _choose_listbox(page, loc, cand)
+                            if pick:
+                                break
+                        if not pick:
+                            raise RuntimeError("no affirmative option")
+                    else:
+                        _tick(page, loc)
+                    log.append({"label": label, "key": "attestation", "value": f"<consented {aid}>", "ok": True})
                 except Exception:
                     blockers.append(f"could not tick approved box [{aid}]: '{label[:120]}'")
             else:
