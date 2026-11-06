@@ -18,7 +18,7 @@ import re
 from datetime import date
 
 from ... import credentials
-from ..guards import attestation_id, classify, match_option, salary_answer, scope_work_auth
+from ..guards import attestation_id, classify, is_plain_consent, match_option, salary_answer, scope_work_auth
 from .base import CORE_FIELDS, DECLINE_KEYS, DECLINE_RX, captcha_visible
 
 A = lambda aid: f"[data-automation-id='{aid}']"  # noqa: E731
@@ -524,7 +524,8 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             continue
         if kind == "sensitive" and key == "attestation" or f["type"] == "checkbox":
             aid = attestation_id(label)
-            if aid in approved_att:
+            pol = pr.get("answer_policy") or {}
+            if aid in approved_att or (req and pol.get("accept_consents") and is_plain_consent(label)):
                 loc.locator("input[type=checkbox]").first.check(force=True)
                 log.append({"label": label, "key": "attestation", "value": f"<checked {aid}>", "ok": True})
             else:

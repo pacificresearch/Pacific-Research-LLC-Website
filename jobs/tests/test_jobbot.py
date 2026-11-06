@@ -434,6 +434,12 @@ class WorkAuthClassifyTest(unittest.TestCase):
                          "legally_authorized_us")
         self.assertEqual(sc("salary_expectation", "Desired salary in Canada", unk), "salary_expectation")
 
+    def test_plain_consent_vs_fact_claim(self):
+        from jobbot.application_executor.guards import is_plain_consent
+        self.assertTrue(is_plain_consent("Yes, I have read and consent to the terms and conditions"))
+        self.assertFalse(is_plain_consent("I certify that the information provided is true and correct"))
+        self.assertFalse(is_plain_consent("I acknowledge that I am not a current employee"))
+
 
 if __name__ == "__main__":
     unittest.main()

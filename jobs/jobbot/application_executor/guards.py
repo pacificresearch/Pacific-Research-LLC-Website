@@ -231,3 +231,17 @@ def salary_answer(rule: str | None, job: dict) -> str | None:
             return f"{round((lo + hi) / 2, -3):,.0f}"
         return None  # no advertised range -> ask the human
     return rule
+
+
+# Andrew 11/6 "yes always consent": required consent / terms / privacy / acknowledgement boxes may be ticked.
+# Never a box that asserts a FACT about the candidate (that stays a human decision).
+CONSENT_RX = re.compile(r"\b(consent|agree|accept|acknowledge|terms|conditions|privacy|personal data|data processing|"
+                        r"have read|i understand|authori[sz]e)\b", re.I)
+FACT_CLAIM_RX = re.compile(r"\b(certify|i am (not )?(a|an|currently)|i have (not )?(been|held|worked|never)|i hold|"
+                           r"i do not have|truthful|true and (correct|complete)|accurate and complete|convicted|"
+                           r"licensed|citizen|authori[sz]ed to work|sponsorship|over 18|years of age)\b", re.I)
+
+
+def is_plain_consent(label: str) -> bool:
+    l = " ".join((label or "").split())
+    return bool(CONSENT_RX.search(l)) and not FACT_CLAIM_RX.search(l)

@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from ..guards import CAPTCHA_SELECTORS, attestation_id, classify, match_option, salary_answer, scope_work_auth
+from ..guards import CAPTCHA_SELECTORS, attestation_id, classify, is_plain_consent, match_option, salary_answer, scope_work_auth
 
 SCAN_JS = r"""
 () => {
@@ -222,7 +222,7 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
         if kind == "sensitive":
             if key == "attestation":
                 aid = attestation_id(label)
-                if aid in approved_att:
+                if aid in approved_att or (req and policy.get("accept_consents") and is_plain_consent(label)):
                     actions.append({**act, "check": True, "attestation_id": aid})
                 elif req:
                     blockers.append(f"attestation needs your explicit approval [{aid}]: '{label[:200]}'")
