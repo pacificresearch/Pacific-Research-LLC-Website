@@ -588,10 +588,21 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             t = date.today()
             mi = loc.locator("[data-automation-id='dateSectionMonth-input']")
             want = (str(t.month), str(t.day), str(t.year))
+            def _cur():
+                try:
+                    return tuple(str(int(loc.locator(f"[data-automation-id='dateSection{p}-input']").first.input_value() or 0))
+                                 for p in ("Month", "Day", "Year"))
+                except Exception:
+                    return ()
             for _ in range(3):  # MM/DD/YYYY widget auto-advances: type it in one go from the month, then verify
-                if not mi.count():
+                if not mi.count() or _cur() == want:
                     break
-                mi.first.click()
+                try:
+                    if not (mi.first.is_visible() and mi.first.is_enabled()):
+                        break  # tenant fills and locks today's date itself
+                    mi.first.click(timeout=5000)
+                except Exception:
+                    break
                 page.keyboard.press("Control+A")
                 page.keyboard.type(f"{t.month:02d}{t.day:02d}{t.year}", delay=60)
                 page.wait_for_timeout(500)
