@@ -375,6 +375,8 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     sec.fill(str(val))
             continue
         val = _value_for(key, label, f, job, pr)
+        if key == "salary_expectation" and val and re.search(r"currency", label, re.I) and "USD" not in str(val):
+            val = f"{val} USD"
         if val in (None, "") and kind == "unknown":
             from ...evidence_answers import answer as evidence_answer
             val = evidence_answer(label, f.get("options", []), job)
@@ -393,6 +395,13 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     pick, opts = _choose_listbox(page, loc, cand)
                     if pick:
                         break
+                if pick:  # verify the widget now shows the choice; Workday occasionally drops a click
+                    for _ in range(2):
+                        shown = loc.locator("button[aria-haspopup='listbox']").first.inner_text().strip()
+                        if shown == pick or pick in shown:
+                            break
+                        page.wait_for_timeout(600)
+                        _choose_listbox(page, loc, pick)
                 if not pick:
                     full = loc.inner_text()[:1500].replace("\n", " ")
                     blockers.append(f"'{val}' matches no option for '{label[:80]}': {opts[:6]}"

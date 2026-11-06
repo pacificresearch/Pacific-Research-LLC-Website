@@ -218,6 +218,8 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
                     blockers.append(f"licensing question: '{label[:120]}'")
                 continue
             val = salary_answer(ans.get("salary_expectation_rule"), job) if key == "salary_expectation" else ans.get(key)
+            if key == "salary_expectation" and val and re.search(r"currency", label, re.I):
+                val = f"{val} USD"
             if key in ("previously_employed_here", "previously_interviewed_here") and any(p.lower() in job["employer"].lower()
                                                          for p in pr.get("prior_employers", [])):
                 val = "Yes"
