@@ -91,6 +91,9 @@ def execute(app_id: int, mode: str = "review", headless: bool = False, wait_huma
     kind = route({"apply_url": url_override or job["apply_url"]})
     if cfg.get("paused"):
         return {"app": app_id, "outcome": "paused"}
+    if a["status"] == "FAILED" and a["approved_at"] and not db.ever_clicked_submit(app_id):
+        db.transition(app_id, "AWAITING_APPROVAL", "retry: earlier attempt failed before any submit click")
+        a = db.app(app_id)
     if a["status"] not in ("AWAITING_APPROVAL", "MATERIALS_READY", "NEEDS_HUMAN_ACTION"):
         return {"app": app_id, "outcome": f"skipped: status {a['status']}"}
     if mode == "submit":

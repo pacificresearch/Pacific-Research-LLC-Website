@@ -296,11 +296,19 @@ def fill(page, actions: list[dict]) -> list[dict]:
                         from ..guards import match_option
                         m = match_option(want, texts)
                         pick = texts.index(m) if m else None
+                    def _choose(k):
+                        try:
+                            opts.nth(k).click(timeout=5000)
+                        except Exception:  # option re-rendered under the cursor: select it by keyboard
+                            el.focus()
+                            for _ in range(k + 1):
+                                page.keyboard.press("ArrowDown")
+                            page.keyboard.press("Enter")
                     if pick is not None:
-                        opts.nth(pick).click()
+                        _choose(pick)
                         a = dict(a, value=texts[pick])
                     elif a.get("key") == "location" and texts:
-                        opts.nth(0).click()
+                        _choose(0)
                         a = dict(a, value=texts[0])
                     else:
                         raise RuntimeError(f"no dropdown option matches '{want}' (options: {texts[:6]})")
