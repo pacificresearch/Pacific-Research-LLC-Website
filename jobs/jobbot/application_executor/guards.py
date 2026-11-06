@@ -45,7 +45,7 @@ SENSITIVE = [
 ]
 
 ROUTINE = [
-    ("first_name", r"first name|given name|preferred first"),
+    ("first_name", r"first name|given name|preferred (first )?name|nickname"),
     ("last_name", r"last name|surname|family name"),
     ("full_name", r"^\s*(full )?name\s*$|your name|legal name"),
     ("country", r"^\s*country\s*$|country of residence|address\W+country\s*$"),
