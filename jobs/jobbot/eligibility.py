@@ -114,6 +114,9 @@ def screen(job: dict, facts: dict) -> dict:
                 ctx = _req_context(s)
                 if held in ("fluent", "native", "professional"):
                     add("language", "pass", f"{lang}: {held}", s)
+                elif re.search(r"for some (portfolios?|positions?|roles?|countries|projects?)|depending on|"
+                               r"(one|any) of|or.{0,40}(french|spanish|portuguese|arabic)|a second language", l):
+                    add("language", "review", f"{lang} needed only for some assignments / one of several languages", s)
                 elif ctx == "required" or (ctx == "neutral" and re.search(r"\bfluen|bilingual", l)):
                     add("language", "fail" if held in ("none", "") else "review",
                         f"{lang} proficiency required; profile: {held or 'not verified'}", s)
