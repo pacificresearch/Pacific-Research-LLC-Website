@@ -24,7 +24,7 @@ Usage:
 Optional command-line overrides:
     --days N        Look back N days for posted opportunities (default: 30)
     --limit N       Max opportunities to request per NAICS query (default: 100)
-    --api-key KEY   Override the hardcoded API key (or set env SAM_API_KEY)
+    --api-key KEY   Supply the SAM.gov API key (or set env SAM_API_KEY)
 
 Notes:
     * The script is self-contained; only the standard library and `requests`
@@ -60,11 +60,11 @@ except ImportError:  # pragma: no cover
 # 1. INPUT DATA CONFIGURATION
 # ---------------------------------------------------------------------------
 
-# API access. Prefer the environment variable so the key is not committed to
-# history, but fall back to the value provided for turnkey execution.
-API_KEY = os.environ.get(
-    "SAM_API_KEY", "SAM-216eed32-d400-463e-83ce-606c02d02ccf"
-)
+# API access. The key is read ONLY from the environment (or --api-key). There
+# is deliberately no committed fallback: a hardcoded key cannot be rotated
+# without a code change, so a stale checkout keeps sending a dead key and the
+# run screens zero notices while looking healthy. See LEARNING_LOG entry 14.
+API_KEY = os.environ.get("SAM_API_KEY", "")
 
 # SAM.gov Opportunities API (v2 is the current GA endpoint; v1 is deprecated).
 API_URL = "https://api.sam.gov/opportunities/v2/search"
@@ -1207,6 +1207,28 @@ def _redact_key(text):
     return re.sub(r'api_key=[^&\s"]+', 'api_key=REDACTED', text)
 
 
+def _die_auth(status, body):
+    """Abort the whole run on an authentication failure.
+
+    A rejected key makes every query return nothing. Continuing would write a
+    report reading "0 notices screened" that is indistinguishable from a week
+    with no postings — the exact failure that hid a dead key for seven weeks
+    (LEARNING_LOG entry 14). So stop here instead, loudly.
+    """
+    detail = "API_KEY_INVALID" if "API_KEY_INVALID" in (body or "") else ""
+    sys.stderr.write(
+        f"\nFATAL: SAM.gov rejected the API key (HTTP {status}"
+        + (f" {detail}" if detail else "") + ").\n"
+        "  Every query would return nothing, so this run is stopping rather\n"
+        "  than writing an empty report that looks like a quiet week.\n\n"
+        "  The key came from SAM_API_KEY (or --api-key). Check that it is the\n"
+        "  current one: sam.gov > Workspace > Account Details > API Key.\n"
+        "  A stale SAM_API_KEY in your shell or user environment overrides\n"
+        "  everything else — check that first.\n"
+    )
+    raise SystemExit(2)
+
+
 def _http_retry(fn, *args, **kwargs):
     """Call requests.get/post with a short timeout, limited retries, and a
     CIRCUIT BREAKER. Without the breaker a dead network makes every one of
@@ -1393,6 +1415,8 @@ def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
                     "Results are PARTIAL. Try again later or reduce --limit.\n"
                 )
                 break
+            if resp.status_code in (401, 403):
+                _die_auth(resp.status_code, getattr(resp, "text", ""))
             resp.raise_for_status()
             payload = resp.json()
 
@@ -4580,11 +4604,46 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
     p.append('<div class="wrap">')
 
     # Header
+    failed = _RUN_STATE.get("failed_codes") or []
+    partial = bool(failed) or _RUN_STATE.get("rate_limited")
+    coverage = (' · <strong>COVERAGE INCOMPLETE</strong>' if partial else '')
     p.append('<header><p class="eyebrow">Executive Pipeline Report</p>'
              f'<h1>{COMPANY_NAME} — Federal Opportunity Pipeline</h1>'
              f'<p class="sub">{SOCIOECONOMIC_STATUS} · generated '
              f'{dt.date.today().isoformat()} · last {days} days · '
-             f'{len(results)} notices screened</p></header>')
+             f'{len(results)} notices screened{coverage}</p></header>')
+
+    # An empty report must never be mistaken for a quiet week. If any query
+    # failed, say so here, at the top, where the reader actually looks — the
+    # console banner alone hid a dead key for seven weeks (LEARNING_LOG 14).
+    if partial:
+        bits = []
+        if failed:
+            shown = ", ".join(failed[:12])
+            more = f" (+{len(failed) - 12} more)" if len(failed) > 12 else ""
+            bits.append(
+                f"<strong>{len(failed)} query(s) FAILED</strong> and were not "
+                f"screened: {shown}{more}. These are NOT zero-result codes — "
+                "opportunities in them were never looked at."
+            )
+        if _RUN_STATE.get("rate_limited"):
+            bits.append(
+                "<strong>SAM.gov rate-limited this run (HTTP 429)</strong>, so "
+                "results are partial."
+            )
+        bits.append(
+            "Counts below are a FLOOR, not a total. Re-run before treating "
+            "this report as a complete picture of the window."
+        )
+        p.append(
+            '<div style="border:2px solid #b3261e;background:#fdecea;'
+            'border-radius:8px;padding:14px 18px;margin:18px 0;'
+            'color:#5f1512;font-size:0.95rem;line-height:1.5">'
+            '<p style="margin:0 0 6px;font-weight:700;font-size:1.05rem">'
+            '⚠ Incomplete run — do not read this as "nothing posted"</p>'
+            + "".join(f'<p style="margin:6px 0">{b}</p>' for b in bits)
+            + '</div>'
+        )
 
     # KPI cards — each count card is a clickable filter for the matrix below.
     kpi_filter = {
@@ -6614,10 +6673,20 @@ def main(argv=None):
 
     api_key = args.api_key or API_KEY
 
-    if not api_key or api_key.startswith("SAM-") is False:
+    if not api_key or not api_key.startswith("SAM-"):
         sys.stderr.write(
-            "WARNING: API key looks malformed. Set --api-key or SAM_API_KEY.\n"
+            "\nFATAL: no usable SAM.gov API key.\n"
+            "  The key is read from the SAM_API_KEY environment variable, or\n"
+            "  passed with --api-key. There is no built-in key.\n\n"
+            "  Get one: sam.gov > sign in > Workspace > Account Details >\n"
+            "  API Key. Then set it:\n"
+            "    Windows (PowerShell, this window):  $env:SAM_API_KEY='SAM-...'\n"
+            "    Windows (permanent): System Properties > Environment Variables\n"
+            "    macOS/Linux:  export SAM_API_KEY='SAM-...'\n\n"
+            "  Refusing to run: a keyless run would produce an empty report\n"
+            "  that is indistinguishable from a quiet week.\n"
         )
+        return 2
 
     posted_from, posted_to = _date_range(args.days)
     sys.stderr.write(

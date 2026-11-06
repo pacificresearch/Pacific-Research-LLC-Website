@@ -62,10 +62,12 @@ the run PREPARES those actions but never executes them.
 ## 1. Setup
 - If `capture/WORKFLOW.md` is missing from the default branch, fetch and
   check out `claude/system-design-discussion-x15cat` (pre-merge state).
-- Verify `api.sam.gov` is reachable. If the egress proxy blocks it
-  (HTTP 403 CONNECT), STOP and notify: "Network policy still blocks
-  api.sam.gov — allow it in the environment settings at
-  claude.ai/code." Do not fabricate a report.
+- Verify SAM.gov with a KEYED probe, not a reachability check: a
+  bare GET to `api.sam.gov` answers 404 even with no key, so "the host
+  is up" proves nothing (LEARNING_LOG 14). Issue one real search with
+  the key the run will use and confirm HTTP 200. On 401/403 the key is
+  dead or stale — STOP and notify; on a proxy 403 CONNECT the host is
+  blocked — STOP and notify. Do not fabricate a report.
 
 ## 2. Generate the report
 ```
@@ -78,7 +80,10 @@ run fetches each description before screening (cached across runs in
 `~/.prg_desc_cache.json`). If the hydration line reports 0 retrieved,
 the screen is running on titles only — STOP and fix it rather than
 trusting the output.
-(`SAM_API_KEY` env var overrides the built-in key.) Commit the report.
+(`SAM_API_KEY` must be set — there is no built-in key, and
+`--api-key` overrides it. The run aborts with exit 2 rather than
+writing an empty report if the key is missing or rejected.) Commit the
+report.
 Look back 3 days so weekend/holiday gaps self-heal; dedupe against
 notice IDs already present in `capture/reports/` and
 `capture/opportunities/`.
