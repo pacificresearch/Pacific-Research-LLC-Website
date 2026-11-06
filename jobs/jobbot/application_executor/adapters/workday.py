@@ -170,6 +170,24 @@ def _unselect(page, field, text):
             page.wait_for_timeout(600)
 
 
+def _tick(page, loc) -> None:
+    """Tick a Workday checkbox: native input, a styled role=checkbox, or the clickable label/row."""
+    for sel in ("input[type=checkbox]", "[role=checkbox]", "[data-automation-id*='checkbox' i]", "label"):
+        el = loc.locator(sel)
+        if el.count():
+            el = el.first
+            try:
+                if sel == "input[type=checkbox]":
+                    el.check(force=True, timeout=5000)
+                else:
+                    if (el.get_attribute("aria-checked") or "") != "true":
+                        el.click(force=True, timeout=5000)
+                return
+            except Exception:
+                continue
+    raise RuntimeError("could not tick the checkbox")
+
+
 def _choose_exact(page, inp, text):
     for attempt in (None, text):
         if attempt:
@@ -488,7 +506,7 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             continue  # policy: optional -> blank (Workday marks required fields reliably)
         if key == "truth_certification" and pr.get("answer_policy", {}).get("e_sign_when_all_answers_from_profile"):
             if f["type"] in ("checkbox",):
-                loc.locator("input[type=checkbox]").first.check(force=True)
+                _tick(page, loc)
             elif f["type"] == "select":
                 _choose_listbox(page, loc, "Yes")
             elif f["type"] in ("text", "textarea"):
@@ -544,8 +562,11 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             aid = attestation_id(label)
             pol = pr.get("answer_policy") or {}
             if aid in approved_att or (req and pol.get("accept_consents") and is_plain_consent(label)):
-                loc.locator("input[type=checkbox]").first.check(force=True)
-                log.append({"label": label, "key": "attestation", "value": f"<checked {aid}>", "ok": True})
+                try:
+                    _tick(page, loc)
+                    log.append({"label": label, "key": "attestation", "value": f"<checked {aid}>", "ok": True})
+                except Exception:
+                    blockers.append(f"could not tick approved box [{aid}]: '{label[:120]}'")
             else:
                 blockers.append(f"attestation needs your explicit approval [{aid}]: '{label[:200]}'")
             continue
