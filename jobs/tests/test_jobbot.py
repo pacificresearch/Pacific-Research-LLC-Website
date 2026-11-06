@@ -257,7 +257,8 @@ class Guards(unittest.TestCase):
         self.assertEqual(classify("Full name ✱")[1], "full_name")
         self.assertEqual(classify("Start date month*")[1], "education_dates")
         self.assertEqual(classify("Do you consent to receiving text messages?")[1], "sms_consent")
-        self.assertEqual(classify("I certify the information is true and correct")[1], "attestation")
+        self.assertEqual(classify("I certify the information is true and correct")[1], "truth_certification")
+        self.assertEqual(classify("I agree to the arbitration terms")[1], "attestation")
         self.assertEqual(match_option("No", ["Select...", "Yes", "No"]), "No")
         self.assertIsNone(match_option("Maybe", ["Yes", "No"]))
 
@@ -380,7 +381,8 @@ class Executor(unittest.TestCase):
                  '<label for="why">Why do you want to work at Acme? *</label><textarea id="why" name="q10" required></textarea>')
         state, reasons = self._run(extra, answers={"legally_authorized_us": "Yes", "requires_sponsorship": "No"})
         self.assertEqual(state, "blocked")
-        self.assertTrue(any("attestation" in r for r in reasons))  # motivation Qs are now answered cover-letter style
+        # truthfulness certification is only signed when the profile's policy allows it (example profile: not set)
+        self.assertTrue(any("certification" in r for r in reasons))
 
     def test_captcha_is_not_bypassed(self):
         extra = '<iframe src="https://hcaptcha.com/challenge" style="width:300px;height:150px"></iframe>'
