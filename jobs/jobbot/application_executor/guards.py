@@ -17,6 +17,8 @@ SENSITIVE = [
     ("contact_method", r"preferred (method|mode|way) of (communication|contact)|how (should|would you like) (we|us to) contact"),
     ("future_opportunities", r"(interested in|like to) (hear|be contacted|be considered|learn) (about|for) (other|future|contract|additional)|"
                              r"if not selected.*(interested|consider)|talent (community|pool)"),
+    ("visa_status_na", r"optional practical training|\bopt\b|stem extension|h-?1b (transfer|cap)|f-?1 student|tn status|e-?3"),
+    ("conflict_of_interest", r"conflicts? of interest"),
     ("noncompete", r"non[- ]?compet|non[- ]?solicit|restrictive covenant"),
     ("work_auth_type", r"what (type|kind) of (valid )?(work )?authori[sz]ation|^(current )?(work authori[sz]ation|immigration) (type|status)\b"),
     ("e_signature", r"applicant.?s statement|statement (&|and) acknowledg|type your (full )?(legal )?name (above |below )?to (agree|acknowledge|sign)|"
@@ -130,6 +132,11 @@ def norm(s: str) -> str:
 
 def match_option(answer: str, options: list[str]) -> str | None:
     """Pick the option matching an approved answer; None if not unambiguous."""
+    if norm(answer) in ("not applicable", "n a", "na"):
+        na = [o for o in options if re.search(r"not applicable|\bn/?a\b|does not apply|u\.?s\.? citizen", o, re.I)]
+        if na:
+            return na[0]
+        answer = "No"
     a = norm(answer)
     opts = [(o, norm(o)) for o in options if norm(o) and norm(o) not in ("select", "select one", "please select", "")]
     for o, n in opts:
