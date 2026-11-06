@@ -597,31 +597,18 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             for _ in range(3):  # MM/DD/YYYY widget auto-advances: type it in one go from the month, then verify
                 if not mi.count() or _cur() == want:
                     break
-                try:  # Workday hides the real input under a display layer: click through it
-                    mi.first.click(force=True, timeout=5000)
+                # same method as the work-history dates (proven live): click the month DISPLAY layer, then type
+                # MMDDYYYY; Workday auto-advances month -> day -> year
+                disp = loc.locator("[data-automation-id='dateSectionMonth-display']")
+                try:
+                    (disp.first if disp.count() else mi.first).scroll_into_view_if_needed(timeout=5000)
+                    (disp.first if disp.count() else mi.first).click(timeout=5000)
                 except Exception:
-                    try:
-                        loc.locator("[data-automation-id='dateSectionMonth-display'], [data-automation-id='dateInputWrapper']").first.click(timeout=5000)
-                    except Exception:
-                        break
-                # each section separately (some tenants do not auto-advance), clearing what is there first
-                for part, val in (("Month", f"{t.month:02d}"), ("Day", f"{t.day:02d}"), ("Year", str(t.year))):
-                    sec = loc.locator(f"[data-automation-id='dateSection{part}-input']").first
-                    try:
-                        sec.click(force=True, timeout=5000)
-                        for _b in range(4):
-                            page.keyboard.press("Backspace")
-                        page.keyboard.type(val, delay=80)
-                    except Exception:
-                        try:
-                            sec.fill(val)
-                        except Exception:
-                            pass
+                    mi.first.evaluate("e => { e.scrollIntoView({block: 'center'}); e.focus(); }")
+                page.keyboard.type(f"{t.month:02d}{t.day:02d}{t.year}", delay=80)
                 page.keyboard.press("Tab")
                 page.wait_for_timeout(500)
-                got = tuple(str(int(loc.locator(f"[data-automation-id='dateSection{p}-input']").first.input_value() or 0))
-                            for p in ("Month", "Day", "Year"))
-                if got == want:
+                if _cur() == want:
                     break
             continue
         if f["id"] == "skills" or re.search(r"type to add skills|^skills$", label, re.I):
