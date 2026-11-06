@@ -16,6 +16,7 @@ SENSITIVE = [
     ("conditional_other", r"^if (you (selected|chose|answered|picked) .{0,3}other|other)\b"),
     ("essential_functions", r"essential functions"),
     ("advisory_board_member", r"institutional review board|\birb\b|ethics committee|advisory board"),
+    ("temporary_work_auth", r"temporary (work )?authori[sz]ation|temporary work (permit|visa|status)"),
     ("offer_factors", r"factors .{0,40}should consider|anything (else )?we should (know|consider) (about|regarding) (an )?offer"),
     ("debarment", r"debarred|debarment|excluded.*federal|ineligible to participate in federal|oig exclusion|"
                   r"sanctioned by (the )?(fda|oig|hhs)|list of excluded|\boig\b|disqualified or restricted by the (fda|hhs)|"
@@ -134,7 +135,8 @@ def _classify(l: str) -> tuple[str, str]:
     return "unknown", ""
 
 
-WORK_AUTH_KEYS = ("legally_authorized_us", "requires_sponsorship", "us_citizen", "visa_status_na", "work_auth_type")
+WORK_AUTH_KEYS = ("legally_authorized_us", "requires_sponsorship", "us_citizen", "visa_status_na", "work_auth_type",
+                  "temporary_work_auth")
 US_RX = re.compile(r"\b(united states|u\.?s\.?a?\.?|america)\b", re.I)
 COUNTRY_RX = re.compile(r"\b(canada|mexico|brazil|argentina|chile|peru|colombia|united kingdom|\buk\b|england|ireland|"
                         r"germany|france|spain|italy|netherlands|belgium|switzerland|poland|india|china|japan|"
