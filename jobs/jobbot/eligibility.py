@@ -52,6 +52,8 @@ def screen(job: dict, facts: dict) -> dict:
     years = float(facts.get("years_professional", 0))
 
     # 1. security clearance --------------------------------------------------------
+    if re.search(r"\bts/sci\b|\bts w/|\btop secret\b|polygraph|\bsci\b", title.lower()) and clearance in ("none", "", "unknown"):
+        add("clearance", "fail", "title requires TS/SCI or polygraph; no active clearance", title)
     for s in sents:
         l = s.lower()
         if re.search(r"(secret|ts/sci|top secret|public trust|security clearance|\bclearance\b)", l):
