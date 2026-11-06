@@ -164,8 +164,13 @@ def _value_for(key, label, f, job, pr):
              "source": "Website" if re.search(r"website|career", str(ans.get("how_did_you_hear")), re.I)
              else ans.get("how_did_you_hear"), "country": "United States of America",
              "countryPhoneCode": "United States of America (+1)"}
+    edu = (pr.get("education_structured") or [{}])[0]
+    by_id.update({"school": edu.get("school"), "schoolName": edu.get("school"), "degree": edu.get("degree"),
+                  "fieldOfStudy": edu.get("discipline"), "fieldsOfStudy": edu.get("discipline")})
     if f["id"] in by_id:
         return by_id[f["id"]]
+    if key in ("school", "degree", "discipline"):
+        return {"school": edu.get("school"), "degree": edu.get("degree"), "discipline": edu.get("discipline")}[key]
     if key in ("first_name", "last_name", "full_name", "email", "phone"):
         return {"first_name": first, "last_name": last, "full_name": c["name"], "email": pr.get("account_email"),
                 "phone": c["phone"]}[key]
@@ -353,7 +358,15 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             continue
         try:
             if f["type"] == "select":
-                pick, opts = _choose_listbox(page, loc, str(val))
+                cands = [str(val)]
+                if f["id"] == "degree" or key == "degree":
+                    cands = ["Master of Arts", "Master's Degree", "Masters Degree", "Masters", "Master's", "Master",
+                             "MA", "M.A.", "Graduate Degree", str(val)]
+                pick = opts = None
+                for cand in cands:
+                    pick, opts = _choose_listbox(page, loc, cand)
+                    if pick:
+                        break
                 if not pick:
                     full = loc.inner_text()[:1500].replace("\n", " ")
                     blockers.append(f"'{val}' matches no option for '{label[:80]}': {opts[:6]}"
