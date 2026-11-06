@@ -99,9 +99,10 @@ def answer(question: str, options: list[str], job: dict, timeout: int = 120) -> 
     key = _norm(q)
     c = cache()
     hit = c.get(key)
-    if hit is None:  # stored questions may be truncated copies: match on a long shared prefix
-        hit = next((v for k, v in c.items() if v.get("override") is not None and len(k) >= 60
-                    and (key.startswith(k[:120]) or k.startswith(key[:120]))), None)
+    if hit is None or hit.get("override") is None:  # an override on a (truncated) copy of the question wins
+        ov = next((v for k, v in c.items() if v.get("override") is not None and len(k) >= 60
+                   and (key.startswith(k[:120]) or k.startswith(key[:120]))), None)
+        hit = ov or hit
     if hit and hit.get("override") is not None:
         return hit["override"]  # Andrew's own answer always wins
     if re.search(r"(if yes|please (describe|explain|specify|provide details))", q, re.I) and job.get("employer"):
