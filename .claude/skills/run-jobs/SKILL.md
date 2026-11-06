@@ -17,6 +17,12 @@ paste his phone, email or registry numbers into PRs or commits.
    promising hits, write `jobs/data/imports/indeed_<date>.json` ([{employer,title,location,
    description,salary_min,salary_max,posted_date,job_url,apply_url,source_job_id}]), then
    `python3 -m jobbot import <file> --source indeed`.
+3b. LinkedIn (discovery only, Andrew 11/6): search engines do not index LinkedIn job pages, so
+   read LinkedIn job-alert emails (Gmail: `from:jobalerts-noreply@linkedin.com newer_than:2d`).
+   For each promising posting, find the same job on the employer's own site (search "<company> careers <title>").
+   If that site is a supported ATS board, add it with `harvest` (new boards) or `add-url` (one
+   posting); the system then applies there. LinkedIn-only (Easy Apply) postings go on a short list
+   in the report for Andrew to apply himself — never automate LinkedIn itself.
 4. `python3 -m jobbot qualify`. Claude review runs automatically through `claude -p`.
 5. `python3 -m jobbot shortlist`, then `python3 -m jobbot prepare`.
 6. `python3 -m jobbot report`. Send Andrew the report plus a zip of `data/materials/app_*`.
