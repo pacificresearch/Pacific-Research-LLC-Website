@@ -585,10 +585,19 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             continue
         if f["type"] == "date" and "Self Identify" in step:
             t = date.today()
-            for part, val in (("Month", t.month), ("Day", t.day), ("Year", t.year)):
-                sec = loc.locator(f"[data-automation-id='dateSection{part}-input']")
-                if sec.count():
-                    sec.fill(str(val))
+            mi = loc.locator("[data-automation-id='dateSectionMonth-input']")
+            want = (str(t.month), str(t.day), str(t.year))
+            for _ in range(3):  # MM/DD/YYYY widget auto-advances: type it in one go from the month, then verify
+                if not mi.count():
+                    break
+                mi.first.click()
+                page.keyboard.press("Control+A")
+                page.keyboard.type(f"{t.month:02d}{t.day:02d}{t.year}", delay=60)
+                page.wait_for_timeout(500)
+                got = tuple(str(int(loc.locator(f"[data-automation-id='dateSection{p}-input']").first.input_value() or 0))
+                            for p in ("Month", "Day", "Year"))
+                if got == want:
+                    break
             continue
         if f["id"] == "skills" or re.search(r"type to add skills|^skills$", label, re.I):
             if loc.locator("[data-automation-id='selectedItem']").count() >= 1:
