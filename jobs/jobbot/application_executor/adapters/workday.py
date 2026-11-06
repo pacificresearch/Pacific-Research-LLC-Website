@@ -389,15 +389,20 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 continue
             if f["type"] == "select":
                 loc.locator("button[aria-haspopup='listbox']").click()
-                page.wait_for_timeout(500)
-                opts = [o.strip() for o in page.locator("[role='option']").all_inner_texts()]
+                page.wait_for_timeout(600)
+                opts = _all_listbox_texts(page)
+                page.keyboard.press("Escape")
                 pick = next((o for o in opts if DECLINE_RX.search(o)), None)
+                if not pick and re.search(r"veteran", label, re.I) and pr.get("veteran_fallback"):
+                    # required, no decline option: answer truthfully (service-disabled veteran -> protected veteran)
+                    pick = next((o for o in opts if re.search(r"identify as (a |one or more )?.*protected veteran|^i am a protected veteran", o, re.I)), None)
                 if pick:
-                    page.locator("[role='option']", has_text=pick).first.click()
-                    log.append({"label": label, "key": key or "disclosure", "value": pick, "ok": True})
+                    p2, _ = _choose_listbox(page, loc, pick)
+                    log.append({"label": label, "key": key or "disclosure", "value": p2 or pick, "ok": bool(p2)})
+                    if not p2:
+                        blockers.append(f"could not select '{pick}' for '{label[:80]}'")
                 else:
-                    page.keyboard.press("Escape")
-                    blockers.append(f"required disclosure without a decline option: '{label[:80]}' {opts[:5]}")
+                    blockers.append(f"required disclosure without a decline option: '{label[:80]}' {opts[:6]}")
             elif f["type"] in ("radio", "checkbox"):
                 pick = next((o for o in f["options"] if DECLINE_RX.search(o)), None)
                 if pick:
