@@ -468,7 +468,16 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             val = f"{val} USD"
         if val in (None, "") and kind == "unknown":
             from ...evidence_answers import answer as evidence_answer
-            val = evidence_answer(label, f.get("options", []), job)
+            opts_for_q = f.get("options", [])
+            if f["type"] == "select" and not opts_for_q:  # read the listbox so choice questions get a listed option
+                try:
+                    loc.locator("button[aria-haspopup='listbox']").click()
+                    page.wait_for_timeout(500)
+                    opts_for_q = [t for t in _all_listbox_texts(page) if t != "Select One"]
+                    page.keyboard.press("Escape")
+                except Exception:
+                    opts_for_q = []
+            val = evidence_answer(label, opts_for_q, job)
         if val in (None, ""):
             blockers.append(f"{'custom question' if kind == 'unknown' else (key or 'field').replace('_', ' ')} "
                             f"needs your answer: '{label[:160]}'")

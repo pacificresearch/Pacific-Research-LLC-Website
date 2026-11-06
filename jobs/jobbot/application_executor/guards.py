@@ -22,7 +22,9 @@ SENSITIVE = [
     ("e_signature", r"applicant.?s statement|statement (&|and) acknowledg|type your (full )?(legal )?name (above |below )?to (agree|acknowledge|sign)|"
                     r"electronic (name|signature)|e-?signature|sign(ature)? by typing"),
     ("relatives_here", r"relatives?|(family|household) members?.{0,40}(work|employ)"),
-    ("licensed_hcp", r"health ?care professionals?|\bhcps?\b|physician licensed|licensed (physician|to practice)|sunshine act"),
+    ("licensed_hcp", r"health ?care professionals?|\bhcps?\b|physician licensed|licensed (physician|to practice|medic)|"
+                     r"sunshine act|general medical council|\bgmc\b"),
+    ("undisclosed_employment", r"employment (that is )?not listed|not listed on your (cv|resume)|other employment"),
     ("electronic_offer", r"(submitted|sent|delivered) to you electronic|electronic(ally)? (delivery|offer)"),
     ("truth_certification", r"certify .{0,40}(truthful|true|accurate|correct|complete)|(truthful|true and (correct|complete)).{0,30}certif"),
     ("sms_consent", r"consent to (receiv|be contacted)|text messag|\bsms\b"),
@@ -46,7 +48,7 @@ SENSITIVE = [
     ("education_dates", r"(start|end) date (month|year)|graduation (date|year)|dates? attended"),
     ("start_date", r"start date|available to start|availability|notice period|when can you start"),
     ("previously_interviewed_here", r"(ever|previously) interviewed (with|at|for)"),
-    ("previously_employed_here", r"previously (been )?(an? )?(employee|employed|worked|contingent)|former (employee|worker|contractor)|worked (for|at) .* (before|previously)|ever been employed|(are|were) you (currently or )?(previously )?(an? )?(employee|contingent worker) (of|for|at)|have you (ever )?worked (for|at)"),
+    ("previously_employed_here", r"(been|were) (an? )?(contingent worker|contractor|consultant|temp\w*) (at|for|with)|previously (been )?(an? )?(employee|employed|worked|contingent)|former (employee|worker|contractor)|worked (for|at) .* (before|previously)|ever been employed|(are|were) you (currently or )?(previously )?(an? )?(employee|contingent worker) (of|for|at)|have you (ever )?worked (for|at)"),
     ("can_travel_percent", r"\btravel\b"),
     ("license", r"licen[cs]e|licensure|certified in"),
     ("attestation", r"attest|certify|i (hereby )?(confirm|acknowledge|agree|consent|understand|authori[sz]e)|terms|privacy (policy|notice)|"
