@@ -581,6 +581,17 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
         step = _step(page)
         if step.startswith("Review"):
             return log
+        if step.startswith("Create Account") or step.startswith("Sign In"):
+            try:
+                page.wait_for_selector(A("password"), timeout=30000)
+                sign_in_or_create(page, url, pr, log)
+            except WorkdayError as ex:
+                raise Blocked([str(ex)])
+            except Exception:
+                pass
+            if _step(page).startswith(("Create Account", "Sign In")):
+                raise Blocked(["could not get past Workday sign-in (see screenshot)"])
+            continue
         import os
         if os.environ.get("JOBBOT_WD_DUMP"):
             dump = page.evaluate("()=>[...document.querySelectorAll('[data-automation-id]')].filter(e=>e.offsetParent||e.type==='file')"
