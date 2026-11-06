@@ -444,6 +444,8 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     sec.fill(str(val))
             continue
         if f["id"] == "skills" or re.search(r"type to add skills|^skills$", label, re.I):
+            if loc.locator("[data-automation-id='selectedItem']").count() >= 1:
+                continue  # already has skills (earlier pass or saved draft)
             added = 0
             for sk in ["Clinical Trials", "Project Management", "Good Clinical Practice", "REDCap", "Clinical Research"]:
                 try:
