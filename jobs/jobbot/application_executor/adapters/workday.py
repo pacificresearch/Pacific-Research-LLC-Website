@@ -437,6 +437,23 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 loc.locator("input, textarea").first.fill(pr["contact"]["name"])
             log.append({"label": label, "key": "truth_certification", "value": "<certified (approved 11/4)>", "ok": True})
             continue
+        if f["type"] == "checkbox" and key == "us_citizen" and str((pr.get("approved_answers") or {}).get("us_citizen")).lower().startswith("yes"):
+            # "Indicate which, if any, where you are a citizen" -> a country checklist: tick United States only
+            boxes = loc.locator("input[type=checkbox]")
+            us = None
+            for b_i in range(boxes.count()):
+                bid = boxes.nth(b_i).get_attribute("id") or ""
+                lab = page.locator(f"label[for='{bid}']").first.inner_text().strip() if bid else ""
+                lab = lab or (boxes.nth(b_i).get_attribute("aria-label") or "")
+                if re.fullmatch(r"(the )?united states( of america)?|usa?|u\.s\.(a\.)?", lab.strip(), re.I):
+                    us = boxes.nth(b_i)
+                    break
+            if us is not None:
+                us.check(force=True)
+                log.append({"label": label, "key": "us_citizen", "value": "United States", "ok": True})
+            else:
+                blockers.append(f"citizenship checklist has no 'United States' box: '{label[:120]}'")
+            continue
         if kind == "sensitive" and key == "attestation" or f["type"] == "checkbox":
             aid = attestation_id(label)
             if aid in approved_att:

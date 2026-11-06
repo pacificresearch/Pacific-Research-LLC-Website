@@ -14,6 +14,8 @@ import re
 SENSITIVE = [
     # follow-up shown only for an "Other" choice we did not make (e.g. "If you selected 'Other,' specify the visa")
     ("conditional_other", r"^if (you (selected|chose|answered|picked) .{0,3}other|other)\b"),
+    ("essential_functions", r"essential functions"),
+    ("advisory_board_member", r"institutional review board|\birb\b|ethics committee|advisory board"),
     ("offer_factors", r"factors .{0,40}should consider|anything (else )?we should (know|consider) (about|regarding) (an )?offer"),
     ("debarment", r"debarred|debarment|excluded.*federal|ineligible to participate in federal|oig exclusion|"
                   r"sanctioned by (the )?(fda|oig|hhs)|list of excluded|\boig\b|disqualified or restricted by the (fda|hhs)|"
