@@ -92,7 +92,8 @@ CORE_FIELDS = {"first_name", "last_name", "full_name", "email", "phone", "countr
 DECLINE_KEYS = {"veteran_status", "disability_status", "gender", "race_ethnicity", "hispanic_latino",
                 "sexual_orientation"}
 DECLINE_RX = re.compile(r"decline|do(n'?t| not) (wish|want|care) to|prefer not|choose not|not (to )?(answer|disclose|"
-                        r"self[- ]identify|specified)|i do not want to answer|rather not", re.I)
+                        r"self[- ]identify|specified|declared|provided)|undeclared|i do not want to answer|rather not|"
+                        r"no answer|withhold", re.I)
 
 
 def decline_option(options: list[str]) -> str | None:
