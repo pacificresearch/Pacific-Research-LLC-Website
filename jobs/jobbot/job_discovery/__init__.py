@@ -53,7 +53,9 @@ def run(only: list[str] | None = None, limit_employers: int | None = None) -> di
             entries.append(extra)
     if limit_employers:
         entries = entries[:limit_employers]
-    entries = [e for e in entries if not (only and e["ats"] not in only) and e["name"].lower() not in excluded
+    sel = {o.lower() for o in (only or [])}  # ATS names ("workday") or employer names ("PATH")
+    entries = [e for e in entries if not (sel and e["ats"].lower() not in sel and e["name"].lower() not in sel)
+               and e["name"].lower() not in excluded
                and e["ats"] in ADAPTERS]
 
     def one(e):
