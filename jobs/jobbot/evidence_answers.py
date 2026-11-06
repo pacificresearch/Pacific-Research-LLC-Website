@@ -52,8 +52,16 @@ candidate evidence below. Do not assume anything not stated. Site-based clinical
 at an academic medical center is NOT working for a CRO, sponsor, pharma or biotech company. Founding a
 small federal contracting firm in 2026 is real but recent experience.
 
-If the evidence clearly settles the question, answer it; "No" is correct when the evidence shows the
-candidate lacks it. If it does not clearly settle it, answer "UNKNOWN".
+Two kinds of questions:
+1. FACTS about the candidate (experience, credentials, history): answer only if the evidence clearly settles
+   it; "No" is correct when the evidence shows the candidate lacks it; otherwise "UNKNOWN".
+2. LOW-STAKES ADMINISTRATIVE preferences (how did you hear, preferred contact channel, interview scheduling
+   preference, talent-pool / future-opportunity opt-in, newsletter, preferred pronunciation, shift or
+   schedule flexibility, willingness to complete assessments, etc.): use sensible judgment for a candidate
+   who wants to keep the application moving — pick the neutral, efficient option. Never pick an option
+   that asserts something untrue (e.g. "an employee referred me"). Basis may be ["judgment"].
+Never answer legal attestations, consents, terms acceptance, conflicts of interest, or personal/legal status
+questions — return "UNKNOWN" for those.
 {choice_rule}
 Return ONLY JSON: {{"answer": "...", "basis": ["evidence ids"], "confidence": 0.0-1.0}}
 
@@ -93,6 +101,10 @@ def answer(question: str, options: list[str], job: dict, timeout: int = 120) -> 
     hit = c.get(key)
     if hit and hit.get("override") is not None:
         return hit["override"]  # Andrew's own answer always wins
+    if re.search(r"(if yes|please (describe|explain|specify|provide details))", q, re.I) and job.get("employer"):
+        for v in c.values():
+            if v.get("detail") and v.get("employer_first_seen", "").split()[0].lower() in job["employer"].lower():
+                return v["detail"]
     if MOTIVATION.search(q) and not [o for o in options if o and not re.match(r"^(select|please select|select one|--)", o, re.I)]:
         return motivation_answer(job)  # free-text only; never pasted into a choice list
     if not q or OUT_OF_SCOPE.search(q):
@@ -129,7 +141,7 @@ def answer(question: str, options: list[str], job: dict, timeout: int = 120) -> 
     ans = str(d.get("answer", "")).strip()
     basis = [str(b) for b in d.get("basis", [])][:6]
     conf = float(d.get("confidence", 0) or 0)
-    ok = ans and ans != "UNKNOWN" and conf >= 0.75 and basis
+    ok = ans and ans != "UNKNOWN" and conf >= 0.7 and basis
     if ok and opts and ans not in opts:
         ok = False
     if ok and not opts and (len(ans) > 450 or fact_guard(ans, job.get("description", ""))):
