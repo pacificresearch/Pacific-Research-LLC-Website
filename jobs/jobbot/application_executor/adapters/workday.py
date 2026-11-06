@@ -454,7 +454,20 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 if re.fullmatch(r"(the )?united states( of america)?|usa?|u\.s\.(a\.)?", lab.strip(), re.I):
                     us = boxes.nth(b_i)
                     break
-            if us is not None:
+            if us is None and str((pr.get("approved_answers") or {}).get("other_citizenships", "")).lower() == "none":
+                # country checklist without the US (export-control screens: Cuba/Iran/...): "None of these" is true
+                # only for a US-only citizen -> needs the approved other_citizenships: none
+                for b_i in range(boxes.count()):
+                    bid = boxes.nth(b_i).get_attribute("id") or ""
+                    lab = page.locator(f"label[for='{bid}']").first.inner_text().strip() if bid else ""
+                    if re.fullmatch(r"none( of (these|the above))?|not applicable|n/?a", lab.strip(), re.I):
+                        boxes.nth(b_i).check(force=True)
+                        log.append({"label": label, "key": "us_citizen", "value": lab, "ok": True})
+                        us = False
+                        break
+            if us is False:
+                pass
+            elif us is not None:
                 us.check(force=True)
                 log.append({"label": label, "key": "us_citizen", "value": "United States", "ok": True})
             else:
