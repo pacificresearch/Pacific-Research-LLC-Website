@@ -193,6 +193,19 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
             elif req:
                 blockers.append(f"required field has no approved value: '{label[:100]}'")
             continue
+        if kind == "sensitive" and key == "truth_certification":
+            # Andrew 11/4 approved signing truthfulness certifications ("type in my name for the e-signature")
+            if policy.get("e_sign_when_all_answers_from_profile"):
+                if f["type"] == "checkbox":
+                    actions.append({**act, "check": True})
+                elif f["type"] in ("select-one", "radio"):
+                    opt = match_option("Yes", f.get("options", [])) or next((o for o in f.get("options", []) if re.search(r"agree|certify|accept|yes", o, re.I)), None)
+                    actions.append({**act, "option": opt}) if opt else blockers.append(f"certification options unclear: '{label[:80]}'")
+                else:
+                    actions.append({**act, "value": c["name"]})
+            elif req:
+                blockers.append(f"certification needs your approval: '{label[:120]}'")
+            continue
         if kind == "sensitive" and key == "e_signature":
             if policy.get("e_sign_when_all_answers_from_profile"):
                 if f["type"] in ("text", "textarea"):

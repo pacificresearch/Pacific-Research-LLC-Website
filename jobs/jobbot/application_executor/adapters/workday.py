@@ -355,6 +355,15 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             continue
         if not req:
             continue  # policy: optional -> blank (Workday marks required fields reliably)
+        if key == "truth_certification" and pr.get("answer_policy", {}).get("e_sign_when_all_answers_from_profile"):
+            if f["type"] in ("checkbox",):
+                loc.locator("input[type=checkbox]").first.check(force=True)
+            elif f["type"] == "select":
+                _choose_listbox(page, loc, "Yes")
+            elif f["type"] in ("text", "textarea"):
+                loc.locator("input, textarea").first.fill(pr["contact"]["name"])
+            log.append({"label": label, "key": "truth_certification", "value": "<certified (approved 11/4)>", "ok": True})
+            continue
         if kind == "sensitive" and key == "attestation" or f["type"] == "checkbox":
             aid = attestation_id(label)
             if aid in approved_att:

@@ -21,8 +21,10 @@ SENSITIVE = [
     ("work_auth_type", r"what (type|kind) of (valid )?(work )?authori[sz]ation|^(current )?(work authori[sz]ation|immigration) (type|status)\b"),
     ("e_signature", r"applicant.?s statement|statement (&|and) acknowledg|type your (full )?(legal )?name (above |below )?to (agree|acknowledge|sign)|"
                     r"electronic (name|signature)|e-?signature|sign(ature)? by typing"),
-    ("relatives_here", r"relatives?|family members? (who )?(currently )?(work|employed)"),
-    ("licensed_hcp", r"health ?care professionals?|\bhcps?\b"),
+    ("relatives_here", r"relatives?|(family|household) members?.{0,40}(work|employ)"),
+    ("licensed_hcp", r"health ?care professionals?|\bhcps?\b|physician licensed|licensed (physician|to practice)|sunshine act"),
+    ("electronic_offer", r"(submitted|sent|delivered) to you electronic|electronic(ally)? (delivery|offer)"),
+    ("truth_certification", r"certify .{0,40}(truthful|true|accurate|correct|complete)|(truthful|true and (correct|complete)).{0,30}certif"),
     ("sms_consent", r"consent to (receiv|be contacted)|text messag|\bsms\b"),
     ("requires_sponsorship", r"sponsorship|\bvisa\b|h-?1b|immigration status|sponsor (you|your|an? (employment|work))"),
     ("legally_authorized_us", r"(legally )?(authori[sz]ed|eligible|permitted) to work|work authori[sz]ation|right to work"),
