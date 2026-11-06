@@ -129,6 +129,17 @@ def _choose_multiselect(page, field, text):
     page.wait_for_timeout(1200)
     texts = _open_options(page)  # options shown for THIS field only (scoped to the active popup)
     pick = match_option(text, texts) or (texts[0] if len(texts) == 1 else None)
+    if not pick and re.search(r"website|career", text, re.I) and not any(
+            re.search(r"(company|corporate|career).*(site|website|page)|careers? (site|page|website)|website", t, re.I)
+            for t in texts):
+        for term in ("website", "career"):  # long, virtualized lists: filter by typing
+            inp.fill(term)
+            inp.press("Enter")
+            page.wait_for_timeout(1500)
+            more = _open_options(page)
+            if more:
+                texts = more
+                break
     if not pick and re.search(r"website|career", text, re.I):  # "How did you hear": company site wording varies
         pick = next((t for t in texts if re.search(r"(company|corporate|career).*(site|website|page)|careers? (site|page|website)|"
                                                     r"^website$|company website", t, re.I)), None)
@@ -382,7 +393,11 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 if not pick:
                     blockers.append(f"'{val}' matches no option for '{label[:80]}': {f['options'][:6]}")
                     continue
-                loc.get_by_label(pick, exact=True).check(force=True)
+                try:
+                    loc.get_by_label(pick, exact=True).check(force=True, timeout=5000)
+                except Exception:  # Workday radios: the label is the clickable element
+                    loc.locator("label").filter(has_text=re.compile(rf"^\s*{re.escape(pick)}\s*$")).first.click()
+                    page.wait_for_timeout(400)
             elif f["type"] in ("text", "textarea"):
                 loc.locator("input, textarea").first.fill(str(val))
             else:
