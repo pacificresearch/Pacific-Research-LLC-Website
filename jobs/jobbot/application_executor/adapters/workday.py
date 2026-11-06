@@ -501,12 +501,23 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     if pick:
                         break
                 if pick:  # verify the widget now shows the choice; Workday occasionally drops a click
-                    for _ in range(2):
+                    ok_shown = False
+                    for _ in range(3):
                         shown = loc.locator("button[aria-haspopup='listbox']").first.inner_text().strip()
                         if shown == pick or pick in shown:
+                            ok_shown = True
                             break
                         page.wait_for_timeout(600)
-                        _choose_listbox(page, loc, pick)
+                        btn = loc.locator("button[aria-haspopup='listbox']").first
+                        btn.focus()
+                        page.keyboard.press("Enter")  # keyboard path: open, type-ahead, confirm
+                        page.wait_for_timeout(400)
+                        page.keyboard.type(pick[:3], delay=80)
+                        page.keyboard.press("Enter")
+                        page.wait_for_timeout(500)
+                    if not ok_shown:
+                        blockers.append(f"selection did not stick for '{label[:80]}' (wanted '{pick}')")
+                        continue
                 if not pick:
                     full = loc.inner_text()[:1500].replace("\n", " ")
                     blockers.append(f"'{val}' matches no option for '{label[:80]}': {opts[:6]}"
