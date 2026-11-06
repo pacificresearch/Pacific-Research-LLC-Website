@@ -256,8 +256,22 @@ def fill_work_experience(page, pr, log) -> list[str]:
     return []
 
 
+def _settle(page, max_s: int = 25) -> None:
+    """Workday renders grey skeleton placeholders first; wait until the field list stops changing."""
+    stable, last = 0, -1
+    for _ in range(max_s):
+        n = page.locator("[data-automation-id^='formField-']").count()
+        loading = page.locator("[data-automation-id*='loading'], [class*='skeleton' i], [data-automation-id='loadingSpinner']").count()
+        stable = stable + 1 if (n == last and not loading) else 0
+        if stable >= 2:
+            return
+        last = n
+        page.wait_for_timeout(1000)
+
+
 def fill_step(page, job, pr, app_row, log) -> list[str]:
     """Fill the current Workday step. Returns blockers (empty = step complete)."""
+    _settle(page)
     blockers = []
     approved_att = set(pr.get("approved_attestations", []) or [])
     step = _step(page)
