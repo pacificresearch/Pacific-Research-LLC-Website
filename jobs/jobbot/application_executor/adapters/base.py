@@ -285,8 +285,11 @@ def fill(page, actions: list[dict]) -> list[dict]:
                     el.fill("")
                     el.type(typed, delay=40)
                     page.wait_for_timeout(2500)  # suggestion list (e.g. Google Places) loads async
-                    opts = page.locator("[role='option']")
-                    texts = [opts.nth(k).inner_text().strip() for k in range(min(opts.count(), 15))]
+                    ctl = el.get_attribute("aria-controls") or el.get_attribute("aria-owns")
+                    opts = page.locator(f"[id='{ctl}'] [role='option']") if ctl else page.locator("[role='listbox']:visible [role='option']")
+                    if not opts.count():
+                        opts = page.locator("[role='listbox']:visible [role='option']")
+                    texts = [opts.nth(k).inner_text().strip() for k in range(min(opts.count(), 25))]
                     first = typed.split(",")[0].strip().lower()
                     pick = next((k for k, t in enumerate(texts) if t.lower().startswith(first)), None)
                     if pick is None:
