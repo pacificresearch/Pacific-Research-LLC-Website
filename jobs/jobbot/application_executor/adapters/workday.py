@@ -255,7 +255,7 @@ def _value_for(key, label, f, job, pr):
                 "phone": c["phone"]}[key]
     if key == "salary_expectation":
         return salary_answer(ans.get("salary_expectation_rule"), job)
-    if key == "licensed_hcp" and f["type"] == "select":
+    if key == "licensed_hcp" and f["type"] == "select" and re.search(r"\(\s*[ABC]\s*\)", label):
         hcp = pr.get("hcp_option_letter")  # employer-coded A/B/C answer sets, mapped once from the question text
         if hcp:
             return hcp
