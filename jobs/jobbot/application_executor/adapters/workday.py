@@ -360,9 +360,17 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
 def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
     from .. import Blocked
     log: list[dict] = []
-    page.goto(url, wait_until="networkidle", timeout=60000)
-    page.wait_for_timeout(2500)
+    page.goto(url, wait_until="domcontentloaded", timeout=90000)
+    try:  # Workday keeps background requests open; wait for the apply/sign-in UI instead of network idle
+        page.wait_for_selector(f"{A('applyManually')}, {A('adventureButton')}, {A('email')}, {A('progressBar')}",
+                               timeout=60000)
+    except Exception:
+        pass
+    page.wait_for_timeout(2000)
     _accept_cookies(page)
+    if not page.locator(A("applyManually")).count() and page.locator(A("adventureButton")).count():
+        page.locator(A("adventureButton")).first.click()  # job page -> "Apply" -> start-your-application page
+        page.wait_for_timeout(3000)
     if page.locator(A("applyManually")).count():
         page.click(A("applyManually"))
         page.wait_for_timeout(3500)
