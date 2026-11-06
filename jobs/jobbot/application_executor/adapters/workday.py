@@ -159,7 +159,13 @@ def _open_options(page):
 
 def _choose_multiselect(page, field, text):
     inp = field.locator("input").first
-    inp.click()
+    try:
+        inp.click(timeout=5000)
+    except Exception:  # a leftover search popup from a previous try can cover the input
+        page.keyboard.press("Escape")
+        inp.click(force=True, timeout=5000)
+    if inp.input_value():
+        inp.fill("")  # clear a previous search term so the full list comes back
     page.wait_for_timeout(1200)
     texts = _open_options(page)  # options shown for THIS field only (scoped to the active popup)
     pick = match_option(text, texts) or (texts[0] if len(texts) == 1 else None)
@@ -580,7 +586,11 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 if not pick and (f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline"):
                     for alt in ("International Relations", "International Affairs", "Global Studies", "Other"):
                         page.keyboard.press("Escape")
-                        pick, _ = _choose_multiselect(page, loc, alt)
+                        page.wait_for_timeout(500)
+                        try:
+                            pick, _ = _choose_multiselect(page, loc, alt)
+                        except Exception:
+                            pick = None
                         if pick:
                             break
                 if not pick:
