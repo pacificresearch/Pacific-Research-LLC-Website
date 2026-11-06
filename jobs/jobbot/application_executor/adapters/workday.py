@@ -167,6 +167,10 @@ def _value_for(key, label, f, job, pr):
                 "phone": c["phone"]}[key]
     if key == "salary_expectation":
         return salary_answer(ans.get("salary_expectation_rule"), job)
+    if key == "licensed_hcp" and f["type"] == "select":
+        hcp = pr.get("hcp_option_letter")  # employer-coded A/B/C answer sets, mapped once from the question text
+        if hcp:
+            return hcp
     if key == "previously_employed_here" or re.search(r"previously (worked|been employed)|worked for .* before", label, re.I):
         prior = [p.lower() for p in pr.get("prior_employers", [])]
         return "Yes" if any(p in job["employer"].lower() for p in prior) else ans.get("previously_employed_here")
@@ -333,7 +337,9 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             if f["type"] == "select":
                 pick, opts = _choose_listbox(page, loc, str(val))
                 if not pick:
-                    blockers.append(f"'{val}' matches no option for '{label[:80]}': {opts[:6]}")
+                    full = loc.inner_text()[:1500].replace("\n", " ")
+                    blockers.append(f"'{val}' matches no option for '{label[:80]}': {opts[:6]}"
+                                    + (f" || FULL QUESTION: {full}" if all(len(o) <= 2 for o in opts if o != 'Select One') else ""))
                     continue
             elif f["type"] == "multiselect":
                 pick, opts = _choose_multiselect(page, loc, str(val))
