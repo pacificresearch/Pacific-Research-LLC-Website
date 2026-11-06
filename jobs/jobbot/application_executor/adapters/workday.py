@@ -342,6 +342,18 @@ def fill_work_experience(page, pr, log) -> list[str]:
             _fill_date(f("endDate"), end)
         log.append({"label": "Work experience", "key": "experience",
                     "value": f"{role['title']} @ {role['org']} ({role['dates']})", "ok": True})
+    # the resume parse can leave extra entries; an EMPTY one has required fields and blocks the step -> delete it
+    for k in range(titles.count() - 1, len(roles) - 1, -1):
+        entry = titles.nth(k).locator("xpath=ancestor::div[.//*[@data-automation-id='formField-startDate']][1]")
+        box = entry.locator("[data-automation-id='formField-jobTitle'] input")
+        if box.count() and not box.first.input_value().strip():
+            panel = titles.nth(k).locator("xpath=ancestor::div[.//button[contains(normalize-space(.), 'Delete')]][1]")
+            btn = panel.get_by_role("button", name=re.compile(r"^delete", re.I))
+            if btn.count():
+                btn.last.click()
+                page.wait_for_timeout(1000)
+                log.append({"label": "Work experience", "key": "experience", "value": f"removed empty entry {k + 1}",
+                            "ok": True})
     return []
 
 
