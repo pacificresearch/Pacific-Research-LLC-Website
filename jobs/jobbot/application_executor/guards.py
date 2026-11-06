@@ -12,6 +12,8 @@ import re
 
 # order matters: first match wins
 SENSITIVE = [
+    ("noncompete", r"non-?compete|non-?solicit"),
+    ("work_auth_type", r"what (type|kind) of (valid )?(work )?authori[sz]ation|^(current )?(work authori[sz]ation|immigration) (type|status)\b"),
     ("e_signature", r"applicant.?s statement|statement (&|and) acknowledg|type your (full )?(legal )?name (above |below )?to (agree|acknowledge|sign)|"
                     r"electronic (name|signature)|e-?signature|sign(ature)? by typing"),
     ("relatives_here", r"relatives?|family members? (who )?(currently )?(work|employed)"),

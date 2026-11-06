@@ -291,12 +291,19 @@ def fill(page, actions: list[dict]) -> list[dict]:
                     pick = next((k for k, t in enumerate(texts) if t.lower().startswith(first)), None)
                     if pick is None:
                         pick = next((k for k, t in enumerate(texts) if first in t.lower()), None)
+                    if pick is None and a.get("key") not in ("location",):
+                        from .. import Blocked  # noqa: F401
+                        from ..guards import match_option
+                        m = match_option(want, texts)
+                        pick = texts.index(m) if m else None
                     if pick is not None:
                         opts.nth(pick).click()
                         a = dict(a, value=texts[pick])
+                    elif a.get("key") == "location" and texts:
+                        opts.nth(0).click()
+                        a = dict(a, value=texts[0])
                     else:
-                        page.keyboard.press("ArrowDown")
-                        page.keyboard.press("Enter")
+                        raise RuntimeError(f"no dropdown option matches '{want}' (options: {texts[:6]})")
                     page.wait_for_timeout(500)
                 else:
                     el.fill(a["value"])
