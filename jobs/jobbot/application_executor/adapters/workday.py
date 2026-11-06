@@ -166,6 +166,16 @@ def _choose_multiselect(page, field, text):
     page.wait_for_timeout(1500)
     now = _open_options(page)
     selected = field.locator("[data-automation-id='selectedItem']").count() > 0
+    for _ in range(3):  # nested prompts: a category opens a sub-list, sometimes with a same-named leaf
+        if selected or not now or set(now) == set(texts):
+            break
+        leaf = next((t for t in now if t == pick), None) or (now[0] if len(now) == 1 else None)
+        if not leaf:
+            break
+        page.locator(OPT).filter(has_text=re.compile(rf"^\s*{re.escape(leaf)}\s*$")).first.click()
+        page.wait_for_timeout(1200)
+        texts, now = now, _open_options(page)
+        selected = field.locator("[data-automation-id='selectedItem']").count() > 0
     sub = [t for t in now if t != pick] if (now and set(now) != set(texts)) else []  # sub-menu only if the list CHANGED
     if sub and not selected:
         # hierarchical prompt (e.g. Website -> specific site): take the employer's own careers site
