@@ -577,6 +577,12 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     continue
             elif f["type"] == "multiselect":
                 pick, opts = _choose_multiselect(page, loc, str(val))
+                if not pick and (f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline"):
+                    for alt in ("International Relations", "International Affairs", "Global Studies", "Other"):
+                        page.keyboard.press("Escape")
+                        pick, _ = _choose_multiselect(page, loc, alt)
+                        if pick:
+                            break
                 if not pick:
                     blockers.append(f"'{val}' matches no option for '{label[:80]}': {opts[:6]}")
                     continue
