@@ -597,12 +597,13 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             for _ in range(3):  # MM/DD/YYYY widget auto-advances: type it in one go from the month, then verify
                 if not mi.count() or _cur() == want:
                     break
-                try:
-                    if not (mi.first.is_visible() and mi.first.is_enabled()):
-                        break  # tenant fills and locks today's date itself
-                    mi.first.click(timeout=5000)
+                try:  # Workday hides the real input under a display layer: click through it
+                    mi.first.click(force=True, timeout=5000)
                 except Exception:
-                    break
+                    try:
+                        loc.locator("[data-automation-id='dateSectionMonth-display'], [data-automation-id='dateInputWrapper']").first.click(timeout=5000)
+                    except Exception:
+                        break
                 page.keyboard.press("Control+A")
                 page.keyboard.type(f"{t.month:02d}{t.day:02d}{t.year}", delay=60)
                 page.wait_for_timeout(500)
