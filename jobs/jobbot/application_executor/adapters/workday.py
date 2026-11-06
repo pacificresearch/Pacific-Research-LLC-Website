@@ -103,7 +103,8 @@ def _choose_listbox(page, field, option_text):
     if not pick:
         page.keyboard.press("Escape")
         return None, texts
-    page.locator("[role='option']", has_text=pick).first.click()
+    exact = page.get_by_role("option", name=pick, exact=True)
+    (exact.first if exact.count() else page.locator("[role='option']", has_text=pick).first).click()
     page.wait_for_timeout(400)
     return pick, texts
 
