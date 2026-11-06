@@ -157,7 +157,37 @@ def _open_options(page):
     return texts
 
 
-def _choose_multiselect(page, field, text):
+# acceptable field-of-study picks for an MA in International Studies
+FOS_OK = re.compile(r"^\s*(international|global)\b.*(stud|relation|affair)|^\s*other\s*$", re.I)
+
+
+def _unselect(page, field, text):
+    chips = field.locator("[data-automation-id='selectedItem']", has_text=text)
+    for i in range(chips.count() - 1, -1, -1):
+        x = chips.nth(i).locator("[data-automation-id='DELETE_charm'], [aria-label*='elete' i], [aria-label*='emove' i]")
+        if x.count():
+            x.first.click(force=True)
+            page.wait_for_timeout(600)
+
+
+def _choose_exact(page, inp, text):
+    for attempt in (None, text):
+        if attempt:
+            inp.fill(attempt)
+            inp.press("Enter")
+            page.wait_for_timeout(1500)
+        texts = _open_options(page)
+        pick = next((t for t in texts if t.strip().lower() == text.lower()), None)
+        if pick:
+            page.locator(OPT).filter(has_text=re.compile(rf"^\s*{re.escape(pick)}\s*$")).first.click()
+            page.wait_for_timeout(1200)
+            page.keyboard.press("Escape")
+            return pick, texts
+    page.keyboard.press("Escape")
+    return None, texts
+
+
+def _choose_multiselect(page, field, text, exact=False):
     inp = field.locator("input").first
     try:
         inp.click(timeout=5000)
@@ -168,6 +198,8 @@ def _choose_multiselect(page, field, text):
         inp.fill("")  # clear a previous search term so the full list comes back
     page.wait_for_timeout(1200)
     texts = _open_options(page)  # options shown for THIS field only (scoped to the active popup)
+    if exact:  # e.g. "Other": never let it match "Mgmt & Business Admin - Other"
+        return _choose_exact(page, inp, text)
     pick = match_option(text, texts) or (texts[0] if len(texts) == 1 else None)
     if not pick and not re.search(r"website|career", text, re.I):  # long lists (field of study, skills): type to filter
         inp.fill(text)
@@ -346,6 +378,12 @@ def fill_work_experience(page, pr, log) -> list[str]:
         _fill_date(f("startDate"), start)
         if not current:
             _fill_date(f("endDate"), end)
+        rd = f("roleDescription")
+        if rd.count() and "*" in (rd.inner_text() or ""):  # required on some tenants (Merck): CV bullets, verbatim
+            box = rd.locator("textarea").first
+            text = "\n".join("- " + b["text"] for b in role.get("bullets", []) if b.get("text"))[:1900]
+            if box.count() and text and not box.input_value().strip():
+                box.fill(text)
         log.append({"label": "Work experience", "key": "experience",
                     "value": f"{role['title']} @ {role['org']} ({role['dates']})", "ok": True})
     # the resume parse can leave extra entries; an EMPTY one has required fields and blocks the step -> delete it
@@ -401,6 +439,17 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
         key = scope_work_auth(key, label, job)
         req = f["required"]
         loc = page.locator(f"[data-jobbot-wd='{f['i']}']")
+        is_fos = f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline"
+        if is_fos and f["type"] == "multiselect" and f["value"] not in ("", "0 items selected"):
+            chips = loc.locator("[data-automation-id='selectedItem']")
+            bad = [chips.nth(i) for i in range(chips.count()) if not FOS_OK.search(chips.nth(i).inner_text())]
+            for chip in reversed(bad):  # a wrong field (parse or earlier mistake) is never left in place
+                x = chip.locator("[data-automation-id='DELETE_charm'], [aria-label*='elete' i], [aria-label*='emove' i]")
+                if x.count():
+                    x.first.click(force=True)
+                    page.wait_for_timeout(600)
+            if bad:
+                f["value"] = "" if not loc.locator("[data-automation-id='selectedItem']").count() else f["value"]
         if f["value"] and f["type"] in ("select", "text", "multiselect") and f["value"] not in ("Select One",
                                                                                                "0 items selected"):
             continue  # Workday prefilled it (from the account or resume parse)
@@ -596,12 +645,18 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     continue
             elif f["type"] == "multiselect":
                 pick, opts = _choose_multiselect(page, loc, str(val))
-                if not pick and (f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline"):
+                if pick and is_fos and not FOS_OK.search(pick):
+                    _unselect(page, loc, pick)
+                    pick = None
+                if not pick and is_fos:
                     for alt in ("International Relations", "International Affairs", "Global Studies", "Other"):
                         page.keyboard.press("Escape")
                         page.wait_for_timeout(500)
                         try:
-                            pick, _ = _choose_multiselect(page, loc, alt)
+                            pick, _ = _choose_multiselect(page, loc, alt, exact=(alt == "Other"))
+                            if pick and not FOS_OK.search(pick):
+                                _unselect(page, loc, pick)
+                                pick = None
                         except Exception:
                             pick = None
                         if pick:
