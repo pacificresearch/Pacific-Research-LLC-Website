@@ -40,6 +40,7 @@ SENSITIVE = [
     ("sexual_orientation", r"sexual orientation|transgender|lgbt"),
     ("gender", r"\bgender\b|\bsex\b|pronoun"),
     ("criminal_history", r"criminal|convict|felony|misdemeanor|offen[cs]e|background check"),
+    ("age_under_18", r"under (the age of )?18|younger than 18|less than 18"),
     ("age_18_or_over", r"18 years|age of 18|\bover 18\b|date of birth|\bbirth\b|minimum age"),
     ("willing_to_relocate", r"relocat"),
     ("willing_onsite", r"willing to (be|work) (on-?site|in (the )?office)|not a remote position|commute to"),
