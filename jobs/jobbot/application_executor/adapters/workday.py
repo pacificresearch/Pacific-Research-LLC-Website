@@ -637,6 +637,8 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
         page.screenshot(path=str(evid / f"wd_{re.sub(r'[^A-Za-z]+', '_', step)}.png"), full_page=True)
         if blockers:
             raise Blocked([f"[{step}] {b}" for b in blockers])
+        if "something went wrong" in page.inner_text("body").lower():
+            continue  # loop top reloads (once) or stops cleanly
         page.locator(A("pageFooterNextButton")).click(timeout=60000)
         page.wait_for_timeout(6000)
         errs = page.locator(A("errorMessage")).all_inner_texts()
