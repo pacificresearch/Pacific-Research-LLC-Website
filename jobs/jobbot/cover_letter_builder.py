@@ -149,7 +149,8 @@ def build(app_id: int, job: dict, family: str, emphasize: list[str] | None = Non
     c = pr["contact"]
     folder = path("materials", f"app_{app_id:05d}", "x").parent
     last = c["name"].split()[-1].replace("'", "")
-    stem = f"{last}_{c['name'].split()[0]}_CoverLetter_{re.sub(r'[^A-Za-z0-9]+', '', job['employer'].title())[:24]}"
+    from .resume_builder import file_stem
+    stem = file_stem(c["name"], job["title"], "_Cover_Letter")
     header = [c["name"], " | ".join(x for x in (c["location"], c["email"], c["phone"]) if x),
               date.today().strftime("%B %-d, %Y"), "", f"Hiring Team, {job['employer']}", f"Re: {job['title']}", "",
               "Dear Hiring Team,"]

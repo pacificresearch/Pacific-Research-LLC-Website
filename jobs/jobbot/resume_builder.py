@@ -181,6 +181,13 @@ def _slug(s: str, n: int = 40) -> str:
     return re.sub(r"[^A-Za-z0-9]+", "", s.title())[:n]
 
 
+def file_stem(name: str, title: str, suffix: str = "") -> str:
+    """Andrew 11/7: 'AO_' + the job title, e.g. AO_Manager_Clinical_Operations (+ '_Cover_Letter')."""
+    initials = "".join(w[0] for w in name.replace("'", "").split() if w[:1].isalpha()).upper()
+    t = "_".join(re.findall(r"[A-Za-z0-9]+", title))[:60].strip("_")
+    return f"{initials}_{t}{suffix}"
+
+
 def build(app_id: int, job: dict, family: str, emphasize: list[str] | None = None) -> dict:
     r = select(job, family, emphasize)
     flat = "\n".join([r["summary"], *r["skills"], *[b["text"] for role in r["roles"] for b in role["bullets"]]])
@@ -190,7 +197,7 @@ def build(app_id: int, job: dict, family: str, emphasize: list[str] | None = Non
     folder = path("materials", f"app_{app_id:05d}", "x").parent
     last = r["contact"]["name"].split()[-1].replace("'", "")
     first = r["contact"]["name"].split()[0]
-    stem = f"{last}_{first}_Resume_{_slug(job['employer'], 24)}_{_slug(job['title'], 36)}"
+    stem = file_stem(r["contact"]["name"], job["title"])
     pdf, docx = folder / f"{stem}.pdf", folder / f"{stem}.docx"
     write_pdf(r, pdf)
     write_docx(r, docx)
