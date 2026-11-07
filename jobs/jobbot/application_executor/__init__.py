@@ -201,7 +201,17 @@ def _wait_for_code(page, evid: Path, wait_seconds: int):
     import time
     from ..email_monitor import fetch_security_code
     f = path("verification_code.txt")
+    marker = path("waiting_for_code.txt")  # signal for the watching Claude session: "read the code from Gmail now"
+    marker.write_text(time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
     deadline = time.time() + max(wait_seconds, 0)
+    try:
+        return _poll_code(page, f, deadline, fetch_security_code)
+    finally:
+        marker.unlink(missing_ok=True)
+
+
+def _poll_code(page, f, deadline, fetch_security_code):
+    import time
     while True:
         code = fetch_security_code() or (f.read_text().strip() if f.exists() else None)
         if code:
