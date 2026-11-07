@@ -1207,6 +1207,23 @@ def _redact_key(text):
     return re.sub(r'api_key=[^&\s"]+', 'api_key=REDACTED', text)
 
 
+# True when no key was supplied locally and the run relies on a credential
+# that the network proxy injects as an X-Api-Key header. See _auth_params.
+_KEYLESS = False
+
+
+def _auth_params(api_key):
+    """The auth part of a SAM request's query string.
+
+    SAM (api.data.gov) accepts the key three ways: an ``api_key`` query
+    parameter, an ``X-Api-Key`` header, or HTTP Basic. When no key is held
+    locally we send NEITHER and let the network proxy attach the header from
+    its own credential store — so the key lives in exactly one place and a
+    rotation never leaves a stale copy behind in code, a .env or a shell.
+    """
+    return {"api_key": api_key} if api_key else {}
+
+
 def _die_auth(status, body):
     """Abort the whole run on an authentication failure.
 
@@ -1221,10 +1238,15 @@ def _die_auth(status, body):
         + (f" {detail}" if detail else "") + ").\n"
         "  Every query would return nothing, so this run is stopping rather\n"
         "  than writing an empty report that looks like a quiet week.\n\n"
-        "  The key came from SAM_API_KEY (or --api-key). Check that it is the\n"
-        "  current one: sam.gov > Workspace > Account Details > API Key.\n"
-        "  A stale SAM_API_KEY in your shell or user environment overrides\n"
-        "  everything else — check that first.\n"
+        + ("  No key was supplied locally, so this run expected the network\n"
+           "  proxy to attach one as an X-Api-Key header. Either no credential\n"
+           "  is stored for api.sam.gov, or the stored one is dead. Add or\n"
+           "  update it in the environment's network secrets.\n"
+           if _KEYLESS else
+           "  The key came from SAM_API_KEY (or --api-key). Check that it is the\n"
+           "  current one: sam.gov > Workspace > Account Details > API Key.\n"
+           "  A stale SAM_API_KEY in your shell or user environment overrides\n"
+           "  everything else — check that first.\n")
     )
     raise SystemExit(2)
 
@@ -1326,7 +1348,7 @@ def fetch_description(opp, api_key):
         return cache[nid]
     try:
         resp = _http_retry(requests.get, DESC_URL,
-                           params={"api_key": api_key, "noticeid": nid},
+                           params={**_auth_params(api_key), "noticeid": nid},
                            timeout=20)
         if resp.status_code == 429:
             _RUN_STATE["rate_limited"] = True
@@ -1380,7 +1402,7 @@ def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
     stderr warning so that one bad request does not abort the whole run.
     """
     params = {
-        "api_key": api_key,
+        **_auth_params(api_key),      # omitted entirely when running keyless
         code_param: code,             # ncode=NAICS or ccode=PSC
         "postedFrom": posted_from,    # MM/DD/YYYY (required)
         "postedTo": posted_to,        # MM/DD/YYYY (required)
@@ -1417,6 +1439,11 @@ def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
                 break
             if resp.status_code in (401, 403):
                 _die_auth(resp.status_code, getattr(resp, "text", ""))
+            # Running keyless, api.data.gov answers 404 to a request that
+            # carries no credential at all — same meaning as a 401 here, and
+            # it must not be mistaken for "this code has no notices".
+            if resp.status_code == 404 and _KEYLESS:
+                _die_auth(resp.status_code, "no credential reached SAM")
             resp.raise_for_status()
             payload = resp.json()
 
@@ -6673,20 +6700,27 @@ def main(argv=None):
 
     api_key = args.api_key or API_KEY
 
-    if not api_key or not api_key.startswith("SAM-"):
+    if api_key and not api_key.startswith("SAM-"):
         sys.stderr.write(
-            "\nFATAL: no usable SAM.gov API key.\n"
-            "  The key is read from the SAM_API_KEY environment variable, or\n"
-            "  passed with --api-key. There is no built-in key.\n\n"
-            "  Get one: sam.gov > sign in > Workspace > Account Details >\n"
-            "  API Key. Then set it:\n"
-            "    Windows (PowerShell, this window):  $env:SAM_API_KEY='SAM-...'\n"
-            "    Windows (permanent): System Properties > Environment Variables\n"
-            "    macOS/Linux:  export SAM_API_KEY='SAM-...'\n\n"
-            "  Refusing to run: a keyless run would produce an empty report\n"
-            "  that is indistinguishable from a quiet week.\n"
+            "\nFATAL: the SAM.gov key supplied is not a SAM key.\n"
+            "  A SAM.gov key begins with 'SAM-'. The value came from\n"
+            "  SAM_API_KEY or --api-key; check which one is set.\n\n"
+            "  Get the right one: sam.gov > sign in > Workspace >\n"
+            "  Account Details > API Key.\n"
         )
         return 2
+
+    if not api_key:
+        # No local key. Send no api_key parameter and let the network proxy
+        # attach its stored credential as an X-Api-Key header. If no credential
+        # is stored, SAM answers 401/404 and _die_auth stops the run before any
+        # file is written — a blank report is never produced either way.
+        global _KEYLESS
+        _KEYLESS = True
+        sys.stderr.write(
+            "No local SAM.gov key; relying on the managed credential for\n"
+            "api.sam.gov. The run aborts if SAM rejects it.\n"
+        )
 
     posted_from, posted_to = _date_range(args.days)
     sys.stderr.write(
