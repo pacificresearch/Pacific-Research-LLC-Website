@@ -322,6 +322,22 @@ verified one without the difference shown. Gated (prepare + notify only):
 contacting listing agents/lenders, submitting offers, incentive
 applications.
 
+## JOB LANE — Andrew's personal job applications (11/3)
+
+A fourth system, personal career rather than contracting: `jobs/jobbot`
+finds, screens, scores and tailors applications daily (quotas: 10 clinical
+research, 10 best overall fit, 5 international) and submits only what
+Andrew approved, through the employer's own ATS. Docs:
+`jobs/README.md`, `jobs/OPERATIONS.md`. **One command:** "Run Job System"
+(or `/run-jobs`, skill at `.claude/skills/run-jobs/SKILL.md`).
+
+Rules that override instinct in this lane: never invent or inflate a
+qualification (the fact guard enforces it); never guess a sensitive answer
+(work authorization, veteran/disability, EEO, criminal, clearance, salary,
+attestations) — unapproved = NEEDS_HUMAN_ACTION; a submission counts only
+with employer confirmation; no CAPTCHA solving, no automated LinkedIn or
+Indeed applications. Personal data stays in `jobs/data/` (gitignored).
+
 ## Repository context
 
 - The SAM.gov screening tool lives on branch
