@@ -170,6 +170,32 @@ def _unselect(page, field, text):
             page.wait_for_timeout(600)
 
 
+def _fill_full_date(page, loc, d) -> bool:
+    """Workday MM/DD/YYYY widget: click the month display layer, type MMDDYYYY (auto-advances), verify."""
+    mi = loc.locator("[data-automation-id='dateSectionMonth-input']")
+    want = (str(d.month), str(d.day), str(d.year))
+
+    def cur():
+        try:
+            return tuple(str(int(loc.locator(f"[data-automation-id='dateSection{p}-input']").first.input_value() or 0))
+                         for p in ("Month", "Day", "Year"))
+        except Exception:
+            return ()
+    for _ in range(3):
+        if not mi.count() or cur() == want:
+            break
+        disp = loc.locator("[data-automation-id='dateSectionMonth-display']")
+        try:
+            (disp.first if disp.count() else mi.first).scroll_into_view_if_needed(timeout=5000)
+            (disp.first if disp.count() else mi.first).click(timeout=5000)
+        except Exception:
+            mi.first.evaluate("e => { e.scrollIntoView({block: 'center'}); e.focus(); }")
+        page.keyboard.type(f"{d.month:02d}{d.day:02d}{d.year}", delay=80)
+        page.keyboard.press("Tab")
+        page.wait_for_timeout(500)
+    return cur() == want
+
+
 def _tick(page, loc) -> None:
     """Tick a Workday checkbox: native input, a styled role=checkbox, or the clickable label/row."""
     for sel in ("input[type=checkbox]", "[role=checkbox]", "[data-automation-id*='checkbox' i]", "label"):
@@ -585,31 +611,13 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             loc.locator("input").first.fill(pr["contact"]["name"])
             continue
         if f["type"] == "date" and ("Self Identify" in step or "Disclosure" in step):
-            t = date.today()
-            mi = loc.locator("[data-automation-id='dateSectionMonth-input']")
-            want = (str(t.month), str(t.day), str(t.year))
-            def _cur():
-                try:
-                    return tuple(str(int(loc.locator(f"[data-automation-id='dateSection{p}-input']").first.input_value() or 0))
-                                 for p in ("Month", "Day", "Year"))
-                except Exception:
-                    return ()
-            for _ in range(3):  # MM/DD/YYYY widget auto-advances: type it in one go from the month, then verify
-                if not mi.count() or _cur() == want:
-                    break
-                # same method as the work-history dates (proven live): click the month DISPLAY layer, then type
-                # MMDDYYYY; Workday auto-advances month -> day -> year
-                disp = loc.locator("[data-automation-id='dateSectionMonth-display']")
-                try:
-                    (disp.first if disp.count() else mi.first).scroll_into_view_if_needed(timeout=5000)
-                    (disp.first if disp.count() else mi.first).click(timeout=5000)
-                except Exception:
-                    mi.first.evaluate("e => { e.scrollIntoView({block: 'center'}); e.focus(); }")
-                page.keyboard.type(f"{t.month:02d}{t.day:02d}{t.year}", delay=80)
-                page.keyboard.press("Tab")
-                page.wait_for_timeout(500)
-                if _cur() == want:
-                    break
+            _fill_full_date(page, loc, date.today())  # signature date = today
+            continue
+        if f["type"] == "date" and key == "start_date" and \
+                re.search(r"two weeks|2 weeks", str((pr.get("approved_answers") or {}).get("start_date", "")), re.I):
+            from datetime import timedelta
+            _fill_full_date(page, loc, date.today() + timedelta(days=14))  # approved: within two weeks of offer
+            log.append({"label": label, "key": "start_date", "value": str(date.today() + timedelta(days=14)), "ok": True})
             continue
         if f["id"] == "skills" or re.search(r"type to add skills|^skills$", label, re.I):
             if loc.locator("[data-automation-id='selectedItem']").count() >= 1:
