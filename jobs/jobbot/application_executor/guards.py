@@ -32,7 +32,7 @@ SENSITIVE = [
                     r"electronic (name|signature)|e-?signature|sign(ature)? by typing"),
     ("relatives_here", r"relatives?|(family|household) members?.{0,40}(work|employ)"),
     ("licensed_hcp", r"health ?care professionals?|\bhcps?\b|physician licensed|licensed (physician|to practice|medic)|"
-                     r"sunshine act|general medical council|\bgmc\b"),
+                     r"sunshine act|open payments|general medical council|\bgmc\b|are you a physician"),
     ("undisclosed_employment", r"employment (that is )?not listed|not listed on your (cv|resume)|other employment"),
     ("electronic_offer", r"(submitted|sent|delivered) to you electronic|electronic(ally)? (delivery|offer)"),
     ("truth_certification", r"certify .{0,40}(truthful|true|accurate|correct|complete)|(truthful|true and (correct|complete)).{0,30}certif"),
