@@ -10,3 +10,4 @@
 | Date (UTC) | Run | Sources | Self-test | Survivors | Report landed on main | Notes |
 |---|---|---|---|---|---|---|
 | 2026-08-25 | build session (manual) | ⚠️ partial — 4 of 9 unavailable (SBIR.gov 403, DoD DSIP 403, Simpler.Grants.gov and SAM.gov uncredentialed) | ✅ 18 passed | 1 (PAR-27-040, forecast) | sbir/reports/PRG_SBIR_digest_2026-08-25.md | Lane built; first pass across all 24 PA-27-102 institutes filed |
+| 2026-11-09 | sbir weekly digest | ⚠️ partial — see digest | ✅ 18 passed | 1 | sbir/reports/PRG_SBIR_digest_2026-11-09.md | scheduled run |
