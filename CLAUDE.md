@@ -53,6 +53,10 @@ they are outward-facing and irreversible:
 
 Everything else: move.
 
+**How to ask Andrew (11/10):** when a decision is needed, ask with the AskUserQuestion
+tool — clickable options, recommended option first — never as a typed-answer question.
+Batch related questions (up to 4) and lead with a one-line status.
+
 ## NEVER ARGUE WITH A CONTRACTING OFFICER — standing order (Andrew, 8/19)
 
 **No document PRG sends a CO ever argues.** Not a rebuttal, not a
