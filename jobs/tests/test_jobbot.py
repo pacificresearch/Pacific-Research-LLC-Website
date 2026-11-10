@@ -440,6 +440,14 @@ class WorkAuthClassifyTest(unittest.TestCase):
         self.assertFalse(is_plain_consent("I certify that the information provided is true and correct"))
         self.assertFalse(is_plain_consent("I acknowledge that I am not a current employee"))
 
+    def test_years_option(self):
+        from jobbot.application_executor.guards import years_option
+        o = ["Less than 1 year", "1-3 years", "4-7 years", "8+ years"]
+        self.assertEqual(years_option("About 8 years. From Jan 2018 ...", o), "8+ years")
+        self.assertEqual(years_option("5 years", o), "4-7 years")
+        self.assertEqual(years_option("0.5 years", o), "Less than 1 year")
+        self.assertEqual(years_option("about 8 years", ["0-2", "3-5", "6-10", "10+"]), "6-10")
+
 
 if __name__ == "__main__":
     unittest.main()

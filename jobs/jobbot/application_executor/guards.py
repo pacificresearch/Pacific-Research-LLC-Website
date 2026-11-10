@@ -250,3 +250,29 @@ FACT_CLAIM_RX = re.compile(r"\b(certify|i am (not )?(a|an|currently)|i have (not
 def is_plain_consent(label: str) -> bool:
     l = " ".join((label or "").split())
     return bool(CONSENT_RX.search(l)) and not FACT_CLAIM_RX.search(l)
+
+
+def years_option(answer: str, options: list[str]) -> str | None:
+    """'About 8 years ...' + ['0-2 years','3-5 years','6-10 years','10+'] -> '6-10 years'."""
+    m = re.search(r"(\d+(?:\.\d+)?)\s*\+?\s*(years?|yrs?)", answer or "", re.I) or re.match(r"\s*(\d+(?:\.\d+)?)\b", answer or "")
+    if not m:
+        return None
+    n = float(m.group(1))
+    best = None
+    for o in options:
+        t = o.lower().replace("–", "-").replace("—", "-")
+        r = re.search(r"(\d+(?:\.\d+)?)\s*(?:-|to)\s*(\d+(?:\.\d+)?)", t)
+        if r and float(r.group(1)) <= n <= float(r.group(2)):
+            return o
+        p_ = re.search(r"(\d+(?:\.\d+)?)\s*\+|(\d+(?:\.\d+)?)\s*(?:years?\s*)?(?:or more|and (?:above|up)|plus)|(?:more|greater) than\s*(\d+(?:\.\d+)?)", t)
+        if p_:
+            lo = float(next(g for g in p_.groups() if g))
+            if n >= lo and (best is None or lo > best[0]):
+                best = (lo, o)
+        l_ = re.search(r"(?:less than|under|fewer than|<)\s*(\d+(?:\.\d+)?)", t)
+        if l_ and n < float(l_.group(1)):
+            return o
+        e_ = re.fullmatch(r"\s*(\d+(?:\.\d+)?)\s*(years?)?\s*", t)
+        if e_ and float(e_.group(1)) == n:
+            return o
+    return best[1] if best else None

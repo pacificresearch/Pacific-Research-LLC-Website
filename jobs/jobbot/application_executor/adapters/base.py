@@ -331,9 +331,12 @@ def fill(page, actions: list[dict], job: dict | None = None) -> list[dict]:
                     if pick is None and a.get("kind") == "evidence" and texts and job is not None:
                         # options only appear once the dropdown is open: re-answer against the real choices
                         from ...evidence_answers import answer as evidence_answer
+                        from ..guards import match_option, years_option
                         again = evidence_answer(a["label"], texts, job)
-                        if again in texts:
-                            pick = texts.index(again)
+                        hit = (again if again in texts else (match_option(again, texts) if again else None)) \
+                            or years_option(want, texts) or (years_option(again, texts) if again else None)
+                        if hit:
+                            pick = texts.index(hit)
                     def _choose(k):
                         try:
                             opts.nth(k).click(timeout=5000)
