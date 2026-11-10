@@ -88,7 +88,7 @@ ROUTINE = [
     ("website", r"website|portfolio|personal site|github"),
     ("current_employer", r"current (company|employer)|^company$|most recent employer"),
     ("current_title", r"current (job )?title|most recent title"),
-    ("how_did_you_hear", r"how did you (hear|learn|find)|\bsource\b|referr?al source|where did you (hear|find|learn)"),
+    ("how_did_you_hear", r"how did you (hear|learn|find)|\bsource\b(?!\s*(documents?|documentation|data|verification|code|files?|records?|materials?))|referr?al source|where did you (hear|find|learn)"),
     ("education_level", r"highest (level of )?(education|degree)"),
     ("resume", r"resume|\bcv\b|curriculum"),
     ("cover_letter", r"cover letter|motivation letter|letter of interest"),

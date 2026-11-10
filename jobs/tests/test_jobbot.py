@@ -448,6 +448,11 @@ class WorkAuthClassifyTest(unittest.TestCase):
         self.assertEqual(years_option("0.5 years", o), "Less than 1 year")
         self.assertEqual(years_option("about 8 years", ["0-2", "3-5", "6-10", "10+"]), "6-10")
 
+    def test_source_documentation_is_not_how_did_you_hear(self):
+        from jobbot.application_executor.guards import classify
+        self.assertNotEqual(classify("Do you have experience working on source documentation?*")[1], "how_did_you_hear")
+        self.assertEqual(classify("Source")[1], "how_did_you_hear")
+
 
 if __name__ == "__main__":
     unittest.main()
