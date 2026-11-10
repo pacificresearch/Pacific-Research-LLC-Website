@@ -203,6 +203,8 @@ def match_option(answer: str, options: list[str]) -> str | None:
         if na:
             return na[0]
         answer = "No"
+    if norm(answer) == "no" and any(norm(o) == "stop" for o in options) and not any(norm(o) == "no" for o in options):
+        return next(o for o in options if norm(o) == "stop")  # SMS opt-in rendered as HELP/STOP: 'No' = STOP
     a = norm(answer)
     opts = [(o, norm(o)) for o in options if norm(o) and norm(o) not in ("select", "select one", "please select", "")]
     for o, n in opts:

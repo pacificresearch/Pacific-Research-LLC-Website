@@ -274,7 +274,7 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
     return actions, blockers
 
 
-def fill(page, actions: list[dict]) -> list[dict]:
+def fill(page, actions: list[dict], job: dict | None = None) -> list[dict]:
     log = []
     for a in actions:
         sel = f"[data-jobbot-idx='{a['idx']}']" if a["type"] != "radio" else None
@@ -328,6 +328,12 @@ def fill(page, actions: list[dict]) -> list[dict]:
                         from ..guards import match_option
                         m = match_option(want, texts)
                         pick = texts.index(m) if m else None
+                    if pick is None and a.get("kind") == "evidence" and texts and job is not None:
+                        # options only appear once the dropdown is open: re-answer against the real choices
+                        from ...evidence_answers import answer as evidence_answer
+                        again = evidence_answer(a["label"], texts, job)
+                        if again in texts:
+                            pick = texts.index(again)
                     def _choose(k):
                         try:
                             opts.nth(k).click(timeout=5000)
@@ -370,7 +376,7 @@ def run_form(page, job, pr, app_row, evid, wait_human_seconds=0):
     actions, blockers = plan(fields, job, pr, app_row, evid)
     if blockers:
         raise Blocked(blockers)
-    log = fill(page, actions)
+    log = fill(page, actions, job)
     bad = [l for l in log if not l["ok"]]
     if bad:
         raise Blocked([f"could not fill '{b['label'][:80]}': {b.get('error', '')[:80]}" for b in bad])
