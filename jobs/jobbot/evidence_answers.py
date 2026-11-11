@@ -29,7 +29,7 @@ OUT_OF_SCOPE = re.compile(r"\b(relatives?|family members?|conflicts? of interest
                           r"anything else)\b", re.I)
 MOTIVATION = re.compile(r"excite|why (do|are|would) you|interest(ed|s)? (in|you)|motivat|passion|attract|what draws|"
                         r"why this (role|company|position)", re.I)
-RESIDENCE = re.compile(r"(currently )?(live|reside|located|based) in (the )?([a-z .,'-]+?)(\?|\*|$)", re.I)
+RESIDENCE = re.compile(r"(currently )?(live|living|reside|residing|located|based) in (the )?([a-z .,'-]+?)(\?|\*|✱|$)", re.I)
 BAY = {"san francisco bay area", "bay area", "san francisco"}
 SOCAL = {"southern california", "orange county", "los angeles", "socal", "california", "greater los angeles"}
 
@@ -42,7 +42,8 @@ def residence_answer(question: str, pr: dict) -> str | None:
     place = m.group(4).strip(" ,.").lower()
     addr = pr.get("address") or {}
     here = {(addr.get("city") or "").lower(), (addr.get("state") or "").lower(), "orange county", "southern california",
-            "socal", "greater los angeles", "los angeles area"}
+            "socal", "greater los angeles", "los angeles area", "united states", "united states of america", "us",
+            "u.s", "u.s.", "usa", "u.s.a", "america"}
     if place in here or (place in SOCAL and (addr.get("state") or "").lower() == "california"):
         return "Yes"
     return "No"

@@ -62,6 +62,7 @@ SENSITIVE = [
     ("previously_interviewed_here", r"(ever|previously) interviewed (with|at|for)"),
     ("previously_employed_here", r"(been|were) (an? )?(contingent worker|contractor|consultant|temp\w*) (at|for|with)|previously (been )?(an? )?(employee|employed|worked|contingent)|former (employee|worker|contractor)|worked (for|at) .* (before|previously)|ever been employed|(are|were) you (currently or )?(previously )?(an? )?(employee|contingent worker) (of|for|at)|have you (ever )?worked (for|at)"),
     ("can_travel_percent", r"\btravel\b"),
+    ("drivers_license", r"driv(er'?s?|ing) licen[cs]e|licen[cs]ed driver"),
     ("license", r"licen[cs]e|licensure|certified in"),
     ("attestation", r"attest|certify|i (hereby )?(confirm|acknowledge|agree|consent|understand|authori[sz]e)|terms|privacy (policy|notice)|"
                     r"signature|e-?sign|declar|accurate and complete|true and correct"),
