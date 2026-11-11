@@ -177,6 +177,8 @@ def scope_work_auth(key: str, label: str, job: dict | None) -> str:
     non-US / unknown-location job) gets its own key with no approved answer, so it stops for a human."""
     if key not in WORK_AUTH_KEYS:
         return key
+    if key == "us_citizen" and not re.match(r"\s*(are|is|do|have|were)\b", label or "", re.I):
+        return "citizenship_country"  # 'Citizenship Status' / 'What is your citizenship?' -> the country you hold
     text = " ".join((label or "").split())
     stem = re.sub(r"\([^)]*\)?", " ", text)
     if COUNTRY_RX.search(stem):

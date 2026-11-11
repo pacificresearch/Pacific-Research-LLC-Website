@@ -337,6 +337,8 @@ def _value_for(key, label, f, job, pr):
     if key in ("first_name", "last_name", "full_name", "email", "phone"):
         return {"first_name": first, "last_name": last, "full_name": c["name"], "email": pr.get("account_email"),
                 "phone": c["phone"]}[key]
+    if key == "citizenship_country" and str(ans.get("us_citizen", "")).lower().startswith("yes"):
+        return "United States of America"
     if key == "salary_expectation":
         return salary_answer(ans.get("salary_expectation_rule"), job)
     if key == "licensed_hcp" and f["type"] == "select" and re.search(r"\(\s*[ABC]\s*\)", label):
@@ -554,7 +556,7 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 loc.locator("input, textarea").first.fill(pr["contact"]["name"])
             log.append({"label": label, "key": "truth_certification", "value": "<certified (approved 11/4)>", "ok": True})
             continue
-        if f["type"] == "checkbox" and key == "us_citizen" and str((pr.get("approved_answers") or {}).get("us_citizen")).lower().startswith("yes"):
+        if f["type"] == "checkbox" and key in ("us_citizen", "citizenship_country") and str((pr.get("approved_answers") or {}).get("us_citizen")).lower().startswith("yes"):
             # "Indicate which, if any, where you are a citizen" -> a country checklist: tick United States only
             boxes = loc.locator("input[type=checkbox]")
             us = None

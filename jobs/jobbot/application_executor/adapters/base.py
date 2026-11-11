@@ -256,6 +256,8 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
                     blockers.append(f"licensing question: '{label[:120]}'")
                 continue
             val = salary_answer(ans.get("salary_expectation_rule"), job) if key == "salary_expectation" else ans.get(key)
+            if key == "citizenship_country" and str(ans.get("us_citizen", "")).lower().startswith("yes"):
+                val = "United States"
             if key == "education_dates":
                 val = education_date_value(label, edu, f.get("options", []))
             if key == "salary_expectation" and val and re.search(r"currency", label, re.I):
