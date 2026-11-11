@@ -532,6 +532,10 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 if not pick and re.search(r"veteran", label, re.I) and pr.get("veteran_fallback"):
                     # required, no decline option: answer truthfully (service-disabled veteran -> protected veteran)
                     pick = next((o for o in opts if re.search(r"identify as (a |one or more )?.*protected veteran|^i am a protected veteran", o, re.I)), None)
+                if not pick and re.search(r"hispanic|latino", label, re.I) and \
+                        (pr.get("approved_answers") or {}).get("hispanic_forced"):
+                    # Andrew 11/11: only when the form forces Yes/No with no decline option
+                    pick = match_option(str(pr["approved_answers"]["hispanic_forced"]), opts)
                 if pick:
                     p2, _ = _choose_listbox(page, loc, pick)
                     log.append({"label": label, "key": key or "disclosure", "value": p2 or pick, "ok": bool(p2)})
@@ -541,6 +545,9 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     blockers.append(f"required disclosure without a decline option: '{label[:80]}' {opts[:6]}")
             elif f["type"] in ("radio", "checkbox"):
                 pick = next((o for o in f["options"] if DECLINE_RX.search(o)), None)
+                if not pick and re.search(r"hispanic|latino", label, re.I) and \
+                        (pr.get("approved_answers") or {}).get("hispanic_forced"):
+                    pick = match_option(str(pr["approved_answers"]["hispanic_forced"]), f["options"])
                 if pick:
                     loc.get_by_label(pick).check(force=True)
                     log.append({"label": label, "key": key or "disclosure", "value": pick, "ok": True})
