@@ -41,6 +41,13 @@ include_title_patterns:
   - 'healthcare (consultant|consulting|operations)|management consultant.*(health|life sciences)'
   - 'readiness|continuity of operations|\\bcoop\\b|logistics (manager|lead|program)'
   - 'training (manager|program manager|lead)|learning (and|&) development manager'
+  # Added 11/11 (Andrew: equity upside + top-paying medtech sales ladders)
+  - 'clinical (specialist|consultant|educator|education|applications?|support specialist|field)'
+  - 'field clinical (engineer|specialist|representative)|clinical field engineer|field service engineer'
+  - 'clinical territory associate|associate (sales|territory|clinical) (representative|rep|manager|specialist)|sales associate.*(medical|surgical|clinical)'
+  - '(ep|electrophysiology|mapping|cardiac|neuro|robotic|surgical|procedure|case) (mapping )?specialist'
+  - '(clinical|surgical|medical device|capital).*account manager|account manager.*(clinical|surgical|medical)'
+  - 'chief of staff|business operations (manager|lead|director)|strategy (manager|associate)'
   # Category C — international (most international titles also hit the above)
   - 'country (director|manager|representative)|deputy chief of party|chief of party'
   - 'health (officer|specialist|coordinator|adviser|advisor)'
@@ -50,10 +57,10 @@ include_title_patterns:
 exclude_title_patterns:
   - '\bintern(ship)?\b|\bstudent\b|\bfellowship\b|\bpostdoc'
   - 'software engineer|\bdeveloper\b|\bsre\b|machine learning engineer|data engineer|devops'
-  - 'sales (representative|rep|executive)|account (executive|manager)|territory|key account'
+  - '^(?!.*(clinical|surgical|medical|device|associate|mapping|robotic)).*(sales (representative|rep|executive)|account (executive|manager)|territory|key account)'
   - '\brn\b|\bnurse\b|nursing|physician|\bmd\b|pharmacist|surgeon|therapist|dentist|veterinar|psychiatrist|nephrologist|\w+ologist\b|phlebotom'
   - 'scientist(?!.*program)|chemist|biologist|lab(oratory)? technician'
-  - 'vice president|\bvp\b|chief (?!of party)|\bsvp\b|\bevp\b|head of'
+  - 'vice president|\bvp\b|chief (?!of (party|staff))|\bsvp\b|\bevp\b|head of'
   - 'mechanic|driver|warehouse|janitor|custodian|cook|cashier'
   - 'accountant|payroll|tax |auditor(?!.*clinical)'
   - 'medical writer|regulatory writer|biostatistician|statistical programmer'

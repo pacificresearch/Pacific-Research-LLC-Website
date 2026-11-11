@@ -51,6 +51,12 @@ def screen(job: dict, facts: dict) -> dict:
     degrees = {d.lower() for d in facts.get("degrees", [])}
     years = float(facts.get("years_professional", 0))
 
+    # 0. Andrew 11/11: no roles involving animal research ------------------------------
+    if re.search(r"\b(animal (research|studies|models?|husbandry|care|facility|handling)|vivarium|in vivo|"
+                 r"rodents?|mice\b|murine|non-?human primates?|\bnhp\b|iacuc|laboratory animals?|veterinar)", low):
+        add("animal_research", "fail", "role involves animal research (Andrew 11/11: excluded)",
+            next((s for s in sents if re.search(r"animal|vivarium|in vivo|rodent|mice|murine|primate|iacuc|veterinar", s, re.I)), ""))
+
     # 1. security clearance --------------------------------------------------------
     if re.search(r"\bts/sci\b|\bts w/|\btop secret\b|polygraph|\bsci\b", title.lower()) and clearance in ("none", "", "unknown"):
         add("clearance", "fail", "title requires TS/SCI or polygraph; no active clearance", title)
