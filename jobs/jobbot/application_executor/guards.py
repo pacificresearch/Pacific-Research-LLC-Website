@@ -19,6 +19,10 @@ SENSITIVE = [
     ("temporary_work_auth", r"temporary (work )?authori[sz]ation|temporary work (permit|visa|status)"),
     ("consent_choice", r"by selecting .{0,3}yes.{0,3},? you (consent|agree)|consent to the use of (ai|artificial intelligence)|"
                        r"(do you )?consent to (us )?(using|use of) (ai|artificial intelligence|automated)"),
+    ("outside_business_detail", r"(describe|explain|provide (details|more information)|please specify|if yes).{0,80}(other|outside) (business|employment|work|activit)"),
+    ("outside_business", r"(engaged|involved) in any other (business|employment)|(other|outside) business or employment|"
+                         r"maintain any outside (employment|business|work)|outside (employment|business activit)|"
+                         r"(continue|intend) to (work|be employed) (for|by|at) (another|any other)"),
     ("offer_factors", r"factors .{0,40}should consider|anything (else )?we should (know|consider) (about|regarding) (an )?offer"),
     ("debarment", r"debarred|debarment|excluded.*federal|ineligible to participate in federal|oig exclusion|"
                   r"sanctioned by (the )?(fda|oig|hhs)|list of excluded|\boig\b|disqualified or restricted by the (fda|hhs)|"
