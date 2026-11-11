@@ -685,6 +685,11 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     pick, opts = _choose_listbox(page, loc, cand)
                     if pick:
                         break
+                if not pick and (key == "how_did_you_hear" or f["id"] == "source") and opts:
+                    from .base import neutral_source_option
+                    alt = neutral_source_option([o for o in opts if "(+" not in o])
+                    if alt:
+                        pick, opts = _choose_listbox(page, loc, alt)
                 if not pick:  # virtualized list: type-ahead with the keyboard, then confirm what it landed on
                     btn = loc.locator("button[aria-haspopup='listbox']").first
                     for cand in cands:

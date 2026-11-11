@@ -87,7 +87,7 @@ ROUTINE = [
     ("addr_state", r"\bstate\b|province|territory"),
     ("addr_city", r"\bcity\b|\btown\b"),
     ("addr_line2", r"address (line )?2|\bapt\b|\bsuite\b|\bunit\b"),
-    ("home_address", r"(home|street|mailing) address|^address( line 1)?$|address 1"),
+    ("home_address", r"(home|street|mailing|full|current|permanent) address|^address( line 1)?$|address 1|^\s*address\s*$"),
     ("linkedin", r"linkedin"),
     ("website", r"website|portfolio|personal site|github"),
     ("current_employer", r"current (company|employer)|^company$|most recent employer"),

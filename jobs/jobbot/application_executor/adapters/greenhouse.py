@@ -12,7 +12,8 @@ def form_url(url: str, job: dict | None = None) -> str:
     jid = re.search(r"gh_jid=(\d+)", url)
     src = (job or {}).get("source") or ""
     if jid and src.startswith("greenhouse:"):
-        return f"https://job-boards.greenhouse.io/{src.split(':', 1)[1]}/jobs/{jid.group(1)}"
+        # embed form: renders the application itself (the hosted board may redirect to the company site)
+        return f"https://boards.greenhouse.io/embed/job_app?for={src.split(':', 1)[1]}&token={jid.group(1)}"
     return url
 
 
