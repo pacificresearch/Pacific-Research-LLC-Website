@@ -17,6 +17,8 @@ SENSITIVE = [
     ("essential_functions", r"essential functions"),
     ("advisory_board_member", r"institutional review board|\birb\b|ethics committee|advisory board"),
     ("temporary_work_auth", r"temporary (work )?authori[sz]ation|temporary work (permit|visa|status)"),
+    ("consent_choice", r"by selecting .{0,3}yes.{0,3},? you (consent|agree)|consent to the use of (ai|artificial intelligence)|"
+                       r"(do you )?consent to (us )?(using|use of) (ai|artificial intelligence|automated)"),
     ("offer_factors", r"factors .{0,40}should consider|anything (else )?we should (know|consider) (about|regarding) (an )?offer"),
     ("debarment", r"debarred|debarment|excluded.*federal|ineligible to participate in federal|oig exclusion|"
                   r"sanctioned by (the )?(fda|oig|hhs)|list of excluded|\boig\b|disqualified or restricted by the (fda|hhs)|"
