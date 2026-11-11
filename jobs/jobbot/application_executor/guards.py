@@ -36,7 +36,7 @@ SENSITIVE = [
     ("work_auth_type", r"what (type|kind) of (valid )?(work )?authori[sz]ation|^(current )?(work authori[sz]ation|immigration) (type|status)\b"),
     ("e_signature", r"applicant.?s statement|statement (&|and) acknowledg|type your (full )?(legal )?name (above |below )?to (agree|acknowledge|sign)|"
                     r"electronic (name|signature)|e-?signature|sign(ature)? by typing"),
-    ("relatives_here", r"relatives?|(family|household) members?.{0,40}(work|employ)"),
+    ("relatives_here", r"relatives?|(family|household) members?.{0,40}(work|employ)|related to (anyone|someone|any (current )?employee)"),
     ("licensed_hcp", r"health ?care professionals?|\bhcps?\b|physician licensed|licensed (physician|to practice|medic)|"
                      r"sunshine act|open payments|general medical council|\bgmc\b|are you a physician"),
     ("undisclosed_employment", r"employment (that is )?not listed|not listed on your (cv|resume)|other employment"),
