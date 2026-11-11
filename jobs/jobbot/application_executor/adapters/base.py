@@ -137,6 +137,7 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
                "phone": c["phone"], "location": city_state,
                "home_address": f"{addr.get('line1')}, {addr.get('city')}, {st} {addr.get('postal_code')}" if addr.get("line1") else None,
                "addr_city": addr.get("city"), "addr_state": addr.get("state"), "addr_zip": addr.get("postal_code"),
+               "addr_county": addr.get("county"),
                "linkedin": c["linkedin"] if c["linkedin"].startswith("http") else "https://www." + c["linkedin"].removeprefix("www."),
                "website": ans.get("website"), "current_employer": ans.get("current_employer"),
                "current_title": ans.get("current_title"), "how_did_you_hear": ans.get("how_did_you_hear"),

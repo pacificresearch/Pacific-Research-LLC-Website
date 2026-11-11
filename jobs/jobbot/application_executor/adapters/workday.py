@@ -337,6 +337,8 @@ def _value_for(key, label, f, job, pr):
     if key in ("first_name", "last_name", "full_name", "email", "phone"):
         return {"first_name": first, "last_name": last, "full_name": c["name"], "email": pr.get("account_email"),
                 "phone": c["phone"]}[key]
+    if key == "addr_county":
+        return addr.get("county") or ("Orange" if (addr.get("city") or "").lower() == "orange" else None)
     if key == "citizenship_country" and str(ans.get("us_citizen", "")).lower().startswith("yes"):
         return "United States of America"
     if key == "salary_expectation":

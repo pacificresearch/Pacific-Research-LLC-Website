@@ -82,6 +82,7 @@ ROUTINE = [
     ("email", r"e-?mail"),
     ("phone", r"phone|mobile|telephone"),
     ("location", r"^\s*(current )?location\b|where are you (located|based)"),
+    ("addr_county", r"^\s*county\s*$|county of residence|^\s*county/parish"),
     ("addr_zip", r"zip|postal"),
     ("addr_state", r"\bstate\b|province|territory"),
     ("addr_city", r"\bcity\b|\btown\b"),
