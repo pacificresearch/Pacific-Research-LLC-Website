@@ -353,6 +353,14 @@ def fill(page, actions: list[dict], job: dict | None = None) -> list[dict]:
                         from ..guards import match_option
                         m = match_option(want, texts)
                         pick = texts.index(m) if m else None
+                    if pick is None and a.get("key") == "discipline" and texts:
+                        # MA International Studies: closest truthful entries, else exactly "Other"
+                        for alt in ("International Relations", "International Affairs", "Global Studies"):
+                            pick = next((k for k, t in enumerate(texts) if t.lower().startswith(alt.lower())), None)
+                            if pick is not None:
+                                break
+                        if pick is None:
+                            pick = next((k for k, t in enumerate(texts) if t.strip().lower() == "other"), None)
                     if pick is None and a.get("kind") == "evidence" and texts and job is not None:
                         # options only appear once the dropdown is open: re-answer against the real choices
                         from ...evidence_answers import answer as evidence_answer
