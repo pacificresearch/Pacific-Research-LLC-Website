@@ -10,6 +10,13 @@ from .base import SourceError, http
 
 def fetch(e: dict, terms: dict):
     key, email = os.environ.get("USAJOBS_API_KEY"), os.environ.get("USAJOBS_EMAIL")
+    if not key:  # key kept with the private data (gitignored), registered to the portal-account email
+        from ..config import home
+        f = home() / "usajobs_key.txt"
+        key = f.read_text().strip() if f.exists() else None
+    if key and not email:
+        from ..evidence import profile
+        email = profile().get("account_email")
     if not key or not email:
         raise SourceError("USAJOBS_API_KEY / USAJOBS_EMAIL not set — source skipped")
     hdr = {"Authorization-Key": key, "User-Agent": email, "Host": "data.usajobs.gov"}
