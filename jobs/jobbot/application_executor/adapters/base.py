@@ -124,6 +124,30 @@ def education_date_value(label: str, edu: dict, options: list[str]) -> str | Non
     return f"{m}/{y}"
 
 
+UNSAFE_SOURCE = re.compile(r"referr|employee|recruiter|contingent|worker|agency|campus|university|fair|event|intern|"
+                           r"former|current|other \(please|specify", re.I)
+
+
+def neutral_source_option(options: list[str]) -> str | None:
+    """'How did you hear' with no careers-site option: a true, neutral pick (Andrew 11/6: anything easy, never untrue)."""
+    opts = [o for o in options if o and not re.match(r"^(select|please select|--)", o, re.I)]
+    for rx in (r"(company|corporate|career).*(site|website|page)|careers? (site|page|website)|website",
+               r"job board|indeed|linkedin|internet|online|search engine|google|glassdoor|social|ziprecruiter"):
+        hit = next((o for o in opts if re.search(rx, o, re.I) and not UNSAFE_SOURCE.search(o)), None)
+        if hit:
+            return hit
+    return next((o for o in opts if re.fullmatch(r"\s*other\s*", o, re.I)), None)
+
+
+def travel_yes_no(approved: str, label: str, options: list[str]) -> str | None:
+    """Approved 'Up to N%' + 'willing to travel X%?' Yes/No -> Yes when X <= N."""
+    cap = re.search(r"(\d+)\s*%", approved)
+    asked = [int(x) for x in re.findall(r"(\d+)\s*%", label)]
+    if cap and (not asked or max(asked) <= int(cap.group(1))):
+        return match_option("Yes", options)
+    return None
+
+
 def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[list[dict], list[str]]:
     c, ans = pr["contact"], pr.get("approved_answers", {}) or {}
     policy = pr.get("answer_policy", {"skip_optional": True, "decline_disclosures": True})
@@ -208,6 +232,8 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
             if val:
                 if f["type"] in ("select-one", "radio"):
                     opt = match_option(val, f.get("options", []))
+                    if not opt and key == "how_did_you_hear":
+                        opt = neutral_source_option(f.get("options", []))
                     if opt:
                         actions.append({**act, "option": opt})
                     elif req:
@@ -272,6 +298,8 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
                 continue
             if f["type"] in ("select-one", "radio"):
                 opt = match_option(str(val), f.get("options", []))
+                if not opt and key == "can_travel_percent":
+                    opt = travel_yes_no(str(val), label, f.get("options", []))
                 if opt:
                     actions.append({**act, "option": opt})
                 else:
