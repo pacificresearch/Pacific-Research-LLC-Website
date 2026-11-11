@@ -141,13 +141,15 @@ def _classify(l: str) -> tuple[str, str]:
 
 WORK_AUTH_KEYS = ("legally_authorized_us", "requires_sponsorship", "us_citizen", "visa_status_na", "work_auth_type",
                   "temporary_work_auth")
-US_RX = re.compile(r"\b(united states|u\.?s\.?a?\.?|america)\b", re.I)
+US_RX = re.compile(r"(?i:\bunited states\b|\bamerica\b)|\bU\.S\.(A\.)?|\bUSA\b|\bUS\b(?!\s+(if|to|know|at|a|an|the|with|for|about))")
 COUNTRY_RX = re.compile(r"\b(canada|mexico|brazil|argentina|chile|peru|colombia|united kingdom|\buk\b|england|ireland|"
                         r"germany|france|spain|italy|netherlands|belgium|switzerland|poland|india|china|japan|"
                         r"singapore|australia|new zealand|philippines|south africa|israel|eu\b|european union|"
                         r"europe|kenya|nigeria|uae|saudi)", re.I)
 JOB_COUNTRY_RX = re.compile(r"(country|location) (in )?(which|where) (this|the) (position|role|job) (is|will be) "
-                            r"(located|posted|based)|this country|the country of (employment|the position)", re.I)
+                            r"(located|posted|based)|this country|the country of (employment|the position)|"
+                            r"country (that )?(you are|you're) applying (for|to|in)|country (for|to|in) which you are applying|"
+                            r"country where (this|the) (job|position|role)", re.I)
 US_STATES = ("alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida|georgia|hawaii|idaho|"
              "illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|"
              "mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|"
@@ -185,7 +187,7 @@ def scope_work_auth(key: str, label: str, job: dict | None) -> str:
         return key + "_foreign"
     if US_RX.search(stem):
         return key
-    if JOB_COUNTRY_RX.search(stem) or not re.search(r"\bu\.?s\b", text, re.I):
+    if JOB_COUNTRY_RX.search(stem) or not US_RX.search(text):
         in_us = job_in_us(job)
         if in_us is True:
             return key

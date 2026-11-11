@@ -453,6 +453,14 @@ class WorkAuthClassifyTest(unittest.TestCase):
         self.assertNotEqual(classify("Do you have experience working on source documentation?*")[1], "how_did_you_hear")
         self.assertEqual(classify("Source")[1], "how_did_you_hear")
 
+    def test_pronoun_us_is_not_united_states(self):
+        from jobbot.application_executor.guards import scope_work_auth as sc
+        l = ("To obtain or maintain employment eligibility, will you now or in the future require work sponsorship to work "
+             "in the country you are applying for? (Please ask us if you are uncertain.)")
+        self.assertEqual(sc("requires_sponsorship", l, {"country": "ireland"}), "requires_sponsorship_foreign")
+        self.assertEqual(sc("requires_sponsorship", l, {"country": "united states"}), "requires_sponsorship")
+        self.assertEqual(sc("legally_authorized_us", "Are you authorized to work in the US?", {"country": ""}), "legally_authorized_us")
+
 
 if __name__ == "__main__":
     unittest.main()
