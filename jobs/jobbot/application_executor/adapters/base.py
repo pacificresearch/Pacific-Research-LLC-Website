@@ -101,6 +101,29 @@ def decline_option(options: list[str]) -> str | None:
     return c[0] if len(c) >= 1 else None
 
 
+MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+               "November", "December"]
+
+
+def education_date_value(label: str, edu: dict, options: list[str]) -> str | None:
+    """'Start date month' / 'End date year' etc. from education_structured start/end ('YYYY-MM')."""
+    l = label.lower()
+    which = "end" if re.search(r"\bend|graduat|complet|to\b", l) else "start"
+    v = edu.get(which)
+    if not v:
+        return None
+    y, m = str(v).split("-")[:2]
+    if "year" in l:
+        return y
+    if "month" in l:
+        name = MONTH_NAMES[int(m) - 1]
+        for o in options:
+            if o.strip().lower() in (name.lower(), name[:3].lower(), str(int(m)), f"{int(m):02d}"):
+                return o
+        return name
+    return f"{m}/{y}"
+
+
 def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[list[dict], list[str]]:
     c, ans = pr["contact"], pr.get("approved_answers", {}) or {}
     policy = pr.get("answer_policy", {"skip_optional": True, "decline_disclosures": True})
@@ -233,6 +256,8 @@ def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[
                     blockers.append(f"licensing question: '{label[:120]}'")
                 continue
             val = salary_answer(ans.get("salary_expectation_rule"), job) if key == "salary_expectation" else ans.get(key)
+            if key == "education_dates":
+                val = education_date_value(label, edu, f.get("options", []))
             if key == "salary_expectation" and val and re.search(r"currency", label, re.I):
                 val = f"{val} USD"
             if key in ("previously_employed_here", "previously_interviewed_here") and any(p.lower() in job["employer"].lower()
