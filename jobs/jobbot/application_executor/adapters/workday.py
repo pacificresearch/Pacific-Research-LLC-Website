@@ -826,6 +826,22 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
             page.reload(wait_until="networkidle")
             page.wait_for_timeout(4000)
             continue
+        # a slow tenant can show the sign-in interstitial only now (after the early check above ran)
+        em2 = page.get_by_role("button", name=re.compile(r"sign in with email", re.I))
+        if em2.count() and not page.locator(A("password")).count():
+            em2.first.click()
+            page.wait_for_timeout(2500)
+            if not credentials.get(url) and page.locator(A("createAccountLink")).count():
+                page.click(A("createAccountLink"))
+                page.wait_for_timeout(2500)
+        if page.locator(A("email")).count() and page.locator(A("password")).count() and \
+                not page.locator(A("pageFooterNextButton")).count():
+            try:
+                sign_in_or_create(page, url, pr, log)
+            except WorkdayError as ex:
+                raise Blocked([str(ex)])
+            page.wait_for_timeout(3000)
+            continue
         step = _step(page)
         if step.startswith("Review"):
             return log
