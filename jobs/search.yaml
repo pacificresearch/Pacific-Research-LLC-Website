@@ -29,6 +29,18 @@ include_title_patterns:
   - 'health policy|policy analyst'
   - 'federal|government (program|project)'
   - 'implementation (manager|lead)|deployment (manager|lead)'
+  # Broadened 11/11 (Andrew: more solid applications) — PM/ops roles across healthcare, gov services, consulting
+  - 'project (coordinator|lead|director|specialist)|program (coordinator|lead|specialist|analyst)'
+  - '(portfolio|pmo) (manager|lead|analyst)|\\bpmo\\b'
+  - 'operations (lead|specialist|analyst|program)|business operations|strategy (and|&) operations'
+  - '(quality|compliance) (manager|lead|program)|quality assurance manager|gcp|audit (manager|lead)'
+  - 'regulatory (affairs )?(project|program|operations) (manager|lead)'
+  - 'vendor (manager|management)|contract(s)? manager|procurement (manager|lead)'
+  - 'grants? (manager|management|administrator)|sponsored (programs|research)'
+  - 'medical (affairs|operations) (manager|lead)|medical science liaison'
+  - 'healthcare (consultant|consulting|operations)|management consultant.*(health|life sciences)'
+  - 'readiness|continuity of operations|\\bcoop\\b|logistics (manager|lead|program)'
+  - 'training (manager|program manager|lead)|learning (and|&) development manager'
   # Category C — international (most international titles also hit the above)
   - 'country (director|manager|representative)|deputy chief of party|chief of party'
   - 'health (officer|specialist|coordinator|adviser|advisor)'
@@ -47,6 +59,8 @@ exclude_title_patterns:
   - 'medical writer|regulatory writer|biostatistician|statistical programmer'
 
 workday_queries:
+  - project manager
+  - operations manager
   - clinical trial manager
   - clinical research associate
   - clinical project manager
