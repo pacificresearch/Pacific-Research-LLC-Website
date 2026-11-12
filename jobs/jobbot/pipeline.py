@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 import logging
 
 from . import application_tracker as db
@@ -14,6 +15,12 @@ log = logging.getLogger("jobbot.pipeline")
 
 def _tiers() -> dict:
     return {e["name"]: e.get("tier", 3) for e in (load_yaml("employers.yaml", {}) or {}).get("employers", [])}
+
+
+def _bar(cfg: dict, cat: str) -> float:
+    """Score bar per category. Andrew 11/12: international (C) needs only 55; everything else min_score (60)."""
+    per = cfg.get("min_score_by_category") or {"C": 55}
+    return float(per.get(cat, cfg["min_score"]))
 
 
 def qualify(rescore: bool = False, use_semantic: bool | None = None) -> dict:
@@ -48,7 +55,7 @@ def qualify(rescore: bool = False, use_semantic: bool | None = None) -> dict:
             calls = 0
             while calls < cap:
                 live = sorted([x for x in scored if x[4]["category"] == cat and x[3]["eligibility"] != "fail"
-                               and x[4]["score"] >= cfg["min_score"] - 5], key=lambda x: -x[4]["score"])[:need]
+                               and x[4]["score"] >= _bar(cfg, cat) - 5], key=lambda x: -x[4]["score"])[:need]
                 todo = [x for x in live if not x[4].get("semantic")]
                 if not todo:
                     break
@@ -78,7 +85,7 @@ def qualify(rescore: bool = False, use_semantic: bool | None = None) -> dict:
             fails = "; ".join(r["detail"] for r in el["eligibility_reasons"] if r["outcome"] == "fail")
             db.transition(aid, "REJECTED", f"screen: {fails}"[:500])
             stats["failed_eligibility"] += 1
-        elif sc["score"] < cfg["min_score"]:
+        elif sc["score"] < _bar(cfg, sc["category"]):
             if st == "QUALIFIED":
                 db.transition(aid, "SCREENED", f"rescored below threshold ({sc['score']})")
             stats["below_threshold"] += 1
@@ -109,7 +116,9 @@ def shortlist(quotas: dict | None = None) -> dict[str, list]:
                 geo = (json.loads(r["subscores"] or "{}") or {}).get("geo", 80)
             except Exception:
                 geo = 80
-            return (r["score"] or 0) + max(0, geo - 80) * 0.3  # remote (100) +6, hybrid (92) +3.6
+            loc = (r["location"] or "").lower() + " " + (r["country"] or "").lower()
+            brazil = 8 if re.search(r"rio de janeiro|s[aã]o paulo|\bbrazil\b|\bbra[-\s]", loc) else 0
+            return (r["score"] or 0) + max(0, geo - 80) * 0.3 + brazil  # remote +6, hybrid +3.6, Brazil +8 (Andrew 11/12)
         rows.sort(key=_rank, reverse=True)
         picked, per_emp = [], {}
         for r in rows:
