@@ -10,6 +10,7 @@ CHUNK=${1:-5}
 LOCK=data/runqueue.lock
 exec 9>"$LOCK"; flock -n 9 || { echo "runqueue already running"; exit 0; }
 python3 -m jobbot recover >/dev/null 2>&1
+rm -f data/waiting_for_code.txt  # a crashed run can leave a stale marker
 n=0
 while [ -s "$Q" ]; do
   id=$(head -1 "$Q" | tr -dc '0-9')
