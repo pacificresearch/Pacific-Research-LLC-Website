@@ -1,5 +1,28 @@
 # PRG Capture Pipeline — live status board
-> **Last updated: 2026-08-18 (Monday)**
+> **Last updated: 2026-11-12 (Thursday)** — domestic sweep, 752 notices.
+> Report: https://claude.ai/artifact/1w5Y8pgJY549Dp7KKgFf1c
+> Prior board content below this section is from 2026-08-18 and is stale;
+> it has not been re-verified.
+
+## 🎯 Active pursuit — opened 2026-11-12
+
+| # | Pursuit | Stage | Deadline | Next action | Owner |
+|---|---------|-------|----------|-------------|-------|
+| 1 | **RFQDJA27AEETPR0019** — ATF/NCETR Instructor Services · multiple-award FFP BPA, FAR 13.303 · 100% Small Business · NAICS 611430 · Huntsville AL · $500K SAT · 60 mo / 5 ordering periods | SCREENED → BID AS PRIME. Folder + compliance matrix built. **Not priced**: FAR 52.222-41 incorporated with no WD attached; no 1099 day-rate quotes; no SME identified | Quote window opens **2026-11-16**, due **2026-11-30 17:00 ET**. **Questions due 2026-11-18** | ⛔ **Andrew: send the SCA/WD question** (`03_proposal/co_question_draft.md`) by 11/18. Then recruit 1099 SMEs per category; bid only categories with a signed quote + identified SME | Andrew sends → Claude assembles |
+
+**Why it matters:** price is *not rated* (RFQ §6 — reasonableness only per
+FAR 12.204), past performance is rated neutral when absent, award is
+multiple. The aggregation margin is not competed away. Annual on-ramp
+windows Oct 15–31 through 2030 if this window is missed.
+
+## 🛑 No-bid recorded 2026-11-12
+
+| Notice | Decision | Reason |
+|---|---|---|
+| **36C25027Q0078** — VA Roudebush VAMC fire suppression + kitchen exhaust, SDVOSB set-aside, due 2026-12-01 | **PASS** | Award basis **"Price Alone"** + LoS Services **50%** cap + **Kidde IND-21 requires factory-authorized OEM personnel** PRG cannot hold. Compliance forces price ≥ 2× sub cost; a self-performing SDVOSB competitor wins on price by construction. Competitive price falls below the 6% trade-sub floor. Full reasoning in `capture/reports/PRG_report_2026-11-12.md` |
+| SPE7LX27U0564 · SPE7M527U0075 | PASS | DLA parts buys — hard kill #1, pure resale |
+| F3G1EB6257AG01 | ⏳ EXPIRING-SOON | Due 2026-11-20, under the 10-day teaming lead minimum; visible, not queued |
+
 
 ## ✅ Send queue CLEARED (2026-08-18 ~1:05 PM PT)
 All 18 sources-sought/presolicitation responses SENT from
