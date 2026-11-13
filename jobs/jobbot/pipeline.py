@@ -19,7 +19,7 @@ def _tiers() -> dict:
 
 def _bar(cfg: dict, cat: str) -> float:
     """Score bar per category. Andrew 11/12: international (C) needs only 55; everything else min_score (60)."""
-    per = cfg.get("min_score_by_category") or {"C": 55}
+    per = cfg.get("min_score_by_category") or {"C": 55, "F": 55}
     return float(per.get(cat, cfg["min_score"]))
 
 
@@ -50,7 +50,7 @@ def qualify(rescore: bool = False, use_semantic: bool | None = None) -> dict:
         cap = cfg["semantic"].get("max_calls_per_category", 60)
         prior = {r["job_id"]: json.loads(r["semantic"]) for r in db.connect().execute(
             "SELECT job_id, semantic FROM assessments WHERE semantic IS NOT NULL")}
-        for cat in ("A", "B", "C", "D", "E"):
+        for cat in ("A", "B", "C", "D", "E", "F"):
             need = 2 * cfg["quotas"].get(cat, 10)
             calls = 0
             while calls < cap:

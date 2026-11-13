@@ -20,7 +20,7 @@ from .. import application_tracker as db
 from ..config import load_config, load_yaml
 from ..job_normalization import normalize
 from .base import relevant_title
-from . import ashby, bigtech, greenhouse, icims, lever, smartrecruiters, un_careers, usajobs, workday
+from . import ashby, bigtech, greenhouse, icims, reliefweb, lever, smartrecruiters, un_careers, usajobs, workday
 
 log = logging.getLogger("jobbot.discovery")
 
@@ -34,6 +34,7 @@ ADAPTERS = {
     "un_careers": un_careers.fetch,
     "icims": icims.fetch,
     "bigtech": bigtech.fetch,
+    "reliefweb": reliefweb.fetch,
 }
 
 

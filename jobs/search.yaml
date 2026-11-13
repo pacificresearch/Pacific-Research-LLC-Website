@@ -160,3 +160,14 @@ startup_employers:
   - updoc
   - npowermedicine
   - n-power medicine
+
+# Andrew 11/13: lane F — UN / WHO / global health, 5-10 a day
+global_health_employers: [world health organization, who , unicef, undp, unops, unhcr, unfpa, unaids, world food programme,
+  wfp, international organization for migration, iom, pan american health, paho, united nations, world bank, gavi,
+  global fund, cepi, unitaid, médecins sans frontières, medecins sans frontieres, doctors without borders, msf,
+  international rescue committee, international medical corps, path, fhi 360, jhpiego, clinton health access,
+  psi, partners in health, save the children, care international, mercy corps, relief international, core group,
+  corus international, drugs for neglected diseases, alima, intrahealth, management sciences for health, jsi,
+  rti international, population council, pathfinder, resolve to save lives, vital strategies, global health corps,
+  americares, direct relief, project hope, icap, elizabeth glaser, egpaf, chemonics, abt associates, icrc,
+  international committee of the red cross, ifrc, red cross, giz, wellcome, gates foundation]

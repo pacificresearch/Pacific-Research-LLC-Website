@@ -93,6 +93,10 @@ def screen(job: dict, facts: dict) -> dict:
             else:
                 add("citizenship", "fail", f"restricted to {target} citizens/nationals", s)
             break
+        if re.search(r"open to candidates with existing work authori[sz]ation in the location", l) and \
+                job.get("country") not in ("united states", ""):
+            add("work_authorization", "fail", "open only to candidates already authorized to work there", s)
+            break
         if re.search(r"(right|authori[sz]ation|eligib\w+) to work in (the )?(?!united states|us\b|u\.s)([a-z ]+)", l) and \
                 _req_context(s) == "required" and job.get("country") not in ("united states", ""):
             add("work_authorization", "fail" if not re.search(r"sponsor|visa (support|will be provided)", l) else "review",

@@ -54,6 +54,9 @@ def domain_relevant(job: dict) -> bool:
 def categorize(job: dict, terms: dict) -> str:
     t = job["title"].lower()
     emp = job["employer"].lower()
+    # Andrew 11/13: lane F = UN / WHO / global health (5-10 a day), checked before generic international
+    if job.get("ats") in ("reliefweb", "un_careers") or any(x in emp for x in terms.get("global_health_employers", [])):
+        return "F"
     intl_emp = any(x in emp for x in terms.get("international_employers", []))
     if job.get("country") not in ("united states", "") or intl_emp:
         return "C"
@@ -74,7 +77,7 @@ def family_for(job: dict, category: str) -> str:
     t = (job["title"] + " " + (job.get("description") or "")[:6000]).lower()
     if category == "A":
         return "clinical"
-    if category == "C":
+    if category in ("C", "F"):
         return "international"
     if category in ("D", "E") and re.search(r"clinical (research|trial|study|operations)|\bcra\b", job["title"].lower()):
         return "clinical"

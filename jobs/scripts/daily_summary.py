@@ -16,8 +16,8 @@ from jobbot.config import home  # noqa: E402
 
 PT = timezone(timedelta(hours=-8))
 LANES = {"A": "Clinical research", "B": "Program / operations", "C": "International",
-         "D": "Big tech", "E": "Startups"}
-TARGET = {"A": 8, "B": 3, "C": 4, "D": 5, "E": 5}
+         "D": "Big tech", "E": "Startups", "F": "UN / WHO / global health"}
+TARGET = {"A": 8, "B": 3, "C": 4, "D": 5, "E": 5, "F": 7}
 
 
 def pt_day(ts: str | None) -> str | None:
