@@ -384,6 +384,10 @@ def fill(page, actions: list[dict], job: dict | None = None) -> list[dict]:
                         from ..guards import match_option
                         m = match_option(want, texts)
                         pick = texts.index(m) if m else None
+                    if pick is None and a.get("key") in DECLINE_KEYS and texts:
+                        # self-ID typeahead whose options only appear once open: take its own decline wording
+                        alt = decline_option(texts)
+                        pick = texts.index(alt) if alt else None
                     if pick is None and a.get("key") == "how_did_you_hear" and texts:
                         alt = neutral_source_option(texts)
                         pick = texts.index(alt) if alt in texts else None
