@@ -835,7 +835,7 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
             sign_in_or_create(page, url, pr, log)
         except WorkdayError as ex:
             raise Blocked([str(ex)])
-    retries = 0
+    retries = blank_reloads = 0
     for _ in range(12):
         if "something went wrong" in page.inner_text("body").lower():
             if retries >= 1:
@@ -863,6 +863,17 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
             page.wait_for_timeout(3000)
             continue
         step = _step(page)
+        if not step and not page.locator(A("pageFooterNextButton")).count():
+            # blank SPA render (seen on MGB/UChicago after a restart): wait, then reload the apply page once
+            try:
+                page.wait_for_selector(A("pageFooterNextButton"), timeout=30000)
+            except Exception:
+                if blank_reloads >= 2:
+                    raise Blocked(["Workday page stayed blank after two reloads — retry later"])
+                blank_reloads += 1
+                page.goto(url, wait_until="networkidle", timeout=90000)
+                page.wait_for_timeout(5000)
+            continue
         if step.startswith("Review"):
             return log
         if step.startswith("Create Account") or step.startswith("Sign In"):
