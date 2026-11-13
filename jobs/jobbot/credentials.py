@@ -15,6 +15,7 @@ import json
 import os
 import secrets
 import string
+import re
 from urllib.parse import urlparse
 
 from .config import home
@@ -33,8 +34,14 @@ def generate_password(length: int = 16) -> str:
 
 
 def site_key(url: str) -> str:
-    """One account per employer portal: the host (Workday tenants are per-host)."""
-    return urlparse(url).netloc.lower() or url.lower()
+    """One account per employer portal: the host (Workday tenants are per-host), plus the tenant on shared
+    hosts like wd5.myworkdaysite.com/recruiting/<tenant>/ (one host, many employers, separate accounts)."""
+    u = urlparse(url)
+    host = u.netloc.lower()
+    m = re.match(r"/recruiting/([^/]+)/", u.path or "")
+    if host.endswith("myworkdaysite.com") and m:
+        return f"{host}/{m.group(1).lower()}"
+    return host or url.lower()
 
 
 def _file():
