@@ -205,20 +205,39 @@ def _fill_full_date(page, loc, d) -> bool:
 
 
 def _tick(page, loc) -> None:
-    """Tick a Workday checkbox: native input, a styled role=checkbox, or the clickable label/row."""
-    for sel in ("input[type=checkbox]", "[role=checkbox]", "[data-automation-id*='checkbox' i]", "label"):
+    """Tick a Workday checkbox (native input, styled role=checkbox, or its label) and VERIFY it stuck:
+    a forced check() on a styled box can leave React state unchecked (MGB 'I certify' box)."""
+    def checked():
+        try:
+            box = loc.locator("input[type=checkbox]")
+            if box.count() and box.first.is_checked():
+                return True
+            rb = loc.locator("[role=checkbox]")
+            return bool(rb.count() and (rb.first.get_attribute("aria-checked") or "") == "true")
+        except Exception:
+            return False
+    if checked():
+        return
+    for sel in ("input[type=checkbox]", "[role=checkbox]", "label", "[data-automation-id*='checkbox' i]"):
         el = loc.locator(sel)
-        if el.count():
-            el = el.first
+        if not el.count():
+            continue
+        el = el.first
+        for how in ("click", "space", "force"):
             try:
-                if sel == "input[type=checkbox]":
-                    el.check(force=True, timeout=5000)
+                if how == "click":
+                    el.scroll_into_view_if_needed(timeout=3000)
+                    el.click(timeout=4000)
+                elif how == "space":
+                    el.focus()
+                    page.keyboard.press("Space")
                 else:
-                    if (el.get_attribute("aria-checked") or "") != "true":
-                        el.click(force=True, timeout=5000)
-                return
+                    el.check(force=True, timeout=4000) if sel == "input[type=checkbox]" else el.click(force=True, timeout=4000)
             except Exception:
-                continue
+                pass
+            page.wait_for_timeout(300)
+            if checked():
+                return
     raise RuntimeError("could not tick the checkbox")
 
 
