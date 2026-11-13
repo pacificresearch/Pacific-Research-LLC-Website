@@ -929,6 +929,14 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
                                  ".map(e=>e.getAttribute('data-automation-id')+'|'+e.tagName+'|'+(e.type||'')+'|'"
                                  "+(e.innerText||e.value||'').trim().slice(0,50).replace(/\\n/g,' '))")
             (evid / f"dump_{re.sub(r'[^A-Za-z]+', '_', step)}.txt").write_text("\n".join(dump))
+        if page.locator(A("password")).first.is_visible() if page.locator(A("password")).count() else False:
+            # an auth form is showing (session dropped mid-flow): sign in / create, never treat it as questions
+            try:
+                sign_in_or_create(page, url, pr, log)
+            except WorkdayError as ex:
+                raise Blocked([str(ex)])
+            page.wait_for_timeout(3000)
+            continue
         blockers = fill_step(page, job, pr, app_row, log)
         if not blockers:  # answers can reveal follow-up questions (e.g. "If yes, please specify"): second pass
             page.wait_for_timeout(800)
