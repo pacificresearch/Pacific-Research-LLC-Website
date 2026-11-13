@@ -6918,6 +6918,40 @@ def main(argv=None):
         report_path = args.report or _desktop_path(
             f"{rp_stem}_{stamp}.html")
 
+    # A run that screened NOTHING must not write files. An empty report is
+    # indistinguishable from a quiet week once it is published as a page, and
+    # that ambiguity is what let eleven weeks of dead runs read as success
+    # (LEARNING_LOG 14-16). _die_auth already refuses to write on a rejected
+    # key for exactly this reason; the same has to hold however the run came
+    # back empty — rate limiting (HTTP 429), a network failure, every NAICS
+    # code failing, or a genuinely empty window. Stop loudly and write nothing,
+    # so a scheduled run has no blank page to publish.
+    if not results:
+        why = []
+        if _RUN_STATE.get("rate_limited"):
+            why.append("SAM.gov rate-limited this run (HTTP 429) — the daily "
+                       "quota for the API key is spent")
+        if _RUN_STATE.get("failed_codes"):
+            why.append(
+                "%d NAICS code(s) FAILED after retries: %s"
+                % (len(_RUN_STATE["failed_codes"]),
+                   ", ".join(_RUN_STATE["failed_codes"])))
+        sys.stderr.write(
+            "\nFATAL: 0 notices screened — refusing to write a report.\n"
+            "  An empty report cannot be told apart from a quiet week, so\n"
+            "  this run writes NO .html and NO .xlsx rather than leave a\n"
+            "  blank page to be published as if it were a real sweep.\n")
+        for line in why:
+            sys.stderr.write("  CAUSE: %s\n" % line)
+        if not why:
+            sys.stderr.write(
+                "  CAUSE: not determined. Every query returned zero rows with\n"
+                "  no rate-limit and no failed code. Re-run with a wider\n"
+                "  --days before concluding the window is genuinely empty.\n")
+        sys.stderr.write(
+            "\n  If the quota is spent it resets at 00:00 UTC. Re-run then.\n")
+        return 2
+
     saved = []
     if not args.no_excel:
         try:

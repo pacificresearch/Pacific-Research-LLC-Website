@@ -81,6 +81,17 @@ def probe():
             return False, "HTTP %d — key rejected" % exc.code
         if exc.code == 404 and not key:
             return False, "HTTP 404 — no credential reached SAM"
+        if exc.code == 429:
+            # Quota exhaustion is NOT a dead key: the credential authenticated
+            # fine, it has simply spent its daily allowance (usually because a
+            # sweep already ran today). Reporting it as dead sends Andrew to
+            # regenerate a key that is working, and the real key keeps its
+            # expiry. SAM names the reset time in the body.
+            when = ""
+            m = re.search(r"access API after ([0-9A-Za-z:+\- ]+)", body or "")
+            if m:
+                when = " — resets %s" % m.group(1).strip()
+            return "quota", "HTTP 429 — daily quota spent%s" % when
         return False, "HTTP %d" % exc.code
     except Exception as exc:                                  # noqa: BLE001
         # A network blip is not a dead key. Say so rather than crying wolf.
@@ -90,6 +101,16 @@ def probe():
 def main():
     ok, detail = probe()
     days, when = expiry_days()
+
+    if ok == "quota":
+        print("SAM key is VALID but THROTTLED (%s)." % detail)
+        print("  The credential authenticated — it has spent today's request")
+        print("  allowance, almost always because a sweep already ran today.")
+        print("  Do NOT regenerate the key: that does not add quota and the")
+        print("  current key is fine. Re-run after the reset shown above.")
+        if days is not None and when is not None:
+            print("  Recorded expiry: %s (%d days)." % (when, days))
+        return 1
 
     if ok is None:
         print("SAM key check INCONCLUSIVE — could not reach SAM (%s)." % detail)

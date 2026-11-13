@@ -53,3 +53,49 @@ The gate's kill list IS the accumulated falsification record of "ANY."
 7. A credential belongs in the one store every runner already reads,
    never copied per-machine. Count the copies: more than one means a
    rotation will miss some of them (entry 16).
+
+## Entry 17 — 2026-11-13 · "the executive report is always blank"
+
+**Reported by Andrew, repeatedly.** Empty executive reports kept reaching
+him. Entries 14–16 each fixed a *cause* of an empty sweep (dead key, stale
+env var, retracted network diagnosis). None of them fixed the thing that
+turned an empty sweep into a blank report in his hands.
+
+**The actual defect:** `samgov_opportunity_matcher.py` `main()` wrote the
+`.html` and `.xlsx` and returned **0 even when it had screened 0 notices**.
+`_die_auth()` already refused to write on a rejected key, with a comment
+naming this exact hazard — "a report reading '0 notices screened' that is
+indistinguishable from a week with no postings" — but that protection was
+wired only to HTTP 401/403. Every other way a sweep comes back empty —
+HTTP 429 quota exhaustion, a network failure, all NAICS codes failing, a
+genuinely empty window — fell straight through to the save block. The run
+then exited 0, the scheduled task read that as success, and published a
+blank page as a real sweep.
+
+**Fix:** the no-write rule now keys off the *result*, not the cause. Zero
+results ⇒ write nothing, name the cause (rate-limited / failed codes /
+undetermined), exit 2. A scheduled run has no blank page left to publish.
+Verified both ways offline: 0 results ⇒ exit 2, no files; normal run ⇒
+exit 0, 185 notices, 221 rows.
+
+**Second defect, same root:** `capture/check_sam_key.py` reported
+**"SAM CREDENTIAL IS DEAD"** on HTTP 429, because every non-401/403 code
+fell through to the dead-key branch — then printed renewal steps telling
+Andrew to regenerate a key that was working fine. 429 is quota exhaustion,
+usually because a sweep already ran that day. Now its own branch: "VALID
+but THROTTLED", with the reset time SAM supplies, exit 1, and an explicit
+"do NOT regenerate the key".
+
+**Rule 8 for the standing list:** a guard against a misleading artifact
+must key off the artifact, not off one cause of it. "Don't write a blank
+report when the key is dead" is a special case of "don't ever write a blank
+report"; only the general form survives a new cause. Three entries fixed
+causes; the blank reports continued until the general form was written.
+
+**Rule 9:** every lane's report is emitted with the same `<title>`
+("PRG Pipeline Executive Report — <date>"), so domestic, international and
+any other run are indistinguishable in a browser tab, a file listing and
+the artifact gallery. That ambiguity cost real diagnostic time on 11-12:
+two same-titled reports from the same day were conflated. The INTL run
+already writes `PRG_INTL_*` filenames; the `<title>` should carry the lane
+too. Not yet fixed — logged so it is not rediscovered.
