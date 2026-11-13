@@ -791,6 +791,7 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     except Exception:
                         pick = None
                     if not pick and key == "how_did_you_hear" and opts:
+                        from .base import neutral_source_option
                         alt = neutral_source_option(opts)
                         if alt:
                             pick, opts = _choose_multiselect(page, loc, alt)
