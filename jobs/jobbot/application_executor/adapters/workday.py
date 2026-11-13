@@ -758,10 +758,22 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                             page.wait_for_timeout(400)
                             page.keyboard.type(cand.split()[0][:6], delay=90)
                             page.wait_for_timeout(500)
+                            if f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline":
+                                # type-ahead lands on the FIRST "Intern..." entry (e.g. International Business):
+                                # step down through neighbours until a truthful one (Int'l Studies/Relations/Affairs)
+                                for _ in range(15):
+                                    act = page.locator("[role='option'][aria-selected='true'], [role='option']:focus, "
+                                                       "[role='option'][data-focused='true']")
+                                    cur = act.first.inner_text().strip() if act.count() else ""
+                                    if FOS_OK.search(cur) or not cur.lower().startswith(cand.split()[0][:4].lower()):
+                                        break
+                                    page.keyboard.press("ArrowDown")
+                                    page.wait_for_timeout(150)
                             page.keyboard.press("Enter")
                             page.wait_for_timeout(600)
                             shown = btn.inner_text().strip()
-                            if shown and shown != "Select One" and match_option(cand, [shown]):
+                            if shown and shown != "Select One" and (match_option(cand, [shown]) or (
+                                    (f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline") and FOS_OK.search(shown))):
                                 pick = shown
                                 break
                         except Exception:
