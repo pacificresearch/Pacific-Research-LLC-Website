@@ -783,6 +783,17 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                             pick = None
                         if pick:
                             break
+                if not pick and not opts:  # popup opened empty (slow load): close, wait, try once more
+                    page.keyboard.press("Escape")
+                    page.wait_for_timeout(2500)
+                    try:
+                        pick, opts = _choose_multiselect(page, loc, str(val))
+                    except Exception:
+                        pick = None
+                    if not pick and key == "how_did_you_hear" and opts:
+                        alt = neutral_source_option(opts)
+                        if alt:
+                            pick, opts = _choose_multiselect(page, loc, alt)
                 if not pick:
                     blockers.append(f"'{val}' matches no option for '{label[:80]}': {opts[:6]}")
                     continue
