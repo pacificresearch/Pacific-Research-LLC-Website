@@ -342,6 +342,16 @@ def _choose_multiselect(page, field, text, exact=False):
     return pick, texts
 
 
+def _override(label):
+    from ...evidence_answers import _norm, cache
+    c, k = cache(), _norm(" ".join((label or "").replace("*", " ").split()))
+    hit = (c.get(k) or {}).get("override")
+    if hit is None and len(k) >= 60:  # truncated / extended copies of the same question
+        hit = next((v["override"] for kk, v in c.items() if v.get("override") is not None and len(kk) >= 60
+                    and (k.startswith(kk[:120]) or kk.startswith(k[:120]))), None)
+    return hit
+
+
 def _value_for(key, label, f, job, pr):
     c, ans = pr["contact"], pr.get("approved_answers", {}) or {}
     addr = pr.get("address") or {}
@@ -357,6 +367,10 @@ def _value_for(key, label, f, job, pr):
                   "fieldOfStudy": edu.get("discipline"), "fieldsOfStudy": edu.get("discipline")})
     if f["id"] in by_id:
         return by_id[f["id"]]
+    from ...evidence_answers import _norm, cache
+    ov = _override(label)
+    if ov is not None:  # Andrew's explicit answer for this exact question beats any classifier key
+        return ov
     if key == "education_level":
         return edu.get("degree")
     if key in ("school", "degree", "discipline"):
@@ -563,6 +577,8 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                         (pr.get("approved_answers") or {}).get("hispanic_forced"):
                     # Andrew 11/11: only when the form forces Yes/No with no decline option
                     pick = match_option(str(pr["approved_answers"]["hispanic_forced"]), opts)
+                if not pick and _override(label) is not None:  # e.g. "Were/Are you a member of the U.S. Armed Forces?"
+                    pick = match_option(str(_override(label)), opts)
                 if pick:
                     p2, _ = _choose_listbox(page, loc, pick)
                     log.append({"label": label, "key": key or "disclosure", "value": p2 or pick, "ok": bool(p2)})
