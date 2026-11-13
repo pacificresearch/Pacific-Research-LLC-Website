@@ -114,3 +114,49 @@ international_employers:
   - jhpiego
   - clinton health access initiative
   - partners in health
+
+# Andrew 11/13: 20% big tech / 20% startups (quota lanes D and E)
+bigtech_employers: [amazon, microsoft, google, apple, meta, verily, alphabet, nvidia, one medical, aws]
+startup_employers:
+  - assort health
+  - ambience healthcare
+  - tennr
+  - heidi health
+  - abridge
+  - openevidence
+  - formation bio
+  - truveta
+  - qventus
+  - suvoda
+  - lyrahealth
+  - includedhealth
+  - aledade
+  - arcadia
+  - florence healthcare
+  - healthverity
+  - iterative health
+  - headlands research
+  - care access
+  - braveheart bio
+  - lightship
+  - noah medical
+  - medable
+  - endpointclinical
+  - leantaas
+  - cardiosense
+  - kardium
+  - impulse dynamics
+  - setpoint
+  - galvanize
+  - imperative care
+  - gt medical
+  - resolve to save lives
+  - alimentiv
+  - adams clinical
+  - butterfly network
+  - eikon therapeutics
+  - kailera
+  - treeline biosciences
+  - updoc
+  - npowermedicine
+  - n-power medicine

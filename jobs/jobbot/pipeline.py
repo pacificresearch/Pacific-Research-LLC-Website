@@ -50,7 +50,7 @@ def qualify(rescore: bool = False, use_semantic: bool | None = None) -> dict:
         cap = cfg["semantic"].get("max_calls_per_category", 60)
         prior = {r["job_id"]: json.loads(r["semantic"]) for r in db.connect().execute(
             "SELECT job_id, semantic FROM assessments WHERE semantic IS NOT NULL")}
-        for cat in ("A", "B", "C"):
+        for cat in ("A", "B", "C", "D", "E"):
             need = 2 * cfg["quotas"].get(cat, 10)
             calls = 0
             while calls < cap:

@@ -57,6 +57,11 @@ def categorize(job: dict, terms: dict) -> str:
     intl_emp = any(x in emp for x in terms.get("international_employers", []))
     if job.get("country") not in ("united states", "") or intl_emp:
         return "C"
+    # Andrew 11/13: dedicated lanes — D = big tech (20%), E = startups (20%)
+    if job.get("ats") == "bigtech" or any(x == emp or emp.startswith(x + " ") for x in terms.get("bigtech_employers", [])):
+        return "D"
+    if any(x == emp or emp.startswith(x) for x in terms.get("startup_employers", [])):
+        return "E"
     if len(INTL_SCOPE.findall((job["title"] + " " + (job.get("description") or "")[:8000]).lower())) >= 3:
         return "C"  # US-based role with meaningful international responsibilities
     if re.search(r"clinical (research|trial|study|operations|project)|\bcra\b|clinical monitor|study start|"
@@ -71,6 +76,8 @@ def family_for(job: dict, category: str) -> str:
         return "clinical"
     if category == "C":
         return "international"
+    if category in ("D", "E") and re.search(r"clinical (research|trial|study|operations)|\bcra\b", job["title"].lower()):
+        return "clinical"
     if len(INTL_SCOPE.findall(t)) >= 2:
         return "international"
     if len(re.findall(r"clinical (trial|research|stud|site|operations)|\bsite\b|protocol|\bgcp\b|investigator|enrollment", t)) >= 6:
