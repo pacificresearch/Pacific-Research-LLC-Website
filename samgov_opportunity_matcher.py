@@ -6949,8 +6949,15 @@ def main(argv=None):
                 "  no rate-limit and no failed code. Re-run with a wider\n"
                 "  --days before concluding the window is genuinely empty.\n")
         sys.stderr.write(
-            "\n  If the quota is spent it resets at 00:00 UTC. Re-run then.\n")
-        return 2
+            "\n  If the quota is spent it resets at 00:00 UTC. Re-run then.\n"
+            "\n  EXIT 3 = swept but empty. This is NOT a rejected credential\n"
+            "  (that is exit 2) — do not regenerate the SAM key on this.\n")
+        # Exit 3, deliberately NOT 2. Exit 2 already means "SAM rejected the
+        # key", and the scheduled-run prompts turn a 2 into "regenerate the
+        # key at sam.gov". A quota-exhausted or empty run must not send Andrew
+        # to replace a credential that is working — that is the same
+        # wrong-advice failure this commit fixes in check_sam_key.py.
+        return 3
 
     saved = []
     if not args.no_excel:

@@ -99,3 +99,16 @@ the artifact gallery. That ambiguity cost real diagnostic time on 11-12:
 two same-titled reports from the same day were conflated. The INTL run
 already writes `PRG_INTL_*` filenames; the `<title>` should carry the lane
 too. Not yet fixed — logged so it is not rediscovered.
+
+**Follow-up, same day — an exit-code collision I introduced.** The first
+version of this fix returned **exit 2** on a zero-result run. Exit 2 already
+meant "SAM rejected the key", and both capture Routine prompts turn a 2 into
+"FAILED — regenerate the credential at sam.gov". So a quota-exhausted sweep
+would have told Andrew to replace a key that was working — the identical
+wrong-advice failure this entry fixes in `check_sam_key.py`, reintroduced one
+level up. Zero-result now returns **exit 3**, and the run prints
+"EXIT 3 = swept but empty ... NOT a rejected credential (that is exit 2)".
+
+Addendum to rule 8: when you add a new failure exit, check who already reads
+that code. A guard is only as good as the consumer's interpretation of it.
+
