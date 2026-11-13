@@ -899,6 +899,17 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
                 page.goto(url, wait_until="networkidle", timeout=90000)
                 page.wait_for_timeout(5000)
             continue
+        if step and not step.startswith("Review"):
+            # slow render: the step header is up but its fields are not yet (seen on Medtronic/Allina)
+            try:
+                page.wait_for_selector("[data-automation-id^='formField']", state="visible", timeout=25000)
+            except Exception:
+                if blank_reloads >= 2:
+                    raise Blocked([f"[{step}] Workday fields never rendered after two reloads — retry later"])
+                blank_reloads += 1
+                page.reload(wait_until="networkidle")
+                page.wait_for_timeout(5000)
+                continue
         if step.startswith("Review"):
             return log
         if step.startswith("Create Account") or step.startswith("Sign In"):
