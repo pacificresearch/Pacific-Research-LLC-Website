@@ -55,6 +55,7 @@ include_title_patterns:
   - 'monitoring.*evaluation|\bmeal\b|m&e'
 
 exclude_title_patterns:
+  - 'construction|facilit(y|ies) project|capital project|residential|real estate|architect'   # Andrew 11/13: not his lane
   - '\bintern(ship)?\b|\bstudent\b|\bfellowship\b|\bpostdoc'
   - 'software engineer|\bdeveloper\b|\bsre\b|machine learning engineer|data engineer|devops'
   - '^(?!.*(clinical|surgical|medical|device|associate|mapping|robotic)).*(sales (representative|rep|executive)|account (executive|manager)|territory|key account)'
