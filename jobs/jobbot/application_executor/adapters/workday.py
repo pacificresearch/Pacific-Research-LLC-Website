@@ -595,6 +595,26 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             else:
                 blockers.append(f"citizenship checklist has no 'United States' box: '{label[:120]}'")
             continue
+        if f["type"] == "checkbox" and loc.locator("input[type=checkbox]").count() > 1:
+            # single-choice checklist ("Indicate which ... describes your relationship"): use Andrew's override
+            from ...evidence_answers import _norm, cache
+            ov = (cache().get(_norm(label)) or {}).get("override")
+            if ov:
+                boxes = loc.locator("input[type=checkbox]")
+                labs = []
+                for b_i in range(boxes.count()):
+                    bid = boxes.nth(b_i).get_attribute("id") or ""
+                    lab = page.locator(f"label[for='{bid}']").first.inner_text().strip() if bid else ""
+                    labs.append(lab or (boxes.nth(b_i).get_attribute("aria-label") or ""))
+                hit = match_option(ov, labs) or next((l for l in labs if re.search(
+                    r"none of (the|these)|not applicable|no (prior |current )?(relationship|affiliation)|external", l, re.I)
+                    and re.match(r"none|n/?a|no\b", ov, re.I)), None)
+                if hit:
+                    boxes.nth(labs.index(hit)).check(force=True)
+                    log.append({"label": label, "key": "checklist_override", "value": hit, "ok": True})
+                    continue
+                blockers.append(f"no checklist option matches '{ov}' for '{label[:100]}' (options: {labs[:6]})")
+                continue
         if kind == "sensitive" and key == "attestation" or f["type"] == "checkbox":
             aid = attestation_id(label)
             pol = pr.get("answer_policy") or {}
