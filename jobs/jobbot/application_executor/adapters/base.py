@@ -384,6 +384,9 @@ def fill(page, actions: list[dict], job: dict | None = None) -> list[dict]:
                         from ..guards import match_option
                         m = match_option(want, texts)
                         pick = texts.index(m) if m else None
+                    if pick is None and a.get("key") == "how_did_you_hear" and texts:
+                        alt = neutral_source_option(texts)
+                        pick = texts.index(alt) if alt in texts else None
                     if pick is None and a.get("key") == "discipline" and texts:
                         # MA International Studies: closest truthful entries, else exactly "Other"
                         for alt in ("International Relations", "International Affairs", "Global Studies"):
