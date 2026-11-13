@@ -875,6 +875,17 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
         page.wait_for_timeout(6000)
         errs = page.locator(A("errorMessage")).all_inner_texts()
         if not errs and "errors found" in page.inner_text("body").lower():
+            try:  # expand the banner so Workday lists the offending fields
+                page.locator("[data-automation-id='errorBanner'] button, button:has-text('Errors Found')").first.click(timeout=3000)
+                page.wait_for_timeout(800)
+                errs = [e for e in page.locator(A("errorMessage")).all_inner_texts() if e.strip()]
+            except Exception:
+                pass
+            if not errs:
+                errs = page.evaluate("""() => [...document.querySelectorAll('[aria-invalid="true"]')].map(el => {
+                    const c = el.closest('[data-automation-id^="formField"]') || el.parentElement;
+                    return 'invalid: ' + ((c && c.innerText) || el.name || el.id || '').slice(0, 120); })""") or []
+        if not errs and "errors found" in page.inner_text("body").lower():
             errs = [e for e in page.locator("[data-automation-id='errorBanner'], [role='alert']").all_inner_texts() if e.strip()] \
                 or ["Workday reported 'Errors Found' on this step"]
         errs = [e for e in errs if not re.search(r"successfully (uploaded|saved)", e, re.I)]
