@@ -97,6 +97,9 @@ def answer(question: str, options: list[str], job: dict, timeout: int = 120) -> 
     res = residence_answer(q, profile())
     if res:
         return res
+    bls = bls_answer(q, options)
+    if bls:
+        return bls
     key = _norm(q)
     c = cache()
     hit = c.get(key)
@@ -171,3 +174,26 @@ def motivation_answer(job: dict) -> str | None:
     if len(text) > 600 or fact_guard(text, job.get("description", "")):
         return None
     return text
+
+
+BLS_RX = re.compile(r"\bBLS\b|basic life support|\bCPR\b", re.I)
+BLS_CURRENT_RX = re.compile(r"\b(current|active|valid|currently (hold|have)|do you (hold|have|possess))\b", re.I)
+BLS_WILLING_RX = re.compile(r"\b(willing|able|obtain|within \d+|upon hire|prior to start|by (your )?start)\b", re.I)
+
+
+def bls_answer(q: str, options: list[str]) -> str | None:
+    """Andrew 11/13: BLS is expired and will be renewed upon hire. Truthful either way:
+    'can you obtain it' -> Yes; 'do you currently hold it' -> No / the renew-on-hire option."""
+    if not BLS_RX.search(q) or re.search(r"\bACLS|PALS\b", q) and not BLS_RX.search(q.replace("ACLS", "")):
+        return None
+    opts = [o for o in options if o and not re.match(r"^(select|please select|--)", o, re.I)]
+    if BLS_WILLING_RX.search(q):
+        return next((o for o in opts if re.match(r"^yes\b", o, re.I)), "Yes")
+    if BLS_CURRENT_RX.search(q) or opts:
+        renew = next((o for o in opts if re.search(r"will (obtain|renew)|upon hire|willing|in progress|expired", o, re.I)), None)
+        if renew:
+            return renew
+        if opts:
+            return next((o for o in opts if re.match(r"^no\b", o, re.I)), None)
+        return "No - BLS (AHA) previously held; will renew upon hire"
+    return "AHA BLS previously held (expired); will renew upon hire"
