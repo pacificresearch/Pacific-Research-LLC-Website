@@ -62,6 +62,14 @@ def _accept_cookies(page):
 def sign_in_or_create(page, url, pr, log):
     email = pr.get("account_email") or pr["contact"]["email"]
     cred, new = credentials.get_or_create(url, email)
+    if new and not page.locator(A("createAccountSubmitButton")).count():
+        # first visit lands on Sign In: switch to Create Account instead of signing in with a fresh password
+        link = page.locator(A("createAccountLink"))
+        if not link.count():
+            link = page.get_by_role("button", name=re.compile(r"^create account$", re.I))
+        if link.count():
+            link.first.click()
+            page.wait_for_timeout(2500)
     if page.locator(A("createAccountSubmitButton")).count() and new:
         page.fill(A("email"), email)
         page.fill(A("password"), cred["password"])
