@@ -933,7 +933,9 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
         if step and not step.startswith("Review"):
             # slow render: the step header is up but its fields are not yet (seen on Medtronic/Allina)
             try:
-                page.wait_for_selector("[data-automation-id^='formField']", state="visible", timeout=25000)
+                page.wait_for_selector("[data-automation-id^='formField'], [data-automation-id*='upload' i], "
+                                       "[data-automation-id*='drop' i], [data-automation-id='applyFlowPage'] input, "
+                                       "main input:not([type=hidden]), [role='combobox']", state="visible", timeout=25000)
             except Exception:
                 if blank_reloads >= 2:
                     raise Blocked([f"[{step}] Workday fields never rendered after two reloads — retry later"])
