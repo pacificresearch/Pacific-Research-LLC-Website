@@ -155,12 +155,15 @@ def score(job: dict, elig: dict, cfg: dict, terms: dict, tiers: dict, evidence_l
     s = cfg["salary"]
     mid = sal.get("usd_mid")
     intl = category == "C"
+    floor = s["floor_usd"]
+    if is_health_system(job, cfg):  # Andrew 11/13: $85K floor at hospitals / academic medical centers
+        floor = min(floor, s.get("amc_floor_usd", 85000))
     if mid is None:
         comp = 50
     elif intl:
-        comp = 90 if mid >= s["target_min"] else 75 if mid >= s["floor_usd"] else 55 if mid >= s["international_floor_usd"] else 25
+        comp = 90 if mid >= s["target_min"] else 75 if mid >= floor else 55 if mid >= s["international_floor_usd"] else 25
     else:
-        comp = 100 if mid >= s["target_max"] else 88 if mid >= s["target_min"] else 65 if mid >= s["floor_usd"] else 20
+        comp = 100 if mid >= s["target_max"] else 88 if mid >= s["target_min"] else 65 if mid >= floor else 20
     if sal["label"] == "estimated":
         comp = 50 + (comp - 50) * 0.5  # estimates move the needle half as much
 
@@ -199,3 +202,17 @@ def score(job: dict, elig: dict, cfg: dict, terms: dict, tiers: dict, evidence_l
         total = 0.0
     return {"category": category, "family": family_for(job, category), "score": round(total, 1),
             "subscores": sub, "salary": sal}
+
+
+HEALTH_SYSTEM_RX = re.compile(r"health|hospital|medical cent|medicine|clinic\b|children'?s|cancer cent|universit|"
+                              r"mass general|cedars|kaiser|mayo|moffitt|st\.? jude|musc|vumc|ochsner|memorial", re.I)
+
+
+def is_health_system(job: dict, cfg: dict) -> bool:
+    """Hospital systems, academic medical centers and research universities (employer name or listed in search.yaml)."""
+    emp = (job.get("employer") or "").lower()
+    listed = [e.lower() for e in cfg.get("health_system_employers", [])]
+    if any(e and e in emp for e in listed):
+        return True
+    return job.get("ats") in ("workday", "icims", "oracle", "taleo") and bool(HEALTH_SYSTEM_RX.search(emp)) \
+        and not re.search(r"health(care)? (tech|ai)|omada|lyra|included", emp)
