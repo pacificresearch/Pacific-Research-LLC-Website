@@ -1,0 +1,173 @@
+# Search vocabulary. Regexes are matched against the lowercased job title.
+# Discovery keeps a posting only if an include pattern matches and no exclude does.
+
+include_title_patterns:
+  # Category A — clinical research (beyond entry level)
+  - 'clinical (research|trial|study|project|program|operations?|ops)'
+  - '\bclinical research associate\b|\bcra\b|\bsr\.? cra\b|clinical monitor'
+  - 'clinical (trial|study|project) (manager|lead|leader|director)'
+  - 'research (operations|program|project) (manager|director|lead|administrator)'
+  - 'research (manager|administrator)'
+  - '(senior|sr\.?|lead|supervis\w*) clinical research coordinator'
+  - 'clinical research (supervisor|manager|program|quality|compliance|director)'
+  - 'study start.?up|site (activation|start.?up|management|relationship)'
+  - 'ecoa|ecoa|eclinical|clinical (systems|data) (manager|lead)'
+  - 'decentralized|patient recruitment (manager|lead)'
+  # Category B — best overall fit
+  - '(global|public|population) health'
+  - 'health security|biosecurity|biodefense|pandemic|preparedness|emergency (management|response|preparedness)'
+  - '(healthcare|health|biomedical|medical technology|medical device|life sciences?|clinical) program'
+  - '(healthcare|health|biomedical|clinical|research|scientific|medical) operations'
+  - 'program manager|program management|programme manager|programme officer|program officer|program director'
+  - 'project manager|project management'
+  - 'technical program manager'
+  - 'partnership|alliance manager|strategic (partnerships|initiatives)'
+  - 'business development.*(health|clinical|life|federal|government)|capture manager'
+  - 'humanitarian|relief|refugee|migration health|resettlement'
+  - 'operations manager|operations director|director of operations'
+  - 'healthcare technology|htm\b|biomedical (equipment|engineering) manager|clinical engineering manager'
+  - 'health policy|policy analyst'
+  - 'federal|government (program|project)'
+  - 'implementation (manager|lead)|deployment (manager|lead)'
+  # Broadened 11/11 (Andrew: more solid applications) — PM/ops roles across healthcare, gov services, consulting
+  - 'project (coordinator|lead|director|specialist)|program (coordinator|lead|specialist|analyst)'
+  - '(portfolio|pmo) (manager|lead|analyst)|\\bpmo\\b'
+  - 'operations (lead|specialist|analyst|program)|business operations|strategy (and|&) operations'
+  - '(quality|compliance) (manager|lead|program)|quality assurance manager|gcp|audit (manager|lead)'
+  - 'regulatory (affairs )?(project|program|operations) (manager|lead)'
+  - 'vendor (manager|management)|contract(s)? manager|procurement (manager|lead)'
+  - 'grants? (manager|management|administrator)|sponsored (programs|research)'
+  - 'medical (affairs|operations) (manager|lead)|medical science liaison'
+  - 'healthcare (consultant|consulting|operations)|management consultant.*(health|life sciences)'
+  - 'readiness|continuity of operations|\\bcoop\\b|logistics (manager|lead|program)'
+  - 'training (manager|program manager|lead)|learning (and|&) development manager'
+  # Added 11/11 (Andrew: equity upside + top-paying medtech sales ladders)
+  - 'clinical (specialist|consultant|educator|education|applications?|support specialist|field)'
+  - 'field clinical (engineer|specialist|representative)|clinical field engineer|field service engineer'
+  - 'clinical territory associate|associate (sales|territory|clinical) (representative|rep|manager|specialist)|sales associate.*(medical|surgical|clinical)'
+  - '(ep|electrophysiology|mapping|cardiac|neuro|robotic|surgical|procedure|case) (mapping )?specialist'
+  - '(clinical|surgical|medical device|capital).*account manager|account manager.*(clinical|surgical|medical)'
+  - 'chief of staff|business operations (manager|lead|director)|strategy (manager|associate)'
+  # Category C — international (most international titles also hit the above)
+  - 'country (director|manager|representative)|deputy chief of party|chief of party'
+  - 'health (officer|specialist|coordinator|adviser|advisor)'
+  - 'medical (coordinator|logistics|logistician)|health logistics|supply chain.*health'
+  - 'monitoring.*evaluation|\bmeal\b|m&e'
+
+exclude_title_patterns:
+  - '\bintern(ship)?\b|\bstudent\b|\bfellowship\b|\bpostdoc'
+  - 'software engineer|\bdeveloper\b|\bsre\b|machine learning engineer|data engineer|devops'
+  - '^(?!.*(clinical|surgical|medical|device|associate|mapping|robotic)).*(sales (representative|rep|executive)|account (executive|manager)|territory|key account)'
+  - '\brn\b|\bnurse\b|nursing|physician|\bmd\b|pharmacist|surgeon|therapist|dentist|veterinar|psychiatrist|nephrologist|\w+ologist\b|phlebotom'
+  - 'scientist(?!.*program)|chemist|biologist|lab(oratory)? technician'
+  - 'vice president|\bvp\b|chief (?!of (party|staff))|\bsvp\b|\bevp\b|head of'
+  - 'mechanic|driver|warehouse|janitor|custodian|cook|cashier'
+  - 'accountant|payroll|tax |auditor(?!.*clinical)'
+  - 'medical writer|regulatory writer|biostatistician|statistical programmer'
+
+workday_queries:
+  - project manager
+  - operations manager
+  - clinical trial manager
+  - clinical research associate
+  - clinical project manager
+  - clinical operations manager
+  - clinical study manager
+  - program manager health
+  - global health
+  - clinical research manager
+
+usajobs_queries:
+  - clinical research
+  - health program manager
+  - biomedical
+  - health security
+  - public health program
+
+# Family/category lexicons used for scoring (lowercase substrings)
+category_keywords:
+  A: [clinical research, clinical trial, clinical study, clinical operations, cra, monitoring visit, site management,
+      protocol, gcp, ich, irb, edc, ctms, enrollment, recruitment, sponsor, cro, investigator, study start, tmf,
+      decentralized, dct, ecoa, epro, econsent, redcap, oncore, medidata, rave, infectious disease, nih]
+  B: [program management, project management, stakeholder, cross-functional, budget, federal, government,
+      partnership, strategy, operations, medical device, biomedical, healthcare technology, health security,
+      biosecurity, preparedness, vendor, contract, procurement, risk, milestones, kpi, implementation,
+      business development, capture, dod, va, hhs, darpa, barda, cdc]
+  C: [global health, international, humanitarian, country office, field, low- and middle-income, lmic, usaid,
+      un agency, unicef, who, refugee, migration, emergency response, capacity building, ngo, donor,
+      multilateral, cross-cultural, travel, overseas, latin america, brazil, africa, asia]
+
+international_employers:
+  - world health organization
+  - icrc
+  - international committee of the red cross
+  - ifrc
+  - united nations
+  - unicef
+  - unops
+  - undp
+  - iom
+  - international organization for migration
+  - international rescue committee
+  - path
+  - fhi 360
+  - jhpiego
+  - clinton health access initiative
+  - partners in health
+
+# Andrew 11/13: 20% big tech / 20% startups (quota lanes D and E)
+bigtech_employers: [amazon, microsoft, google, apple, meta, verily, alphabet, nvidia, one medical, aws]
+startup_employers:
+  - assort health
+  - ambience healthcare
+  - tennr
+  - heidi health
+  - abridge
+  - openevidence
+  - formation bio
+  - truveta
+  - qventus
+  - suvoda
+  - lyrahealth
+  - includedhealth
+  - aledade
+  - arcadia
+  - florence healthcare
+  - healthverity
+  - iterative health
+  - headlands research
+  - care access
+  - braveheart bio
+  - lightship
+  - noah medical
+  - medable
+  - endpointclinical
+  - leantaas
+  - cardiosense
+  - kardium
+  - impulse dynamics
+  - setpoint
+  - galvanize
+  - imperative care
+  - gt medical
+  - resolve to save lives
+  - alimentiv
+  - adams clinical
+  - butterfly network
+  - eikon therapeutics
+  - kailera
+  - treeline biosciences
+  - updoc
+  - npowermedicine
+  - n-power medicine
+
+# Andrew 11/13: lane F — UN / WHO / global health, 5-10 a day
+global_health_employers: [world health organization, who , unicef, undp, unops, unhcr, unfpa, unaids, world food programme,
+  wfp, international organization for migration, iom, pan american health, paho, united nations, world bank, gavi,
+  global fund, cepi, unitaid, médecins sans frontières, medecins sans frontieres, doctors without borders, msf,
+  international rescue committee, international medical corps, path, fhi 360, jhpiego, clinton health access,
+  psi, partners in health, save the children, care international, mercy corps, relief international, core group,
+  corus international, drugs for neglected diseases, alima, intrahealth, management sciences for health, jsi,
+  rti international, population council, pathfinder, resolve to save lives, vital strategies, global health corps,
+  americares, direct relief, project hope, icap, elizabeth glaser, egpaf, chemonics, abt associates, icrc,
+  international committee of the red cross, ifrc, red cross, giz, wellcome, gates foundation]

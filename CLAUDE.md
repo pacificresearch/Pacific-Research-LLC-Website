@@ -53,6 +53,10 @@ they are outward-facing and irreversible:
 
 Everything else: move.
 
+**How to ask Andrew (11/10):** when a decision is needed, ask with the AskUserQuestion
+tool — clickable options, recommended option first — never as a typed-answer question.
+Batch related questions (up to 4) and lead with a one-line status.
+
 ## NEVER ARGUE WITH A CONTRACTING OFFICER — standing order (Andrew, 8/19)
 
 **No document PRG sends a CO ever argues.** Not a rebuttal, not a
@@ -321,6 +325,27 @@ never NOI; a great return with poor data confidence never outranks a
 verified one without the difference shown. Gated (prepare + notify only):
 contacting listing agents/lenders, submitting offers, incentive
 applications.
+
+## JOB LANE — Andrew's personal job applications (11/3)
+
+A fourth system, personal career rather than contracting: `jobs/jobbot`
+finds, screens, scores and tailors applications daily (quotas: 10 clinical
+research, 10 best overall fit, 5 international) and submits only what
+Andrew approved, through the employer's own ATS. Docs:
+`jobs/README.md`, `jobs/OPERATIONS.md`. **One command:** "Run Job System"
+(or `/run-jobs`, skill at `.claude/skills/run-jobs/SKILL.md`).
+
+**Job lane autonomy (Andrew 11/13): do NOT ask Andrew operational questions** — account logins,
+password resets on his own career-site accounts, duplicates, retries, which jobs to queue. Decide toward
+the goal (more solid applications) and report after. Only the fact guard and sensitive-answer rules below
+stay gated.
+
+Rules that override instinct in this lane: never invent or inflate a
+qualification (the fact guard enforces it); never guess a sensitive answer
+(work authorization, veteran/disability, EEO, criminal, clearance, salary,
+attestations) — unapproved = NEEDS_HUMAN_ACTION; a submission counts only
+with employer confirmation; no CAPTCHA solving, no automated LinkedIn or
+Indeed applications. Personal data stays in `jobs/data/` (gitignored).
 
 ## Repository context
 

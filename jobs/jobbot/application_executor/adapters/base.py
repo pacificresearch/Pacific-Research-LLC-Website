@@ -1,0 +1,463 @@
+"""Label-driven form scanning and filling shared by every ATS adapter.
+
+scan() tags each visible control with data-jobbot-idx and returns its label, type,
+required flag and options. plan() decides a value for each control from the profile and
+approved answers — or records a blocker. fill() applies the plan. Nothing is ever
+guessed: unknown required questions and unapproved sensitive ones become blockers.
+"""
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+from ..guards import CAPTCHA_SELECTORS, attestation_id, classify, is_plain_consent, match_option, salary_answer, scope_work_auth
+
+SCAN_JS = r"""
+() => {
+  const vis = el => { const r = el.getBoundingClientRect(); const s = getComputedStyle(el);
+    if (el.type !== 'file' && (el.getAttribute('aria-hidden') === 'true' || parseFloat(s.opacity) === 0 || el.tabIndex === -1 && r.width < 3)) return false;
+    return (r.width > 0 || r.height > 0 || el.type === 'file') && s.visibility !== 'hidden' && s.display !== 'none'; };
+  const questionOf = el => {  // walk up to the element that holds the question text, excluding option labels
+    let n = el.parentElement;
+    for (let k = 0; k < 7 && n; k++, n = n.parentElement) {
+      const q = n.querySelector(':scope > legend, :scope > .application-label, :scope > label:not(:has(input)), :scope > [class*="label"]:not(:has(input)), :scope > [class*="question"]:not(:has(input)), :scope > p, :scope > span:not(:has(input))');
+      if (q && txt(q) && !n.matches('label')) return txt(q);
+    }
+    return '';
+  };
+  const txt = el => (el ? (el.innerText || el.textContent || '') : '').replace(/\s+/g, ' ').trim();
+  const labelOf = el => {
+    if (el.id) { const l = document.querySelector(`label[for="${CSS.escape(el.id)}"]`); if (l && txt(l)) return txt(l); }
+    if (el.getAttribute('aria-labelledby')) {
+      const t = el.getAttribute('aria-labelledby').split(/\s+/).map(i => txt(document.getElementById(i))).join(' ');
+      if (t.trim()) return t; }
+    if (el.getAttribute('aria-label')) return el.getAttribute('aria-label');
+    const wrap = el.closest('label'); if (wrap && txt(wrap)) return txt(wrap);
+    const fs = el.closest('fieldset'); if (fs && fs.querySelector('legend')) return txt(fs.querySelector('legend'));
+    const grp = el.closest('[class*="question"], [class*="field"], [class*="application-question"], li, .form-group');
+    if (grp) { const l = grp.querySelector('label, .label, .application-label, [class*="label"]'); if (l && txt(l)) return txt(l); }
+    return '';
+  };
+  const out = []; let i = 0; const radios = {};
+  for (const el of document.querySelectorAll('input, select, textarea')) {
+    const type = (el.type || el.tagName).toLowerCase();
+    if (['hidden', 'submit', 'button', 'image', 'reset', 'search'].includes(type)) continue;
+    if (!vis(el) && type !== 'file') continue;
+    if (type === 'radio' || type === 'checkbox') {
+      const key = el.name || el.id;
+      const optLabel = labelOf(el);
+      const q = questionOf(el) || optLabel;
+      if (type === 'radio') {
+        if (!radios[key]) { radios[key] = {idx: i++, type: 'radio', name: key, label: q, required: el.required, options: []}; out.push(radios[key]); }
+        el.setAttribute('data-jobbot-idx', `${radios[key].idx}:${radios[key].options.length}`);
+        radios[key].options.push(optLabel); continue;
+      }
+      el.setAttribute('data-jobbot-idx', String(i));
+      const single = !q || q === optLabel ? optLabel : (optLabel && optLabel.length > 25 ? optLabel : q + ' — ' + optLabel);
+      out.push({idx: i++, type, name: el.name, label: single, required: el.required || /\*\s*$/.test(q) || el.getAttribute('aria-required') === 'true', options: []}); continue;
+    }
+    el.setAttribute('data-jobbot-idx', String(i));
+    let lab = labelOf(el);
+    if (!lab || /^type your response$/i.test(lab)) lab = questionOf(el) || el.getAttribute('placeholder') || el.name || '';
+    const f = {idx: i++, type, name: el.name || el.id, label: lab,
+               required: el.required || el.getAttribute('aria-required') === 'true' || /\*\s*$/.test(labelOf(el)),
+               options: type.startsWith('select') ? [...el.options].map(o => o.text.trim()) : [],
+               value: type === 'file' ? '' : (el.value || '')};
+    out.push(f);
+  }
+  return out;
+}
+"""
+
+
+def captcha_visible(page) -> bool:
+    for sel in CAPTCHA_SELECTORS:
+        for el in page.locator(sel).all():
+            try:
+                box = el.bounding_box()
+                if box and box["width"] > 40 and box["height"] > 40 and el.is_visible():
+                    return True
+            except Exception:
+                continue
+    return False
+
+
+def scan(page) -> list[dict]:
+    return page.evaluate(SCAN_JS)
+
+
+# Andrew's standing policy (11/4): skip every optional question; when a voluntary-disclosure
+# question is REQUIRED, choose the "I don't wish to disclose" option. Never pick a substantive answer.
+CORE_FIELDS = {"first_name", "last_name", "full_name", "email", "phone", "country"}
+DECLINE_KEYS = {"veteran_status", "disability_status", "gender", "race_ethnicity", "hispanic_latino",
+                "sexual_orientation"}
+DECLINE_RX = re.compile(r"decline|do(n'?t| not) (wish|want|care) to|prefer not|choose not|not (to )?(answer|disclose|"
+                        r"self[- ]identify|specified|declared|provided)|undeclared|i do not want to answer|rather not|"
+                        r"no answer|withhold|undisclosed|not disclosed", re.I)
+
+
+def decline_option(options: list[str]) -> str | None:
+    c = [o for o in options if DECLINE_RX.search(o or "")]
+    return c[0] if len(c) >= 1 else None
+
+
+MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+               "November", "December"]
+
+
+def education_date_value(label: str, edu: dict, options: list[str]) -> str | None:
+    """'Start date month' / 'End date year' etc. from education_structured start/end ('YYYY-MM')."""
+    l = label.lower()
+    which = "end" if re.search(r"\bend|graduat|complet|to\b", l) else "start"
+    v = edu.get(which)
+    if not v:
+        return None
+    y, m = str(v).split("-")[:2]
+    if "year" in l:
+        return y
+    if "month" in l:
+        name = MONTH_NAMES[int(m) - 1]
+        for o in options:
+            if o.strip().lower() in (name.lower(), name[:3].lower(), str(int(m)), f"{int(m):02d}"):
+                return o
+        return name
+    return f"{m}/{y}"
+
+
+UNSAFE_SOURCE = re.compile(r"referr|employee|recruiter|contingent|worker|agency|campus|university|fair|event|intern|"
+                           r"former|current|other \(please|specify", re.I)
+
+
+def neutral_source_option(options: list[str]) -> str | None:
+    """'How did you hear' with no careers-site option: a true, neutral pick (Andrew 11/6: anything easy, never untrue)."""
+    opts = [o for o in options if o and not re.match(r"^(select|please select|--)", o, re.I)]
+    for rx in (r"(company|corporate|career).*(site|website|page)|careers? (site|page|website)|website",
+               r"job board|indeed|linkedin|internet|online|search engine|google|glassdoor|social|ziprecruiter"):
+        hit = next((o for o in opts if re.search(rx, o, re.I) and not UNSAFE_SOURCE.search(o)), None)
+        if hit:
+            return hit
+    return next((o for o in opts if re.fullmatch(r"\s*other\s*", o, re.I)), None)
+
+
+def travel_yes_no(approved: str, label: str, options: list[str]) -> str | None:
+    """Approved 'Up to N%' + 'willing to travel X%?' Yes/No -> Yes when X <= N."""
+    cap = re.search(r"(\d+)\s*%", approved)
+    asked = [int(x) for x in re.findall(r"(\d+)\s*%", label)]
+    if cap and (not asked or max(asked) <= int(cap.group(1))):
+        return match_option("Yes", options)
+    return None
+
+
+def plan(fields: list[dict], job: dict, pr: dict, app_row, evid: Path) -> tuple[list[dict], list[str]]:
+    c, ans = pr["contact"], pr.get("approved_answers", {}) or {}
+    policy = pr.get("answer_policy", {"skip_optional": True, "decline_disclosures": True})
+    approved_att = set(pr.get("approved_attestations", []) or [])
+    first, last = c["name"].split()[0], c["name"].split()[-1]
+    addr = pr.get("address") or {}
+    st = {"california": "CA"}.get((addr.get("state") or "").lower(), addr.get("state") or "")
+    city_state = f"{addr['city']}, {st}" if addr.get("city") else c["location"]
+    routine = {"first_name": first, "last_name": last, "full_name": c["name"],
+               "email": pr.get("application_email") or c["email"],
+               "phone": c["phone"], "location": city_state,
+               "home_address": f"{addr.get('line1')}, {addr.get('city')}, {st} {addr.get('postal_code')}" if addr.get("line1") else None,
+               "addr_city": addr.get("city"), "addr_state": addr.get("state"), "addr_zip": addr.get("postal_code"),
+               "addr_county": addr.get("county"),
+               "linkedin": c["linkedin"] if c["linkedin"].startswith("http") else "https://www." + c["linkedin"].removeprefix("www."),
+               "website": ans.get("website"), "current_employer": ans.get("current_employer"),
+               "current_title": ans.get("current_title"), "how_did_you_hear": ans.get("how_did_you_hear"),
+               "country": ans.get("country") or "United States", "school": None, "degree": None, "discipline": None,
+               "referred_by_employee": ans.get("referred_by_employee")}
+    edu = (pr.get("education_structured") or [{}])[0]
+    routine.update({k: edu.get(k) for k in ("school", "degree", "discipline") if edu.get(k)})
+    routine["education_level"] = edu.get("degree")
+    actions, blockers = [], []
+    cover_txt = None
+    if app_row["cover_path"]:
+        p = Path(app_row["cover_path"]).with_name("cover_letter.txt")
+        cover_txt = p.read_text() if p.exists() else None
+    for f in fields:
+        label = (f.get("label") or "").strip()
+        if f.get("options") and f["type"].startswith("select"):
+            for o in f["options"]:  # wrapping <label> also contains every option's text
+                if o:
+                    label = label.replace(o, " ")
+            label = " ".join(label.split())
+        kind, key = classify(label)
+        key = scope_work_auth(key, label, job)
+        req = bool(f.get("required"))
+        act = {"idx": f["idx"], "type": f["type"], "label": label[:160], "kind": kind, "key": key}
+        if policy.get("skip_optional", True) and not req and f["type"] != "file" and \
+                not (kind == "routine" and key in CORE_FIELDS) and key != "cover_letter":
+            continue  # optional question: left blank by policy
+        if key in DECLINE_KEYS and policy.get("decline_disclosures", True):
+            if f["type"] in ("select-one", "radio") or f.get("options"):
+                opt = decline_option(f.get("options", []))
+                if opt:
+                    actions.append({**act, "option": opt})
+                else:
+                    blockers.append(f"required {key.replace('_', ' ')} has no 'decline to disclose' option: "
+                                    f"{f.get('options', [])[:6]}")
+            elif f["type"] in ("text", "search") or f.get("role") == "combobox":
+                actions.append({**act, "value": "I don't wish to answer"})  # typeahead picker
+            else:
+                blockers.append(f"required {key.replace('_', ' ')} in unexpected format: '{label[:80]}'")
+            continue
+        if f["type"] == "file":
+            nm = (f.get("name") or "").lower()
+            if kind == "unknown" and "cover" in nm:
+                key = "cover_letter"
+            if key == "cover_letter":
+                if app_row["cover_path"]:
+                    actions.append({**act, "file": app_row["cover_path"]})
+                elif req:
+                    blockers.append(f"required cover letter upload but none prepared: '{label[:80]}'")
+            elif key == "resume" or re.search(r"resume|\bcv\b", (f.get("name") or "").lower()) or \
+                    (not label and sum(1 for x in fields if x["type"] == "file") == 1):
+                actions.append({**act, "file": app_row["resume_path"]})
+            elif req:
+                blockers.append(f"required upload not recognized: '{label[:80]}'")
+            continue
+        if kind == "routine":
+            if key == "cover_letter" and f["type"] == "textarea":
+                if cover_txt:
+                    actions.append({**act, "value": cover_txt})
+                elif req:
+                    blockers.append(f"required cover letter text but none prepared: '{label[:80]}'")
+                continue
+            if key == "resume":
+                continue
+            val = routine.get(key)
+            if key == "home_address" and re.search(r"\b1\b|line", label, re.I):
+                val = addr.get("line1") or val  # split address form: street line only
+            if val:
+                if f["type"] in ("select-one", "radio"):
+                    opt = match_option(val, f.get("options", []))
+                    if not opt and key == "how_did_you_hear":
+                        opt = neutral_source_option(f.get("options", []))
+                    if opt:
+                        actions.append({**act, "option": opt})
+                    elif req:
+                        blockers.append(f"no option matches '{val}' for '{label[:80]}'")
+                elif f["type"] == "checkbox":
+                    continue
+                else:
+                    actions.append({**act, "value": val})
+            elif req:
+                blockers.append(f"required field has no approved value: '{label[:100]}'")
+            continue
+        if kind == "sensitive" and key == "truth_certification":
+            # Andrew 11/4 approved signing truthfulness certifications ("type in my name for the e-signature")
+            if policy.get("e_sign_when_all_answers_from_profile"):
+                if f["type"] == "checkbox":
+                    actions.append({**act, "check": True})
+                elif f["type"] in ("select-one", "radio"):
+                    opt = match_option("Yes", f.get("options", [])) or next((o for o in f.get("options", []) if re.search(r"agree|certify|accept|yes", o, re.I)), None)
+                    actions.append({**act, "option": opt}) if opt else blockers.append(f"certification options unclear: '{label[:80]}'")
+                else:
+                    actions.append({**act, "value": c["name"]})
+            elif req:
+                blockers.append(f"certification needs your approval: '{label[:120]}'")
+            continue
+        if kind == "sensitive" and key == "e_signature":
+            if policy.get("e_sign_when_all_answers_from_profile"):
+                if f["type"] in ("text", "textarea"):
+                    actions.append({**act, "value": c["name"]})
+                elif f["type"] == "checkbox":
+                    actions.append({**act, "check": True})
+                else:
+                    blockers.append(f"e-signature in unexpected format: '{label[:80]}'")
+            elif req:
+                blockers.append(f"e-signature needs your approval: '{label[:120]}'")
+            continue
+        if kind == "sensitive":
+            if key == "attestation":
+                aid = attestation_id(label)
+                if aid in approved_att or (req and policy.get("accept_consents") and is_plain_consent(label)):
+                    actions.append({**act, "check": True, "attestation_id": aid})
+                elif req:
+                    blockers.append(f"attestation needs your explicit approval [{aid}]: '{label[:200]}'")
+                # optional consent/marketing boxes are left unchecked
+                continue
+            if key == "license":
+                if req:
+                    blockers.append(f"licensing question: '{label[:120]}'")
+                continue
+            val = salary_answer(ans.get("salary_expectation_rule"), job) if key == "salary_expectation" else ans.get(key)
+            if key == "citizenship_country" and str(ans.get("us_citizen", "")).lower().startswith("yes"):
+                val = "United States"
+            if key == "education_dates":
+                val = education_date_value(label, edu, f.get("options", []))
+            if key == "salary_expectation" and val and re.search(r"currency", label, re.I):
+                val = f"{val} USD"
+            if key in ("previously_employed_here", "previously_interviewed_here") and any(p.lower() in job["employer"].lower()
+                                                         for p in pr.get("prior_employers", [])):
+                val = "Yes"
+            if val is None:
+                if req or f["type"] in ("select-one", "radio"):
+                    blockers.append(f"{key.replace('_', ' ')} not approved: '{label[:120]}'")
+                continue
+            if f["type"] in ("select-one", "radio"):
+                opt = match_option(str(val), f.get("options", []))
+                if not opt and key == "can_travel_percent":
+                    opt = travel_yes_no(str(val), label, f.get("options", []))
+                if opt:
+                    actions.append({**act, "option": opt})
+                else:
+                    blockers.append(f"approved {key} '{val}' matches no option {f.get('options', [])[:6]} for '{label[:80]}'")
+            elif f["type"] == "checkbox":
+                blockers.append(f"checkbox for {key} needs review: '{label[:100]}'")
+            else:
+                actions.append({**act, "value": str(val)})
+            continue
+        # unknown question: answer from the evidence library when the CV settles it, else ask Andrew
+        if req:
+            from ...evidence_answers import answer as evidence_answer
+            val = evidence_answer(label, f.get("options", []), job)
+            if val is None:
+                blockers.append(f"custom question needs your answer: '{label[:200]}'")
+            elif f["type"] in ("select-one", "radio"):
+                opt = match_option(val, f.get("options", []))
+                if opt:
+                    actions.append({**act, "option": opt, "kind": "evidence"})
+                else:
+                    blockers.append(f"evidence answer '{val}' matches no option for '{label[:80]}'")
+            elif f["type"] in ("text", "textarea", "search", "number"):
+                actions.append({**act, "value": val, "kind": "evidence"})
+            else:
+                blockers.append(f"custom question needs your answer: '{label[:200]}'")
+    if not any(a.get("file") == app_row["resume_path"] for a in actions):
+        blockers.append("no resume upload field found")
+    return actions, blockers
+
+
+def fill(page, actions: list[dict], job: dict | None = None) -> list[dict]:
+    log = []
+    for a in actions:
+        sel = f"[data-jobbot-idx='{a['idx']}']" if a["type"] != "radio" else None
+        try:
+            if a.get("file"):
+                page.locator(sel).set_input_files(a["file"])
+                page.wait_for_timeout(1200)
+            elif a["type"] == "radio":
+                loc = page.locator(f"[data-jobbot-idx^='{a['idx']}:']")
+                for k in range(loc.count()):
+                    el = loc.nth(k)
+                    lab = el.evaluate("e => (document.querySelector(`label[for='${e.id}']`)||e.closest('label')||{}).innerText||''")
+                    if lab.strip() == a["option"].strip():
+                        el.check(force=True)
+                        break
+            elif a["type"].startswith("select"):
+                page.locator(sel).select_option(label=a["option"])
+            elif a.get("check"):
+                page.locator(sel).check(force=True)
+            elif "value" in a:
+                el = page.locator(sel)
+                if el.get_attribute("role") == "combobox" or el.get_attribute("aria-autocomplete"):
+                    want = a["value"]
+                    typed = want.replace(", CA", ", California") if a.get("key") == "location" else want
+                    el.fill("")
+                    el.type(typed, delay=40)
+                    page.wait_for_timeout(2500)  # suggestion list (e.g. Google Places) loads async
+                    ctl = el.get_attribute("aria-controls") or el.get_attribute("aria-owns")
+                    opts = page.locator(f"[id='{ctl}'] [role='option']") if ctl else page.locator("[role='listbox']:visible [role='option']")
+                    if not opts.count():
+                        opts = page.locator("[role='listbox']:visible [role='option']")
+                    texts = [opts.nth(k).inner_text().strip() for k in range(min(opts.count(), 25))]
+                    if not texts:  # typed text filtered everything out: open the unfiltered list instead
+                        el.fill("")
+                        el.press("ArrowDown")
+                        page.wait_for_timeout(1200)
+                        opts = page.locator(f"[id='{ctl}'] [role='option']") if ctl else page.locator("[role='listbox']:visible [role='option']")
+                        if not opts.count():
+                            opts = page.locator("[role='listbox']:visible [role='option']")
+                        texts = [opts.nth(k).inner_text().strip() for k in range(min(opts.count(), 40))]
+                        if a.get("key") == "work_auth_type" and texts:
+                            hit = next((t for t in texts if re.search(r"\bcitizen\b", t, re.I) and not re.search(r"non|not", t, re.I)), None)
+                            if hit:
+                                want = hit
+                    first = typed.split(",")[0].strip().lower()
+                    pick = next((k for k, t in enumerate(texts) if t.lower().startswith(first)), None)
+                    if pick is None:
+                        pick = next((k for k, t in enumerate(texts) if first in t.lower()), None)
+                    if pick is None and a.get("key") not in ("location",):
+                        from .. import Blocked  # noqa: F401
+                        from ..guards import match_option
+                        m = match_option(want, texts)
+                        pick = texts.index(m) if m else None
+                    if pick is None and a.get("key") in DECLINE_KEYS and texts:
+                        # self-ID typeahead whose options only appear once open: take its own decline wording
+                        alt = decline_option(texts)
+                        pick = texts.index(alt) if alt else None
+                    if pick is None and a.get("key") == "how_did_you_hear" and texts:
+                        alt = neutral_source_option(texts)
+                        pick = texts.index(alt) if alt in texts else None
+                    if pick is None and a.get("key") == "discipline" and texts:
+                        # MA International Studies: closest truthful entries, else exactly "Other"
+                        for alt in ("International Relations", "International Affairs", "Global Studies"):
+                            pick = next((k for k, t in enumerate(texts) if t.lower().startswith(alt.lower())), None)
+                            if pick is not None:
+                                break
+                        if pick is None:
+                            pick = next((k for k, t in enumerate(texts) if t.strip().lower() == "other"), None)
+                    if pick is None and a.get("kind") == "evidence" and texts and job is not None:
+                        # options only appear once the dropdown is open: re-answer against the real choices
+                        from ...evidence_answers import answer as evidence_answer
+                        from ..guards import match_option, years_option
+                        again = evidence_answer(a["label"], texts, job)
+                        hit = (again if again in texts else (match_option(again, texts) if again else None)) \
+                            or years_option(want, texts) or (years_option(again, texts) if again else None)
+                        if hit:
+                            pick = texts.index(hit)
+                    def _choose(k):
+                        try:
+                            opts.nth(k).click(timeout=5000)
+                        except Exception:  # option re-rendered under the cursor: select it by keyboard
+                            el.focus()
+                            for _ in range(k + 1):
+                                page.keyboard.press("ArrowDown")
+                            page.keyboard.press("Enter")
+                    if pick is not None:
+                        _choose(pick)
+                        a = dict(a, value=texts[pick])
+                    elif a.get("key") == "location" and texts:
+                        _choose(0)
+                        a = dict(a, value=texts[0])
+                    else:
+                        raise RuntimeError(f"no dropdown option matches '{want}' (options: {texts[:6]})")
+                    page.wait_for_timeout(500)
+                else:
+                    val = a["value"]
+                    if (el.get_attribute("type") or "").lower() == "number":
+                        # numeric inputs (salary, years): "$120,000" -> "120000"; "5 years" -> "5"
+                        import re as _re
+                        m = _re.search(r"\d[\d,]*(\.\d+)?", str(val))
+                        val = m.group(0).replace(",", "") if m else val
+                    el.fill(val)
+            log.append({"label": a["label"], "key": a["key"], "kind": a["kind"],
+                        "value": "<file:" + Path(a["file"]).name + ">" if a.get("file") else
+                        a.get("option") or ("<checked>" if a.get("check") else
+                                            (a.get("value", "")[:60] + ("…" if len(a.get("value", "")) > 60 else ""))),
+                        "ok": True})
+        except Exception as ex:
+            log.append({"label": a["label"], "key": a["key"], "ok": False, "error": str(ex)[:200]})
+    return log
+
+
+def run_form(page, job, pr, app_row, evid, wait_human_seconds=0):
+    from .. import Blocked
+    if captcha_visible(page):
+        if wait_human_seconds:
+            page.wait_for_timeout(wait_human_seconds * 1000)
+        if captcha_visible(page):
+            raise Blocked(["human verification (CAPTCHA) shown before the form — not bypassed"])
+    fields = scan(page)
+    if not fields:
+        raise Blocked(["no application form found on the page (posting may be closed or require sign-in)"])
+    actions, blockers = plan(fields, job, pr, app_row, evid)
+    if blockers:
+        raise Blocked(blockers)
+    log = fill(page, actions, job)
+    bad = [l for l in log if not l["ok"]]
+    if bad:
+        raise Blocked([f"could not fill '{b['label'][:80]}': {b.get('error', '')[:80]}" for b in bad])
+    return log
