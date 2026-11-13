@@ -269,6 +269,11 @@ Andrew approved, through the employer's own ATS. Docs:
 `jobs/README.md`, `jobs/OPERATIONS.md`. **One command:** "Run Job System"
 (or `/run-jobs`, skill at `.claude/skills/run-jobs/SKILL.md`).
 
+**Job lane autonomy (Andrew 11/13): do NOT ask Andrew operational questions** — account logins,
+password resets on his own career-site accounts, duplicates, retries, which jobs to queue. Decide toward
+the goal (more solid applications) and report after. Only the fact guard and sensitive-answer rules below
+stay gated.
+
 Rules that override instinct in this lane: never invent or inflate a
 qualification (the fact guard enforces it); never guess a sensitive answer
 (work authorization, veteran/disability, EEO, criminal, clearance, salary,
