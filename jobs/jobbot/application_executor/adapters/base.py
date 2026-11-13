@@ -426,7 +426,13 @@ def fill(page, actions: list[dict], job: dict | None = None) -> list[dict]:
                         raise RuntimeError(f"no dropdown option matches '{want}' (options: {texts[:6]})")
                     page.wait_for_timeout(500)
                 else:
-                    el.fill(a["value"])
+                    val = a["value"]
+                    if (el.get_attribute("type") or "").lower() == "number":
+                        # numeric inputs (salary, years): "$120,000" -> "120000"; "5 years" -> "5"
+                        import re as _re
+                        m = _re.search(r"\d[\d,]*(\.\d+)?", str(val))
+                        val = m.group(0).replace(",", "") if m else val
+                    el.fill(val)
             log.append({"label": a["label"], "key": a["key"], "kind": a["kind"],
                         "value": "<file:" + Path(a["file"]).name + ">" if a.get("file") else
                         a.get("option") or ("<checked>" if a.get("check") else
