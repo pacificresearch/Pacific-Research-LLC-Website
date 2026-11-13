@@ -888,10 +888,10 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
             page.wait_for_timeout(3000)
             continue
         step = _step(page)
-        if not step and not page.locator(A("pageFooterNextButton")).count():
+        if not step and not page.locator(A("pageFooterNextButton")).first.is_visible():
             # blank SPA render (seen on MGB/UChicago after a restart): wait, then reload the apply page once
             try:
-                page.wait_for_selector(A("pageFooterNextButton"), timeout=30000)
+                page.wait_for_selector(A("pageFooterNextButton"), state="visible", timeout=30000)
             except Exception:
                 if blank_reloads >= 2:
                     raise Blocked(["Workday page stayed blank after two reloads — retry later"])
