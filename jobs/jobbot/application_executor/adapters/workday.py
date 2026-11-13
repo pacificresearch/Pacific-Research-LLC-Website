@@ -78,7 +78,10 @@ def sign_in_or_create(page, url, pr, log):
         if box.count():
             log.append({"label": "Create-account applicant privacy notice", "key": "account_terms",
                         "value": "accepted (standing instruction: create portal logins)", "ok": True})
-            box.check()
+            try:
+                _tick(page, box.first.locator("xpath=.."))
+            except Exception:
+                box.first.check(force=True)
         btn = A("click_filter") if page.locator(A("click_filter")).count() else A("createAccountSubmitButton")
         page.click(btn)
     else:
@@ -95,8 +98,14 @@ def sign_in_or_create(page, url, pr, log):
         credentials.set_status(url, "needs_email_verification")
         raise WorkdayError("account created — Workday sent a verification email to "
                            f"{email}; click it (or let a Claude session read it) and re-run")
-    if page.locator(A("errorMessage")).count() and _step(page).startswith("Create Account"):
+    if page.locator(A("errorMessage")).count() and (_step(page).startswith(("Create Account", "Sign In"))
+                                                    or page.locator(A("password")).count()):
+        if new:
+            credentials.set_status(url, "pending_signup")
         raise WorkdayError("sign-in failed: " + page.locator(A("errorMessage")).first.inner_text()[:200])
+    if new and page.locator(A("createAccountSubmitButton")).count():
+        credentials.set_status(url, "pending_signup")
+        raise WorkdayError("account creation did not complete (still on Create Account) — retry")
     credentials.set_status(url, "active")
     log.append({"label": "portal account", "key": "account", "value": f"{email} @ {credentials.site_key(url)}",
                 "ok": True})
