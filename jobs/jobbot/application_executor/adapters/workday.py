@@ -720,6 +720,11 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     pick, opts = _choose_listbox(page, loc, cand)
                     if pick:
                         break
+                if not pick and opts and re.search(r"travel", label, re.I):
+                    from ..guards import travel_band
+                    band = travel_band(str(val), opts)
+                    if band:
+                        pick, opts = _choose_listbox(page, loc, band)
                 if not pick and (key == "how_did_you_hear" or f["id"] == "source") and opts:
                     from .base import neutral_source_option
                     alt = neutral_source_option([o for o in opts if "(+" not in o])

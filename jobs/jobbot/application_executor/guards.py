@@ -70,7 +70,7 @@ SENSITIVE = [
     ("previously_interviewed_here", r"(ever|previously) interviewed (with|at|for)"),
     ("previously_employed_here", r"(been|were) (an? )?(contingent worker|contractor|consultant|temp\w*) (at|for|with)|previously (been )?(an? )?(employee|employed|worked|contingent)|former (employee|worker|contractor)|worked (for|at) .* (before|previously)|ever been employed|(are|were) you (currently or )?(previously )?(an? )?(employee|contingent worker) (of|for|at)|have you (ever )?worked (for|at)"),
     ("can_travel_percent", r"\btravel\b"),
-    ("drivers_license", r"driv(er'?s?|ing) licen[cs]e|licen[cs]ed driver"),
+    ("drivers_license", r"driv(er[’']?s?[’']?|ing) licen[cs]e|licen[cs]ed driver"),
     ("license", r"licen[cs]e|licensure|certified in"),
     ("attestation", r"attest|certify|i (hereby )?(confirm|acknowledge|agree|consent|understand|authori[sz]e)|terms|privacy (policy|notice)|"
                     r"signature|e-?sign|declar|accurate and complete|true and correct"),
@@ -290,3 +290,20 @@ def years_option(answer: str, options: list[str]) -> str | None:
         if e_ and float(e_.group(1)) == n:
             return o
     return best[1] if best else None
+
+
+def travel_band(answer: str, options: list[str]) -> str | None:
+    """Approved 'Up to N%' travel vs banded options ('10% to 25%', '65% to 100%'): the highest band that
+    lies entirely within N% (willing to travel up to N covers every band at or below it)."""
+    m = re.search(r"(\d+)\s*%", str(answer or ""))
+    if not m:
+        return None
+    cap, best, best_hi = int(m.group(1)), None, -1
+    for o in options:
+        nums = [int(x) for x in re.findall(r"(\d+)\s*%", o or "")]
+        if not nums or re.search(r"over|more than|above|\+", o or "", re.I) and max(nums) > cap:
+            continue
+        hi = max(nums)
+        if hi <= cap and hi > best_hi:
+            best, best_hi = o, hi
+    return best
