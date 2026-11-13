@@ -862,6 +862,8 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     page.wait_for_timeout(400)
             elif f["type"] in ("text", "textarea"):
                 loc.locator("input, textarea").first.fill(str(val))
+            elif f["type"] == "date" and str(val).upper() == "TODAY":
+                _fill_full_date(page, loc, date.today())  # acknowledgement signed by dating it today
             else:
                 blockers.append(f"unsupported Workday widget for '{label[:80]}'")
                 continue
