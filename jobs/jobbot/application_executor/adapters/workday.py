@@ -946,7 +946,8 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
             page.wait_for_timeout(3000)
             continue
         step = _step(page)
-        if not step and not page.locator(A("pageFooterNextButton")).first.is_visible():
+        nxt = page.locator(A("pageFooterNextButton"))
+        if step in ("", "?") and not (nxt.count() and nxt.first.is_visible()):
             # blank SPA render (seen on MGB/UChicago after a restart): wait, then reload the apply page once
             try:
                 page.wait_for_selector(A("pageFooterNextButton"), state="visible", timeout=30000)
@@ -957,7 +958,7 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
                 page.goto(url, wait_until="networkidle", timeout=90000)
                 page.wait_for_timeout(5000)
             continue
-        if step and not step.startswith("Review"):
+        if step not in ("", "?") and not step.startswith("Review"):
             # slow render: the step header is up but its fields are not yet (seen on Medtronic/Allina)
             try:
                 page.wait_for_selector("[data-automation-id^='formField'], [data-automation-id*='upload' i], "
