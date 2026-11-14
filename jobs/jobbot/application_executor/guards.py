@@ -64,7 +64,7 @@ SENSITIVE = [
     ("willing_onsite", r"willing to (be|work) (on-?site|in (the )?office)|not a remote position|commute to|"
                        r"willing to work (in|at|from) (that|the|this|these|those) (specific )?locations?"),
     ("years_clinical_research", r"years of (\w+ )?experience .*(clinical (research|trials?)|crc\b)"),
-    ("salary_expectation", r"salary|compensation|pay (expectation|requirement)|desired pay|expected pay"),
+    ("salary_expectation", r"salary|compensation|pay (expectation|requirement)|desired (annual |yearly )?(pay|salary|compensation)|expected (annual )?pay"),
     ("education_dates", r"(start|end) date (month|year)|graduation (date|year)|dates? attended"),
     ("start_date", r"start date|available to start|availability|notice period|when can you start"),
     ("previously_interviewed_here", r"(ever|previously) interviewed (with|at|for)"),
