@@ -700,7 +700,7 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 try:
                     if f["type"] == "select":  # consent rendered as a Yes/No dropdown (BD)
                         pick = None
-                        for cand in ("Yes", "I consent", "I agree", "Agree", "Accept"):
+                        for cand in ("Yes", "I consent", "I agree", "Agree", "Accept", "I acknowledge", "Acknowledge", "I have read"):
                             pick, _o = _choose_listbox(page, loc, cand)
                             if pick:
                                 break
