@@ -526,7 +526,16 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
     if "Experience" in step:
         up = page.locator("input[type=file]")
         if up.count() and not page.locator(A("file-upload-successful")).count():
-            up.first.set_input_files(app_row["resume_path"])
+            # several upload zones (certification attachments + Resume/CV): target the resume one
+            idx = up.count() - 1
+            for k in range(up.count()):
+                sect = up.nth(k).evaluate("e => { let n = e; for (let i = 0; i < 12 && n; i++) { n = n.parentElement;"
+                                          " if (n && /resume|cv|curriculum/i.test(n.innerText || '') &&"
+                                          " (n.innerText || '').length < 1500) return n.innerText; } return ''; }")
+                if sect and not re.search(r"certification|licen[cs]e", sect[:300], re.I):
+                    idx = k
+                    break
+            up.nth(idx).set_input_files(app_row["resume_path"])
             page.wait_for_timeout(6000)  # Workday parses the resume and may prefill work history
             log.append({"label": "Resume upload", "key": "resume", "value": "<file:resume.pdf>", "ok": True})
         blockers += fill_work_experience(page, pr, log)
