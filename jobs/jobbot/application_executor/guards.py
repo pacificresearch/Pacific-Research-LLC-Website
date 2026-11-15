@@ -224,14 +224,16 @@ def match_option(answer: str, options: list[str]) -> str | None:
     for o, n in opts:
         if n == a:
             return o
-    starts = [o for o, n in opts if n.startswith(a) or a.startswith(n)]
+    NEG = re.compile(r"\b(not|don ?t|do not|disagree|decline|refuse|no longer)\b")
+    if not NEG.search(a):  # a positive answer never lands on a negated option ("I agree" vs "I do not agree")
+        opts = [(o, n) for o, n in opts if not NEG.search(n)] or opts
+    if a in ("yes", "no"):  # short answers: whole first word only ("no" must not match "not"/"none"/"I do not agree")
+        yn = [o for o, n in opts if n.split()[:1] == [a]]
+        return yn[0] if len(yn) == 1 else None
+    starts = [o for o, n in opts if re.match(rf"{re.escape(a)}\b", n) or re.match(rf"{re.escape(n)}\b", a)]
     if len(starts) == 1:
         return starts[0]
-    if a in ("yes", "no"):
-        yn = [o for o, n in opts if n.split()[:1] == [a]]
-        if len(yn) == 1:
-            return yn[0]
-    contains = [o for o, n in opts if a and a in n]
+    contains = [o for o, n in opts if a and re.search(rf"\b{re.escape(a)}\b", n)]
     return contains[0] if len(contains) == 1 else None
 
 
