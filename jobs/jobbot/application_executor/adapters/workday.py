@@ -877,6 +877,10 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     if not ok_shown:
                         blockers.append(f"selection did not stick for '{label[:80]}' (wanted '{pick}')")
                         continue
+                if not pick and not req and (f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline"):
+                    page.keyboard.press("Escape")
+                    log.append({"label": label, "key": "discipline", "value": "<optional, left blank>", "ok": True})
+                    continue  # optional field of study: leave blank rather than block the application
                 if not pick:
                     full = loc.inner_text()[:1500].replace("\n", " ")
                     blockers.append(f"'{val}' matches no option for '{label[:80]}': {opts[:6]}"
@@ -912,6 +916,10 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                         alt = neutral_source_option(opts)
                         if alt:
                             pick, opts = _choose_multiselect(page, loc, alt)
+                if not pick and not req and (is_fos or key == "discipline"):
+                    page.keyboard.press("Escape")
+                    log.append({"label": label, "key": "discipline", "value": "<optional, left blank>", "ok": True})
+                    continue
                 if not pick:
                     blockers.append(f"'{val}' matches no option for '{label[:80]}': {opts[:6]}")
                     continue
