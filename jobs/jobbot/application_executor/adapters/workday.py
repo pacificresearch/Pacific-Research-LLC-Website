@@ -904,10 +904,28 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 loc.locator("input, textarea").first.fill(str(val))
             elif f["type"] == "date" and re.fullmatch(r"(19|20)\d\d", str(val)):
                 # year-only box (education From / To (Actual or Expected)): click, type the year
-                inp = loc.locator("input").first
-                inp.click()
-                page.keyboard.type(str(val), delay=60)
-                page.keyboard.press("Tab")
+                done_y = False
+                for sel in ("[data-automation-id*='dateSectionYear-display']", "[data-automation-id*='dateSectionYear']",
+                            "[data-automation-id*='dateSection']", "input"):
+                    el = loc.locator(sel)
+                    if not el.count():
+                        continue
+                    try:
+                        el.first.click(timeout=5000)
+                    except Exception:
+                        try:
+                            el.first.click(force=True, timeout=5000)
+                        except Exception:
+                            continue
+                    page.keyboard.type(str(val), delay=60)
+                    page.keyboard.press("Tab")
+                    page.wait_for_timeout(300)
+                    if str(val) in (loc.inner_text() + " " + " ".join(
+                            loc.locator("input").evaluate_all("els => els.map(e => e.value)"))):
+                        done_y = True
+                        break
+                if not done_y:
+                    raise RuntimeError(f"year box did not take {val}")
             elif f["type"] == "date" and str(val).upper() == "TODAY":
                 _fill_full_date(page, loc, date.today())  # acknowledgement signed by dating it today
             else:
