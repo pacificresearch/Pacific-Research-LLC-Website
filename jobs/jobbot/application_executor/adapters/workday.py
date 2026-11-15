@@ -624,6 +624,8 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 if not pick and re.search(r"\bgender\b|\bsex\b", label, re.I) and \
                         (pr.get("approved_answers") or {}).get("gender_forced"):
                     pick = match_option(str(pr["approved_answers"]["gender_forced"]), f["options"])
+                if not pick and _override(label) is not None:
+                    pick = match_option(str(_override(label)), f["options"])
                 if pick:
                     loc.get_by_label(pick).check(force=True)
                     log.append({"label": label, "key": key or "disclosure", "value": pick, "ok": True})
