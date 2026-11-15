@@ -778,6 +778,11 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 if not pick and opts and re.search(r"travel", label, re.I):
                     from ..guards import travel_band
                     band = travel_band(str(val), opts)
+                    if not band and re.search(r"up to\s*(\d+)", str(val), re.I):
+                        from .base import travel_yes_no
+                        band = travel_yes_no(str(val), label, opts) or (
+                            next((o for o in opts if o.strip().lower() == "yes"), None)
+                            if int(re.search(r"(\d+)", str(val)).group(1)) >= 50 and not re.search(r"\d+\s*%", label) else None)
                     if band:
                         pick, opts = _choose_listbox(page, loc, band)
                 if not pick and (key == "how_did_you_hear" or f["id"] == "source") and opts:
