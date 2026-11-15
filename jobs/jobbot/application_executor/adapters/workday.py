@@ -627,7 +627,7 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 if not pick and _override(label) is not None:
                     pick = match_option(str(_override(label)), f["options"])
                 if pick:
-                    loc.get_by_label(pick).check(force=True)
+                    loc.get_by_label(pick, exact=True).first.check(force=True)
                     log.append({"label": label, "key": key or "disclosure", "value": pick, "ok": True})
                 else:
                     blockers.append(f"required disclosure without a decline option: '{label[:80]}'")
@@ -896,7 +896,7 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     blockers.append(f"'{val}' matches no option for '{label[:80]}': {f['options'][:6]}")
                     continue
                 try:
-                    loc.get_by_label(pick, exact=True).check(force=True, timeout=5000)
+                    loc.get_by_label(pick, exact=True).first.check(force=True, timeout=5000)
                 except Exception:  # Workday radios: the label is the clickable element
                     loc.locator("label").filter(has_text=re.compile(rf"^\s*{re.escape(pick)}\s*$")).first.click()
                     page.wait_for_timeout(400)
