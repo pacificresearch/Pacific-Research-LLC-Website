@@ -586,6 +586,10 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                         (pr.get("approved_answers") or {}).get("hispanic_forced"):
                     # Andrew 11/11: only when the form forces Yes/No with no decline option
                     pick = match_option(str(pr["approved_answers"]["hispanic_forced"]), opts)
+                if not pick and re.search(r"\bgender\b|\bsex\b", label, re.I) and \
+                        (pr.get("approved_answers") or {}).get("gender_forced"):
+                    # Andrew 11/14: only when the form forces a choice with no decline option
+                    pick = match_option(str(pr["approved_answers"]["gender_forced"]), opts)
                 if not pick and _override(label) is not None:  # e.g. "Were/Are you a member of the U.S. Armed Forces?"
                     pick = match_option(str(_override(label)), opts)
                 if pick:
@@ -600,6 +604,9 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                 if not pick and re.search(r"hispanic|latino", label, re.I) and \
                         (pr.get("approved_answers") or {}).get("hispanic_forced"):
                     pick = match_option(str(pr["approved_answers"]["hispanic_forced"]), f["options"])
+                if not pick and re.search(r"\bgender\b|\bsex\b", label, re.I) and \
+                        (pr.get("approved_answers") or {}).get("gender_forced"):
+                    pick = match_option(str(pr["approved_answers"]["gender_forced"]), f["options"])
                 if pick:
                     loc.get_by_label(pick).check(force=True)
                     log.append({"label": label, "key": key or "disclosure", "value": pick, "ok": True})
