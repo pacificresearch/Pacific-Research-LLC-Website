@@ -1002,6 +1002,13 @@ def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
             continue
         step = _step(page)
         nxt = page.locator(A("pageFooterNextButton"))
+        manual = page.locator(A("applyManually"))
+        if not manual.count():
+            manual = page.get_by_role("button", name=re.compile(r"^apply manually$", re.I))
+        if step in ("", "?") and manual.count() and manual.first.is_visible():
+            manual.first.click()  # "Start Your Application" chooser (Autofill / Apply Manually / Use Last)
+            page.wait_for_timeout(4000)
+            continue
         if step in ("", "?") and not (nxt.count() and nxt.first.is_visible()):
             # blank SPA render (seen on MGB/UChicago after a restart): wait, then reload the apply page once
             try:
