@@ -332,8 +332,20 @@ def _choose_multiselect(page, field, text, exact=False):
         page.keyboard.press("Escape")
         return None, texts
     exact = page.locator(OPT).filter(has_text=re.compile(rf"^\s*{re.escape(pick)}\s*$"))
-    (exact.first if exact.count() else page.locator(OPT, has_text=pick).first).click()
+    target = exact.first if exact.count() else page.locator(OPT, has_text=pick).first
+    target.click()
     page.wait_for_timeout(1500)
+    selected = field.locator("[data-automation-id='selectedItem']").count() > 0
+    if not selected:  # option rendered with its own checkbox (e.g. Thermo Fisher citizenship): tick that box
+        for sel in ("input[type=checkbox]", "[role=checkbox]", "[data-automation-id*='checkbox' i]"):
+            try:
+                box = target.locator(sel)
+                if box.count():
+                    box.first.click(force=True, timeout=3000)
+                    page.wait_for_timeout(1200)
+                    break
+            except Exception:
+                continue
     now = _open_options(page)
     selected = field.locator("[data-automation-id='selectedItem']").count() > 0
     for _ in range(3):  # nested prompts: a category opens a sub-list, sometimes with a same-named leaf
