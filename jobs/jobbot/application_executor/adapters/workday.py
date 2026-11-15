@@ -35,7 +35,7 @@ FIELDS_JS = r"""
   const date = e.querySelector("[data-automation-id*='dateSection']");
   const ta = e.querySelector('textarea'); const inp = e.querySelector("input[type=text], input:not([type]), input[type=tel], input[type=email], input[type=number]");
   let type = radios.length ? 'radio' : cb.length ? 'checkbox' : btn ? 'select' : multi ? 'multiselect' : date ? 'date' : ta ? 'textarea' : inp ? 'text' : 'other';
-  const opts = radios.map(r => { const l = document.querySelector(`label[for='${r.id}']`); return l ? l.innerText.trim() : r.value; });
+  const opts = (radios.length ? radios : (cb.length > 1 ? [...cb] : [])).map(r => { const l = document.querySelector(`label[for='${r.id}']`); return l ? l.innerText.trim() : r.value; });
   const sel = e.querySelector("[data-automation-id='selectedItem']");
   const value = btn ? btn.innerText.trim() : multi ? (sel ? sel.innerText.trim() : '') : (inp ? inp.value : ta ? ta.value : '');
   return {i, id: e.getAttribute('data-automation-id').slice(10), label, required: /\*\s*$/.test(label) || !!e.querySelector('[aria-required=true],[required]'),
