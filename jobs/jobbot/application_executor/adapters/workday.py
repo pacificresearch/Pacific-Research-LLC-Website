@@ -587,6 +587,10 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     dec[0].check(force=True)
                 log.append({"label": label, "key": "self_identify", "value": dec[1], "ok": True})
                 continue
+        if f["type"] in ("text", "textarea") and _override(label) is not None:
+            loc.locator("input, textarea").first.fill(str(_override(label)))  # e.g. initials acknowledgement
+            log.append({"label": label, "key": "override_text", "value": str(_override(label)), "ok": True})
+            continue
         if key in DECLINE_KEYS or re.search(r"disabilit|veteran|gender|ethnic|race", label, re.I):
             if not req:
                 continue
