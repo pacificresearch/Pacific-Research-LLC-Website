@@ -372,10 +372,14 @@ def _value_for(key, label, f, job, pr):
              else ans.get("how_did_you_hear"), "country": "United States of America",
              "countryPhoneCode": "United States of America (+1)"}
     edu = (pr.get("education_structured") or [{}])[0]
+    by_id.update({"firstYearAttended": str(edu.get("start", ""))[:4] or None,
+                  "lastYearAttended": str(edu.get("end", ""))[:4] or None})
     by_id.update({"school": edu.get("school"), "schoolName": edu.get("school"), "degree": edu.get("degree"),
                   "fieldOfStudy": edu.get("discipline"), "fieldsOfStudy": edu.get("discipline")})
     if f["id"] in by_id:
         return by_id[f["id"]]
+    if f["type"] == "date" and re.fullmatch(r"to \(actual or expected\)\*?", label.strip(), re.I):
+        return str(edu.get("end", ""))[:4] or None
     from ...evidence_answers import _norm, cache
     ov = _override(label)
     if ov is not None:  # Andrew's explicit answer for this exact question beats any classifier key
@@ -878,6 +882,12 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     page.wait_for_timeout(400)
             elif f["type"] in ("text", "textarea"):
                 loc.locator("input, textarea").first.fill(str(val))
+            elif f["type"] == "date" and re.fullmatch(r"(19|20)\d\d", str(val)):
+                # year-only box (education From / To (Actual or Expected)): click, type the year
+                inp = loc.locator("input").first
+                inp.click()
+                page.keyboard.type(str(val), delay=60)
+                page.keyboard.press("Tab")
             elif f["type"] == "date" and str(val).upper() == "TODAY":
                 _fill_full_date(page, loc, date.today())  # acknowledgement signed by dating it today
             else:
