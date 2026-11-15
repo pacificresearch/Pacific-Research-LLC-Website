@@ -115,21 +115,27 @@ def _all_listbox_texts(page) -> list[str]:
     """Workday listboxes are virtualized: scroll the open list to collect every option."""
     seen: list[str] = []
     lb = page.locator("[role='listbox']:visible").last
-    for _ in range(25):
+    for _ in range(80):
         for t in page.locator("[role='option']:visible").all_inner_texts():
             t = t.strip()
             if t and t not in seen:
                 seen.append(t)
         try:
-            at_end = lb.evaluate("e => { const b = e.scrollTop; e.scrollTop += Math.max(200, e.clientHeight); "
-                                 "return e.scrollTop === b; }")
+            # scroll the element that actually scrolls (often an ancestor of the listbox, not the listbox itself)
+            at_end = lb.evaluate("""e => { let n = e.querySelector("[role='option']") || e;
+                while (n && n !== document.body && !(n.scrollHeight > n.clientHeight + 4 &&
+                       /auto|scroll/.test(getComputedStyle(n).overflowY))) n = n.parentElement;
+                if (!n || n === document.body) n = e;
+                const b = n.scrollTop; n.scrollTop += Math.max(200, n.clientHeight * 0.8);
+                return n.scrollTop === b; }""")
         except Exception:
             break
         page.wait_for_timeout(200)
         if at_end:
             break
     try:
-        lb.evaluate("e => e.scrollTop = 0")
+        lb.evaluate("""e => { let n = e.querySelector("[role='option']") || e;
+            while (n && n !== document.body) { if (n.scrollTop) n.scrollTop = 0; n = n.parentElement; } }""")
     except Exception:
         pass
     return seen
@@ -147,7 +153,10 @@ def _choose_listbox(page, field, option_text):
             if o.count() and o.first.is_visible():
                 break
             try:
-                lb.evaluate("e => e.scrollTop += Math.max(200, e.clientHeight)")
+                lb.evaluate("""e => { let n = e.querySelector("[role='option']") || e;
+                    while (n && n !== document.body && !(n.scrollHeight > n.clientHeight + 4 &&
+                           /auto|scroll/.test(getComputedStyle(n).overflowY))) n = n.parentElement;
+                    if (!n || n === document.body) n = e; n.scrollTop += Math.max(200, n.clientHeight * 0.8); }""")
             except Exception:
                 break
             page.wait_for_timeout(150)
