@@ -1,10 +1,19 @@
 {
+ "26-510": {
+  "first_seen": "2026-11-16",
+  "fit_score": 0.0,
+  "hash": "e394bbb4030f6573",
+  "killed_by": "G3",
+  "last_seen": "2026-11-16",
+  "last_verdict": "",
+  "title": "Small Business Innovation Research / Small Business Technology Transfer Phase I, Phase II, Fast-Track Programs: Developing Deep Technologies that Advance U.S. Competitiveness and Security"
+ },
  "26-511": {
   "first_seen": "2026-08-25",
   "fit_score": 0.0,
   "hash": "51b73423e399f566",
   "killed_by": "G3",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "NSF Small Business Innovation Research / Small Business Technology Transfer Phase I, Phase II, Fast-Track Programs: A Pilot Emphasis on Scientific Instrumentation"
  },
@@ -13,7 +22,7 @@
   "fit_score": 0.0,
   "hash": "a6c94cef2ff3500d",
   "killed_by": "G3",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Unlocking New Levels of Output and Capacity for Key Subsurface Resources SBIR/STTR (UNLOCK SBIR/STTR)"
  },
@@ -22,7 +31,7 @@
   "fit_score": null,
   "hash": "5a231df7a246a9f4",
   "killed_by": "G1",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Forecast to Publish a Notice of Funding Opportunity for SBIR Phase IIB Bridge Awards to Accelerate the Development of Cancer-Relevant Technologies Toward Commercialization (R44 Clinical Trial Optional"
  },
@@ -31,7 +40,7 @@
   "fit_score": 0.0,
   "hash": "b975457c79e7a322",
   "killed_by": "G5",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Forecast to Publish a Notice of Funding Opportunity for Small Business Transition Grant For Early Career Scientists (R41/R42 Clinical Trial Not Allowed)"
  },
@@ -40,7 +49,7 @@
   "fit_score": null,
   "hash": "72bb1e8597cfea72",
   "killed_by": "G2",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Small Business Translator: MedTech and Digital Health Technologies"
  },
@@ -49,7 +58,7 @@
   "fit_score": null,
   "hash": "c7042f3731d7ac67",
   "killed_by": "G2",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Small Business Innovation Research (SBIR) program, Phase I"
  },
@@ -58,7 +67,7 @@
   "fit_score": null,
   "hash": "96d82164fc610b23",
   "killed_by": "G2",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Small Business Innovation Research Program (SBIR) Phase II"
  },
@@ -67,7 +76,7 @@
   "fit_score": 0.0,
   "hash": "40add1fdcfa63722",
   "killed_by": "G3",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Notice of Need to Rescind NOT-AT-20-017 \"NCCIH Policy Change to Budget Limit and Grant Durations for SBIR/STTR Phase I and Phase II Applications\" to update NCCIH Policy Change to Budget Limit and Gran"
  },
@@ -76,7 +85,7 @@
   "fit_score": null,
   "hash": "021f0a0e3407dc6c",
   "killed_by": "G2",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Notice of NIDA's Participation in PA-24-246 \"PHS 2024-2 Omnibus Solicitation of the NIH and CDC for Small Business Innovation Research Grant Applications (Parent SBIR [R43/R44] Clinical Trial Required"
  },
@@ -85,7 +94,7 @@
   "fit_score": 0.5,
   "hash": "33f4d44901012d41",
   "killed_by": "G3",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Notice of NIDA'S Participation in PA-24-248 \"PHS 2024-2 Omnibus Solicitation of the NIH for Small Business Technology Transfer Grant Applications (Parent STTR [R41/R42] Clinical Trial Required)\""
  },
@@ -94,7 +103,7 @@
   "fit_score": 0.0,
   "hash": "f2f0fc57031e3e5d",
   "killed_by": "G3",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "NIGMS Interest in Small Business Applications Focused on the Development of Educational Tools and Technologies for Enhancing Biomedical Entrepreneurship"
  },
@@ -103,16 +112,25 @@
   "fit_score": 0.0,
   "hash": "b9d1676d29084ed9",
   "killed_by": "G3",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "NIH Entrepreneurship Boot Camp for pre-SBIR/STTR Innovators"
+ },
+ "NOT-OD-24-149": {
+  "first_seen": "2026-11-16",
+  "fit_score": 0.0,
+  "hash": "21dcaab69579d0f4",
+  "killed_by": "G3",
+  "last_seen": "2026-11-16",
+  "last_verdict": "",
+  "title": "Prior Approval Requirement for Changes to Domestic Subawards for the SBIR and STTR Programs"
  },
  "NOT-OD-24-152": {
   "first_seen": "2026-08-25",
   "fit_score": null,
   "hash": "eccf5fff52387208",
   "killed_by": "G2",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Notice of ORWH's Participation in PA-24-246 \"PHS 2024-2 Omnibus Solicitation of the NIH and CDC for Small Business Innovation Research Grant Applications (Parent SBIR [R43/R44] Clinical Trial Required"
  },
@@ -121,7 +139,7 @@
   "fit_score": null,
   "hash": "7aceda9f8243e1a1",
   "killed_by": "G2",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Notice of ORWH's Participation in PA-24-245 \"PHS 2024-2 Omnibus Solicitation of the NIH and CDC for Small Business Innovation Research Grant Applications (Parent SBIR [R43/R44] Clinical Trial Not Allo"
  },
@@ -130,7 +148,7 @@
   "fit_score": 0.0,
   "hash": "6c732c895b08c182",
   "killed_by": "G3",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Notice of ORWH's Participation in PA-24-247 \"PHS 2024-2 Omnibus Solicitation of the NIH for Small Business Technology Transfer Grant Applications (Parent STTR [R41/R42] Clinical Trial Not Allowed)\""
  },
@@ -139,7 +157,7 @@
   "fit_score": 0.0,
   "hash": "459b066aa763d2b0",
   "killed_by": "G3",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Notice of ORWH's Participation in PA-24-248 \"PHS 2024-2 Omnibus Solicitation of the NIH for Small Business Technology Transfer Grant Applications (Parent STTR [R41/R42] Clinical Trial Required)"
  },
@@ -148,7 +166,7 @@
   "fit_score": 0.0,
   "hash": "7e4bc583830d0647",
   "killed_by": "G3",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "NIH Entrepreneurship Boot Camp for pre-SBIR/STTR Innovators"
  },
@@ -157,7 +175,7 @@
   "fit_score": 0.0,
   "hash": "5f6c782f5b50e529",
   "killed_by": "G3",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "ICorpsatNIH  An Entrepreneurship Program to Support Commercialization Training for Phase I SBIR/STTR awardees"
  },
@@ -220,7 +238,7 @@
   "fit_score": null,
   "hash": "e5032aa3f855bec6",
   "killed_by": "G2",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Screening, Brief Intervention and Referral to Treatment or Prevention (SBIRT/P) for alcohol, tobacco, and other drugs (ATOD) use and misuse in adult populations that experience health disparities (R01"
  },
@@ -229,7 +247,7 @@
   "fit_score": null,
   "hash": "a457c1812f5059b4",
   "killed_by": "G2",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Small Business Transition Grant for New Entrepreneurs (Parent R43/R44 Clinical Trial Optional)"
  },
@@ -238,7 +256,7 @@
   "fit_score": 0.0,
   "hash": "ff24ebe862d1122c",
   "killed_by": "",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "MONITOR-PREPOSITION",
   "title": "Small Business Transition Grant for New Entrepreneurs (Parent R41/R42 Clinical Trial Optional)"
  },
@@ -256,7 +274,7 @@
   "fit_score": null,
   "hash": "2ec525219e3f97f3",
   "killed_by": "G2",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "FY27 Small Business Development Center State of Kansas Network Rebid"
  },
@@ -265,7 +283,7 @@
   "fit_score": null,
   "hash": "16b56b1014122133",
   "killed_by": "G2",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "NIEHS Worker Training Program&rsquo;s SBIR E-Learning for HAZMAT and Emergency Response (R43/R44 Clinical Trial Not Allowed)"
  },
@@ -274,7 +292,7 @@
   "fit_score": 0.0,
   "hash": "c346a30f18db9079",
   "killed_by": "G3",
-  "last_seen": "2026-11-09",
+  "last_seen": "2026-11-16",
   "last_verdict": "",
   "title": "Small Business Innovation Research and Small Business Technology Transfer Programs Phase II"
  }
