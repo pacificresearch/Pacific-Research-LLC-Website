@@ -283,8 +283,15 @@ def _choose_multiselect(page, field, text, exact=False):
     except Exception:  # a leftover search popup from a previous try can cover the input
         page.keyboard.press("Escape")
         inp.click(force=True, timeout=5000)
-    if inp.input_value():
-        inp.fill("")  # clear a previous search term so the full list comes back
+    try:
+        if inp.input_value(timeout=3000):
+            inp.fill("", timeout=5000)  # clear a previous search term so the full list comes back
+    except Exception:
+        try:
+            inp.press("Control+a", timeout=3000)
+            inp.press("Backspace", timeout=3000)
+        except Exception:
+            pass
     page.wait_for_timeout(1200)
     texts = _open_options(page)  # options shown for THIS field only (scoped to the active popup)
     if exact:  # e.g. "Other": never let it match "Mgmt & Business Admin - Other"
