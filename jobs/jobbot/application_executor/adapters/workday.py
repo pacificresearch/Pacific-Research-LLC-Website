@@ -822,6 +822,11 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     pick, opts = _choose_listbox(page, loc, cand)
                     if pick:
                         break
+                if not pick and opts and key == "salary_expectation":
+                    from ..guards import money_band
+                    band = money_band(str(val), opts)
+                    if band:
+                        pick, opts = _choose_listbox(page, loc, band)
                 if not pick and opts and re.search(r"travel", label, re.I):
                     from ..guards import travel_band
                     band = travel_band(str(val), opts)

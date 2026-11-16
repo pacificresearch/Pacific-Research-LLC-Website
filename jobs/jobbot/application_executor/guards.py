@@ -309,3 +309,22 @@ def travel_band(answer: str, options: list[str]) -> str | None:
         if hi <= cap and hi > best_hi:
             best, best_hi = o, hi
     return best
+
+
+def money_band(answer: str, options: list[str]) -> str | None:
+    """'120,000' vs banded salary options ('$100,000 - $125,000', '$150,000+'): the band containing the amount."""
+    m = re.search(r"\d[\d,]*", str(answer or ""))
+    if not m:
+        return None
+    amt = int(m.group(0).replace(",", ""))
+    for o in options:
+        nums = [int(x.replace(",", "")) for x in re.findall(r"\d[\d,]{2,}", o or "")]
+        if not nums:
+            continue
+        if len(nums) >= 2 and min(nums) <= amt <= max(nums):
+            return o
+        if len(nums) == 1 and re.search(r"\+|more|above|over|greater", o, re.I) and amt >= nums[0]:
+            return o
+        if len(nums) == 1 and re.search(r"less|under|below", o, re.I) and amt < nums[0]:
+            return o
+    return None
