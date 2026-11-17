@@ -1,0 +1,75 @@
+# Employer registry. Every entry below was verified reachable on 2026-11-03.
+# ats: greenhouse | lever | ashby | workday | smartrecruiters | usajobs | un_careers
+# tier: employer quality / role attractiveness input (1 = top, 3 = average)
+# Add employers here (or from the dashboard). Find slugs from the employer's job URL:
+#   job-boards.greenhouse.io/<slug>   jobs.lever.co/<slug>   jobs.ashbyhq.com/<slug>
+#   <tenant>.<wd>.myworkdayjobs.com/<site>
+
+employers:
+  # --- CROs / sponsors (Category A core) -------------------------------------
+  - {name: IQVIA,            ats: workday, tenant: iqvia,        wd: wd1,  site: IQVIA, tier: 1}
+  - {name: ICON plc,         ats: workday, tenant: icon,         wd: wd3,  site: broadbean_external, tier: 1}
+  - {name: Parexel,          ats: workday, tenant: parexel,      wd: wd1,  site: Parexel_External_Careers, tier: 1}
+  - {name: Syneos Health,    ats: workday, tenant: syneoshealth, wd: wd12, site: Syneos_Health_External_Site, tier: 2}
+  - {name: Fortrea,          ats: workday, tenant: fortrea,      wd: wd1,  site: Fortrea, tier: 2}
+  - {name: Thermo Fisher (PPD), ats: workday, tenant: thermofisher, wd: wd5, site: ThermoFisherCareers, tier: 1}
+  - {name: Gilead Sciences,  ats: workday, tenant: gilead,       wd: wd1,  site: gileadcareers, tier: 1}
+  - {name: Amgen,            ats: workday, tenant: amgen,        wd: wd1,  site: Careers, tier: 1}
+  - {name: Bristol Myers Squibb, ats: workday, tenant: bristolmyerssquibb, wd: wd5, site: BMS, tier: 1}
+  - {name: Pfizer,           ats: workday, tenant: pfizer,       wd: wd1,  site: PfizerCareers, tier: 1}
+  - {name: AstraZeneca,      ats: workday, tenant: astrazeneca,  wd: wd3,  site: Careers, tier: 1}
+  - {name: Johnson & Johnson, ats: workday, tenant: jj,          wd: wd5,  site: JJ, tier: 1}
+  - {name: Merck (MSD),      ats: workday, tenant: msd,          wd: wd5,  site: SearchJobs, tier: 1}
+  - {name: Novartis,         ats: workday, tenant: novartis,     wd: wd3,  site: Novartis_Careers, tier: 1}
+  - {name: GSK,              ats: workday, tenant: gsk,          wd: wd5,  site: GSKCareers, tier: 1}
+  # --- Site networks / decentralized trials ------------------------------------
+  - {name: Science 37,       ats: greenhouse, slug: science37, tier: 2}
+  - {name: Headlands Research, ats: greenhouse, slug: headlandsresearch, tier: 2}
+  - {name: Care Access,      ats: greenhouse, slug: careaccess, tier: 2}
+  - {name: Flatiron Health,  ats: greenhouse, slug: flatironhealth, tier: 1}
+  - {name: Formation Bio,    ats: ashby, slug: formationbio, tier: 2}
+  - {name: Unlearn.AI,       ats: ashby, slug: unlearn, tier: 2}
+  - {name: Veeva Systems,    ats: lever, slug: veeva, tier: 1}
+  # --- Biotech / diagnostics ------------------------------------------------------
+  - {name: Natera,           ats: greenhouse, slug: natera, tier: 2}
+  - {name: Freenome,         ats: greenhouse, slug: freenome, tier: 2}
+  - {name: Adaptive Biotechnologies, ats: greenhouse, slug: adaptivebiotechnologies, tier: 2}
+  - {name: Twist Bioscience, ats: greenhouse, slug: twistbioscience, tier: 2}
+  - {name: Ginkgo Bioworks,  ats: greenhouse, slug: ginkgobioworks, tier: 2}
+  # --- Medical technology (biomedical / HTM background) --------------------------
+  - {name: Edwards Lifesciences, ats: workday, tenant: edwards, wd: wd5, site: EdwardsCareers, tier: 1,
+     queries: [clinical, program manager, project manager, clinical research, global health]}
+  - {name: Medtronic,        ats: workday, tenant: medtronic,    wd: wd1,  site: MedtronicCareers, tier: 1}
+  - {name: Stryker,          ats: workday, tenant: stryker,      wd: wd1,  site: StrykerCareers, tier: 1}
+  - {name: BD,               ats: workday, tenant: bdx,          wd: wd1,  site: EXTERNAL_CAREER_SITE_USA, tier: 1}
+  - {name: Abbott,           ats: workday, tenant: abbott,       wd: wd5,  site: abbottcareers, tier: 1}
+  - {name: GE HealthCare,    ats: workday, tenant: gehc,         wd: wd5,  site: GEHC_ExternalSite, tier: 1}
+  - {name: Philips,          ats: workday, tenant: philips,      wd: wd3,  site: jobs-and-careers, tier: 2}
+  # --- AI healthcare ----------------------------------------------------------------
+  - {name: Abridge,          ats: ashby, slug: abridge, tier: 2}
+  - {name: OpenEvidence,     ats: ashby, slug: openevidence, tier: 2}
+  - {name: Oura,             ats: greenhouse, slug: oura, tier: 3, enabled: false}
+  # --- Federal / defense health contractors (VEVRAA employers) -------------------
+  - {name: Leidos,           ats: workday, tenant: leidos, wd: wd5, site: External, tier: 1,
+     queries: [health program manager, clinical, biomedical, public health, medical logistics, biodefense]}
+  - {name: Booz Allen Hamilton, ats: workday, tenant: bah, wd: wd1, site: BAH_Jobs, tier: 1,
+     queries: [health program manager, clinical, biodefense, public health, global health, medical]}
+  - {name: GDIT,             ats: workday, tenant: gdit, wd: wd5, site: External_Career_Site, tier: 2,
+     queries: [health program manager, clinical, public health, medical]}
+  - {name: CACI,             ats: workday, tenant: caci, wd: wd1, site: External, tier: 2,
+     queries: [health program manager, clinical, biomedical, medical]}
+  - {name: RTI International, ats: greenhouse, slug: rti, tier: 1}
+  - {name: Palantir,         ats: lever, slug: palantir, tier: 2}
+  # --- International / global health (Category C) ------------------------------
+  - {name: FHI 360,          ats: workday, tenant: fhi, wd: wd1, site: FHI_360_External_Career_Portal, tier: 1,
+     queries: [program, health, research, operations, clinical, project]}
+  - {name: PATH,             ats: workday, tenant: path, wd: wd1, site: External, tier: 1,
+     queries: [program, health, research, operations, clinical, project]}
+  - {name: United Nations Secretariat, ats: un_careers, tier: 1}
+  # --- Federal (needs free API key; see jobs/OPERATIONS.md) -----------------------
+  - {name: USAJOBS,          ats: usajobs, tier: 1}
+
+# Employers checked but NOT reachable as public feeds on 2026-11-03 (apply via their
+# own portals; add them here if you find their ATS slug):
+#   Stanford, UCSF, UCLA, UCSD, USC, City of Hope, Hoag, Cedars-Sinai, Kaiser (Oracle/Taleo/custom),
+#   WHO, UNICEF, UNDP, IOM, UNOPS (Oracle/PageUp/custom), ICRC, IFRC, IRC, Jhpiego, CHAI.

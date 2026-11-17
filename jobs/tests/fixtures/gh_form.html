@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Apply</title></head><body>
+<h1>Senior Clinical Trial Manager</h1>
+<form id="application-form" onsubmit="event.preventDefault(); location.href='thanks.html';">
+  <label for="first_name">First Name *</label><input id="first_name" name="first_name" required>
+  <label for="last_name">Last Name *</label><input id="last_name" name="last_name" required>
+  <label for="email">Email *</label><input id="email" name="email" type="email" required>
+  <label for="phone">Phone</label><input id="phone" name="phone">
+  <label for="resume">Resume/CV *</label><input id="resume" name="resume" type="file" required>
+  <label for="cover_letter">Cover Letter</label><input id="cover_letter" name="cover_letter" type="file">
+  <label for="li">LinkedIn Profile</label><input id="li" name="question_1">
+  <label for="auth">Are you legally authorized to work in the United States? *</label>
+  <select id="auth" name="question_2" required><option>Select...</option><option>Yes</option><option>No</option></select>
+  <label for="spon">Will you now or in the future require sponsorship for employment visa status? *</label>
+  <select id="spon" name="question_3" required><option>Select...</option><option>Yes</option><option>No</option></select>
+  <label for="hear">How did you hear about this job?</label><input id="hear" name="question_4">
+  <!--EXTRA-->
+  <button type="submit">Submit application</button>
+</form></body></html>

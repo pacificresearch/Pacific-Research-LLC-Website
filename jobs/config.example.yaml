@@ -1,0 +1,12 @@
+# Copied to $JOBBOT_HOME/config.yaml by `python -m jobbot init`. Dashboard changes override this file.
+mode: review                 # review | auto (auto also needs `authorize-auto-submit`)
+quotas: {A: 10, B: 10, C: 5} # A clinical research · B best overall fit · C international
+min_score: 70
+max_per_employer_per_day: 3
+salary: {floor_usd: 100000, target_min: 120000, target_max: 180000, international_floor_usd: 60000}
+semantic: {enabled: true, top_n_per_category: 25, timeout_seconds: 180}
+employers:
+  exclude: []                # e.g. [Palantir]
+  include: []                # extra registry entries, same shape as employers.yaml
+notify:
+  ntfy_url: null             # e.g. https://ntfy.sh/<your-private-topic> for phone pushes

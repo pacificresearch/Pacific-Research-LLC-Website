@@ -9,3 +9,7 @@ property/.env
 property/cache/*.sqlite
 property/cache/*.sqlite-journal
 property/output/
+
+# job application system — personal data never committed
+jobs/data/
+jobs/**/.dashboard_token
