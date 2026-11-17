@@ -22,7 +22,7 @@ def fetch(e: dict, terms: dict):
     hdr = {"Authorization-Key": key, "User-Agent": email, "Host": "data.usajobs.gov"}
     for q in e.get("queries") or terms.get("usajobs_queries", []):
         data = http("GET", "https://data.usajobs.gov/api/search",
-                    params={"Keyword": q, "ResultsPerPage": 100, "WhoMayApply": "public", "DatePosted": 30},
+                    params={"Keyword": q, "ResultsPerPage": 100, "WhoMayApply": "all", "DatePosted": 30},
                     headers=hdr).json()
         for it in data.get("SearchResult", {}).get("SearchResultItems", []):
             d = it["MatchedObjectDescriptor"]

@@ -85,7 +85,8 @@ def qualify(rescore: bool = False, use_semantic: bool | None = None) -> dict:
             fails = "; ".join(r["detail"] for r in el["eligibility_reasons"] if r["outcome"] == "fail")
             db.transition(aid, "REJECTED", f"screen: {fails}"[:500])
             stats["failed_eligibility"] += 1
-        elif sc["score"] < _bar(cfg, sc["category"]):
+        elif sc["score"] < (min(_bar(cfg, sc["category"]), 55.0) if job.get("ats") == "usajobs" else _bar(cfg, sc["category"])):
+            # Andrew 11/17: federal (VA/NIH/DHA/CDC) roles qualify at 55 — veterans' preference offsets the score
             if st == "QUALIFIED":
                 db.transition(aid, "SCREENED", f"rescored below threshold ({sc['score']})")
             stats["below_threshold"] += 1

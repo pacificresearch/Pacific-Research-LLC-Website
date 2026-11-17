@@ -78,12 +78,22 @@ workday_queries:
   - global health
   - clinical research manager
 
-usajobs_queries:
+usajobs_queries:   # Andrew 11/17: target VA / NIH / DHA / CDC; federal bar 55 (veterans' preference)
   - clinical research
+  - clinical trials
+  - clinical research coordinator
+  - health science specialist
+  - health system specialist
+  - research program manager
   - health program manager
+  - program analyst health
+  - research administrator
   - biomedical
   - health security
   - public health program
+  - Veterans Affairs research
+  - National Institutes of Health program
+  - Defense Health Agency program
 
 # Family/category lexicons used for scoring (lowercase substrings)
 category_keywords:
