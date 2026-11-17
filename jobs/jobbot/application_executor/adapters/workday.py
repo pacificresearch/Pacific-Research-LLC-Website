@@ -141,10 +141,17 @@ def _all_listbox_texts(page) -> list[str]:
     return seen
 
 
-def _choose_listbox(page, field, option_text):
+def _choose_listbox(page, field, option_text, _retry=True):
+    page.keyboard.press("Escape")  # close any listbox left open by the previous field
+    page.wait_for_timeout(200)
     field.locator("button[aria-haspopup='listbox']").click()
     page.wait_for_timeout(600)
     texts = _all_listbox_texts(page)
+    if _retry and not (option_text in texts or match_option(option_text, texts)):
+        # a stale popup from another field can be the one read: close, reopen, read again
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(500)
+        return _choose_listbox(page, field, option_text, _retry=False)
     pick = option_text if option_text in texts else match_option(option_text, texts)
     if pick:  # bring it into view in the virtualized list before clicking
         lb = page.locator("[role='listbox']:visible").last
