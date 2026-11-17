@@ -112,3 +112,37 @@ level up. Zero-result now returns **exit 3**, and the run prints
 Addendum to rule 8: when you add a new failure exit, check who already reads
 that code. A guard is only as good as the consumer's interpretation of it.
 
+
+## Entry 18 — 2026-11-17 · the blank report was on a machine no fix had touched
+
+Andrew kept opening a blank `PRG_Executive_Report_<date>.html` on his Windows
+Desktop for weeks after the cloud run was repaired. That file is written by a
+**second, separate job**: Windows Task Scheduler running `run_daily.bat` in
+`OneDrive\Desktop\PRG_SAMgov_Reports` with its own copy of the matcher. Every
+fix in entries 14 to 17 landed in the repository and the cloud routines. None
+reached that folder, because a cloud session has no access to his PC. The PC
+copy was the old script (hardcoded, since-dead key; writes a report on zero
+results), so it produced a blank page daily while the cloud run was healthy.
+
+What went wrong on our side, in order:
+1. "Fixed" was said about the cloud run while the artifact Andrew actually
+   looks at was produced somewhere else. The claim was true and useless.
+2. The updated script was handed over as a file to copy by hand, with no check
+   that it landed and no mention that the PC also needed the new key.
+3. When the real cause was finally named, the fix arrived with a request to
+   run a test and send a screenshot. That was for our reassurance, not his need.
+
+**Rule 10:** before saying a report is fixed, identify **which machine writes
+the file the owner opens**. If it is not one this session can reach, say so in
+the first sentence and do not call anything fixed.
+
+**Rule 11:** when a fix must happen on Andrew's PC, give it **once, complete,
+as a paste-ready command**, the first time the problem is seen. No hand-copy
+instructions, no follow-up verification tasks, no screenshots requested unless
+he asks what to check. His time is the scarcest input in the system.
+
+State after 2026-11-17: the PC script was replaced with the current matcher
+via a one-line `Invoke-WebRequest` from `main`, so the PC can no longer write
+a blank report. Whether it writes a real one depends on `SAM_API_KEY` being
+set on the PC, which is not verified. The PC key and the cloud credential may
+be the same key and would then share one daily quota.

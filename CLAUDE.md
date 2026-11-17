@@ -62,6 +62,14 @@ connector cannot attach). The boundary and the pre-send checks are in
 
 Everything else: move.
 
+**Do not spend Andrew's time (Andrew, 11/17).** Involve him only when a
+step cannot be done without him, and then give it once, complete and
+paste-ready. No verification errands, no "send me a screenshot", no
+second round for something that could have been in the first. Before
+calling a report fixed, check which machine writes the file he opens:
+the Windows Desktop report comes from a separate job on his PC that no
+cloud session can reach (`capture/LEARNING_LOG.md` entry 18).
+
 ## NEVER ARGUE WITH A CONTRACTING OFFICER — standing order (Andrew, 8/19)
 
 **No document PRG sends a CO ever argues.** Not a rebuttal, not a
