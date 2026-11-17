@@ -170,8 +170,11 @@ Then one line each for backlog survivors and the PASS count. No filler.
   message and reply into the conversation so the exchange stays threaded
   on their end (`capture/WORKFLOW.md` Stage 2). `send_mail` with "RE:"
   in the subject starts a second thread. New conversations only.
-- ⛔ NEVER auto-send email to a contracting officer, submit a quote, or
-  publish a job posting to an external board. Prepare + notify only.
+- ⛔ NEVER submit a quote or a price, or publish a job posting to an
+  external board. Prepare + notify only. Email to a contracting officer
+  is sent only inside the boundary in `capture/SENDING_AUTHORITY.md`
+  (Andrew, 2026-11-17: nonbinding sources-sought and RFI responses and
+  clarification questions); everything else to a CO is prepare + notify.
   The careers page ships only via draft PR that Andrew merges.
 - Amendments/updates on opportunities already in `capture/opportunities/`
   take priority over new selections — check them first (step 3).

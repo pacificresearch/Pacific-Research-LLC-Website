@@ -25,3 +25,13 @@ library/
 
 Naming: lowercase, underscores, NAICS code where applicable. Date-stamp
 superseded versions into an `archive/` subfolder rather than deleting.
+
+## Capability statements
+
+`capability_statements/build_capstate.py` builds every variant (one-page
+PDF plus a Markdown copy) from one source, so identity facts cannot
+drift between them. Current variants: `capstate_general`,
+`capstate_541715_clinical_research`, `capstate_541611_healthcare_operations`.
+To tailor for a notice, copy the closest variant in the script, reorder
+the competencies to the notice's own nouns, and rebuild. Every experience
+line is the Managing Director's individual record and says so.
