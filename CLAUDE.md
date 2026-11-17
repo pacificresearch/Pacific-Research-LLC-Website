@@ -51,6 +51,15 @@ they are outward-facing and irreversible:
 - Naming a local partner or expert in any document before their Rail 2
   vetting closes (`intl/COMPLIANCE_RAILS.md`).
 
+**Sending authorization (Andrew, 11/17).** The first carve-out is
+narrowed, not removed. From `andrew@pacificresearchllc.com` Claude may
+send without asking: nonbinding sources-sought and RFI responses,
+clarification questions to a CO, and supplier inquiries and quote
+requests. Still gated: quotes, prices, proposals, certifications,
+agreements, and anything a notice requires as an attachment (the Outlook
+connector cannot attach). The boundary and the pre-send checks are in
+`capture/SENDING_AUTHORITY.md`.
+
 Everything else: move.
 
 ## NEVER ARGUE WITH A CONTRACTING OFFICER — standing order (Andrew, 8/19)

@@ -11,8 +11,10 @@ data from HERE, not from memory. Update this file when anything changes
 | UEI | J585TLDV1CH1 |
 | CAGE | 1Z9B6 |
 | Certifications | SBA-Certified SDVOSB · VOSB |
-| SAM status | Active, registered |
+| SAM status | Active through 2027-06-15 |
+| SBA VetCert | SDVOSB and VOSB, 2026-05-26 to 2029-05-26 |
 | Location | Orange, CA 92867 |
+| Physical address | 2827 E Coolidge Ave, Orange, CA 92867 |
 | Website | pacificresearchllc.com |
 | Public POC | Andrew O'Donnell, Managing Director |
 | Public email | contact@pacificresearchllc.com |
@@ -20,20 +22,30 @@ data from HERE, not from memory. Update this file when anything changes
 | Phone | (650) 213-2381 |
 
 ## NAICS codes
+As listed on the SAM.gov registration (verified 2026-11-17). PSC: R408,
+R499, R707, R425, Q999.
+
 | Code | Description | |
 |------|-------------|---|
 | 541714 | R&D in Biotechnology | **Primary** |
+| 541611 | Admin & General Mgmt Consulting | |
+| 541612 | Human Resources Consulting | |
+| 541618 | Other Management Consulting | |
+| 541620 | Environmental Consulting | |
+| 541690 | Other Scientific & Technical Consulting | |
+| 541720 | R&D in Social Sciences & Humanities | |
+| 541380 | Testing Laboratories | |
 | 541511 | Custom Computer Programming | |
 | 541512 | Computer Systems Design | |
 | 541519 | Other Computer Related Services | |
-| 541380 | Testing Laboratories | |
-| 541611 | Admin & General Mgmt Consulting | |
-| 541618 | Other Management Consulting | |
-| 541690 | Other Scientific & Technical Consulting | |
+| 518210 | Computing Infrastructure & Data Processing | |
+| 541930 | Translation & Interpretation | |
 | 541990 | Other Professional & Technical Services | |
+| 611430 | Mgmt Development Training | |
+| 611710 | Educational Support Services | |
 | 621112 | Physicians, Mental Health | |
 | 621999 | Other Ambulatory Health Care | |
-| 611430 | Mgmt Development Training | |
+| 624230 | Emergency & Other Relief Services | |
 
 ## Headline metrics (cite verbatim in proposals)
 - 1,500+ participants managed across multi-site NIH & industry protocols
