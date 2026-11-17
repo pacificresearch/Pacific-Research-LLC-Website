@@ -274,6 +274,13 @@ password resets on his own career-site accounts, duplicates, retries, which jobs
 the goal (more solid applications) and report after. Only the fact guard and sensitive-answer rules below
 stay gated.
 
+**Future mode — NOT ACTIVE until Andrew says so (11/17):** once Andrew lands a full-time role (Stanford or
+Siemens are the hoped-for ones), switch the job lane from full-time search to EXTRA-INCOME work that fits around it:
+evening/after-hours part-time roles, same-day gig work, freelance/contract projects, or fully remote part-time roles.
+Every lead must be compatible with the day job: no schedule overlap, no conflict of interest (no competitor of the
+employer, nothing touching the employer's sponsors/vendors/IP, and respect any outside-employment policy). Until
+Andrew says "switch to evening mode", keep the full-time search exactly as is.
+
 Rules that override instinct in this lane: never invent or inflate a
 qualification (the fact guard enforces it); never guess a sensitive answer
 (work authorization, veteran/disability, EEO, criminal, clearance, salary,
