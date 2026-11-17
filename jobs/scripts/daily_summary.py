@@ -54,6 +54,35 @@ def main(day: str) -> str:
     lines += [f"- {r['employer']} — {r['title']}: {r['status']}" for r in pending] or ["- none"]
     lines += ["", f"## Needs you ({len(need)})", ""]
     lines += [f"- {r['employer']} — {r['title']}: {(r['status_reason'] or '')[:140]}" for r in need] or ["- nothing"]
+    # --- Outcomes / hit rate (Andrew 11/17: litmus guide for where he can win) ---
+    sub = [r for r in rows if r["confirmation"]]
+    def fam(t):
+        t = (t or "").lower()
+        for k, rx in (("Clinical research coordinator/specialist", r"coordinator|specialist|associate"),
+                      ("Clinical research / trial manager", r"clinical (research|trial|operations)|cra\b|study"),
+                      ("Program / project manager", r"program|project|portfolio|operations"),):
+            if __import__("re").search(rx, t):
+                return k
+        return "Other"
+    ivw = [r for r in sub if r["status"] in ("INTERVIEW", "OFFER")]
+    rej = [r for r in sub if r["status"] == "REJECTED"]
+    aged = [r for r in sub if r["submitted_at"] and
+            (datetime.now(timezone.utc) - datetime.fromisoformat(r["submitted_at"])).days >= 14]
+    lines += ["", "## Outcomes (hit rate)", "",
+              f"All-time: {len(sub)} applications · {len(ivw)} interview(s) · {len(rej)} rejection(s) · "
+              f"{len(sub) - len(ivw) - len(rej)} no answer yet",
+              f"Interview rate: {100 * len(ivw) / len(sub):.1f}% of all; "
+              f"{(100 * sum(1 for r in aged if r in ivw) / len(aged)) if aged else 0:.1f}% of {len(aged)} apps aged 14+ days "
+              "(benchmark for cold online applications: ~2-5%; strong-fit targeted: 5-10%)", "",
+              "| Title family | Applied | Interviews | Rejections |", "|---|---|---|---|"]
+    groups = {}
+    for r in sub:
+        g = groups.setdefault(fam(r["title"]), [0, 0, 0])
+        g[0] += 1; g[1] += r in ivw; g[2] += r in rej
+    for k, (a, i, j) in sorted(groups.items(), key=lambda x: -x[1][0]):
+        lines.append(f"| {k} | {a} | {i} | {j} |")
+    if ivw:
+        lines += ["", "Interviews:"] + [f"- **{r['employer']}** — {r['title']}" for r in ivw]
     text = "\n".join(lines) + "\n"
     out = home() / "reports" / f"daily_{day}.md"
     out.parent.mkdir(parents=True, exist_ok=True)
