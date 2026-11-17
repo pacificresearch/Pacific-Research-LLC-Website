@@ -6648,6 +6648,12 @@ def parse_args(argv):
     parser.add_argument("--recompete-months", type=int, default=18, metavar="N",
                         help="Recompete horizon: contracts expiring within N "
                              "months (default: 18).")
+    parser.add_argument("--json", metavar="FILE", default=None,
+                        help="Also write every evaluated notice (scores, gates, "
+                             "contacts, description, attachment links) as JSON. "
+                             "This is the machine-readable feed that "
+                             "capture/pipeline.py ingests into the opportunity "
+                             "database.")
     parser.add_argument("--fast", action="store_true",
                         help="Fast scan: skip the slow secondary pulls "
                              "(recompetes, grants, SBIR, ReliefWeb) so a daily "
@@ -6666,6 +6672,47 @@ def parse_args(argv):
     parser.add_argument("--selftest", action="store_true",
                         help="Run the built-in NO-BID rule self-tests and exit.")
     return parser.parse_args(argv)
+
+
+def export_json(results, all_opps, path):
+    """Write the evaluated notices as JSON for capture/pipeline.py.
+
+    Each record is the evaluate() dict plus the raw fields a response writer
+    needs and evaluate() does not carry: the full description text, the
+    attachment links, and the notice's own type and office address.
+    """
+    raw = {}
+    for opp in all_opps:
+        nid = opp.get("noticeId")
+        if nid:
+            raw[nid] = opp
+    out = []
+    for r in results:
+        rec = dict(r)
+        opp = raw.get(r.get("notice_id") or "", {})
+        desc = opp.get("description") or ""
+        # An un-hydrated description is still the API URL, not text.
+        rec["description"] = "" if desc.startswith("http") else desc
+        rec["description_hydrated"] = bool(desc) and not desc.startswith("http")
+        rec["resource_links"] = opp.get("resourceLinks") or []
+        rec["base_type"] = opp.get("baseType") or opp.get("type") or ""
+        rec["archive_date"] = opp.get("archiveDate") or ""
+        rec["office_address"] = opp.get("officeAddress") or {}
+        rec["full_parent_path"] = opp.get("fullParentPathName") or ""
+        out.append(rec)
+    payload = {
+        "generated": dt.datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "count": len(out),
+        "coverage_incomplete": bool(_RUN_STATE.get("failed_codes"))
+                               or bool(_RUN_STATE.get("rate_limited")),
+        "failed_codes": list(_RUN_STATE.get("failed_codes") or []),
+        "notices": out,
+    }
+    folder = os.path.dirname(os.path.abspath(path))
+    os.makedirs(folder, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(payload, fh, indent=1, default=str)
+    return path
 
 
 def main(argv=None):
@@ -6960,6 +7007,11 @@ def main(argv=None):
         return 3
 
     saved = []
+    if args.json:
+        try:
+            saved.append(export_json(results, all_opps, args.json))
+        except Exception as exc:
+            sys.stderr.write(f"WARNING: could not save JSON feed: {exc}\n")
     if not args.no_excel:
         try:
             saved.append(export_spreadsheet(results, xlsx_path, recompetes,
