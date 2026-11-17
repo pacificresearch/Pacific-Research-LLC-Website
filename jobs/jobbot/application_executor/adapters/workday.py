@@ -18,7 +18,7 @@ import re
 from datetime import date
 
 from ... import credentials
-from ..guards import attestation_id, classify, is_plain_consent, match_option, salary_answer, scope_work_auth
+from ..guards import job_in_us, attestation_id, classify, is_plain_consent, match_option, salary_answer, scope_work_auth
 from .base import CORE_FIELDS, DECLINE_KEYS, DECLINE_RX, captcha_visible
 
 A = lambda aid: f"[data-automation-id='{aid}']"  # noqa: E731
@@ -822,6 +822,12 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     pick, opts = _choose_listbox(page, loc, cand)
                     if pick:
                         break
+                if not pick and opts and key in ("requires_sponsorship", "legally_authorized_us") and job_in_us(job):
+                    # combined auth+sponsorship question: the option asserting authorization with NO sponsorship need
+                    alt = next((o for o in opts if re.search(r"^\s*yes\b.*authori[sz]ed", o, re.I)
+                                and re.search(r"(do not|don't|will not|won't)\s+(and will not\s+)?(need|require)", o, re.I)), None)
+                    if alt and str((pr.get("approved_answers") or {}).get("us_citizen", "")).lower().startswith("yes"):
+                        pick, opts = _choose_listbox(page, loc, alt)
                 if not pick and opts and key == "salary_expectation":
                     from ..guards import money_band
                     band = money_band(str(val), opts)
