@@ -10,7 +10,13 @@ apply to an incentive program — prepare and notify.
    environment, which carries no repository (the 2026-11-16 run ended in
    44 s for exactly this reason, tagged `no-git-repo`, and reported
    SUCCEEDED). If `property/` is not on disk: `add_repo` for
-   `pacificresearch/Pacific-Research-LLC-Website`, clone it, `cd` in.
+   `pacificresearch/Pacific-Research-LLC-Website` **with access
+   `push`** (the 2026-11-18 validation run cloned read-only, did seven
+   minutes of research, could not push, and lost all of it), clone,
+   `cd` in. **Prove the push before any research**: branch
+   `property/weekly-YYYY-MM-DD`, one HEALTH.md line, commit, push. A
+   failed push ⇒ "RUN FAILED — cannot push" and stop. Commit and push
+   after every research file so partial work survives.
    `python3 property/main.py` installs its own Python dependencies.
 1. **Heartbeat**: read `property/HEALTH.md` on main. Newest successful
    run older than 9 days ⇒ the notification MUST lead with

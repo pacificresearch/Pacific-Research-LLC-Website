@@ -14,8 +14,11 @@ offer, never apply to an incentive program.
 
 ## 0. Repo + dependencies
 A fired session starts with NO repository. If `property/` is not on
-disk: `add_repo` pacificresearch/Pacific-Research-LLC-Website, clone,
-`cd` in. `main.py` installs its own Python dependencies on first run.
+disk: `add_repo` pacificresearch/Pacific-Research-LLC-Website with
+access **push**, clone, `cd` in. Prove the push first (branch
+`property/weekly-YYYY-MM-DD`, one HEALTH.md line, commit, push); a
+failed push is "RUN FAILED — cannot push", stop there. Push after every
+research file. `main.py` installs its own Python dependencies.
 
 ## 1. Self-test + tests
 ```
