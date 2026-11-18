@@ -349,7 +349,13 @@ def fill(page, actions: list[dict], job: dict | None = None) -> list[dict]:
             elif a["type"].startswith("select"):
                 page.locator(sel).select_option(label=a["option"])
             elif a.get("check"):
-                page.locator(sel).check(force=True)
+                try:
+                    page.locator(sel).check(force=True, timeout=5000)
+                except Exception:  # styled boxes (Lever): click the input / its label and verify
+                    page.locator(sel).evaluate("e => { (document.querySelector(`label[for='${e.id}']`) || e.closest('label') || e).click(); }")
+                    page.wait_for_timeout(400)
+                    if not page.locator(sel).is_checked():
+                        raise
             elif "value" in a:
                 el = page.locator(sel)
                 if el.get_attribute("role") == "combobox" or el.get_attribute("aria-autocomplete"):
