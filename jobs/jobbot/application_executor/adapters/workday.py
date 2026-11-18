@@ -18,7 +18,7 @@ import re
 from datetime import date
 
 from ... import credentials
-from ..guards import job_in_us, attestation_id, classify, is_plain_consent, match_option, salary_answer, scope_work_auth
+from ..guards import years_option, job_in_us, attestation_id, classify, is_plain_consent, match_option, salary_answer, scope_work_auth
 from .base import CORE_FIELDS, DECLINE_KEYS, DECLINE_RX, captcha_visible
 
 A = lambda aid: f"[data-automation-id='{aid}']"  # noqa: E731
@@ -647,7 +647,7 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     # Andrew 11/14: only when the form forces a choice with no decline option
                     pick = match_option(str(pr["approved_answers"]["gender_forced"]), opts)
                 if not pick and _override(label) is not None:  # e.g. "Were/Are you a member of the U.S. Armed Forces?"
-                    pick = match_option(str(_override(label)), opts)
+                    pick = match_option(str(_override(label)), opts) or years_option(str(_override(label)), opts)
                 if pick:
                     p2, _ = _choose_listbox(page, loc, pick)
                     log.append({"label": label, "key": key or "disclosure", "value": p2 or pick, "ok": bool(p2)})
@@ -664,7 +664,7 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                         (pr.get("approved_answers") or {}).get("gender_forced"):
                     pick = match_option(str(pr["approved_answers"]["gender_forced"]), f["options"])
                 if not pick and _override(label) is not None:
-                    pick = match_option(str(_override(label)), f["options"])
+                    pick = match_option(str(_override(label)), f["options"]) or years_option(str(_override(label)), f["options"])
                 if pick:
                     loc.get_by_label(pick, exact=True).first.check(force=True)
                     log.append({"label": label, "key": key or "disclosure", "value": pick, "ok": True})
