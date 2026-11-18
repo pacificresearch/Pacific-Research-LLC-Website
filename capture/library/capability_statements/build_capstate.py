@@ -83,7 +83,8 @@ VARIANTS = {
             "Compliance built in: HIPAA, 21 CFR Part 11, ICH GCP, OSHA.",
             "Says plainly what it performs itself and what it brings through a teaming partner.",
         ],
-        "experience": ["research", "oaw", "bmet", "workflow", "data"],
+        "experience": ["research", "bmet", "oaw"],
+        "naics_show": "541611, 541690, 541990, 541720, 621999",
         "role": None,
     },
     "clinical_research": {
@@ -97,8 +98,7 @@ VARIANTS = {
         "competencies": [
             ("Project management and site coordination", "plans, schedules, milestones, site and subcontract coordination, progress reporting"),
             ("Participant recruitment and retention", "screening, enrollment, follow-up and retention tracking against protocol targets"),
-            ("Protocol implementation and regulatory compliance", "IRB submissions, informed consent, GCP and 21 CFR 50, 56 and 312 record keeping"),
-            ("Site monitoring and quality assurance", "source verification, case report form review, corrective action follow-up"),
+            ("Regulatory compliance and site monitoring", "IRB submissions, informed consent, GCP record keeping, source verification"),
             ("Data collection, management and analysis", "REDCap, OnCore CTMS and Medidata; SAS, SPSS, R and Python"),
         ],
         "differentiators": [
@@ -108,9 +108,10 @@ VARIANTS = {
             "One accountable program manager and prime-level quality control on all work.",
             "Adds certified small-business participation to a larger research team.",
         ],
-        "experience": ["research", "data", "oaw", "workflow"],
-        "role": "On large multi-study requirements PRG participates as a small-business team member or subcontractor. "
-                "On separable task areas (coordination, monitoring, recruitment, data management) PRG can perform as prime.",
+        "experience": ["research", "data"],
+        "naics_show": "541715 (small), 541720, 541690, 541990",
+        "role": "On large multi-study requirements PRG participates as a small-business team member. "
+                "On separable task areas PRG can perform as prime.",
     },
     "healthcare_operations": {
         "file": "capstate_541611_healthcare_operations",
@@ -129,12 +130,13 @@ VARIANTS = {
         ],
         "differentiators": [
             "Eligible for SDVOSB set-asides and VA Veterans First contracting.",
+            "One accountable program manager and prime-level quality control on all work.",
             "Managing Director has worked inside DoD medical facilities, a federal interagency medical operation and an academic medical center.",
             "Accreditation-readiness background to Joint Commission and DoD standards.",
-            "Teams with certified SDVOSB specialty firms for senior Lean and HRO coaching, so the team meets limitations on subcontracting.",
             "One accountable program manager and prime-level quality control on all work.",
         ],
-        "experience": ["workflow", "bmet", "oaw", "research"],
+        "experience": ["workflow", "bmet", "oaw"],
+        "naics_show": "541611, 541618, 611430, 541990",
         "role": "PRG performs program management, measurement and training support itself and brings senior Lean and "
                 "high-reliability coaching through qualified teaming partners. No partner is named until an agreement is signed.",
     },
@@ -151,9 +153,9 @@ def _e(t):
 def html(v):
     c = COMPANY
     logo = "data:image/png;base64," + base64.b64encode(open(LOGO, "rb").read()).decode() if os.path.exists(LOGO) else ""
-    comp = "".join(f"<li><b>{_e(a)}:</b> {_e(b)}</li>" for a, b in v["competencies"])
-    diff = "".join(f"<li>{_e(d)}</li>" for d in v["differentiators"])
-    exp = "".join(f"<li><b>{_e(EXPERIENCE[k][0])}.</b> {_e(EXPERIENCE[k][1])}</li>" for k in v["experience"])
+    comp = "".join(f'<div class="cap"><b>{_e(a)}</b>{_e(b[0].upper() + b[1:])}.</div>' for a, b in v["competencies"][:4])
+    diff = "".join(f"<li>{_e(d)}</li>" for d in v["differentiators"][:3])
+    exp = "".join(f"<li><b>{_e(EXPERIENCE[k][0])}.</b> {_e(EXPERIENCE[k][1])}</li>" for k in v["experience"][:3])
     role = f'<h2>How PRG participates</h2><p>{_e(v["role"])}</p>' if v.get("role") else ""
     notice = f'<p class="for">Prepared for {_e(v["for_notice"])}</p>' if v.get("for_notice") else ""
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title>{_e(c['name'])} {_e(v['title'])}</title>
@@ -163,7 +165,7 @@ def html(v):
 :root {{ --navy:#0B1F33; --navy2:#14365C; --blue:#1F6FBF; --ink:#1b2430; --muted:#55606e; --tint:#eef3f9; --line:#cfd8e3 }}
 * {{ box-sizing: border-box }}
 html, body {{ margin:0; padding:0 }}
-body {{ font-family:"Public Sans", Inter, "Helvetica Neue", Arial, sans-serif; color:var(--ink); font-size:9.05pt; line-height:1.33;
+body {{ font-family:"Public Sans", Inter, "Helvetica Neue", Arial, sans-serif; color:var(--ink); font-size:9.9pt; line-height:1.45;
   width:8.5in; height:11in; display:flex; flex-direction:column; -webkit-print-color-adjust:exact; print-color-adjust:exact }}
 header {{ background:var(--navy); color:#fff; padding:0.26in 0.5in 0.22in; display:flex; gap:0.22in; align-items:center }}
 header img {{ width:0.74in; height:0.74in; border-radius:50%; background:#fff; padding:2px; flex:none }}
@@ -173,13 +175,15 @@ header .tag {{ font-size:9pt; color:#a9c2e0; margin-top:2px }}
 header .badge {{ margin-left:auto; text-align:right; font-size:8.6pt; line-height:1.45; color:#dbe7f5; flex:none }}
 header .badge b {{ display:block; font-size:10pt; color:#fff; font-weight:700 }}
 main {{ flex:1; display:grid; grid-template-columns: 1fr 2.45in; min-height:0 }}
-.body {{ padding:0.2in 0.3in 0.12in 0.5in }}
-aside {{ background:var(--tint); padding:0.2in 0.4in 0.12in 0.28in; border-left:1px solid var(--line) }}
+.body {{ padding:0.3in 0.34in 0.2in 0.5in }}
+aside {{ background:var(--tint); padding:0.3in 0.4in 0.2in 0.3in; border-left:1px solid var(--line) }}
 h2 {{ font-size:9pt; letter-spacing:.09em; text-transform:uppercase; color:var(--navy2); margin:0 0 5px; padding-bottom:3px; border-bottom:1.5px solid var(--blue); font-weight:700 }}
-.body h2:not(:first-child), aside h2:not(:first-child) {{ margin-top:9px }}
-p {{ margin:0 0 4px }}
+.body h2:not(:first-child), aside h2:not(:first-child) {{ margin-top:17px }}
+p {{ margin:0 0 6px }}
+.cap {{ margin:0 0 8px }}
+.cap b {{ display:block; color:var(--navy2); font-weight:600 }}
 ul {{ margin:0; padding-left:14px }}
-li {{ margin-bottom:2.4px }}
+li {{ margin-bottom:4px }}
 .note {{ color:var(--muted); font-size:8.5pt }}
 .for {{ font-weight:600; color:var(--navy2) }}
 dl {{ margin:0 }}
@@ -193,8 +197,8 @@ footer {{ background:var(--navy2); color:#dbe7f5; font-size:8.4pt; padding:0.09i
 <div class="badge"><b>SBA-certified SDVOSB</b>UEI {c['uei']}<br>CAGE {c['cage']}</div></header>
 <main><div class="body">
 {notice}<h2>Who we are</h2><p>{_e(v['about'])}</p>
-<h2>Core competencies</h2><ul>{comp}</ul>
-<h2>Differentiators</h2><ul>{diff}</ul>
+<h2>Core capabilities</h2>{comp}
+<h2>How we deliver</h2><ul>{diff}</ul>
 <h2>Experience</h2><p class="note">{_e(EXPERIENCE_NOTE)}</p><ul>{exp}</ul>
 {role}
 </div><aside>
@@ -206,8 +210,7 @@ footer {{ background:var(--navy2); color:#dbe7f5; font-size:8.4pt; padding:0.09i
 <dt>Business size</dt><dd>Small business</dd>
 <dt>Entity</dt><dd>{_e(c['entity'])}</dd>
 <dt>Primary NAICS</dt><dd>{c['naics_primary']}</dd>
-<dt>Other NAICS</dt><dd>{_e(c['naics'])}</dd>
-<dt>PSC</dt><dd>{_e(c['psc'])}</dd></dl>
+<dt>Relevant NAICS</dt><dd>{_e(v.get('naics_show', '541611, 541690, 541990'))}</dd></dl>
 <h2>Contact</h2><dl>
 <dt>Point of contact</dt><dd>{_e(c['poc'])}</dd>
 <dt>Phone</dt><dd>{c['phone']}</dd>
@@ -233,7 +236,7 @@ def markdown(v):
         L += ["", "## How PRG participates", v["role"]]
     L += ["", "## Company data",
           f"- SAM.gov registration: {c['sam']}", f"- Certification: {c['cert']}", f"- Entity: {c['entity']}",
-          f"- Primary NAICS {c['naics_primary']}; other NAICS {c['naics']}", f"- PSC {c['psc']}",
+          f"- Primary NAICS {c['naics_primary']}; all NAICS on the SAM registration: {c['naics']}", f"- PSC {c['psc']}",
           f"- {c['address']} · {c['web']}", ""]
     return "\n".join(L)
 
