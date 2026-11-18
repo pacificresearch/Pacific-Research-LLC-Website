@@ -45,11 +45,21 @@ Every number is a `DataPoint` with status VERIFIED / PROVIDER DATA /
 ESTIMATED / ASSUMED / UNKNOWN, source, URL, retrieved_at, data date.
 UNKNOWN is deliberate — nothing is back-filled.
 
-## Keys (`.env`, never committed)
-`RENTCAST_API_KEY` (required for Stage 2) · `CENSUS_API_KEY` (ACS —
-now required by Census for any API call) · `BLS_API_KEY` ·
-`BRAVE_SEARCH_API_KEY` · `FRED_API_KEY` · `ATTOM_API_KEY` (reserved).
-Missing keys degrade to UNKNOWN; the report says which key would help most.
+## Keys — where to put them (never in chat, never in git)
+Cloud environment menu in the session title bar → Edit:
+- **RentCast** (required for Stage 2): under *Network secrets*, host
+  `api.rentcast.io`, header `X-Api-Key`; then add the environment
+  variable `RENTCAST_API_KEY=proxy` so the client sends a placeholder the
+  proxy replaces. Free tier at rentcast.io is 50 calls/month;
+  `config.yaml → api_budget` is sized for it.
+- **Brave Search** (optional): Network secret, host
+  `api.search.brave.com`, header `X-Subscription-Token`, plus
+  `BRAVE_SEARCH_API_KEY=proxy`.
+- **Census, BLS, FRED** (free registrations; the key travels as a query
+  parameter so the proxy cannot inject it): environment variables
+  `CENSUS_API_KEY`, `BLS_API_KEY`, `FRED_API_KEY`.
+Locally: `property/.env` (gitignored). Missing keys degrade to UNKNOWN
+and the report says which key would help most.
 
 ## Layout
 `main.py` · `config.yaml` (all assumptions) · `src/` (config, models,

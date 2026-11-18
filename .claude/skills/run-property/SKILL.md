@@ -12,6 +12,11 @@ steps (bias-to-action standing order). Gates that stay closed: never
 contact a listing agent or lender on Andrew's behalf, never submit an
 offer, never apply to an incentive program.
 
+## 0. Repo + dependencies
+A fired session starts with NO repository. If `property/` is not on
+disk: `add_repo` pacificresearch/Pacific-Research-LLC-Website, clone,
+`cd` in. `main.py` installs its own Python dependencies on first run.
+
 ## 1. Self-test + tests
 ```
 python3 -m pytest property/tests -q

@@ -17,6 +17,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+
+def _bootstrap_dependencies() -> None:
+    """Fresh cloud containers have no third-party packages; install from requirements.txt once, quietly."""
+    try:
+        import openpyxl, pandas, pydantic, tenacity, yaml  # noqa: F401
+    except ImportError:
+        import subprocess
+        req = Path(__file__).resolve().parent / "requirements.txt"
+        print(f"[bootstrap] installing dependencies from {req}", file=sys.stderr)
+        subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-r", str(req)], check=True)
+
+
+_bootstrap_dependencies()
 from src import brave_search, fred  # noqa: E402
 from src.config import KEY_NAMES, ROOT, api_keys, load_config  # noqa: E402
 from src.database import Cache  # noqa: E402
