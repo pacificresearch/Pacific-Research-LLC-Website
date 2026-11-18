@@ -30,7 +30,7 @@ SENIORITY = [
     (r"\b(director|principal)\b", 85), (r"\b(senior|sr\.?|lead|staff|manager ii|iii)\b.*\bmanager\b", 92),
     (r"\bmanager\b|\bchief of party\b|\bhead\b", 88), (r"\b(lead|supervisor|senior|sr\.?)\b", 75),
     (r"\b(specialist|analyst|officer|associate ii|cra ii)\b", 55),
-    (r"\b(coordinator|associate|assistant)\b", 30),
+    (r"\b(coordinator|associate|assistant)\b", 45),
 ]
 
 
@@ -39,7 +39,8 @@ INTL_SCOPE = re.compile(r"global health|international development|humanitarian|c
                         r"emergency response|refugee|resettlement|migration")
 DOMAIN = re.compile(r"health|clinical|medical|biomed|bio\w*|pharma|patient|life science|device|research|trial|"
                     r"public|humanitarian|global|hospital|care\b|disease|vaccine|lab|diagnostic|therapeut|science|"
-                    r"defense|federal|government|army|navy|air force|va\b|dod")
+                    r"defense|federal|government|army|navy|air force|va\b|dod|international|foreign|diplomat|embassy|policy|"
+                    r"development|security|affairs|relief|refugee|migration")
 
 
 def domain_relevant(job: dict) -> bool:
@@ -101,7 +102,8 @@ def salary_view(job: dict) -> dict:
         if fx is None:
             return {"label": "advertised", "min": lo, "max": hi, "currency": usd, "usd_mid": None}
         mid = ((lo or hi) + (hi or lo)) / 2 * fx
-        return {"label": "advertised", "min": lo, "max": hi, "currency": usd, "usd_mid": mid}
+        return {"label": "advertised", "min": lo, "max": hi, "currency": usd, "usd_mid": mid,
+                "usd_max": (hi or lo) * fx}
     t = job["title"].lower()
     if job.get("country") in ("", "united states"):
         for rx, band in ESTIMATE_BANDS:
@@ -158,6 +160,10 @@ def score(job: dict, elig: dict, cfg: dict, terms: dict, tiers: dict, evidence_l
     floor = s["floor_usd"]
     if is_health_system(job, cfg):  # Andrew 11/13: $85K floor at hospitals / academic medical centers
         floor = min(floor, s.get("amc_floor_usd", 85000))
+    if job.get("ats") == "usajobs" or re.search(r"department of|veterans affairs|national institutes", job["employer"].lower()):
+        floor = min(floor, s.get("amc_floor_usd", 85000))  # Andrew 11/18: federal GS ranges, step increases + benefits
+    if mid is not None and mid < floor <= (sal.get("usd_max") or 0):
+        mid = floor  # Andrew 11/18: the posted range reaches the floor -> negotiable, not a penalty
     if mid is None:
         comp = 50
     elif intl:
@@ -170,7 +176,7 @@ def score(job: dict, elig: dict, cfg: dict, terms: dict, tiers: dict, evidence_l
     # --- advancement
     advancement = seniority
     if re.search(r"clinical research coordinator", title) and not re.search(r"senior|sr|lead|supervis|manager|iii", title):
-        advancement = 20  # entry-level CRC: not the direction
+        advancement = 45  # Andrew 11/18: too narrow at 20 — CRC roles are squarely his background
 
     # --- employer quality
     employer = {1: 90, 2: 75, 3: 60}.get(tiers.get(job["employer"], 3), 60)

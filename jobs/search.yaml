@@ -53,6 +53,14 @@ include_title_patterns:
   - 'health (officer|specialist|coordinator|adviser|advisor)'
   - 'medical (coordinator|logistics|logistician)|health logistics|supply chain.*health'
   - 'monitoring.*evaluation|\bmeal\b|m&e'
+  # Broadened 11/18 (Andrew: "too narrow on my background") — coordinator-level research + IR / foreign affairs
+  - 'health (science|system|systems|research|care) specialist|health scientist administrator'
+  - 'research (study )?coordinator|study coordinator|clinical research coordinator|research (associate|specialist)'
+  - 'clinical trials? (associate|assistant|specialist|coordinator|administrator)|regulatory coordinator'
+  - 'international (relations|affairs|programs?|development|cooperation|operations)|foreign (affairs|service|policy)'
+  - 'diplomat|embassy|consul|political (officer|affairs|analyst)|country (officer|program|analyst)|regional (program|affairs)'
+  - 'development (officer|specialist|advisor|adviser)|technical (officer|advisor|adviser)|liaison officer'
+  - 'emergency management specialist|program support specialist|management (and program )?analyst|public health (analyst|advisor|adviser)'
 
 exclude_title_patterns:
   - 'construction|facilit(y|ies) project|capital project|residential|real estate|architect'   # Andrew 11/13: not his lane
@@ -77,6 +85,10 @@ workday_queries:
   - program manager health
   - global health
   - clinical research manager
+  - research coordinator
+  - clinical trial associate
+  - international programs
+  - global affairs
 
 usajobs_queries:   # Andrew 11/17: target VA / NIH / DHA / CDC; federal bar 55 (veterans' preference)
   - clinical research
@@ -94,6 +106,18 @@ usajobs_queries:   # Andrew 11/17: target VA / NIH / DHA / CDC; federal bar 55 (
   - Veterans Affairs research
   - National Institutes of Health program
   - Defense Health Agency program
+  - research study coordinator
+  - health science specialist research
+  - clinical trial associate
+  - foreign affairs
+  - international relations
+  - international affairs
+  - international program specialist
+  - foreign affairs officer
+  - program officer international
+  - emergency management specialist
+  - public health analyst
+  - management and program analyst
 
 # Family/category lexicons used for scoring (lowercase substrings)
 category_keywords:

@@ -17,6 +17,12 @@ def _tiers() -> dict:
     return {e["name"]: e.get("tier", 3) for e in (load_yaml("employers.yaml", {}) or {}).get("employers", [])}
 
 
+# Andrew 11/18 ("too narrow on my background"): research-coordinator / health-science-specialist roles are his
+# core experience, so they qualify at 55 like federal roles.
+CORE_RX = re.compile(r"research (study )?coordinator|study coordinator|health science specialist|clinical trials? "
+                     r"(associate|coordinator|specialist)", re.I)
+
+
 def _bar(cfg: dict, cat: str) -> float:
     """Score bar per category. Andrew 11/12: international (C) needs only 55; everything else min_score (60)."""
     per = cfg.get("min_score_by_category") or {"C": 55, "F": 55}
@@ -85,7 +91,8 @@ def qualify(rescore: bool = False, use_semantic: bool | None = None) -> dict:
             fails = "; ".join(r["detail"] for r in el["eligibility_reasons"] if r["outcome"] == "fail")
             db.transition(aid, "REJECTED", f"screen: {fails}"[:500])
             stats["failed_eligibility"] += 1
-        elif sc["score"] < (min(_bar(cfg, sc["category"]), 55.0) if job.get("ats") == "usajobs" else _bar(cfg, sc["category"])):
+        elif sc["score"] < (min(_bar(cfg, sc["category"]), 55.0) if job.get("ats") == "usajobs" or CORE_RX.search(job["title"])
+                            else _bar(cfg, sc["category"])):
             # Andrew 11/17: federal (VA/NIH/DHA/CDC) roles qualify at 55 — veterans' preference offsets the score
             if st == "QUALIFIED":
                 db.transition(aid, "SCREENED", f"rescored below threshold ({sc['score']})")
