@@ -6,6 +6,12 @@ only gates: never contact a listing agent, never submit an offer, never
 apply to an incentive program — prepare and notify.
 
 ## 🩺 STEP 0 — SELF-TEST
+0. **Repo present?** The Routine fires a fresh session in the Default
+   environment, which carries no repository (the 2026-11-16 run ended in
+   44 s for exactly this reason, tagged `no-git-repo`, and reported
+   SUCCEEDED). If `property/` is not on disk: `add_repo` for
+   `pacificresearch/Pacific-Research-LLC-Website`, clone it, `cd` in.
+   `python3 property/main.py` installs its own Python dependencies.
 1. **Heartbeat**: read `property/HEALTH.md` on main. Newest successful
    run older than 9 days ⇒ the notification MUST lead with
    "⚠️ PROPERTY SYSTEM DEGRADED since <date>".
@@ -25,7 +31,10 @@ python3 property/main.py --archive            # writes property/output/* and pro
 Commit `property/reports/<date>/`, the `property/PIPELINE.md` refresh,
 `property/HEALTH.md` line, and any `property/research/markets/*.yaml`
 you filled; push to `property/weekly-YYYY-MM-DD`; open a PR to main and
-MERGE it before finishing. Push/merge failure ⇒ notification begins
+MERGE it before finishing (GitHub MCP tools, or `gh pr create` /
+`gh pr merge`; if neither works in the fired session, the push itself is
+the artifact — say "PR not opened: no GitHub tooling" and the next
+session merges it). Push/merge failure ⇒ notification begins
 "RUN FAILED — artifacts not landed".
 
 ## 1. Run

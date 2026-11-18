@@ -96,6 +96,9 @@ def load_config(path: Optional[Path] = None) -> Config:
 
 
 def api_keys() -> Dict[str, Optional[str]]:
+    """Keys from the environment. A key saved as a cloud-environment NETWORK SECRET is injected by the HTTPS proxy
+    (RentCast: host api.rentcast.io, header X-Api-Key; Brave: api.search.brave.com, X-Subscription-Token); in that
+    case set the variable to the literal word `proxy` so the client sends a placeholder header for the proxy to replace."""
     return {k: (os.environ.get(k) or None) for k in KEY_NAMES}
 
 
