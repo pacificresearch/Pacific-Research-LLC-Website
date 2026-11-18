@@ -26,7 +26,7 @@ from .guards import CONFIRM_RX, VALIDATION_RX
 
 log = logging.getLogger("jobbot.executor")
 
-AUTOMATABLE = {"greenhouse", "lever", "ashby", "workday"}
+AUTOMATABLE = {"greenhouse", "lever", "ashby", "workday"}  # oracle: adapter WIP (pre-submit section check needed)
 MANUAL_REASONS = {
     "usajobs": "USAJOBS applications are filed through Login.gov/USAJOBS — use the prepared federal packet",
     "inspira": "UN Inspira requires your account and Personal History Profile — use the prepared cover letter",
@@ -52,6 +52,8 @@ def route(job: dict) -> str:
         return "ashby"
     if "myworkdayjobs.com" in url or "myworkdaysite.com" in url:
         return "workday"
+    if "hcmui/candidateexperience" in url:
+        return "oracle"
     if "usajobs.gov" in url:
         return "usajobs"
     if "careers.un.org" in url:
@@ -65,19 +67,26 @@ def route(job: dict) -> str:
     return "unsupported"
 
 
+def _profile_dir() -> str:
+    """JOBBOT_BROWSER=<name> gives a second runner its own browser profile (data/browser_<name>)."""
+    import os
+    name = os.environ.get("JOBBOT_BROWSER")
+    return str(path(f"browser_{name}" if name else "browser", "x").parent)
+
+
 def _launch(headless: bool):
     from playwright.sync_api import sync_playwright
     pw = sync_playwright().start()
     kw = {"headless": headless, "viewport": {"width": 1280, "height": 1600}, "accept_downloads": False}
     exe = Path("/opt/pw-browsers/chromium")
     try:
-        ctx = pw.chromium.launch_persistent_context(str(path("browser", "x").parent), **kw)
+        ctx = pw.chromium.launch_persistent_context(_profile_dir(), **kw)
     except Exception:
         import glob
         cands = glob.glob("/opt/pw-browsers/chromium-*/chrome-linux*/chrome")
         if not cands:
             raise
-        ctx = pw.chromium.launch_persistent_context(str(path("browser", "x").parent), executable_path=cands[0], **kw)
+        ctx = pw.chromium.launch_persistent_context(_profile_dir(), executable_path=cands[0], **kw)
     return pw, ctx
 
 

@@ -111,7 +111,7 @@ CAPTCHA_SELECTORS = [
 ]
 CONFIRM_RX = re.compile(r"thank(s| you) for (applying|your (application|interest|submission))|application (has been |was )?"
                         r"(received|submitted|complete)|we('ve| have) received your application|successfully submitted|"
-                        r"submission (received|confirmed)", re.I)
+                        r"submission (received|confirmed)|thank you for your job application|you('ve| have) (successfully )?applied", re.I)
 VALIDATION_RX = re.compile(r"(is|are) required|this field is required|please (enter|select|complete|provide)|invalid", re.I)
 
 
