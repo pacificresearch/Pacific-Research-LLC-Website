@@ -26,8 +26,9 @@ from .guards import CONFIRM_RX, VALIDATION_RX
 
 log = logging.getLogger("jobbot.executor")
 
-AUTOMATABLE = {"greenhouse", "lever", "ashby", "workday"}  # oracle: adapter WIP (pre-submit section check needed)
+AUTOMATABLE = {"greenhouse", "ashby", "workday"}  # lever: 0 confirmed in 10 tries (invisible hCaptcha) — packets  # oracle: adapter WIP (pre-submit section check needed)
 MANUAL_REASONS = {
+    "lever": "Lever forms run an invisible human-verification check at submit — apply with the prepared packet",
     "usajobs": "USAJOBS applications are filed through Login.gov/USAJOBS — use the prepared federal packet",
     "inspira": "UN Inspira requires your account and Personal History Profile — use the prepared cover letter",
     "smartrecruiters": "SmartRecruiters forms vary by employer and often require an account — assisted mode",
