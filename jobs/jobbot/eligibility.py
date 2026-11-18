@@ -107,6 +107,19 @@ def screen(job: dict, facts: dict) -> dict:
             add("work_authorization", "fail" if not re.search(r"sponsor|visa (support|will be provided)", l) else "review",
                 "requires existing right to work outside the US; no sponsorship stated", s)
             break
+    # Andrew 11/18: Australia / NZ — sponsor-friendly only. Citizenship/PR/working-rights requirements fail, and a
+    # posting that never mentions sponsorship fails too (public health districts hire locally).
+    if job.get("country") in ("australia", "new zealand") and not any(r["check"] in ("citizenship", "work_authorization")
+                                                                      for r in reasons):
+        if re.search(r"(australian|new zealand|nz) (citizen\w*|permanent resid\w*)|permanent residency|full (working|work) "
+                     r"rights|unrestricted (working|work) rights|valid (working|work) (rights|visa)", low) and \
+                not re.search(r"visa sponsorship (is )?(available|offered|provided)|will sponsor|we sponsor|sponsorship available", low):
+            add("work_authorization", "fail", "Australia/NZ: requires existing work rights / citizenship / PR; no sponsorship")
+        elif re.search(r"visa sponsorship|will sponsor|we sponsor|sponsorship (is )?(available|offered|provided)|"
+                       r"relocation (package|support|assistance)", low):
+            add("work_authorization", "review", "Australia/NZ: sponsorship/relocation mentioned — confirm")
+        else:
+            add("work_authorization", "fail", "Australia/NZ: no visa sponsorship stated (sponsor-friendly only, Andrew 11/18)")
     if job.get("country") not in ("", "united states") and not any(r["check"] in ("citizenship", "work_authorization")
                                                                    for r in reasons):
         intl_org = re.search(r"\b(united nations|unicef|undp|unops|world health organization|icrc|ifrc|iom|"

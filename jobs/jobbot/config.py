@@ -63,7 +63,7 @@ DEFAULTS: dict = {
                          "durham", "raleigh", "research triangle", "minneapolis", "phoenix", "portland",
                          "nashville", "baltimore", "princeton", "new brunswick", "salt lake city"],
         "international": {"default": 70,
-                          "preferred": {"brazil": 90, "portugal": 85, "spain": 85, "italy": 80, "france": 80,
+                          "preferred": {"brazil": 90, "australia": 85, "sydney": 85, "melbourne": 82, "portugal": 85, "spain": 85, "italy": 80, "france": 80,
                                         "switzerland": 85, "geneva": 85, "netherlands": 80, "germany": 75,
                                         "united kingdom": 80, "ireland": 80, "denmark": 80, "austria": 80,
                                         "japan": 80, "singapore": 80, "korea": 75, "australia": 80,
