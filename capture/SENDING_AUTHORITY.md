@@ -45,3 +45,26 @@ conversation.
    the stage change, the follow-up date.
 
 No message is sent to meet a count. If nothing qualifies, nothing goes.
+
+## Volume and approval (Andrew, 2026-11-17)
+
+- **Target: about 50 outbound messages per business day.** Andrew's words:
+  "I don't like 4 or 5, I like 50." Most of that volume is teaming and
+  supplier outreach; a contracting officer only ever receives a response a
+  notice invites.
+- **Approved as a batch, not one by one.** "I approve all of them all at
+  once." Messages inside the boundary above go without a per-message
+  check-in.
+- **The target does not lower the bar.** Every message names a specific
+  notice or a specific reason for that firm, uses facts from the company
+  profile, and tells the recipient they can decline further contact. If
+  fewer than 50 firms qualify on a given day, fewer go out and the report
+  says how many and why.
+- **Who is worth writing to.** On an SDVOSB set-aside the partner must be a
+  certified SDVOSB (similarly situated) or the work must be done by PRG's own
+  W2 hires; on a total small business set-aside any small business
+  qualifies. A requirement one specialist firm would perform end to end is a
+  pass for PRG as prime (CLAUDE.md kill 6): write to that firm about teaming
+  with PRG as a member, not about subcontracting to PRG.
+- **Send window:** 8:00 AM to 5:00 PM in the recipient's time zone where
+  practical.
