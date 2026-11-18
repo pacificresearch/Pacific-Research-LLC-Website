@@ -344,7 +344,15 @@ def fill(page, actions: list[dict], job: dict | None = None) -> list[dict]:
                     el = loc.nth(k)
                     lab = el.evaluate("e => (document.querySelector(`label[for='${e.id}']`)||e.closest('label')||{}).innerText||''")
                     if lab.strip() == a["option"].strip():
-                        el.check(force=True)
+                        try:
+                            el.check(force=True, timeout=5000)
+                        except Exception:  # styled Lever boxes: click the label, then verify
+                            el.evaluate("e => { (document.querySelector(`label[for='${e.id}']`) || e.closest('label') || e).click(); }")
+                            page.wait_for_timeout(400)
+                            if not el.is_checked():
+                                el.evaluate("e => { e.checked = true; e.dispatchEvent(new Event('change', {bubbles: true})); e.dispatchEvent(new Event('input', {bubbles: true})); }")
+                                if not el.is_checked():
+                                    raise
                         break
             elif a["type"].startswith("select"):
                 page.locator(sel).select_option(label=a["option"])
