@@ -14,9 +14,9 @@ Pacific Research Group LLC (PRG) is a Service-Disabled Veteran-Owned Small Busin
 
 ## Differentiators
 - Eligible for SDVOSB set-asides and VA Veterans First contracting.
+- One accountable program manager and prime-level quality control on all work.
 - Managing Director has worked inside DoD medical facilities, a federal interagency medical operation and an academic medical center.
 - Accreditation-readiness background to Joint Commission and DoD standards.
-- Teams with certified SDVOSB specialty firms for senior Lean and HRO coaching, so the team meets limitations on subcontracting.
 - One accountable program manager and prime-level quality control on all work.
 
 ## Experience
@@ -25,7 +25,6 @@ PRG is a recently established firm with no federal contract performance to cite 
 - **Clinical workflow redesign.** 40% reduction in patient processing time through redesign of clinical intake and data workflows.
 - **U.S. Air Force biomedical equipment (4A2X5).** 98% preventive-maintenance and accreditation compliance across a $2M+ biomedical asset inventory, to Joint Commission and DoD standards. AAMI CBET certified.
 - **Operation Allies Welcome.** Mass medical intake and enrollment for 25,000+ evacuees in a federal interagency operation run to CDC requirements.
-- **Clinical research operations.** Multi-site NIH- and industry-sponsored protocols, including work with the Stanford University Department of Medicine. 1,500+ participants managed; at least 90% on-time data-query resolution. ACRP-CP and ACRP-PM certified.
 
 ## How PRG participates
 PRG performs program management, measurement and training support itself and brings senior Lean and high-reliability coaching through qualified teaming partners. No partner is named until an agreement is signed.
@@ -34,6 +33,6 @@ PRG performs program management, measurement and training support itself and bri
 - SAM.gov registration: Active through June 15, 2027
 - Certification: SBA-certified SDVOSB and VOSB (VetCert), May 26, 2026 to May 26, 2029
 - Entity: Single-member LLC, California
-- Primary NAICS 541714; other NAICS 541611, 541618, 541690, 541990, 541720, 541380, 541511, 541512, 541519, 518210, 541612, 541620, 541930, 611430, 611710, 621112, 621999, 624230
+- Primary NAICS 541714; all NAICS on the SAM registration: 541611, 541618, 541690, 541990, 541720, 541380, 541511, 541512, 541519, 518210, 541612, 541620, 541930, 611430, 611710, 621112, 621999, 624230
 - PSC R408, R499, R707, R425, Q999
 - 2827 E Coolidge Ave, Orange, CA 92867 · pacificresearchllc.com

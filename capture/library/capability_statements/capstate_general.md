@@ -23,15 +23,13 @@ Pacific Research Group LLC (PRG) is a Service-Disabled Veteran-Owned Small Busin
 PRG is a recently established firm with no federal contract performance to cite yet. The record below is the individual experience of its Managing Director, a U.S. Air Force veteran.
 
 - **Clinical research operations.** Multi-site NIH- and industry-sponsored protocols, including work with the Stanford University Department of Medicine. 1,500+ participants managed; at least 90% on-time data-query resolution. ACRP-CP and ACRP-PM certified.
-- **Operation Allies Welcome.** Mass medical intake and enrollment for 25,000+ evacuees in a federal interagency operation run to CDC requirements.
 - **U.S. Air Force biomedical equipment (4A2X5).** 98% preventive-maintenance and accreditation compliance across a $2M+ biomedical asset inventory, to Joint Commission and DoD standards. AAMI CBET certified.
-- **Clinical workflow redesign.** 40% reduction in patient processing time through redesign of clinical intake and data workflows.
-- **Data governance and platforms.** Formal Honest Broker for clinical data systems. Epic, Cerner, REDCap, OnCore CTMS, Medidata; SAS, SPSS, R and Python.
+- **Operation Allies Welcome.** Mass medical intake and enrollment for 25,000+ evacuees in a federal interagency operation run to CDC requirements.
 
 ## Company data
 - SAM.gov registration: Active through June 15, 2027
 - Certification: SBA-certified SDVOSB and VOSB (VetCert), May 26, 2026 to May 26, 2029
 - Entity: Single-member LLC, California
-- Primary NAICS 541714; other NAICS 541611, 541618, 541690, 541990, 541720, 541380, 541511, 541512, 541519, 518210, 541612, 541620, 541930, 611430, 611710, 621112, 621999, 624230
+- Primary NAICS 541714; all NAICS on the SAM registration: 541611, 541618, 541690, 541990, 541720, 541380, 541511, 541512, 541519, 518210, 541612, 541620, 541930, 611430, 611710, 621112, 621999, 624230
 - PSC R408, R499, R707, R425, Q999
 - 2827 E Coolidge Ave, Orange, CA 92867 · pacificresearchllc.com
