@@ -3302,6 +3302,10 @@ INTL_LOCAL_ONLY_KILL = [
     "restricted to local companies", "open to local suppliers only",
     "national preference applies", "domestic firms only",
     "locally employed staff only",
+    # Embassy post-level buys word it as an awardee-presence requirement
+    # (e.g. 19GR10-27-Q-0007, Athens HVAC): a sub's address cannot satisfy it.
+    "permanent address in", "established business in",
+    "established local business", "physical office in the host country",
 ]
 
 # Kill 11 — the UNGM Level 2 wall. UN business above US $500,000 requires UNGM
@@ -6437,6 +6441,27 @@ _SELFTEST_CASES = [
             "postedDate": "TODAY",
         },
         "deadline_offset_days": 30,
+        "expect_truthy": ["disqualified"],
+        "expect_equals": {"kill_gate": "Gate 0 (intl: local-firm-only)"},
+    },
+    {
+        "label": "INTL kill 10: embassy buy requiring the awardee to hold a "
+                 "permanent local address — a sub's address cannot cure it",
+        "intl_mode": True,
+        "opp": {
+            "solicitationNumber": "INTL-LOCALADDR-TEST",
+            "noticeId": "sti4b",
+            "title": "HVAC maintenance for leased residential properties",
+            "description": ("The awardee(s) should operate an established "
+                            "business with all required licenses and permits "
+                            "and a permanent address in Athens, Greece."),
+            "naicsCode": "811412",
+            "fullParentPathName": "STATE, DEPARTMENT OF",
+            "placeOfPerformance": {"country": {"code": "GRC", "name": "Greece"}},
+            "type": "Presolicitation",
+            "postedDate": "TODAY",
+        },
+        "deadline_offset_days": 27,
         "expect_truthy": ["disqualified"],
         "expect_equals": {"kill_gate": "Gate 0 (intl: local-firm-only)"},
     },
