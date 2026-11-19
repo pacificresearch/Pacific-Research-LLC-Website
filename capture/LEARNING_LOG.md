@@ -165,3 +165,32 @@ the runners at main (PR #58).
 **Rule 12:** before diagnosing any report, read how it is produced, from the
 repository, across every branch, and including the automation that calls it.
 A fix aimed at a file that a scheduler overwrites is not a fix.
+
+## Entry 19 — 2026-11-19 · a fix that depends on Andrew running it is not a fix
+
+The 11-19 Desktop report was blank again ("0 notices screened"). Main's
+matcher refuses to write a report from an empty sweep, so that page could
+only have come from the frozen-branch copy. The PC was still on the August
+runner, because the PR #58 fix needed Andrew to paste a setup line, and
+nothing made sure he had. The old runner opens the newest report whatever
+happened, so any failure (spent quota, a missing or expired key, a crash)
+put a blank page on his screen.
+
+Fix (Andrew, 11-19: "make sure the executive report works always when it
+pops up"):
+- `samgov_opportunity_matcher.py` on a Windows `--outdir` run never leaves a
+  blank page. Before the run it deletes blank and stale fallback pages and
+  repoints any `run_*.bat` still on the frozen branch at main. After a
+  failed run it writes today's page as the last good report, with a box on
+  top. The box says what failed and gives the one paste line only when
+  Andrew must act (a key problem). Cloud and CI runs still write nothing
+  on failure, so no fallback page is ever published as a real sweep.
+- The frozen branch now serves that same matcher. The PC's next scheduled
+  run migrates itself to main with no action from Andrew.
+- The setup script tests the saved key and asks again only if SAM
+  rejects it. Its runner opens today's page even after a failure, and never
+  pauses.
+
+**Rule 13:** if a fix only works once Andrew takes a step, it is not done.
+Change what the machine already runs, so the fix reaches him without his
+help.

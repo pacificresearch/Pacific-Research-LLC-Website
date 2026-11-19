@@ -343,14 +343,17 @@ applications.
 
 - The SAM.gov screening tool is `samgov_opportunity_matcher.py` on **main**.
   The old branch `claude/samgov-opportunity-matcher-0a3c2f` (PR #1) is
-  frozen since 2026-08-13 and carries a dead key: never point anything at
-  it. Andrew's Windows PC runs the tool through
-  `automation/setup_prg_automation.ps1` (on main), whose runner files pull
-  the matcher from main before each run. Before diagnosing any report
-  problem, search the WHOLE repository history (`git log --all`, every
-  branch) for how that report is produced. The tool's capture-v3 gates,
-  roles, and weighted priority score implement this rule; keep the two
-  aligned when either changes.
+  frozen: never point anything new at it. Since 2026-11-19 it carries a
+  copy of main's matcher solely so that PCs still on the August runner
+  migrate themselves to main on their next run (`capture/LEARNING_LOG.md`
+  entry 19). Andrew's Windows PC runs the tool through
+  `automation/setup_prg_automation.ps1` (on main). On a Windows `--outdir`
+  run the matcher never leaves a blank page: a failed run shows the last
+  good report with a box explaining the failure. Before diagnosing any
+  report problem, search the WHOLE repository history (`git log --all`,
+  every branch) for how that report is produced. The tool's capture-v3
+  gates, roles, and weighted priority score implement this rule; keep the
+  two aligned when either changes.
 - The international lane (`intl/`, and the matcher's `--intl` mode)
   implements `intl/GATE.md`; keep the gate doc and the matcher aligned
   when either changes, same as the domestic pair.

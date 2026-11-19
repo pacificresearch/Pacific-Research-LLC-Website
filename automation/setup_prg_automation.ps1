@@ -10,11 +10,13 @@
 #       downloaded from claude/samgov-opportunity-matcher-0a3c2f, frozen in
 #       August, before every run. That old copy still carries a dead key and
 #       writes a blank report when SAM returns nothing.)
-#    3. Asks for your SAM.gov API key once, only if none is saved.
+#    3. Tests the saved SAM.gov key; asks for one only if it is missing or
+#       SAM rejects it.
 #    4. Deletes old blank reports ("0 notices screened").
-#    5. Rewrites run_daily / run_weekly / run_monthly so they pull from main,
-#       open a report only when the run succeeded, and run the daily scan at
-#       most once a day (the cloud run shares the same SAM daily quota).
+#    5. Rewrites run_daily / run_weekly / run_monthly so they pull from main
+#       and run the daily scan at most once a day. The page that opens is
+#       never blank: a failed run shows the last good report with a box on
+#       top saying what failed and whether anything needs doing.
 #    6. Re-registers the three scheduled tasks and runs one scan now.
 #  Re-running it is safe.
 # =====================================================================
@@ -44,17 +46,39 @@ Write-Host '  Checking Python packages (requests, openpyxl)...' -ForegroundColor
 try { py -m pip install --quiet --upgrade requests openpyxl }
 catch { Write-Host '  (pip step skipped - check that Python is installed)' -ForegroundColor Yellow }
 
-# 4. SAM.gov key, saved for your Windows user so scheduled runs see it too
-$key = [Environment]::GetEnvironmentVariable('SAM_API_KEY', 'User')
-if (-not $key -or $key -like '*PASTE*' -or $key.Trim().Length -lt 20) {
-    Write-Host '  No SAM.gov key is saved on this PC.' -ForegroundColor Yellow
-    Write-Host '  Get it at sam.gov -> Workspace -> Account Details -> API Key.'
-    $key = (Read-Host '  Paste your SAM.gov API key, then press Enter').Trim()
-    [Environment]::SetEnvironmentVariable('SAM_API_KEY', $key, 'User')
-    Write-Host '  Key saved.' -ForegroundColor Green
-} else {
-    Write-Host '  SAM.gov key found.' -ForegroundColor Green
+# 4. SAM.gov key, saved for your Windows user so scheduled runs see it too.
+#    A saved key is tested once against SAM; a new one is asked for only if
+#    the saved one is missing or SAM rejects it (a used-up daily limit is fine).
+function Test-SamKey($k) {
+    $to   = (Get-Date).ToString('MM/dd/yyyy')
+    $from = (Get-Date).AddDays(-1).ToString('MM/dd/yyyy')
+    $uri  = "https://api.sam.gov/opportunities/v2/search?limit=1&postedFrom=$from&postedTo=$to&api_key=$k"
+    try { $null = Invoke-WebRequest -Uri $uri -UseBasicParsing -TimeoutSec 30; return $true }
+    catch {
+        $code = 0
+        try { $code = [int]$_.Exception.Response.StatusCode } catch { }
+        if ($code -eq 401 -or $code -eq 403) { return $false }
+        return $true   # 429 (limit used up) or a network blip: the key itself is not the problem
+    }
 }
+$key = [Environment]::GetEnvironmentVariable('SAM_API_KEY', 'User')
+$needKey = (-not $key -or $key -like '*PASTE*' -or $key.Trim().Length -lt 20)
+if (-not $needKey -and -not (Test-SamKey $key.Trim())) {
+    Write-Host '  SAM.gov rejected the saved key (SAM keys expire; get the current one).' -ForegroundColor Yellow
+    $needKey = $true
+}
+while ($needKey) {
+    Write-Host '  Get your key at sam.gov -> Workspace -> Account Details -> API Key.'
+    $key = (Read-Host '  Paste your SAM.gov API key, then press Enter').Trim()
+    if ($key.Length -ge 20 -and (Test-SamKey $key)) {
+        [Environment]::SetEnvironmentVariable('SAM_API_KEY', $key, 'User')
+        Write-Host '  Key saved.' -ForegroundColor Green
+        $needKey = $false
+    } else {
+        Write-Host '  SAM.gov did not accept that key. Try again.' -ForegroundColor Yellow
+    }
+}
+Write-Host '  SAM.gov key OK.' -ForegroundColor Green
 $env:SAM_API_KEY = $key.Trim()
 
 # 5. Remove blank reports so an old blank page can never reopen
@@ -70,20 +94,20 @@ $today  = 'for /f %%d in (''powershell -NoProfile -Command "Get-Date -Format yyy
 @echo off
 setlocal enabledelayedexpansion
 $today
-rem Already ran today: just open today's report, do not spend SAM quota again.
-if exist "%~dp0Daily\PRG_Executive_Report_!today!.html" (
-  start "" "%~dp0Daily\PRG_Executive_Report_!today!.html"
-  goto :eof
+set "rep=%~dp0Daily\PRG_Executive_Report_!today!.html"
+rem Already ran today with a real report: just open it, do not spend SAM quota again.
+if exist "!rep!" (
+  findstr /m /c:"PRG-FALLBACK-PAGE" "!rep!" >nul
+  if errorlevel 1 (
+    start "" "!rep!"
+    goto :eof
+  )
 )
 $update
 py "%~dp0samgov_opportunity_matcher.py" --days 7 --fast --outdir "%~dp0Daily"
-if errorlevel 1 (
-  echo.
-  echo No report was written. Exit 2 = SAM.gov rejected the key. Exit 3 = SAM returned nothing, usually because today's quota is used up.
-  pause
-  goto :eof
-)
-if exist "%~dp0Daily\PRG_Executive_Report_!today!.html" start "" "%~dp0Daily\PRG_Executive_Report_!today!.html"
+rem Success or not, today's page exists: the real report, or the last good one
+rem with a box on top saying what failed and what (if anything) to do.
+if exist "!rep!" start "" "!rep!"
 "@ | Set-Content (Join-Path $root 'run_daily.bat') -Encoding ASCII
 
 @"
