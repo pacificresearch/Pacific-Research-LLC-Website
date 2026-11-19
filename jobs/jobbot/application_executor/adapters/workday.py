@@ -724,7 +724,7 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
                     lab = page.locator(f"label[for='{bid}']").first.inner_text().strip() if bid else ""
                     labs.append(lab or (boxes.nth(b_i).get_attribute("aria-label") or ""))
                 hit = match_option(ov, labs) or next((l for l in labs if re.search(
-                    r"none of (the|these)|not applicable|no (prior |current )?(relationship|affiliation)|external", l, re.I)
+                    r"none of (the|these)|not applicable|no (prior |current )?(relationship|affiliation|employment)|external", l, re.I)
                     and re.match(r"none|n/?a|no\b", ov, re.I)), None)
                 if hit:
                     boxes.nth(labs.index(hit)).check(force=True)

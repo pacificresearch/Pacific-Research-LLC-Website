@@ -12,6 +12,7 @@ import re
 
 # order matters: first match wins
 SENSITIVE = [
+    ("terminated_or_resigned_in_lieu", r"\b(fired|discharged)\b|asked to resign|resign(ed)? in lieu|terminated (from|by) (a |any )?(position|job|employ)|involuntar(il)?y (terminat|separat)"),
     # follow-up shown only for an "Other" choice we did not make (e.g. "If you selected 'Other,' specify the visa")
     ("conditional_other", r"^if (you (selected|chose|answered|picked) .{0,3}other|other)\b"),
     ("essential_functions", r"essential functions"),
