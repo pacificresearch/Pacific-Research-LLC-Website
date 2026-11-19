@@ -63,6 +63,9 @@ include_title_patterns:
   - 'emergency management specialist|program support specialist|management (and program )?analyst|public health (analyst|advisor|adviser)'
 
 exclude_title_patterns:
+  # Andrew 11/19: "I'm CRC 2 or above" — no CRC Associate / level-I / assistant / temporary roles
+  - '^(?!.*(\bii\b|\biii\b|\b2\b|\b3\b|senior|\bsr\b|lead|manager)).*\b(coordinator|associate|assistant|specialist)\s*(i|1)\b'
+  - 'coordinator associate|research assistant|\btemporary\b|\bper diem\b'
   - 'construction|facilit(y|ies) project|capital project|residential|real estate|architect'   # Andrew 11/13: not his lane
   - '\bintern(ship)?\b|\bstudent\b|\bfellowship\b|\bpostdoc'
   - 'software engineer|\bdeveloper\b|\bsre\b|machine learning engineer|data engineer|devops'
