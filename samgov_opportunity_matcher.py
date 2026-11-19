@@ -6740,7 +6740,209 @@ def export_json(results, all_opps, path):
     return path
 
 
+# ---------------------------------------------------------------------------
+# WINDOWS PC: the report that pops up must never be blank (LEARNING_LOG 19).
+#
+# Andrew's PC runs this file from Task Scheduler with --outdir, then opens the
+# newest PRG_Executive_Report_*.html in that folder. Older runner files (the
+# August setup) open that newest file whatever happened, so a failed run used
+# to leave yesterday's blank page — or a fresh blank one from the old copy —
+# on screen. On the PC, therefore:
+#   * before the run: delete blank / stale-fallback pages, and repoint any
+#     run_*.bat still pulling from the frozen August branch at main;
+#   * after a failed run: write today's page as the LAST GOOD report with a
+#     box on top saying what failed and, only if Andrew has to act, the one
+#     line to paste.
+# Cloud and CI runs are untouched: they still write nothing on failure, so a
+# fallback page can never be published as if it were a real sweep.
+# ---------------------------------------------------------------------------
+FALLBACK_MARK = "PRG-FALLBACK-PAGE"
+_OLD_BRANCH = "claude/samgov-opportunity-matcher-0a3c2f"
+_SETUP_LINE = ('iex (irm "https://raw.githubusercontent.com/pacificresearch/'
+               'Pacific-Research-LLC-Website/main/automation/'
+               'setup_prg_automation.ps1")')
+_BLANK_RE = re.compile(r"\b0 notices screened")
+
+
+def _pc_context(argv):
+    """(outdir, report stem) for a scheduled Windows run, else None."""
+    if os.name != "nt" and os.environ.get("PRG_PC_MODE") != "1":
+        return None
+    try:
+        a = parse_args(list(argv))
+    except SystemExit:
+        return None
+    if getattr(a, "selftest", False) or not getattr(a, "outdir", None):
+        return None
+    stem = ("PRG_INTL_Executive_Report" if getattr(a, "intl", False)
+            else "PRG_Executive_Report")
+    return os.path.abspath(a.outdir), stem
+
+
+def _read(path):
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            return fh.read()
+    except OSError:
+        return ""
+
+
+def _report_files(folder, stem):
+    try:
+        names = os.listdir(folder)
+    except OSError:
+        return []
+    return [os.path.join(folder, n) for n in names
+            if n.startswith(stem + "_") and n.endswith(".html")]
+
+
+def _is_good_report(path):
+    text = _read(path)
+    return bool(text) and FALLBACK_MARK not in text and not _BLANK_RE.search(text)
+
+
+def _pc_housekeeping(outdir, stem):
+    """Delete blank and stale fallback pages; repoint old runner files."""
+    os.makedirs(outdir, exist_ok=True)
+    for path in _report_files(outdir, stem):
+        text = _read(path)
+        if FALLBACK_MARK in text or _BLANK_RE.search(text):
+            try:
+                os.remove(path)
+                sys.stderr.write(f"  removed blank/stale page: {path}\n")
+            except OSError:
+                pass
+    for folder in {os.path.dirname(os.path.abspath(__file__)),
+                   os.path.dirname(outdir)}:
+        try:
+            names = os.listdir(folder)
+        except OSError:
+            continue
+        for n in names:
+            if not (n.lower().startswith("run_") and n.lower().endswith(".bat")):
+                continue
+            path = os.path.join(folder, n)
+            text = _read(path)
+            if _OLD_BRANCH in text:
+                try:
+                    with open(path, "w", encoding="ascii", errors="replace",
+                              newline="\r\n") as fh:
+                        fh.write(text.replace(_OLD_BRANCH, "main"))
+                    sys.stderr.write(f"  runner now pulls from main: {path}\n")
+                except OSError:
+                    pass
+
+
+def _fallback_box(code, detail):
+    esc = html_module.escape
+    if code == 2:
+        no_key = not (os.environ.get("SAM_API_KEY") or "").strip()
+        head = ("Today's SAM.gov search did not run: "
+                + ("no SAM.gov key is saved for scheduled runs on this computer."
+                   if no_key else
+                   "SAM.gov did not accept the API key saved on this computer."))
+        act = ("<p style='margin:10px 0 4px'><b>One fix, once.</b> Open PowerShell, "
+               "paste this line, press Enter. It checks the key and asks for a "
+               "new one only if the saved one is missing or rejected:</p>"
+               "<pre style='white-space:pre-wrap;background:#fff;border:1px solid "
+               "#d9c48a;padding:8px;font-size:13px;margin:0'>"
+               + esc(_SETUP_LINE) + "</pre>"
+               "<p style='margin:8px 0 0'>A key comes from sam.gov &rarr; Workspace "
+               "&rarr; Account Details &rarr; API Key.</p>")
+    elif code == 3:
+        head = ("Today's SAM.gov search came back empty, almost always because "
+                "the day's request limit for the key was used up.")
+        act = ("<p style='margin:10px 0 0'>Nothing to do. The limit resets at "
+               "4 PM Pacific and the next scheduled run tries again.</p>")
+    else:
+        head = "Today's SAM.gov search stopped on an error."
+        act = ("<p style='margin:10px 0 0'>Nothing to do today. If this box is "
+               "still here tomorrow, tell Claude the error line below.</p>")
+    extra = ("<p style='margin:8px 0 0;font-size:12px;color:#6b5a2a'>"
+             + esc(detail) + "</p>") if detail else ""
+    return head, act + extra
+
+
+def _write_pc_fallback(outdir, stem, code, detail=""):
+    """Write today's page as the last good report plus an explanation box."""
+    today = dt.date.today().isoformat()
+    target = os.path.join(outdir, f"{stem}_{today}.html")
+    if os.path.exists(target) and _is_good_report(target):
+        return target                       # an earlier run today succeeded
+    pool = []
+    for folder in {outdir, *[os.path.join(os.path.dirname(outdir), d)
+                              for d in ("Daily", "Weekly", "Monthly")]}:
+        pool += [p for p in _report_files(folder, stem)
+                 if os.path.abspath(p) != os.path.abspath(target)]
+    good = sorted((p for p in pool if _is_good_report(p)),
+                  key=os.path.getmtime, reverse=True)
+    head, act = _fallback_box(code, detail)
+    if good:
+        src = good[0]
+        when = dt.datetime.fromtimestamp(os.path.getmtime(src)).strftime(
+            "%B %d, %Y").replace(" 0", " ")
+        shown = (f"Below is the last good report, from {when} "
+                 f"({html_module.escape(os.path.basename(src))}).")
+        page = _read(src)
+    else:
+        shown = "There is no earlier good report on this computer to show."
+        page = ("<!doctype html><html><head><meta charset='utf-8'><title>PRG "
+                "Executive Report</title></head><body style='font-family:"
+                "Segoe UI,Arial,sans-serif;background:#f4f5f8'></body></html>")
+    box = (f"<!-- {FALLBACK_MARK} -->"
+           f"<div id='{FALLBACK_MARK}' style='max-width:960px;margin:24px auto;"
+           "padding:16px 20px;background:#fff8e1;border:2px solid #c9a227;"
+           "border-radius:8px;font-family:Segoe UI,Arial,sans-serif;color:#3a2f0b;"
+           "font-size:15px;line-height:1.45'>"
+           f"<div style='font-weight:700;font-size:17px'>{html_module.escape(head)}</div>"
+           f"{act}<p style='margin:10px 0 0'>{shown}</p></div>")
+    m = re.search(r"<body[^>]*>", page, re.I)
+    page = (page[:m.end()] + box + page[m.end():]) if m else box + page
+    try:
+        with open(target, "w", encoding="utf-8") as fh:
+            fh.write(page)
+        sys.stderr.write(f"  wrote explained fallback page: {target}\n")
+    except OSError as exc:
+        sys.stderr.write(f"  could not write fallback page: {exc}\n")
+    return target
+
+
 def main(argv=None):
+    argv = list(argv if argv is not None else sys.argv[1:])
+    pc = _pc_context(argv)
+    if not pc:
+        return _run(argv)
+    outdir, stem = pc
+    try:
+        _pc_housekeeping(outdir, stem)
+    except Exception as exc:                      # never block the run
+        sys.stderr.write(f"  housekeeping skipped: {exc}\n")
+    detail = ""
+    try:
+        code = _run(argv)
+    except SystemExit as exc:
+        code = exc.code if isinstance(exc.code, int) else 1
+    except Exception as exc:                      # crash -> explained page
+        import traceback
+        traceback.print_exc()
+        code, detail = 1, f"{type(exc).__name__}: {exc}"
+    if code:
+        if code == 3:
+            why = []
+            if _RUN_STATE.get("rate_limited"):
+                why.append("SAM.gov answered HTTP 429 (daily limit reached)")
+            if _RUN_STATE.get("failed_codes"):
+                why.append("%d NAICS code(s) failed after retries"
+                           % len(_RUN_STATE["failed_codes"]))
+            detail = "; ".join(why)
+        try:
+            _write_pc_fallback(outdir, stem, code, detail)
+        except Exception as exc:
+            sys.stderr.write(f"  fallback page failed: {exc}\n")
+    return code
+
+
+def _run(argv=None):
     args = parse_args(argv if argv is not None else sys.argv[1:])
 
     if args.selftest:
