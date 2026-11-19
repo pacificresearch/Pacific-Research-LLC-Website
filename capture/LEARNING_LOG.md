@@ -146,3 +146,22 @@ via a one-line `Invoke-WebRequest` from `main`, so the PC can no longer write
 a blank report. Whether it writes a real one depends on `SAM_API_KEY` being
 set on the PC, which is not verified. The PC key and the cloud credential may
 be the same key and would then share one daily quota.
+
+### Entry 18, correction (2026-11-19)
+
+Entry 18 said the PC "runs an old copy" of the matcher and that replacing
+the file would fix it. Wrong. The PC's `run_daily.bat`, written by
+`automation/setup_prg_automation.ps1` on the frozen branch
+`claude/samgov-opportunity-matcher-0a3c2f`, **re-downloads the matcher from
+that branch before every run**. So every replacement Andrew pasted in was
+overwritten by the next run, and the blank reports continued. The answer
+was in the repository the whole time: `git log --all -S run_daily.bat`
+finds it in one command. It was found only on 11-19, after Andrew pointed
+out that "it was a couple of lines in PowerShell."
+
+Fix: `automation/setup_prg_automation.ps1` now exists on main and points
+the runners at main (PR #58).
+
+**Rule 12:** before diagnosing any report, read how it is produced, from the
+repository, across every branch, and including the automation that calls it.
+A fix aimed at a file that a scheduler overwrites is not a fix.
