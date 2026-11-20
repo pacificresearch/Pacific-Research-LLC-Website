@@ -72,20 +72,23 @@ actually in it. This is absolute, in every lane.
   scheduled, or attached without the evidence: the Sent Items hit, the
   event, or the file on the message. If it was not verified, say so.
 
-## Volume and approval (Andrew, 2026-11-17)
+## Partner outreach (Andrew, 2026-11-20; replaces the 11/17 volume target)
 
-- **Target: about 50 outbound messages per business day.** Andrew's words:
-  "I don't like 4 or 5, I like 50." Most of that volume is teaming and
-  supplier outreach; a contracting officer only ever receives a response a
-  notice invites.
-- **Approved as a batch, not one by one.** "I approve all of them all at
-  once." Messages inside the boundary above go without a per-message
-  check-in.
-- **The target does not lower the bar.** Every message names a specific
-  notice or a specific reason for that firm, uses facts from the company
-  profile, and tells the recipient they can decline further contact. If
-  fewer than 50 firms qualify on a given day, fewer go out and the report
-  says how many and why.
+- **One potential partner per contract.** Write to one firm about a given
+  notice. Do not write to a second firm while the first is queued,
+  contacted, interested or teaming. If the first declines or goes silent
+  for a week, the next firm may be asked. (On 11/17-18, seven firms were
+  written to about the same VA Orlando notice; that is what this rule ends.)
+- **General introductions build the contact list.** When no open contract
+  fits a firm, send a contract-free introduction instead: who PRG is, the
+  lanes, and a request to stay in touch. A handful a day, not volume for its
+  own sake.
+- **When a partner is chosen,** every other firm that showed interest in
+  that contract gets a short, courteous close-out: PRG has teamed for that
+  one, and would like to stay in touch for future work.
+- **The bar does not move.** Every message names a specific notice or a
+  specific reason for that firm, uses facts from the company profile, and
+  tells the recipient they can decline further contact.
 - **Who is worth writing to.** On an SDVOSB set-aside the partner must be a
   certified SDVOSB (similarly situated) or the work must be done by PRG's own
   W2 hires; on a total small business set-aside any small business
