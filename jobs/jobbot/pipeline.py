@@ -23,6 +23,26 @@ CORE_RX = re.compile(r"research (study )?coordinator|study coordinator|health sc
                      r"(associate|coordinator|specialist)", re.I)
 
 
+LEVELED_RX = re.compile(r"\b(ii|iii|iv|2|3|4|senior|sr\.?|lead|supervis\w*|manager|director|principal|head)\b", re.I)
+COORD_RX = re.compile(r"(research|study|trial)s? coordinator", re.I)
+FLOOR_EXCLUDE_RX = re.compile(r"\bmobile (research )?unit\b|\bcontract\b|\bcontractor\b|community[- ]based", re.I)
+
+
+def below_floor(job: dict, cfg: dict) -> bool:
+    """Andrew 11/20: GAP 'Mobile Unit Clinical Research Coordinator' is the absolute lowest acceptable — and
+    borderline. An un-levelled coordinator title passes only with posted pay reaching $85K at a hospital/AMC
+    (or $100K elsewhere); mobile-unit / contract coordinator roles never pass."""
+    t = job.get("title") or ""
+    if not COORD_RX.search(t) or LEVELED_RX.search(t):
+        return False
+    if FLOOR_EXCLUDE_RX.search(t):
+        return True
+    top = job.get("salary_max") or job.get("salary_min")
+    hs = job_scoring.is_health_system(job, cfg)
+    need = 85000 if hs else 100000
+    return not (top and top >= need)
+
+
 def _bar(cfg: dict, cat: str) -> float:
     """Score bar per category. Andrew 11/12: international (C) needs only 55; everything else min_score (60)."""
     per = cfg.get("min_score_by_category") or {"C": 55, "F": 55}
@@ -90,6 +110,10 @@ def qualify(rescore: bool = False, use_semantic: bool | None = None) -> dict:
         if el["eligibility"] == "fail":
             fails = "; ".join(r["detail"] for r in el["eligibility_reasons"] if r["outcome"] == "fail")
             db.transition(aid, "REJECTED", f"screen: {fails}"[:500])
+            stats["failed_eligibility"] += 1
+        elif below_floor(job, cfg):
+            db.transition(aid, "REJECTED", "screen: below Andrew's CRC floor (11/20) — bare coordinator title without "
+                          "pay >= $85K at a hospital/AMC")
             stats["failed_eligibility"] += 1
         elif sc["score"] < (min(_bar(cfg, sc["category"]), 55.0) if job.get("ats") == "usajobs" or CORE_RX.search(job["title"])
                             else _bar(cfg, sc["category"])):
