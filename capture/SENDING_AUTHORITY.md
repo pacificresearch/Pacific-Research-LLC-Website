@@ -46,6 +46,32 @@ conversation.
 
 No message is sent to meet a count. If nothing qualifies, nothing goes.
 
+## Never reference what is not there (Andrew, 2026-11-20)
+
+No email, draft, or report to Andrew may say a thing was sent,
+attached, enclosed, linked, or scheduled unless the thing itself is
+actually in it. This is absolute, in every lane.
+
+- **Meeting invites (Zoom, Teams, any platform).** Never write "I've
+  sent an invite", "invite to follow", "join link below", or "a Teams
+  meeting is scheduled" unless a real join URL is in that same message
+  body, or a real calendar event exists with the join link on it. Read
+  it back from the created event before saying so. If no tool can
+  produce a real link, say so to Andrew plainly and propose times in
+  text instead; never imply a link exists.
+- **Attachments.** Never write "attached is", "please find attached",
+  or "enclosed" in a draft unless the file is on that draft. The
+  Outlook connector cannot attach, so a draft that needs a file is
+  written without that wording, and Andrew is told **at draft time**,
+  once, with the draft link, the file's full path, and the deadline.
+  A missing attachment discovered at the deadline is this rule failing
+  (75N94027R00005 RFI, 2026-11-19).
+- **Links.** Every "see link", "available here", or URL reference
+  carries the actual URL, checked to resolve.
+- **Reporting to Andrew.** Never tell Andrew something was sent,
+  scheduled, or attached without the evidence: the Sent Items hit, the
+  event, or the file on the message. If it was not verified, say so.
+
 ## Volume and approval (Andrew, 2026-11-17)
 
 - **Target: about 50 outbound messages per business day.** Andrew's words:

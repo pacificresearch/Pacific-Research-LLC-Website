@@ -60,6 +60,12 @@ agreements, and anything a notice requires as an attachment (the Outlook
 connector cannot attach). The boundary and the pre-send checks are in
 `capture/SENDING_AUTHORITY.md`.
 
+**Never reference what is not there (Andrew, 11/20).** No message or
+report may say a Zoom/Teams invite was sent, a file is attached, or a
+link is included unless the real join link, file, or URL is actually in
+it. Never tell Andrew something was sent or scheduled without the
+evidence. Full rule in `capture/SENDING_AUTHORITY.md`.
+
 Everything else: move.
 
 **Do not spend Andrew's time (Andrew, 11/17).** Involve him only when a
