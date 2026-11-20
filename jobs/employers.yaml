@@ -14,7 +14,8 @@ employers:
   - {name: Fortrea,          ats: workday, tenant: fortrea,      wd: wd1,  site: Fortrea, tier: 2}
   - {name: Thermo Fisher (PPD), ats: workday, tenant: thermofisher, wd: wd5, site: ThermoFisherCareers, tier: 1}
   - {name: Gilead Sciences,  ats: workday, tenant: gilead,       wd: wd1,  site: gileadcareers, tier: 1}
-  - {name: Amgen,            ats: workday, tenant: amgen,        wd: wd1,  site: Careers, tier: 1}
+  - {name: Amgen,            ats: workday, tenant: amgen,        wd: wd1,  site: Careers, tier: 1, max_pages: 4,
+     queries: [clinical, study, trial, "clinical operations", "medical affairs", "program manager", "project manager", "operations manager", research, "data management", "site management", feasibility, "patient"]}
   - {name: Bristol Myers Squibb, ats: workday, tenant: bristolmyerssquibb, wd: wd5, site: BMS, tier: 1}
   - {name: Pfizer,           ats: workday, tenant: pfizer,       wd: wd1,  site: PfizerCareers, tier: 1}
   - {name: AstraZeneca,      ats: workday, tenant: astrazeneca,  wd: wd3,  site: Careers, tier: 1}
