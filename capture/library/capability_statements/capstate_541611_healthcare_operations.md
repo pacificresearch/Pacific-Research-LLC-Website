@@ -1,38 +1,40 @@
 # Pacific Research Group LLC — Capability Statement: Healthcare Operations and Performance Improvement
 
-**SBA-certified SDVOSB / VOSB** | UEI J585TLDV1CH1 | CAGE 1Z9B6 | Andrew O'Donnell, Managing Director, (650) 213-2381, Andrew@pacificresearchllc.com
+**Veteran-owned program management for health system readiness and improvement**
 
-## Who we are
-Pacific Research Group LLC (PRG) is a Service-Disabled Veteran-Owned Small Business that manages healthcare operations and improvement programs: program management, current-state assessment, performance measurement, training support and sustainment, under one accountable point of contact. PRG is small under NAICS 541611.
+**SBA-certified SDVOSB / VOSB** | UEI J585TLDV1CH1 | CAGE 1Z9B6 | Andrew O'Donnell, Founder and Managing Director, (650) 213-2381, Andrew@pacificresearchllc.com
 
-## Core competencies
-- **Program management:** schedules, deliverables, risk tracking and a single point of contact for the facility
-- **Readiness and current-state assessment:** clinical and administrative workflow review, baselines, gap analysis
-- **Performance measurement and reporting:** outcome and process measures, dashboards, benefit validation, executive reporting
-- **Training support and standard work:** curricula packaging, job aids, standard work documents, sustainment materials
-- **Access and patient-flow improvement support:** intake, throughput and wait-time workflows
+## Track record at a glance
+- **98%** preventive-maintenance and accreditation compliance on $2M+ of biomedical assets, to Joint Commission and DoD standards
+- **40%** reduction in patient processing time through clinical workflow redesign
+- **25,000+** evacuees through mass medical intake, a federal interagency operation run to CDC requirements
+- **1,500+** participants managed across multi-site NIH and industry research protocols
 
-## Differentiators
-- Eligible for SDVOSB set-asides and VA Veterans First contracting.
-- One accountable program manager and prime-level quality control on all work.
-- Managing Director has worked inside DoD medical facilities, a federal interagency medical operation and an academic medical center.
-- Accreditation-readiness background to Joint Commission and DoD standards.
-- One accountable program manager and prime-level quality control on all work.
+*Founder track record: the individual experience of PRG's founder. PRG was established in 2026 and has no federal contract performance yet.*
 
-## Experience
-PRG is a recently established firm with no federal contract performance to cite yet. The record below is the individual experience of its Managing Director, a U.S. Air Force veteran.
+## What we do
+- **Program management:** Schedules, deliverables, risk tracking and a single point of contact for the facility.
+- **Readiness and current-state assessment:** Clinical and administrative workflow review, baselines and gap analysis, to Joint Commission and DoD standards.
+- **Performance measurement and reporting:** Outcome and process measures, dashboards, benefit validation and executive reporting.
+- **Training support and sustainment:** Curricula packaging, job aids, standard work and sustainment materials; access and patient-flow improvement support.
 
-- **Clinical workflow redesign.** 40% reduction in patient processing time through redesign of clinical intake and data workflows.
-- **U.S. Air Force biomedical equipment (4A2X5).** 98% preventive-maintenance and accreditation compliance across a $2M+ biomedical asset inventory, to Joint Commission and DoD standards. AAMI CBET certified.
-- **Operation Allies Welcome.** Mass medical intake and enrollment for 25,000+ evacuees in a federal interagency operation run to CDC requirements.
+## How PRG works with you
+- **Prime:** SDVOSB set-asides and sole-source awards
+- **Teammate or subcontractor:** SDVOSB participation for your team and subcontracting plan
+- **Mentor-protégé joint venture:** pairing a mentor's past performance with our certification
+- **Early engagement:** sources-sought and market-research responses, before the solicitation
 
-## How PRG participates
-PRG performs program management, measurement and training support itself and brings senior Lean and high-reliability coaching through qualified teaming partners. No partner is named until an agreement is signed.
+PRG owns contract management, quality control, compliance and invoicing, and staffs each requirement with vetted personnel and specialty partners. A partner is named only under a written agreement.
+
+## Founder
+**Andrew O'Donnell, Founder and Managing Director**
+- Education: MA, International Studies · BA, Classics
+- Credentials: ACRP-CP · ACRP-PM · AAMI CBET · NREMT · CPT-I · BLS/ACLS/PALS · PHTLS/TCCC
+- U.S. Air Force veteran (biomedical equipment, 4A2X5) · Level I trauma center · formal Honest Broker for clinical data systems · 4 JAMA publications
 
 ## Company data
 - SAM.gov registration: Active through June 15, 2027
 - Certification: SBA-certified SDVOSB and VOSB (VetCert), May 26, 2026 to May 26, 2029
-- Entity: Single-member LLC, California
 - Primary NAICS 541714; all NAICS on the SAM registration: 541611, 541618, 541690, 541990, 541720, 541380, 541511, 541512, 541519, 518210, 541612, 541620, 541930, 611430, 611710, 621112, 621999, 624230
 - PSC R408, R499, R707, R425, Q999
-- 2827 E Coolidge Ave, Orange, CA 92867 · pacificresearchllc.com
+- 2827 E Coolidge Ave, Orange, CA 92867 (Greater Los Angeles) · pacificresearchllc.com
