@@ -76,8 +76,9 @@ actually in it. This is absolute, in every lane.
 
 - **One potential partner per contract.** Write to one firm about a given
   notice. Do not write to a second firm while the first is queued,
-  contacted, interested or teaming. If the first declines or goes silent
-  for a week, the next firm may be asked. (On 11/17-18, seven firms were
+  contacted, interested or teaming. If the first declines, or sends nothing
+  back within **72 hours** (Andrew, 11/20), it is marked NO REPLY and the
+  next firm may be asked. (On 11/17-18, seven firms were
   written to about the same VA Orlando notice; that is what this rule ends.)
 - **General introductions build the contact list.** When no open contract
   fits a firm, send a contract-free introduction instead: who PRG is, the
