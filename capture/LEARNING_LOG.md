@@ -194,3 +194,11 @@ pops up"):
 **Rule 13:** if a fix only works once Andrew takes a step, it is not done.
 Change what the machine already runs, so the fix reaches him without his
 help.
+
+## Entry 20 — 2026-11-19 · a same-day call invite went badly
+
+A partner call was proposed with about 20 minutes' notice. The partner
+pushed back on the notice, and the Teams link in the invite was never
+created, so the call fell back to phone. **Rule 14:** propose meetings at
+least one week out, and confirm the meeting link exists before sending the
+invite (`capture/SENDING_AUTHORITY.md`, "Meeting lead time").

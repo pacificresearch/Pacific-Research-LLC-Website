@@ -68,3 +68,15 @@ No message is sent to meet a count. If nothing qualifies, nothing goes.
   with PRG as a member, not about subcontracting to PRG.
 - **Send window:** 8:00 AM to 5:00 PM in the recipient's time zone where
   practical.
+
+## Meeting lead time (Andrew, 11/20)
+
+No tight turnarounds, ever. Any call or meeting PRG proposes is at least
+**one week out** from the day it is proposed, so there is time to meet the
+people before anything is applied for or committed. Check Andrew's
+calendar first, offer two or three slots inside the other party's stated
+availability, and never propose same-day or next-day times. If the other
+party asks for something sooner, offer the earliest slot a week out and
+let them come back. A meeting invite is not sent until the time is agreed,
+and an online-meeting link is checked to exist before it is relied on
+(on 11/19 the Teams link was never created and the call fell back to phone).
