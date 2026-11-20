@@ -110,3 +110,10 @@ party asks for something sooner, offer the earliest slot a week out and
 let them come back. A meeting invite is not sent until the time is agreed,
 and an online-meeting link is checked to exist before it is relied on
 (on 11/19 the Teams link was never created and the call fell back to phone).
+
+## Vetting before sending (Andrew, 11/20)
+
+No firm receives a first intro until its Tier 1 checks in `capture/PARTNER_VETTING.md` have run
+and read CLEAR; a check that could not run counts as UNVERIFIED and blocks the send. No NDA,
+teaming agreement, mentor agreement, or naming a partner to the government before its Tier 2 check
+reads CLEAR. Prefer principals with a master's degree or above; a PhD is a plus.
