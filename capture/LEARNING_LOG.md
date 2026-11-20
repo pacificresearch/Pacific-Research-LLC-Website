@@ -195,10 +195,33 @@ pops up"):
 Change what the machine already runs, so the fix reaches him without his
 help.
 
-## Entry 20 — 2026-11-19 · a same-day call invite went badly
+## Entry 20 — 2026-11-19 · two emails pointed at things that did not exist
+
+Two failures on the same day, same cause: a message referred to something
+the sending tool could not produce.
+- **Teams invite with no link.** The 11-19 email to Dr. Jackson (Symmetric,
+  36C24827Q0138) said "The join link is in this invitation (Microsoft
+  Teams…)". No meeting existed and no link was in it. Andrew had to
+  apologize and phone him; Dr. Jackson sent his own Zoom link.
+- **RFI draft with no attachment.** The 75N94027R00005 RFI draft (11-17)
+  said "Attached is…" but the Outlook connector cannot attach, the .docx
+  was never saved anywhere a session could reach, and nobody told Andrew.
+  It surfaced minutes before the 1:00 PM PT deadline.
+
+Fix (Andrew, 11-20: "Dont ever say you sent a zoom or teams invite via
+email without an actual link. Dont ever do that again"): the rule
+"Never reference what is not there" in `capture/SENDING_AUTHORITY.md`,
+summarized in `CLAUDE.md` so every session loads it.
+
+**Rule 14:** never write that an invite, file, or link is included unless
+the real thing is in that message, checked before sending. Never tell
+Andrew something was sent or scheduled without the proof. If the tool
+cannot produce it, say so at draft time, not at the deadline.
+
+## Entry 21 — 2026-11-19 · a same-day call invite went badly
 
 A partner call was proposed with about 20 minutes' notice. The partner
 pushed back on the notice, and the Teams link in the invite was never
-created, so the call fell back to phone. **Rule 14:** propose meetings at
+created, so the call fell back to phone. **Rule 15:** propose meetings at
 least one week out, and confirm the meeting link exists before sending the
 invite (`capture/SENDING_AUTHORITY.md`, "Meeting lead time").
