@@ -217,3 +217,11 @@ summarized in `CLAUDE.md` so every session loads it.
 the real thing is in that message, checked before sending. Never tell
 Andrew something was sent or scheduled without the proof. If the tool
 cannot produce it, say so at draft time, not at the deadline.
+
+## Entry 21 — 2026-11-19 · a same-day call invite went badly
+
+A partner call was proposed with about 20 minutes' notice. The partner
+pushed back on the notice, and the Teams link in the invite was never
+created, so the call fell back to phone. **Rule 15:** propose meetings at
+least one week out, and confirm the meeting link exists before sending the
+invite (`capture/SENDING_AUTHORITY.md`, "Meeting lead time").
