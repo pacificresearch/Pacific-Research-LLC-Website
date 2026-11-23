@@ -58,6 +58,18 @@ catalysts:
     status: completed
     source_url: "https://www.tdlr.texas.gov/TABS/Projects/TABS2024006022"
     verified: true    # TDLR state project filing read ($31,600,000; 2/5/2024 - 3/30/2026)
+  - name: "Permian Basin Behavioral Health Center, 900 FM 1788, Midland (200-bed, 233,753 sf new hospital co-sponsored by Midland County and Ector County hospital districts; ~500 staff and $86.7M state HB 8 appropriation reported; grand opening reported Aug 2026)"
+    company: "Permian Basin Behavioral Health Center (Midland County Hospital District + Ector County Hospital District)"
+    sector: "hospital"
+    investment_usd: 220000000
+    jobs: 0
+    avg_wage: null
+    announced: "2023-10"
+    start: "2024-04"
+    completion: "2026-08"
+    status: completed
+    source_url: "https://www.tdlr.texas.gov/TABS/Projects/TABS2024008565"
+    verified: true    # TDLR filing read ($220,000,000; new construction from 4/1/2024); press figures range $225-240M; staffing/opening date from trade press, not read on a primary page
   - name: "Starfighters Space second launch facility / hypersonic test base at Midland Spaceport (MDC economic development agreement; 23 FTE by 2033; capital investment 'millions' by 2027, amount not stated)"
     company: "Starfighters Space Inc."
     sector: "aerospace"
