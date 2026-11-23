@@ -1,0 +1,135 @@
+# research/markets/33340.yaml — Milwaukee-Waukesha, WI (principal county: Milwaukee). Filled 2026-11-23 from primary sources where marked verified. NOTE: city.milwaukee.gov and docs.legis.wisconsin.gov blocked automated fetches this run (403/503); items that normally cite them were taken from the WI DOR / DATCP PDFs, a FindLaw statute reproduction, state press releases, and local press as noted.
+cbsa: "33340"
+name: "Milwaukee-Waukesha, WI"
+retrieved_at: "2026-11-23"
+cities: ["Milwaukee", "West Allis", "Wauwatosa"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "Microsoft's $7B+ Mount Pleasant AI datacenter campus is in Racine County (CBSA 39540, adjacent, ~25 mi south) — regional spillover only; permanent operating headcount is in the hundreds, not thousands (construction ~10,000 workers to date)"
+  - "Milwaukee revalues ALL property every year at full market value: citywide values +15.4% for 2025, median residential +7.6% for 2026 — tax bills follow assessments quickly after a purchase above the prior assessment"
+  - "Pre-1978 (largely pre-1950) housing stock: federal lead disclosure applies to nearly every 2-4 unit; Milwaukee Health Dept. enforces lead hazard orders with 2022 enhanced penalties — budget lead-safe work on any older duplex"
+  - "Proactive Rental Property Inspection District #1 (Uptown) adopted 2026-09-22 as a 5-year pilot; a 2-4 unit inside the district faces initial inspection and $90/$150 fees if violations are found. Expansion beyond one district is barred during the pilot, but the Mayor's 'Year of Housing' agenda signals more landlord accountability measures"
+  - "Wisconsin's graduated income tax tops out at 7.65% (5.3% bracket from ~$50K single) — higher than flat-tax peers"
+  - "Manufacturing remains ~13% of metro nonfarm employment (BLS via MMAC) — cyclical exposure (Harley-Davidson, Rockwell, Komatsu)"
+major_employers:
+  - "Advocate Aurora Health (hospital, ~32,000 per MMAC via Visit Milwaukee 2025 fact sheet) — https://assets.simpleviewinc.com/simpleview/image/upload/v1/clients/milwaukee/VM_Milwaukee_Economic_Drivers_2025_0d26f8e3-4fab-4b72-be79-c1152aa154cd.pdf"
+  - "Froedtert Health (hospital, ~14,000 per MMAC) — https://assets.simpleviewinc.com/simpleview/image/upload/v1/clients/milwaukee/VM_Milwaukee_Economic_Drivers_2025_0d26f8e3-4fab-4b72-be79-c1152aa154cd.pdf"
+  - "Ascension Wisconsin (hospital, ~10,750 per MMAC) — https://assets.simpleviewinc.com/simpleview/image/upload/v1/clients/milwaukee/VM_Milwaukee_Economic_Drivers_2025_0d26f8e3-4fab-4b72-be79-c1152aa154cd.pdf"
+  - "Medical College of Wisconsin (university/research, ~6,225 per MMAC) — https://assets.simpleviewinc.com/simpleview/image/upload/v1/clients/milwaukee/VM_Milwaukee_Economic_Drivers_2025_0d26f8e3-4fab-4b72-be79-c1152aa154cd.pdf"
+  - "Northwestern Mutual (insurance/finance, ~6,000 per MMAC; company commits >=5,750 downtown by 2030-01-01) — https://news.northwesternmutual.com/2023-02-02-NORTHWESTERN-MUTUAL-ANNOUNCES-500M-INVESTMENT-IN-DOWNTOWN-MILWAUKEE-CAMPUS"
+  - "Milwaukee Tool (manufacturing, >4,000 Wisconsin employees per Governor's release 2025-09) — https://content.govdelivery.com/accounts/WIGOV/bulletins/3ef796b"
+state_income_tax: "graduated 3.50% / 4.40% / 5.30% / 7.65% — TY2025 single brackets $0-14,680 / 14,680-50,480 / 50,480-323,290 / over 323,290 (MFJ $0-19,580 / -67,300 / -431,060 / over); WI DOR — https://www.revenue.wi.gov/Pages/FAQS/pcs-taxrates.aspx"
+cost_of_living: ""
+
+catalysts:
+  - name: "Microsoft Mount Pleasant AI datacenter campus (Racine County — ADJACENT CBSA, regional) — $3.3B first datacenter online early 2026 + $4B second datacenter committed by end-2028"
+    company: "Microsoft"
+    sector: "data_center"
+    investment_usd: 7000000000
+    jobs: 0                       # permanent headcount not stated in Governor's release ('has begun hiring full-time workers'); construction: ~10,000 WI workers to date, >3,000 at peak. Press (WPR) cites ~800-900 permanent when both campuses operate — not verified
+    avg_wage: null
+    announced: "2024-05"
+    start: "2024"
+    completion: "2028"
+    status: under_construction
+    source_url: "https://content.govdelivery.com/accounts/WIGOV/bulletins/3f327b5"
+    verified: true
+  - name: "Northwestern Mutual North Office Building modernization (818 E. Mason St, downtown) — 540,000 sq ft; ~2,000 jobs relocating from Franklin campus; downtown capacity 9,000"
+    company: "Northwestern Mutual"
+    sector: "other"
+    investment_usd: 500000000
+    jobs: 2000
+    avg_wage: null
+    announced: "2023-02"
+    start: "2023-10"
+    completion: "2027"
+    status: under_construction
+    source_url: "https://news.northwesternmutual.com/2023-02-02-NORTHWESTERN-MUTUAL-ANNOUNCES-500M-INVESTMENT-IN-DOWNTOWN-MILWAUKEE-CAMPUS"
+    verified: true
+  - name: "Fiserv global headquarters relocation to downtown Milwaukee (640 N. Vel R. Phillips Ave / HUB640) — 150,000+ sq ft; 980 jobs retained/created incl. 250+ new over five years; up to $7M WEDC credits"
+    company: "Fiserv, Inc."
+    sector: "other"
+    investment_usd: 0             # capital investment figure not stated in WEDC release
+    jobs: 980
+    avg_wage: null
+    announced: "2022-10"
+    start: "2023"
+    completion: "2024-03"
+    status: completed
+    source_url: "https://wedc.org/wisconsin-approves-support-for-new-fiserv-milwaukee-headquarters/"
+    verified: true
+  - name: "Milwaukee Tool new facility, 100 Heritage Reserve, Menomonee Falls (Waukesha County, in CBSA) — 22-acre site; up to $4.5M WEDC Enterprise Zone credits"
+    company: "Milwaukee Tool (Techtronic Industries)"
+    sector: "manufacturing"
+    investment_usd: 42000000
+    jobs: 300
+    avg_wage: null
+    announced: "2025-09"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://content.govdelivery.com/accounts/WIGOV/bulletins/3ef796b"
+    verified: true
+  - name: "Froedtert Hospital West Tower (Milwaukee Regional Medical Center, Wauwatosa) — 9 stories, ~225,000-230,000 sq ft, ~96 inpatient beds; cost not disclosed"
+    company: "Froedtert & the Medical College of Wisconsin"
+    sector: "hospital"
+    investment_usd: 0             # Froedtert declined to disclose cost (WPR 2024-01-09); Mortenson project page: construction began 2024, occupancy late 2027
+    jobs: 0
+    avg_wage: null
+    announced: "2024-01"
+    start: "2024"
+    completion: "2027"
+    status: under_construction
+    source_url: "https://www.wpr.org/economy/froedtert-hospital-9-story-patient-tower-wauwatosa-campus"
+    verified: false
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: "Milwaukee Home Down Payment Assistance Program (City of Milwaukee DCD/NIDC) — forgivable grant up to $5,000 citywide or $7,000 inside the CDBG Area boundary"
+    dollar_value: 7000
+    cash_or_noncash: cash
+    eligibility: "City of Milwaukee resident buying a home within city limits; household income within program limits by family size (figures not published in sources read); 8 hours of counseling from a HUD-approved homebuyer counseling agency; apply through partner agencies ACTS Housing, Housing Resources Inc., or United Community Center; 'additional requirements apply'"
+    minimum_income: "none stated; maximum household income limits by family size apply (amounts UNKNOWN — city page blocked this run)"
+    employment_requirement: "none stated"
+    home_purchase_requirement: "home within City of Milwaukee; $7,000 tier requires address inside the Community Development Block Grant Area; eligible unit count (1-4?) UNKNOWN — not stated in sources read; a third-party lender site cites a $290,000 price cap and first-time/3-year rule — unverified"
+    residency_requirement: "must be a City of Milwaukee resident at application and occupy the home as primary residence"
+    minimum_stay: "5 years owner-occupancy (grant forgivable over that period)"
+    application_deadline: "none; rolling through partner agencies"
+    funding_availability: "active since 2021-06; ~175 grants / $1.1M awarded through 2025 per council briefing coverage; 2026 budget proposal reportedly cut appropriation to $600,000 — outcome UNKNOWN"
+    source_url: "https://urbanmilwaukee.com/pressrelease/milwaukee-home-down-payment-assistance-program-now-available/"
+    verified: false               # city program page https://city.milwaukee.gov/DCD/NIDC/MILWAUKEE-HOME-DOWN-PAYMENT-ASSISTANCE-PROGRAM returned 403 to automated fetch; terms taken from the Common Council press release (2021-06-17) and Fox6
+
+landlord_law:
+  verified: false                # 66.1015 read via FindLaw reproduction (docs.legis blocked); ATCP 134 / 704.17 read from the DATCP Landlord Tenant Guide (03/2026, a state-agency primary); Act 176 / 66.0104 text from docs.legis search excerpts; Milwaukee ordinance items from local press and council releases
+  rent_control: "no — state preemption, Wis. Stat. 66.1015(1): no city, village, town or county may regulate the amount of rent or fees charged for the use of a residential rental dwelling unit (exceptions only for units the government/housing authority owns or agreements with private persons); (3)(b) also bars inclusionary zoning"
+  just_cause_eviction: "no — Wis. Stat. ch. 704 has no just-cause requirement. Month-to-month ends on 28 days' written notice (704.19). Default notices under 704.17: month-to-month — 14-day no-cure notice for nonpayment or breach (or 5-day cure); lease of one year or less — 5-day cure notice for nonpayment/breach, then 14-day no-cure if a second default occurs within 12 months; lease over one year — 30 days to cure; 5-day no-cure notice for criminal/drug activity (704.17(3m)); holdover tenants owe double rent (704.27)"
+  eviction_timeline_days: null   # notice 5-14 days (704.17) then small-claims eviction under Wis. Stat. ch. 799 (writ of restitution 799.44; writ void if sheriff receives it >30 days after issuance; 15-day appeal window); Milwaukee County filing-to-lockout days not published in a primary source read — UNKNOWN
+  rental_licensing: "no — Milwaukee has no rental license or landlord registration. State preemption: Wis. Stat. 66.0104(2)(e) (2015 Act 176, amended 2017 Act 317) bars local certification/registration/licensing of rental units except a registry limited to owner name, contact person, address and phone (one-time fee <= $10 outside first-class cities; Milwaukee is WI's only first-class city). 2024-25 'landlord registration ordinance' proposal: no adopted ordinance found this run — UNKNOWN. Tenant Life Safety Disclosure ordinance (File 250302, adopted 2025-11-25) requires owners of 3+ unit buildings to give tenants standardized fire alarm/sprinkler compliance disclosures"
+  rental_license_fee_annual: null
+  inspection_frequency: "complaint-based (Dept. of Neighborhood Services) citywide. Rental Property Inspection District #1 — Uptown (roughly W. Center St / N. Sherman Blvd / W. North Ave / N. 50th St; ~200 rental properties, 399 units) adopted 2026-09-22 (Files 260362/260363) as a 5-year pilot: ~20 initial inspections/month, pass = removed from cycle for 5 years, uncorrected violations = annual reinspection; fees $90 (initial inspection finding a violation) / $150 (subsequent), none when no habitability violation; owner-occupied single-family excluded; no additional districts may be added during the pilot. The earlier Residential Rental Inspection (Residential Rental Certificate, 2009) program was curtailed by 2015 Act 176; 66.0104(2)(d) now limits districts to areas with documented blight/complaints/code violations and caps fees ($75/$150)"
+  lead_rules: "federal pre-1978 EPA/HUD disclosure (most Milwaukee duplexes are pre-1950). Milwaukee: 1999/2000 Community Lead Safe Zones pilot ordinance (pre-1950 rentals in two target areas; lead hazard control certificate; window abatement) — current enforcement status UNKNOWN; 2022 Lead Enforcement Ordinance added penalties for landlords who fail to correct Health Dept. lead hazard orders and anti-retaliation protections (council releases); a mandatory citywide lead-safe rental certification was proposed but no adopted ordinance found; Milwaukee Health Dept. Lead-Safe Registry is voluntary; WI DHS Lead-Safe Homes Program funds abatement"
+  certificate_of_occupancy_rules: "no point-of-sale inspection, transfer CO, or rental-occupancy permit found for Milwaukee; Wis. Stat. 66.0104(2)(f) bars local occupancy or transfer-of-tenancy fees. Verify legal unit count against the City Assessor record (assessments.milwaukee.gov) and DNS permit history — a 'triplex' assessed as a duplex is a conversion risk"
+  security_deposit_limits: "no cap in Wis. Stat. ch. 704 or ATCP 134 (DATCP guide sets procedures only). ATCP 134.06: before accepting a deposit landlord must give the tenant at least 7 days to document pre-existing damage and offer the prior tenant's damage list; deposit (less lawful withholdings — unpaid rent, tenant damage beyond normal wear, utilities owed) returned with itemized statement within 21 days after the tenancy ends (or after re-rental if earlier) (134.06(2),(4)); earnest money returned next business day if not approved (134.05)"
+  local_landlord_taxes_fees: "none — no rental license, registration fee, landlord tax, or local income tax; inspection fees apply only inside the Uptown pilot district when violations are found; Milwaukee County Sheriff eviction execution $60/hr per deputy (max 2) per Sheriff Civil Process fee page"
+  utility_obligations: "ATCP 134.04(3): before renting, landlord must disclose whether utilities are included and, where units/common areas are not separately metered, how costs are allocated among units; 134.04(2) requires disclosure of uncorrected code violations, heating not capable of 67 F, lack of hot/cold water, unsafe electrical/plumbing/sewage. Milwaukee Water Works charges attach to the property (lien) — not read this run"
+  sources:
+    - "https://codes.findlaw.com/wi/municipalities-ch-59-to-68/wi-st-66-1015/"
+    - "https://datcp.wi.gov/Documents/LT-LandlordTenantGuide497.pdf"
+    - "https://docs.legis.wisconsin.gov/2015/related/acts/176"
+    - "https://docs.legis.wisconsin.gov/document/statutes/66.0104"
+    - "https://docs.legis.wisconsin.gov/document/statutes/704.17"
+    - "https://urbanmilwaukee.com/2026/09/18/proactive-rental-inspections-poised-to-return-to-milwaukee/"
+    - "https://urbanmilwaukee.com/pressrelease/council-adopts-files-creating-a-rental-property-inspection-program/"
+    - "https://city.milwaukee.gov/ImageLibrary/Groups/ccCouncil/News/2025/District-11/11---Fire-Safety-Ordinance-Adopted-Release.pdf"
+    - "https://nchh.org/policy/state-and-local-lead-laws/milwaukee-lead-law/"
+    - "https://county.milwaukee.gov/EN/Sheriff/Divisions/Civil-Process"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "Wisconsin assesses at full market value (Wis. Stat. 70.32) and the City of Milwaukee revalues every parcel every year using prior-year arm's-length sales. There is no mechanical sale reset and no cap, but the DOR Guide for Property Owners (2026) states a recent arm's-length sale of the property is 'the best indicator of market value', the assessor 'must review the sale' (may request interior inspection) and uses sales in the next revaluation — the assessor may not change one parcel solely on its own sale without adjusting comparables, so a purchase well above assessment is typically absorbed over the next one or two annual revaluations rather than at closing. Citywide values +15.4% (2025) and median residential +7.6% (2026) per press. Appeal: Milwaukee Board of Assessors then Board of Review; objection deadline in May each year (verify current date on assessor site). No owner-occupant exemption beyond the state Lottery & Gaming Credit and School Levy Credit."
+  risk: "MEDIUM"
+  assessor_url: "https://city.milwaukee.gov/assessor"
+  treasurer_url: "https://city.milwaukee.gov/treasurer"
+  source_url: "https://www.revenue.wi.gov/DOR%20Publications/pb060.pdf"
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}
