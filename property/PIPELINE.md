@@ -1,6 +1,6 @@
 # Property Pipeline — finalists board
 > Refreshed every weekly run. Status: active / price change / withdrawn / passed (reason) / under contract.
-> Last refresh: 2026-11-23 (persistent weekly session). RENTCAST_API_KEY still missing — Stage 2 has never run on real listings.
+> Last refresh: 2026-11-23 (persistent weekly session). Research layer: 22 files, 98 catalysts (73 primary-verified), 26 incentives. RENTCAST_API_KEY still missing — Stage 2 has never run on real listings.
 
 ## Current finalists (Ranking E)
 | First seen | Address | Market | Units | Ask | Cons. CF/mo | CoC | Econ DSCR | Conf. | Post-sale tax risk | UW ceiling | Status | Open diligence |
