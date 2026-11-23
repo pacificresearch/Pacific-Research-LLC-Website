@@ -1,0 +1,112 @@
+# research/markets/22220.yaml — Fayetteville-Springdale-Rogers, AR (Washington County; Benton County). Filled 2026-11-23 from web reading only; UNKNOWN beats a guess.
+cbsa: "22220"
+name: "Fayetteville-Springdale-Rogers, AR"
+retrieved_at: "2026-11-23"
+cities: ["Fayetteville", "Springdale", "Rogers"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "Property-tax reset on purchase: Ark. Code 26-26-1123 assesses a sold parcel at 20% of full appraised value at the next assessment date and denies the buyer any Amendment 79 cap until the second assessment date after transfer — the seller's capped taxable value is irrelevant to the buyer's bill"
+  - "Washington County's 4-year reappraisal cycle ends 2027 and Benton County's ends 2028 (AACD 2025 report): a 2026 purchase will be followed by a county-wide reappraisal within 1-2 years on top of the sale reset"
+  - "Life Works Here $10,000 + bike relocation incentive (Northwest Arkansas Council, launched 2020-11) is CLOSED — findingnwa.com states the application process has ended (66,000+ applicants, 100 recipients); no current NWA cash relocation program found"
+  - "Economy anchored by three Fortune 500 headquarters (Walmart/Bentonville, Tyson Foods/Springdale, J.B. Hunt/Lowell) plus the University of Arkansas: diversified across retail/food/logistics/education but exposed to Walmart's corporate and supplier-community decisions; Walmart's New Home Office consolidated 15,000+ existing associates rather than adding new jobs"
+  - "Mercy / Alice L. Walton Foundation $700M health affiliation (2024-09) states no construction schedule or job counts — treat as announced, not under way"
+  - "Arkansas state income tax applies to rental income (top rate 3.7% for 2026)"
+major_employers:
+  - "Walmart Inc. (retail HQ, Bentonville; 15,000+ associates at the New Home Office when fully open through 2025 — NWA Council) — https://nwacouncil.org/2025/01/30/walmarts-new-home-office-a-milestone-for-northwest-arkansas/"
+  - "Tyson Foods (food manufacturing HQ, Springdale; NWA headcount n/a — Rogers-Lowell Chamber lists 1,265 in Rogers/Lowell only) — https://www.rogerslowell.com/pages/major-employers/"
+  - "J.B. Hunt Transport Services (logistics HQ, Lowell; ~1,400 in Rogers/Lowell per Rogers-Lowell Chamber, undated) — https://www.rogerslowell.com/pages/major-employers/"
+  - "University of Arkansas (university, Fayetteville; employee count n/a — osai.uark.edu datasets not retrieved) — https://www.uark.edu/"
+  - "Mercy Northwest Arkansas (hospital, Rogers; ~3,000 per Rogers-Lowell Chamber, undated) — https://www.rogerslowell.com/pages/major-employers/"
+  - "Washington Regional Medical Center (hospital, Fayetteville; jobs n/a) — https://www.wregional.com/"
+state_income_tax: "graduated; top individual rate 3.7% effective tax year 2026 (cut from 3.9% by HB1001/SB1, First Extraordinary Session, signed May 2026, retroactive to 2026-01-01; top corporate rate 4.1% from 2027) — https://senate.arkansas.gov/?p=12542 (Arkansas Senate release; the DFA individual income tax landing page does not print the rate)"
+cost_of_living: ""
+
+catalysts:
+  - name: "Walmart New Home Office, Bentonville: 350-acre headquarters campus (first envisioned 2017, construction from 2019), opened 2025-01 with phased move-in through 2025; 15,000+ associates (consolidation of existing HQ workforce, not new jobs); street-facing retail opened spring 2025"
+    company: "Walmart Inc."
+    sector: "other"
+    investment_usd: 0
+    jobs: 0
+    avg_wage: null
+    announced: "2017"
+    start: "2019"
+    completion: "2025-12"
+    status: completed
+    source_url: "https://corporate.walmart.com/news/2025/01/17/the-future-of-better-begins-here-welcome-to-walmarts-new-home-office"
+    verified: true    # Walmart corporate release 2025-01-17 read (350 acres, 8M+ project hours); Walmart gives no dollar figure or headcount — 15,000+ associates and 'fully opens throughout 2025' from the NWA Council post (nwacouncil.org, 2025-01-30)
+  - name: "Mercy / Alice L. Walton Foundation / Heartland Whole Health Institute 30-year, $700M affiliation (with Cleveland Clinic): Mercy $350M to build a cardiac care center of excellence on its Rogers campus + physician recruitment ('hundreds' of physicians); Alice L. Walton Foundation $350M for an outpatient specialty-care center of excellence in Bentonville"
+    company: "Mercy; Alice L. Walton Foundation"
+    sector: "hospital"
+    investment_usd: 700000000
+    jobs: 0
+    avg_wage: null
+    announced: "2024-09"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.mercy.net/newsroom/2024-09-24/lice-l--walton-foundation--mercy--heartland-whole-health-institu/"
+    verified: true    # Mercy newsroom release 2024-09-24 read; no job figures, start, or completion dates stated; Axios (secondary) reports a 2028 target for the Bentonville cardiac center — unverified
+  - name: "Conagra Brands Fayetteville plant expansion (ready-to-eat meals: Banquet, Healthy Choice, Hungry-Man, Gardein, evol): ~$220M multi-year investment to increase chicken production capacity; 100+ new jobs over five years; construction to begin later in 2026"
+    company: "Conagra Brands"
+    sector: "manufacturing"
+    investment_usd: 220000000
+    jobs: 100
+    avg_wage: null
+    announced: "2026-03"
+    start: "2026"
+    completion: ""
+    status: announced
+    source_url: "https://www.arkansasedc.com/news-events/newsroom/detail/2026/03/06/conagra-brands-to-expand-manufacturing-operations-in-fayetteville--arkansas"
+    verified: true    # AEDC release 2026-03-06 read; completion date not stated
+
+incentives:                      # Life Works Here (NWA Council, $10,000 + bike, 2020) is CLOSED per https://findingnwa.com/incentive — 'the application process for the talent incentive has ended'; no city DPA program found for Fayetteville, Springdale or Rogers
+  - program: "Arkansas Development Finance Authority (ADFA) Down Payment Assistance (DPA) Loan Program — statewide, applies in NWA: $1,000-$15,000 for down payment and closing costs as a second mortgage with a 10-year term, available only with an ADFA StartSmart or Move-Up first mortgage"
+    dollar_value: 15000
+    cash_or_noncash: cash
+    eligibility: "Must qualify for an ADFA StartSmart or ADFA Move-Up first mortgage through a participating lender (adfa.arkansas.gov/find-a-lender); income/purchase-price limits, first-time-buyer status and eligible property types are set by the first-mortgage program and are not printed on the DPA page"
+    minimum_income: ""
+    employment_requirement: ""
+    home_purchase_requirement: "Paired with an ADFA first mortgage (owner-occupied financing — a 2-4 unit qualifies only if Andrew occupies a unit and the first-mortgage program allows the property type; not confirmed on the page)"
+    residency_requirement: ""
+    minimum_stay: ""
+    application_deadline: ""
+    funding_availability: "Ongoing program; no funding balance published; ADFA Single Family contact 501-682-5466"
+    source_url: "https://adfa.arkansas.gov/programs/homeloans/down-payment-assistance-program"
+    verified: true    # ADFA program page read 2026-11-23; it is a repayable 10-year second mortgage, not a grant — year-1 benefit is liquidity, not free money
+
+landlord_law:
+  verified: false    # state statute texts read on FindLaw (current as of 2024-03-28), the AG page read directly, and Fayetteville Code §118.01 read in a 2021 council packet; Fayetteville Landlord's Representative Registry (ch. 120) details come from city reminders/third-party summaries, code text not read
+  rent_control: "no — Ark. Code 14-16-601 and 14-54-1409: a local governmental unit (county, city, village, township) shall not enact, maintain, or enforce an ordinance or resolution that would have the effect of controlling the amount of rent charged for leasing private residential or commercial property; no local rent control exists (Fayetteville's 2024 $40 rental-application-fee cap, Ord. 6800, was repealed after the city attorney and AG said it likely violated state law)"
+  just_cause_eviction: "no — civil unlawful detainer, Ark. Code 18-60-304: holdover after the term, holdover after written demand, or nonpayment plus three (3) days' notice to quit and written demand for possession; tenant has 5 days after summons to file a written objection or the sheriff may remove (Arkansas AG); separate criminal failure-to-vacate statute, Ark. Code 18-16-101: 10 days' written notice to vacate, willful refusal is a misdemeanor, $1-$25 per day, each day a separate offense"
+  eviction_timeline_days: null
+  rental_licensing: "no per-unit rental license or registration fee found in Fayetteville, Springdale or Rogers. Fayetteville: (1) Business Registry and License (Code ch. 118) required for landlords EXCEPT an individual (not an LLC/corporation) renting fewer than three (3) dwelling units — §118.01(D) — so an LLC-owned duplex or any triplex/fourplex needs a city business license; (2) Landlord's Representative Registry (Code ch. 120): owners of more than two residential rentals and all STRs must register a designated representative who lives/works in Washington, Benton, Crawford or Madison County, free, updates within 7 days (city reminder 2023; code text not read). Springdale and Rogers: no registration program located (third-party summary only)"
+  rental_license_fee_annual: null
+  inspection_frequency: "no systematic rental inspection program found in Fayetteville, Springdale or Rogers; enforcement is complaint-driven under adopted property-maintenance codes (not verified against city code); Fayetteville life-safety inspections apply to short-term rentals only"
+  lead_rules: "federal only found: pre-1978 lead-based paint disclosure (42 U.S.C. 4852d; 24 CFR 35 / 40 CFR 745); no NWA city lead ordinance located"
+  certificate_of_occupancy_rules: "no certificate-of-occupancy-on-sale or point-of-sale inspection requirement found for Fayetteville, Springdale or Rogers"
+  security_deposit_limits: "Ark. Code 18-16-304: no more than two (2) months' periodic rent, however denominated; 18-16-305: return within 60 days of termination with itemized deductions (per Arkansas AG); 18-16-303: the subchapter does not apply to an individual owning five or fewer dwelling units unless a third party manages/collects rent for a fee — a self-managed 2-4 unit is outside the cap"
+  local_landlord_taxes_fees: "none found beyond Fayetteville's business license for entity/3+ unit landlords (fee not located); no city rental-income or per-unit tax; real property assessed at 20% of market value statewide; Washington/Benton County millage applies (Fayetteville reported at up to 57.95 mills by local press, unverified)"
+  utility_obligations: "Ark. Code 18-17-502 (Act 1052 of 2021; leases entered/renewed after 2021-11-01): landlord must supply hot and cold running water, electricity, potable water, sanitary sewer/plumbing to code, a functioning roof and building envelope, and functioning heating and A/C to the extent they served the premises at signing; tenant gives written notice (certified mail) and, if rent is current and the landlord does not remedy within 30 calendar days, the tenant's sole remedy is termination without penalty plus deposit refund — no rent withholding; stricter local housing codes still apply (18-17-502(h))"
+  sources:
+    - "https://codes.findlaw.com/ar/title-14-local-government/ar-code-sect-14-16-601/"
+    - "https://codes.findlaw.com/ar/title-14-local-government/ar-code-sect-14-54-1409/"
+    - "https://codes.findlaw.com/ar/title-18-property/ar-code-sect-18-60-304/"
+    - "https://codes.findlaw.com/ar/title-18-property/ar-code-sect-18-16-101/"
+    - "https://codes.findlaw.com/ar/title-18-property/ar-code-sect-18-16-304/"
+    - "https://codes.findlaw.com/ar/title-18-property/ar-code-sect-18-16-303/"
+    - "https://codes.findlaw.com/ar/title-18-property/ar-code-sect-18-17-502/"
+    - "https://arkansasag.gov/divisions/public-protection/homes/landlord-and-tenant-rights/"
+    - "https://fayettevilleflyer.com/wp-content/uploads/2021/04/b1-1.pdf"
+    - "https://documents.fayetteville-ar.gov/Forms/landlordregistry"
+    - "https://fayettevilleflyer.com/2023/08/07/city-reminds-landlords-to-register-contacts-for-their-properties"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "Arkansas assesses real property at 20% of market value, reappraised county-wide every 4 years (Act 139 of 2023; Washington County's current cycle ends 2027 and Benton County's ends 2028 per the AACD 2025 Annual Report). Amendment 79 § 1(b) limits a NON-homestead parcel's taxable-value increase after reappraisal to 10%/yr, but the cap belongs to the seller: Ark. Code 26-26-1123(a)-(b) requires the assessor to assess a sold parcel at 20% of full appraised value at the next assessment date after transfer, and the new owner is not entitled to claim any limitation until the second assessment date after transfer (ACD Amendment 79 Assessor's Guide states the same rule). A 2-4 unit bought from a long-held owner therefore resets to full market value the following Jan 1, then faces the 2027 (Washington) / 2028 (Benton) reappraisal — the current owner's bill is never the post-purchase bill. Homestead credit ($500, $600 from 2026 bills) and 5% cap apply only to an owner-occupied unit. County assessor/collector pages returned HTTP 403 on 2026-11-23; URLs are the official washingtoncountyar.gov pages."
+  risk: "HIGH"
+  assessor_url: "https://washingtoncountyar.gov/government/elected-officials/assessor"
+  treasurer_url: "https://washingtoncountyar.gov/government/departments-a-e/collector"
+  source_url: "https://www.dfa.arkansas.gov/wp-content/uploads/AACD_AnnualReport_2025.pdf"
+
+listings: {}
