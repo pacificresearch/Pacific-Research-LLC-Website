@@ -1,0 +1,119 @@
+# research/markets/24780.yaml — Greenville, NC (Pitt County). Filled 2026-11-23 from primary sources where read; UNKNOWN left blank.
+cbsa: "24780"
+name: "Greenville, NC"
+retrieved_at: "2026-11-23"
+cities: ["Greenville"]           # RentCast city search terms
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "public/health-sector concentration: ECU Health + East Carolina University are the two anchor employers (state budget and hospital-system exposure)"
+  - "Boviet Solar (908 jobs) is exposed to solar-tariff and federal clean-energy policy swings; hiring ramp beyond the April 2025 opening not verified"
+  - "Pitt County reappraises every 4 years; next effective 2028-01-01 on a 2024 base built from 2022-23 sales — expect an assessed-value step-up"
+  - "City of Greenville down-payment program page could not be read (Cloudflare block); incentive terms unverified"
+major_employers:
+  - "ECU Health (hospital system HQ / ECU Health Medical Center 1,100+ beds; ~14,000 systemwide per Pitt County EDC page, not independently verified) — https://greenvillenc.gov/business/pitt-county-economic-development"
+  - "East Carolina University (university, ~5,800) — https://greenvillenc.gov/our-city/about-greenville"
+  - "Thermo Fisher Scientific Greenville pharma campus (biotech/pharma manufacturing, ~1,800 at 2021 expansion; 2020-21 expansions added ~790 jobs) — https://www.commerce.nc.gov/news/press-releases/thermo-fisher-expand-operations-pitt-county-154-million-investment-and-290-jobs"
+  - "Hyster-Yale Greenville (lift-truck manufacturing, ~1,500 per local press, unverified) — https://www.pittcountync.gov/1038/Target-Industries"
+  - "Pitt County Government (government, ~1,064 per 2021 directory) — https://www.pittcountync.gov/"
+state_income_tax: "flat 3.99% for tax years after 2025 (NCDOR Tax Rate Schedules: 'For Taxable Years after 2025, the North Carolina individual income tax rate is 3.99%'); NCDOR notes further trigger-based cuts may apply from TY2027 — https://www.ncdor.gov/taxes-forms/individual-income-tax/tax-rate-schedules"
+cost_of_living: ""               # no reliable index read this run
+
+catalysts:
+  - name: "Boviet Solar — first North American PV module/cell plant, Greenville"
+    company: "Boviet Solar"
+    sector: "manufacturing"
+    investment_usd: 294000000
+    jobs: 908
+    avg_wage: null                # release says only 'above Pitt County average of $50,937'
+    announced: "2024-04"
+    start: ""
+    completion: "2025-04"         # grand opening 2025-04-24 (Gov. Stein release); later phases/hiring ramp not stated
+    status: completed
+    source_url: "https://www.commerce.nc.gov/news/press-releases/2024/04/26/global-solar-technology-leader-selects-pitt-county-first-north-american-production-facility"
+    verified: true                # also read https://governor.nc.gov/news/press-releases/2025/04/24/governor-stein-celebrates-boviet-solar-factory-grand-opening-pitt-county
+  - name: "Nipro Medical — first North American manufacturing center of excellence + US HQ (550,000 sf)"
+    company: "Nipro Medical Corporation"
+    sector: "biotech"
+    investment_usd: 397800000
+    jobs: 232
+    avg_wage: 56147
+    announced: "2024-07"
+    start: ""
+    completion: ""                # not stated in release; JDIG runs 12 years
+    status: announced
+    source_url: "https://www.commerce.nc.gov/news/press-releases/2024/07/17/governor-cooper-announces-japanese-healthcare-company-build-first-north-american-manufacturing"
+    verified: true
+  - name: "Attindas Hygiene Partners — Greenville plant expansion"
+    company: "Attindas Hygiene Partners"
+    sector: "manufacturing"
+    investment_usd: 25200000
+    jobs: 25
+    avg_wage: null
+    announced: "2024-07"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://governor.nc.gov/news/press-releases/2024/07/31/global-absorbent-hygiene-product-manufacturer-expand-25-million-investment-greenville"
+    verified: false               # figures from the release title/summary only; page not opened this run
+  - name: "UNX-Christeyns — new Pitt County chemical manufacturing facility (relocation within Greenville)"
+    company: "UNX-Christeyns"
+    sector: "manufacturing"
+    investment_usd: 10000000
+    jobs: 21
+    avg_wage: null
+    announced: "2024-07"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://governor.nc.gov/news/press-releases/2024/07/30/chemical-manufacturer-expand-operations-10-million-relocation-greenville"
+    verified: false               # figures from the release title/summary only; page not opened this run
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: "City of Greenville HOME Down Payment Assistance (0% forgivable second mortgage)"
+    dollar_value: 40000           # 'up to 20% of sales price, capped at $40,000' per city program document; cap NOT re-read this run
+    cash_or_noncash: cash
+    eligibility: "first-time buyer (no ownership in past 3 years); household income at or below 80% AMI for Greenville; homebuyer education + lender pre-qualification; $1,000 minimum buyer contribution"
+    minimum_income: ""
+    employment_requirement: ""
+    home_purchase_requirement: "home inside Greenville city limits; program documents cite a $150,000 maximum sales price (existing or new) — confirm current cap"
+    residency_requirement: "owner-occupancy (repayment triggered if sold, leased or rented)"
+    minimum_stay: "forgivable second mortgage; related city programs use a 10-year 0% second — exact HOME term not confirmed"
+    application_deadline: ""
+    funding_availability: ""      # UNKNOWN — HUD HOME allocation dependent
+    source_url: "https://greenvillenc.gov/government/neighborhood-and-business-services/community-development-division/housing/down-payment-assistance-programs"
+    verified: false               # page returned 403 (Cloudflare) to this session; terms come from search excerpts of city PDFs (doc ids 28639/29805) — re-verify before use
+
+landlord_law:
+  verified: false                 # every item below traces to a primary statute/agency page read this run EXCEPT the 10-day appeal period (UNC School of Government summaries, G.S. 7A-228 not opened) and the 'no local program found' negatives
+  rent_control: "no — state preemption, G.S. 42-14.1(a): no county or city may enact, maintain, or enforce any ordinance regulating the amount of rent for privately owned residential or commercial rental property"
+  just_cause_eviction: "no — no just-cause statute in NC Ch. 42 and no Greenville ordinance found; landlord uses summary ejectment (G.S. 42-26 et seq.) for breach, holdover or lease expiry"
+  eviction_timeline_days: 30      # statutory floor ≈ summons appearance ≤7 business days from issuance (G.S. 42-28) + 10-day appeal window (G.S. 7A-228, per UNC SOG) + sheriff executes writ ≤5 days of receipt (G.S. 42-36.2) + notice/filing time; uncontested cases typically ~3-5 weeks
+  rental_licensing: "no — Greenville has no rental registration/permit program found; G.S. 160D-1207(c) bars local permits-to-lease and general rental registration; registration + fee allowed ONLY for individual properties with >4 verified violations/12 mo, 2+ in 30 days, or top-10% crime/disorder"
+  rental_license_fee_annual: null  # none; statutory cap $500/12-month period applies only to violation-flagged properties (G.S. 160D-1207)
+  inspection_frequency: "none periodic — G.S. 160D-1207(a) limits inspections to reasonable cause (complaint, visible violation, >2 verified violations/12 mo) or designated blighted areas; Greenville Code Enforcement enforces the Minimum Housing Code (City Code Title 9 Art. F, §9-1-90 ff.) on complaint"
+  lead_rules: "federal only — pre-1978 units: EPA/HUD Lead Disclosure Rule (Title X §1018): EPA pamphlet, disclosure of known LBP/hazards and records, Lead Warning Statement in lease, keep 3 years; no Greenville-specific lead rental ordinance found"
+  certificate_of_occupancy_rules: "none on sale or re-rent — no point-of-sale/rental CO inspection in Greenville found; G.S. 160D-1207(c) bars conditioning a CO on enrollment in any rental program or inspection before utility service"
+  security_deposit_limits: "G.S. 42-51(b): max 1.5 months' rent for month-to-month tenancies, 2 months' rent for terms longer than month-to-month; must be held in NC trust account or bonded"
+  local_landlord_taxes_fees: "none rental-specific — G.S. 160D-1207(c) bars fees/taxes levied only on rental property; ordinary Pitt County + City of Greenville ad valorem property tax applies (rates not pulled this run)"
+  utility_obligations: "G.S. 42-42: landlord must maintain electrical, plumbing, sanitary, heating, ventilating and A/C systems; heat capable of 65°F Nov 1-Mar 31; smoke alarms (10-yr lithium on replacement) and CO alarm per level where fossil-fuel appliance or attached garage; landlord may bill tenants for water/sewer under G.S. 42-42.1; no local master-metering rule found"
+  sources:
+    - "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_42/GS_42-14.1.html"
+    - "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_42/GS_42-51.html"
+    - "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_42/GS_42-28.html"
+    - "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_42/GS_42-36.2.html"
+    - "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_42/GS_42-42.html"
+    - "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_160D/GS_160D-1207.html"
+    - "https://www.epa.gov/lead/real-estate-disclosures-about-potential-lead-hazards"
+    - "https://greenvillenc.gov/government/neighborhood-and-business-services/code-enforcement-division"
+    - "https://www.sog.unc.edu/sites/default/files/course_materials/Proc%20for%20LLs.pdf"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "No reassessment on sale. NC counties hold the value set at the last general reappraisal until the next one; G.S. 105-287(b) forbids interim changes for 'inflation, deflation, or other economic changes affecting the county in general' (only physical changes, use changes or errors). Pitt County reappraises every 4 years (statutory max 8, G.S. 105-286); current values effective 2024-01-01 from 2022-23 sales; next reappraisal effective 2028-01-01. A buyer inherits the 2024 value through the FY2027-28 bill, then resets in 2028."
+  risk: "MEDIUM"                  # 2028 reset is 13 months out and will capture 2022→2027 appreciation; rate is re-set by commissioners each June and may or may not be revenue-neutral
+  assessor_url: "https://www.pittcountync.gov/1160/Real-Property-Valuations-Land-Records"
+  treasurer_url: "https://www.pittcountync.gov/465/Tax-Administration"
+  source_url: "https://www.pittcountync.gov/1160/Real-Property-Valuations-Land-Records"
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}
