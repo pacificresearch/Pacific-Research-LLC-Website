@@ -1,0 +1,150 @@
+# research/markets/12620.yaml — Bangor, ME (Penobscot County). Filled 2026-11-23 from web reading only; UNKNOWN beats a guess.
+cbsa: "12620"
+name: "Bangor, ME"
+retrieved_at: "2026-11-23"
+cities: ["Bangor", "Brewer"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "Healthcare concentration: Northern Light EMMC + St. Joseph + Acadia are 3 of the top 4 private employers (FY2024 ACFR); Northern Light Health system has had publicized financial stress statewide"
+  - "Citywide full revaluation (KRT Appraisal) effective April 1, 2026 — first since the late 1980s; 1-4 unit median assessment ratio was 83% before the April 2025 statistical adjustment, so post-reval bills for small multifamily can move materially"
+  - "Bangor Tenants' Housing Rights Ordinance (Ch. 282, eff. 2023-03-09): 60-day notice of ANY rent increase, application fees banned — slows rent repositioning after purchase"
+  - "Maine winter utility disconnection prohibition Nov 15 - Apr 15 (35-A MRS §718) and 68F heating standard (14 MRS §6021) — landlord-paid heat in older 2-4 units is a real winter cash-flow exposure"
+  - "Maine graduated income tax 5.8-7.15% on net rental income (plus a reported 2026 high-income surcharge that could not be read on the MRS page)"
+  - "Several catalysts are University of Maine (Orono) or construction-phase projects with no disclosed permanent-job counts"
+major_employers:
+  - "Northern Light Eastern Maine Medical Center (hospital, 2,501-3,000) — https://www.bangormaine.gov/Archive.aspx?ADID=177"
+  - "St. Joseph Hospital (hospital, 1,001-1,500) — https://www.bangormaine.gov/Archive.aspx?ADID=177"
+  - "Northern Light Acadia Hospital (hospital, 501-1,000) — https://www.bangormaine.gov/Archive.aspx?ADID=177"
+  - "Husson University (university, 501-1,000) — https://www.bangormaine.gov/Archive.aspx?ADID=177"
+  - "Bangor Savings Bank (finance, 1-500 in city; HQ) — https://www.bangormaine.gov/Archive.aspx?ADID=177"
+  - "University of Maine, Orono (university, jobs n/a in FY2024 ACFR table; was 1,000-4,000 in the 2014 column) — https://www.bangormaine.gov/Archive.aspx?ADID=177"
+state_income_tax: "graduated 5.8% / 6.75% / 7.15% (3 brackets, Maine Revenue Services 2026 rate schedule — https://www.maine.gov/revenue/sites/maine.gov.revenue/files/inline-files/ind_tax_rate_sched_2026.pdf; PDF returned 403 so bracket thresholds not read; a revised 2026 schedule adding a 2% surcharge above ~$1M is reported by Tax Foundation/Thomson Reuters but was not read)"
+cost_of_living: ""
+
+catalysts:
+  - name: "University of Maine Morse Arena — 2,660-seat basketball arena, Harold Alfond Foundation-funded (UMS TRANSFORMS athletics), construction starting after fall 2025 semester, opening targeted 2027-28 season"
+    company: "University of Maine System / Harold Alfond Foundation"
+    sector: "university"
+    investment_usd: 170000000
+    jobs: 0
+    avg_wage: null
+    announced: "2025-10"      # ENR article date (2025-10-29); the underlying Alfond athletics gift predates it
+    start: "2025-12"
+    completion: "2027-10"
+    status: under_construction
+    source_url: "https://www.enr.com/articles/61782-construction-nearing-for-university-of-maines-new-morse-arena"
+    verified: false   # ENR (trade press) read; UMaine capital-projects page for the arena not read; a Dec 2025 BDN piece says construction begins spring 2026 instead
+  - name: "Bangor Region YMCA new downtown campus — $57.8M facility on a 7.5-acre vacant downtown site; FAME approved Maine New Markets Capital Investment tax-credit financing 2026-04-30 ($10.4M CDE investment, up to $4.06M credits); 242 permanent jobs projected"
+    company: "Bangor Region YMCA (New Bangor Region YMCA Support Corporation)"
+    sector: "other"
+    investment_usd: 57800000
+    jobs: 242
+    avg_wage: null
+    announced: "2026-04"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.bangordailynews.com/2026/05/10/bdn-maine/fame-approves-financing-for-bangor-ymca/"
+    verified: false   # BDN read (local press); FAME release not read; NBRC Fall 2025 Catalyst award of $1M to the project appears in a Sen. Collins grant list; construction start/completion not stated
+  - name: "University of Maine Green Engineering and Materials (GEM) laboratory / 'Factory of the Future' — 50,000 sf advanced-manufacturing and large-scale 3D-printing lab, Orono; groundbreaking 2024-10-29, opening expected mid-2026"
+    company: "University of Maine (Advanced Structures and Composites Center)"
+    sector: "university"
+    investment_usd: 90000000   # federal funds 'totaling more than $90 million' pay for the project 'in part' (Maine Public); total project cost not stated
+    jobs: 0
+    avg_wage: null
+    announced: "2024-10"
+    start: "2024-10"
+    completion: "2026-06"
+    status: under_construction
+    source_url: "https://www.mainepublic.org/business-and-economy/2024-10-29/umaine-breaks-ground-on-factory-of-the-future-to-scale-up-3d-printed-manufacturing"
+    verified: false   # Maine Public read; UMaine capital-projects page for GEM not read; mid-2026 opening not confirmed as of 2026-11
+  - name: "Amazon-linked last-mile delivery station, 1674 Hammond St, Hermon (former Bangor Drive-In) — 60,000 sf warehouse, ~20 acres, 365 parking spaces; $17.5M per Maine DEP filing by SPA Properties on behalf of Amazon; construction reported started April 2026"
+    company: "SPA Properties (for Amazon)"
+    sector: "logistics"
+    investment_usd: 17500000
+    jobs: 0
+    avg_wage: null
+    announced: "2026-03"
+    start: "2026-04"
+    completion: ""
+    status: under_construction
+    source_url: "https://www.bangordailynews.com/2026/03/20/bangor/bangor-business/amazon-warehouse-hermon-drive-in/"
+    verified: false   # BDN read; DEP filing not read; Amazon has not publicly confirmed; job count not disclosed (comparable Caribou station ~10 employees + ~200 contract drivers)
+  - name: "C&L Aerospace paint facility at Bangor International Airport — $3M conversion of a 17,000 sf hangar to an aircraft paint shop, plus a separate five-month $6M refurbishment of two hangars joined to a new structure (120,000 sf total MRO campus)"
+    company: "C&L Aerospace (C&L Aviation Group)"
+    sector: "aerospace"
+    investment_usd: 9000000
+    jobs: 0
+    avg_wage: null
+    announced: "2026-03"
+    start: ""
+    completion: "2026-03"
+    status: completed
+    source_url: "https://backend.ainonline.com/sites/default/files/article_export/rtf/C&L_Aerospace_Adds_Paint_Facility-03-07-2026.rtf"
+    verified: false   # AIN (trade press) read; company release not read; no job figure given
+
+incentives:
+  - program: "City of Bangor Down Payment Assistance + Closing Cost Assistance (HUD CDBG, Community & Economic Development Dept.)"
+    dollar_value: 20000
+    cash_or_noncash: cash
+    eligibility: "income-eligible (HUD low/moderate-income) homebuyer purchasing within Bangor city limits; higher income limits inside the Neighborhood Revitalization Strategy Area; first come, first served"
+    minimum_income: ""
+    employment_requirement: ""
+    home_purchase_requirement: "yes — purchase within Bangor city limits; 50% of down payment up to $10,000 + closing costs up to $10,000 (NewsCenter Maine); 2-4 unit eligibility not stated"
+    residency_requirement: ""
+    minimum_stay: ""
+    application_deadline: "rolling (first come, first served, subject to annual CDBG allocation — $72,776 line in the 2025-2026 Action Plan per city housing page snippet)"
+    funding_availability: "annual CDBG allocation; city homebuyer page (bangormaine.gov/homebuyer) returned 404 on fetch — confirm current cap and funding"
+    source_url: "https://www.bangormaine.gov/homebuyer"
+    verified: false   # city page not readable (404); $20K cap from NewsCenter Maine (undated local TV), 2023 application PDF also 404
+  - program: "MaineHousing First Home Loan — Advantage down payment / closing cost assistance (statewide, applies in Bangor)"
+    dollar_value: 5000
+    cash_or_noncash: cash
+    eligibility: "first-time homebuyer (no ownership interest in 3 years) or veteran/military exception; MaineHousing income and purchase-price limits; minimum 1% borrower contribution"
+    minimum_income: ""
+    employment_requirement: ""
+    home_purchase_requirement: "yes — must use a MaineHousing First Home Loan (FHA/VA/RD/conventional); FHA/VA 1-4 unit single family listed, Advantage unit-count eligibility not stated"
+    residency_requirement: ""
+    minimum_stay: ""
+    application_deadline: "rolling"
+    funding_availability: "ongoing"
+    source_url: "https://www.mainehousing.org/programs-services/homebuyer/first-home-program-faqs"
+    verified: true    # MaineHousing FAQ read ($5,000 Advantage; hoMEworks class required). A May 2026 BDN guide cites $10,000 — not confirmed on the MaineHousing page
+
+landlord_law:
+  verified: false
+  rent_control: "no state rent control and no state preemption — the municipal rent control chapters (30 MRS ch. 244; 30-A MRS ch. 167) are repealed and 30-A MRS §3007 contains no rent/registration preemption (LD 522 of 2019 proposing one did not appear in the current text); Portland has local rent control (Ch. 6 Art. XI, under litigation CUMcv-21-40); Bangor has NO rent control — its Ch. 282 Tenants' Housing Rights Ordinance regulates notice and fees only"
+  just_cause_eviction: "no — 14 MRS §6002: tenancy at will ends on 30 days' written notice without cause; 7-day notice for cause (rent 7+ days in arrears, damage, nuisance, unauthorized occupant); tenant may cure nonpayment before expiry and reinstate after by paying arrears + landlord filing/service fees; Bangor Ch. 282 adds 60 days' written notice of ANY rent increase (state default 14 MRS §6015: 45 days, 75 days if increase >= 10% per Maine AG 2026-01-29 advisory — statute page not read)"
+  eviction_timeline_days: null   # notice is 7 or 30 days; forcible entry & detainer (14 MRS §6001 et seq.) court timeline not read on a primary page
+  rental_licensing: "no general long-term rental registration or license in Bangor as of 2026-11 — only a VOLUNTARY 'Quality Housing Provider' rental registry pilot (guidelines PDF not readable) and mandatory short-term rental registration (Ch. 254, adopted 2023-10-23, $100 renewal); vacant-building registration under Ch. 223 §223-8"
+  rental_license_fee_annual: null
+  inspection_frequency: "none on a cycle for long-term rentals — Code Enforcement complaint-based under Ch. 223 Property Maintenance (IPMC); STR units inspected at registration"
+  lead_rules: "federal pre-1978 disclosure (42 U.S.C. 4852d; 24 CFR 35 / 40 CFR 745) plus Maine Lead Poisoning Control Act, 22 MRS ch. 252: §1320 department inspection of dwelling units, §1321 notice and removal (abatement) orders, §1327 essential maintenance practices, §1331 lead-safe leased dwelling registry — section texts not read, chapter table of contents only; no Bangor-specific lead ordinance located"
+  certificate_of_occupancy_rules: "none found — no Bangor point-of-sale or change-of-tenant occupancy inspection located (a 'Bangor occupancy inspection' PDF in search results is Bangor, MICHIGAN — not applicable)"
+  security_deposit_limits: "max 2 months' rent (14 MRS §6032); return or itemized statement within 21 days (tenancy at will) or lease term not exceeding 30 days (§6033); landlord who misses the deadline forfeits the right to withhold any portion"
+  local_landlord_taxes_fees: "none found — no Bangor rental registration fee or rental tax; property tax mill rate $17.13/$1,000 FY2027 plus $0.72 Downtown District (bangormaine.gov/160/Assessing); Bangor Ch. 282 bans rental application fees and caps screening fees at actual cost or $75, chargeable to successful applicants only"
+  utility_obligations: "landlord may not make a tenant-at-will in a multi-unit building pay for common-area or other-unit utilities/heat absent a signed agreement with a rent reduction (14 MRS §6024; damages >= $250 + fees); implied warranty of habitability requires heating capable of 68F at -20F outdoors where landlord provides heat, min 62F by signed agreement with rent reduction (14 MRS §6021); electric/gas utilities may not disconnect residential customers Nov 15 - Apr 15 without PUC CASD approval (35-A MRS §718; PUC Ch. 815)"
+  sources:
+    - "https://legislature.maine.gov/statutes/30-A/title30-Asec3007.html"
+    - "https://legislature.maine.gov/statutes/14/title14sec6002.html"
+    - "https://legislature.maine.gov/statutes/14/title14sec6032.html"
+    - "https://legislature.maine.gov/statutes/14/title14sec6033.html"
+    - "https://legislature.maine.gov/statutes/14/title14sec6021.html"
+    - "https://legislature.maine.gov/statutes/14/title14sec6024.html"
+    - "https://legislature.maine.gov/statutes/35-A/title35-Asec718.html"
+    - "https://legislature.maine.gov/statutes/22/title22ch252sec0.html"
+    - "https://bangormaine.gov/697/Tenants-Rights"
+    - "https://ecode360.com/41902285"
+    - "https://www.bangormaine.gov/360/Short-Term-Rentals"
+    - "https://www.maine.gov/ag/consumer-protection/consumer-issues-scam/rent-increase-notices-advisory-thu-01292026-0751"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "Maine property tax is assessed and collected by the MUNICIPALITY (City of Bangor), not Penobscot County. No reassessment-on-sale: the City Assessor runs an annual in-house STATISTICAL revaluation using a one-year sales-ratio study (assessed value / sale price) grouped by property class (incl. '1 to 4 Unit Residence' as its own class) and then by neighborhood, adjusting whole classes/neighborhoods so the median ratio lands ~91-100% (Jan 2025 memo: 1-4 unit median ratio was 83% before adjustment; taxable value raised 6.85% for April 1, 2025). A buyer's own sale enters the ratio sample but is not individually 'chased'. The first FULL citywide revaluation since the late 1980s (KRT Appraisal, interior/exterior inspection of every property) is effective April 1, 2026 and appears in the July 2026 (FY2027) commitment at 100% market value — a recently purchased 2-4 unit should expect assessed value near its purchase price from FY2027 onward. FY2027 mill rate $17.13/$1,000 (+$0.72 Downtown District); taxes due Sept 15 and Mar 15; 7% interest on late payments. Homestead exemption ($25,000) is owner-occupant only."
+  risk: "MEDIUM"
+  assessor_url: "https://bangormaine.gov/160/Assessing"
+  treasurer_url: "https://bangormaine.gov/160/Assessing"    # City of Bangor Tax Collector/Treasury collects; dedicated treasury page URL not located (bangormaine.gov/treasury 404) — Assessing page carries due dates and rate; Penobscot County has no property tax assessor/collector role
+  source_url: "https://bangormaine.gov/DocumentCenter/View/3165/Assessor---Finance-Committee-Update---February-2025-PDF"
+
+listings: {}
