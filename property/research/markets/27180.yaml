@@ -1,0 +1,142 @@
+# research/markets/27180.yaml — Jackson, TN (Madison County). Filled 2026-11-23 from primary sources where marked verified.
+cbsa: "27180"
+name: "Jackson, TN"
+retrieved_at: "2026-11-23"
+cities: ["Jackson"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "BlueOval City (Stanton, Haywood County — adjacent, not in the CBSA) has been reset twice: Ford dropped the electric truck on 2025-12-15 and now plans gas-powered trucks starting 2029 (Ford release); the Stanton battery plant passed to SK On Tennessee (JV dissolved 2026) with production now targeted for 2028 and a ~100-person core team per local press. Spillover housing demand is later and smaller than the 2021 projections (5,800 jobs, 2025 start)"
+  - "Madison County reappraises on a 5-year cycle; next reappraisal 2027 (last 2022). Comptroller 2026 appraisal ratio is 0.7574, i.e. appraised values sit ~24% below market, so 2027 values reset upward (county-wide rate is recertified revenue-neutral, but individual bills shift)"
+  - "Pace Industries die-casting plant closed in 2026 (site backfilled by ArtiCast, 100 jobs, Sept 2026)"
+  - "Population flat: 98,834 (2020) to 99,295 (2024), +0.47%; TNECD forecast 94,522 (decline)"
+  - "Local economy is heavily manufacturing + one hospital system; 2024 county unemployment 3.90% vs TN 3.40% (TNECD)"
+major_employers:
+  - "Jackson-Madison County General Hospital District / West Tennessee Healthcare (hospital, ~6,000) — https://tnecd.com/counties/madison/"
+  - "Jackson-Madison County School System (education, ~2,000) — https://tnecd.com/counties/madison/"
+  - "Pringles Manufacturing Company (food manufacturing, ~1,180) — https://tnecd.com/counties/madison/"
+  - "Delta Faucet (manufacturing, ~1,094) — https://tnecd.com/counties/madison/"
+  - "Stanley Black and Decker (manufacturing, ~650) — https://tnecd.com/counties/madison/"
+  - "Toyota Boshoku Tennessee (automotive manufacturing, ~524) — https://tnecd.com/counties/madison/"
+state_income_tax: "none — Tennessee levies no tax on wages or salaries; the Hall tax on interest/dividends was repealed for tax periods beginning 2021-01-01 (TN Dept. of Revenue) — https://www.tn.gov/revenue/taxes/hall-income-tax.html"
+cost_of_living: ""
+
+catalysts:
+  - name: "Prysmian Jackson cable/fiber plant expansion (doubles facility; 2nd Jackson expansion since 2018 General Cable acquisition)"
+    company: "Prysmian (Prysmian Cables and Systems USA, LLC)"
+    sector: "manufacturing"
+    investment_usd: 100000000
+    jobs: 100
+    avg_wage: null
+    announced: "2026-08"
+    start: "2026-10"
+    completion: "2028"
+    status: announced
+    source_url: "https://tnecd.com/?p=129740"
+    verified: true
+  - name: "ArtiCast Jackson high-pressure die casting (former Pace Industries plant; aerospace/defense/drone/automotive components)"
+    company: "ArtiCast Jackson (ArtiFlex Manufacturing, Michigan)"
+    sector: "manufacturing"
+    investment_usd: 10300000
+    jobs: 100
+    avg_wage: null
+    announced: "2026-09"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://tnecd.com/news/articast-jackson-to-establish-tennessee-manufacturing-presence-with-expansion-to-madison-county/"
+    verified: true
+  - name: "Toyota Motor Manufacturing Tennessee (Jackson) — three new hybrid transaxle case/housing and engine block casting lines (part of $912M five-plant hybrid investment)"
+    company: "Toyota Motor North America"
+    sector: "manufacturing"
+    investment_usd: 71400000
+    jobs: 33
+    avg_wage: null
+    announced: "2025-11"
+    start: ""
+    completion: "2028"
+    status: announced
+    source_url: "https://pressroom.toyota.com/?p=111192"
+    verified: true
+  - name: "ALUKO Group first U.S. plant — aluminum battery casings for BlueOval City"
+    company: "ALUKO Group (South Korea)"
+    sector: "manufacturing"
+    investment_usd: 36300000
+    jobs: 55
+    avg_wage: null
+    announced: "2024-12"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.tn.gov/ecd/news/2024/12/17/aluko-group-to-locate-first-u-s--manufacturing-facility-in-madison-county.html"
+    verified: true
+  - name: "MAT Industries air compressor / air brake tank plant expansion (multiple new production lines; Jackson headcount to ~260)"
+    company: "MAT Industries, LLC (MAT Holdings)"
+    sector: "manufacturing"
+    investment_usd: 9000000
+    jobs: 30
+    avg_wage: null
+    announced: "2025-06"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.tn.gov/ecd/news/2025/6/3/governor-lee--commissioner-mcwhorter-announce-mat-industries--llc-to-expand-in-madison-county.html"
+    verified: true
+  - name: "Ford Tennessee Truck Plant (formerly BlueOval City / Tennessee Electric Vehicle Center), Stanton, Haywood County — ADJACENT county, ~35 mi west; $5.6B / 5,800 jobs are the 2021 Ford+SK commitment (TN Governor release). Electric truck CANCELLED 2025-12-15; gas-powered trucks from 2029 (Ford release); battery plant now SK On Tennessee, production 2028 (local press). Plant structure is built; retooling for new product"
+    company: "Ford Motor Company (assembly) / SK On Tennessee (battery)"
+    sector: "manufacturing"
+    investment_usd: 5600000000
+    jobs: 5800
+    avg_wage: null
+    announced: "2021-09"
+    start: "2022-09"
+    completion: "2029"
+    status: under_construction
+    source_url: "https://www.fromtheroad.ford.com/us/en/articles/2025/ford-reinvests-trucks-hybrids-affordable-electric-vehicles"
+    verified: true
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: "THDA Great Choice Plus down payment assistance (STATEWIDE, Tennessee Housing Development Agency) — second mortgage paired with a THDA Great Choice 30-yr fixed first mortgage (FHA/USDA/VA/conventional). DOLLAR AMOUNT NOT VERIFIED: THDA's homebuyer page read 2026-11-23 states no amount; the 2026 lender notice (Plus-No Payment tier, pilot) returned HTTP 403. 2-4 unit eligibility NOT verified from a THDA page (THDA program matrix lists a 105% CLTV line for 2-4 units, not read directly). No Jackson/Madison County-specific homebuyer or relocation program found"
+    dollar_value: 0
+    cash_or_noncash: cash
+    eligibility: "Primarily first-time homebuyers (no ownership in 3 years); repeat buyers eligible in 43 targeted counties / designated areas or if qualified military/veteran (Homeownership for Heroes); all borrowers 640+ credit; county income and purchase-price limits apply (chart not read)"
+    minimum_income: "none stated; maximum household income by county applies"
+    employment_requirement: "none"
+    home_purchase_requirement: "must use a THDA Great Choice first mortgage through a THDA-approved lender; property type rules per THDA Originating Agents Guide (not read)"
+    residency_requirement: "primary residence (THDA program; occupancy terms not read)"
+    minimum_stay: "UNKNOWN"
+    application_deadline: "none; continuous through approved lenders"
+    funding_availability: "program open as of 2026-11 per THDA site"
+    source_url: "https://thda.org/homebuyers/first-time"
+    verified: false
+
+landlord_law:
+  verified: false                # statute text read from a code-publisher compilation (CAATN URLTA 2025 PDF; FindLaw for 66-35-102), not capitol.tn.gov; local items from city pages. Jackson code (Municode) could not be opened.
+  rent_control: "no — state preemption, Tenn. Code Ann. 66-35-102(a): a local governmental unit shall not enact, maintain or enforce an ordinance or resolution controlling the amount of rent for private residential or commercial property; subsection (b) (added 2024, Pub. Ch. 1051, eff. 2024-07-01) also bars mandatory below-market / inclusionary requirements; voluntary incentive programs allowed"
+  just_cause_eviction: "no — Tennessee URLTA (66-28, applies in Madison County: counties >75,000 pop. per 2010 census, 66-28-102) has no just-cause requirement. Month-to-month terminable by either party on 30 days' written notice (66-28-512(b)); week-to-week 10 days. Nonpayment/curable breach: 14-day notice to cure or terminate (66-28-505(a)(2)), 7 days on repeat within 6 months; non-curable breach 14 days (505(a)(3)); 3-day termination for violence, drug activity or hazardous conditions (66-28-517). 2025 bills HB1345/SB1088 to cut 14 days to 7 FAILED (HB1345 failed in subcommittee 2025-03-12; SB1088 sent to general subcommittee 2025-03-18). Court (detainer warrant, General Sessions) timeline after notice: UNKNOWN"
+  eviction_timeline_days: null
+  rental_licensing: "no — no City of Jackson rental registration, license or rental-inspection program found (city codes page lists 2018 IPMC enforcement from 2022-01-01 by Building & Codes; no rental program). State landlord-registration statute 66-28-107 ($10/yr fee, $50/week fine) applies ONLY to metropolitan governments >500,000 (66-28-107(c)) — i.e. Nashville, not Jackson. Jackson Code of Ordinances (Municode) could not be opened to confirm — treat as UNKNOWN pending a code check"
+  rental_license_fee_annual: null
+  inspection_frequency: "no routine rental inspection cycle found; City of Jackson Building & Codes enforces the 2018 International Property Maintenance Code (adopted, enforced since 2022-01-01) on complaint/nuisance basis"
+  lead_rules: "federal only (pre-1978 housing: EPA/HUD Section 1018 — EPA pamphlet, disclosure of known lead-based paint/hazards and records, Lead Warning Statement in lease, records kept 3 years); no City of Jackson or Madison County lead ordinance found"
+  certificate_of_occupancy_rules: "no point-of-sale certificate of occupancy or rental inspection on sale found for Jackson, TN (city codes page silent; municipal code not opened) — UNKNOWN"
+  security_deposit_limits: "no statutory cap. Deposits must be held in a dedicated account at a TN/federally regulated institution and the tenant told the account location at signing (66-28-301(a),(h)); tenant has right to a move-out inspection and itemized damage list; landlord forfeits right to retain any deposit if not held in the required account or no damage list (301(c)); refund notice to last known address, unclaimed after 60 days reverts to landlord (301(f)); later-discovered damage recoverable only if found within 30 days of vacancy or 7 days after a new tenant (301(g))"
+  local_landlord_taxes_fees: "none Jackson-specific found. Statewide: 66-28-302 (as amended by the 2024 'Landlord Transparency Act', SB1694/HB1814, eff. 2025-01-01 — chaptered text not read, legiscan blocked) requires written disclosure at/before tenancy of the managing agent, an owner/agent for service of process, and a maintenance phone/email or online portal; binds successor owners. Property tax: Madison County + City of Jackson rates not read (UNKNOWN)"
+  utility_obligations: "URLTA 66-28-304(a): landlord must comply with building/housing codes affecting health and safety, keep premises fit and habitable, keep common areas clean and safe, and in complexes of 4+ units provide waste receptacles; no statutory requirement that landlord pay utilities — allocation is by lease. Jackson Energy Authority (JEA) is the municipal electric/gas/water/wastewater provider (tariffs not read)"
+  sources:
+    - "https://codes.findlaw.com/tn/title-66-property/tn-code-sect-66-35-102/"
+    - "https://assets-002.noviams.com/novi-file-uploads/caatn/URLTA_2025.pdf"
+    - "https://wapp.capitol.tn.gov/apps/BillInfo/Default.aspx?BillNumber=SB1088&GA=114"
+    - "https://cityofjacksontn.hosted.civiclive.com/government/codes_ordinances"
+    - "https://www.epa.gov/lead/real-estate-disclosures-about-potential-lead-hazards"
+    - "https://library.municode.com/tn/jackson/codes/code_of_ordinances"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "No sale-triggered reassessment in Tennessee. Madison County appraises on a 5-year reappraisal cycle: last reappraisal 2022, next 2027 (Comptroller Division of Property Assessments schedule; Assessor's page: 'Madison County's next Reappraisal is scheduled for 2027'). Between reappraisals ~1/3 of parcels are field-inspected each year and value changes only for physical changes (Value Change Notice). Residential/rental real property is assessed at 25% of appraised value (TN constitution/67-5-801). 2026 county appraisal ratio is 0.7574 (values ~24% below market; Assessor cites median sale $251,450 Jan 2026 vs $212,500 at the 2022 reappraisal, +18.3%), so a buyer's 2027 bill will be set on a fresh market value while the county-wide rate is recertified to be revenue-neutral (67-5-1701). Seller's current bill is NOT a reliable proxy for the 2027+ bill"
+  risk: "MEDIUM"
+  assessor_url: "https://www.madisoncountytn.gov/90/Assessor-of-Property"
+  treasurer_url: "https://www.madisoncountytn.gov/120/Trustee"
+  source_url: "https://comptroller.tn.gov/office-functions/pa/tax-resources/assessment-information-for-each-county/reappraisal-schedule.html"
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}
