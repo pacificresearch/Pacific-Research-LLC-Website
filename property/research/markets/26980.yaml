@@ -1,0 +1,121 @@
+# research/markets/26980.yaml — Iowa City, IA (Johnson County). Filled 2026-11-23 from web reading only; UNKNOWN beats a guess.
+cbsa: "26980"
+name: "Iowa City, IA"
+retrieved_at: "2026-11-23"
+cities: ["Iowa City", "Coralville"]
+single_employer_dependence: true
+energy_boom_watch: false
+risks:
+  - "single-employer (University of Iowa + UI Health Care) concentration: university + hospital establishments = ~41,000 of ~87,000 county jobs (47%, Greater Iowa City Inc.); UIHC alone >15,000; federal research-funding cuts already delayed the ~$1.5-2B UIHC inpatient tower (Gazette/CBJ 2025)"
+  - "Ed-tech contraction: ACT (1,350 jobs in 2017) laid off 106 in 2023 (40 in Iowa City), went for-profit under Nexus Capital 2024 and sold its ~385-acre campus; Pearson Educational Measurement (1,200 in 2017) is in the same sector"
+  - "Iowa City rental permit regime: every rental needs a City rental permit with periodic Housing Inspection Services inspections (city page unreadable from this session — fee schedule and current cycle UNKNOWN; Gazette reported council moved inspections from every 2 years to annual)"
+  - "Iowa odd-year reassessment (2025, 2027) with no individual-parcel cap: a purchase price feeds the next odd-year sales study; the statewide residential rollback (44.5345% for AY2025) only caps aggregate statewide growth"
+  - "Student-driven rental demand near campus: lease cycles and occupancy are tied to UI enrollment (~30,000)"
+  - "Iowa City Assessor website (iowacity.iowaassessors.com) returned 403 — assessor-specific statements not read"
+major_employers:
+  - "University of Iowa (university, 18,650 in Apr 2017 ICAD table) — https://johnsoncountyiowa.gov/sites/default/files/2019-09/2018_Comprehensive_Plan_Volume_1_chapter_3.pdf"
+  - "University of Iowa Health Care / UIHC (hospital, >15,000 per Greater Iowa City Inc. 2026-07; 8,704 in 2017 ICAD table) — https://greateriowacity.com/?p=32360"
+  - "Iowa City Community School District (education, 2,346 in 2017) — https://johnsoncountyiowa.gov/sites/default/files/2019-09/2018_Comprehensive_Plan_Volume_1_chapter_3.pdf"
+  - "Iowa City VA Health Care System (federal/hospital, 1,562 in 2017) — https://johnsoncountyiowa.gov/sites/default/files/2019-09/2018_Comprehensive_Plan_Volume_1_chapter_3.pdf"
+  - "ACT, Inc. (educational testing, 1,350 in 2017; reduced since — 2023 layoffs, 2024 campus sale) — https://corridorbusiness.com/act-to-lay-off-106-employees-continuing-edtech-spiral-in-iowa-city/"
+  - "Procter & Gamble Iowa City plant (manufacturing, jobs n/a; +100 announced 2025) — https://opportunityiowa.gov/press-release/2025-09-19/ieda-board-approves-assistance-six-established-companies-three-startups-and-six-community-quality"
+state_income_tax: "flat 3.8% on all taxable individual income for 2026 (SF 2442, 2024; Iowa Dept. of Revenue 2025-10-21 release — https://revenue.iowa.gov/press-release/2025-10-21/idr-announces-2026-individual-income-tax-and-interest-rates)"
+cost_of_living: ""
+
+catalysts:
+  - name: "Procter & Gamble Iowa City plant expansion — new production line (Oral-B per local BUILD 2026 deck), 150,000 sf building + new equipment; IEDA High Quality Jobs tax benefits approved 2025-09-19; 100 jobs at $31.85/hr qualifying wage"
+    company: "Procter & Gamble"
+    sector: "manufacturing"
+    investment_usd: 150000000
+    jobs: 100
+    avg_wage: 66248   # $31.85/hr qualifying wage x 2,080 hrs (IEDA release states the hourly figure)
+    announced: "2025-09"
+    start: "2026-01"   # 'construction start in 2026' per Greater Iowa City BUILD 2026 deck (search snippet; PDF not readable) — month not stated
+    completion: "2027-12"
+    status: announced
+    source_url: "https://opportunityiowa.gov/press-release/2025-09-19/ieda-board-approves-assistance-six-established-companies-three-startups-and-six-community-quality"
+    verified: true    # IEDA (state EDA) press release read: $150M, 150,000 sf, 100 incented jobs, $31.85/hr; Iowa City Council letter of support 2025-09-16 (greateriowacity.com 2025-09-19); construction start not confirmed
+  - name: "UI Health Care Patient Care Tower — Phase 1 (Early Work): entrances, skywalk realignment, utilities and site work enabling the planned ~842,000 sf inpatient tower on the Iowa City University Campus; full tower budget (est. $1.5-2B per CBJ/Gazette) to be approved at future Regents meetings and timeline delayed after federal funding cuts"
+    company: "University of Iowa Health Care (Iowa Board of Regents)"
+    sector: "hospital"
+    investment_usd: 72500000   # Phase 1 only (verified); full tower estimated $1.5B (CBJ 2025-06-12) to $2B (Gazette) — not read on a primary page
+    jobs: 0
+    avg_wage: null
+    announced: "2022-01"       # Permission to Proceed with Project Planning, Regents Jan 2022
+    start: "2025-06"
+    completion: ""
+    status: under_construction
+    source_url: "https://www.iowaregents.edu/media/cms/0625_PF_2__UI_Register_A04D449825E7A.pdf"
+    verified: true    # Regents Property & Facilities Committee June 2025 agenda read ($72.5M, funded by UI Health Care Earnings and Equity; approval authorizes construction/demolition); full-tower cost/schedule unverified
+  - name: "UI Health Care Medical Center North Liberty (Forevergreen Road) — 36 inpatient beds, 12 ORs, 14 emergency rooms, 84 exam rooms, orthopedics-focused hospital; opened to patients 2025-04-28"
+    company: "University of Iowa Health Care"
+    sector: "hospital"
+    investment_usd: 525600000  # $525.6M budget per Gazette (Regents raised budget Aug 2022) — search snippet only, not read on a Regents page
+    jobs: 0
+    avg_wage: null
+    announced: "2021-09"
+    start: "2022-01"
+    completion: "2025-04"
+    status: completed
+    source_url: "https://uihealthcare.org/press-release/ui-health-care-welcomes-first-patients-new-north-liberty-campus"
+    verified: false   # UI Health Care release read (opening date) and location page read (beds/ORs); dollar figure and start date not read on a primary page; no staffing count disclosed
+  - name: "Former ACT campus redevelopment, Iowa City (~385 acres incl. main buildings) — sold to Iceberg Development Group (West Des Moines) 2024-05 with ACT staying as tenant; housing/education-focused mixed use; parcels being sold to Oaknoll East for senior-living expansion (2026)"
+    company: "Iceberg Development Group / Oaknoll East"
+    sector: "other"
+    investment_usd: 0
+    jobs: 0
+    avg_wage: null
+    announced: "2024-05"
+    start: ""
+    completion: ""
+    status: speculative
+    source_url: "https://corridorbusiness.com/act-has-entered-into-an-agreement-to-sell-iowa-city-campus/"
+    verified: false   # CBJ read (sale agreement, price undisclosed, uses TBD); 2026 redevelopment/Oaknoll East items appear only in search snippets (constructionowners.com 404, BUILD 2026 deck 404)
+
+incentives:
+  - program: "City of Iowa City Down Payment Assistance (CDBG/HOME; lender partners GreenState Credit Union and Hills Bank)"
+    dollar_value: 24999
+    cash_or_noncash: cash
+    eligibility: "household income <= 80% AMI by household size; home within Iowa City limits (2022 program version also required a low-income census tract and purchase price <= $247,000); single-family homes and condos eligible, mobile homes not — 2-4 unit eligibility not stated"
+    minimum_income: ""
+    employment_requirement: ""
+    home_purchase_requirement: "yes — purchase and occupy as principal residence; must qualify for financing through GreenState or Hills; HUD-approved homebuyer education course required"
+    residency_requirement: "principal residence in Iowa City"
+    minimum_stay: "10 years — assistance is a 10-year forgivable loan, forgiven if the buyer lives in the home for ten years"
+    application_deadline: "rolling while funds last"
+    funding_availability: "annual CDBG/HOME allocation; current cap 'up to $24,999' per city page (search snippet; page returned 403) — 2022 CBJ article cited up to $15,000"
+    source_url: "https://icgov.org/government/departments-and-divisions/neighborhood-and-development-services/neighborhood-services/community-development/down-payment-assistance"
+    verified: false   # city page not readable (403); terms from Corridor Business Journal 2022-04-20 and the city page's search snippet; income table on CBJ dated 2021
+
+landlord_law:
+  verified: false
+  rent_control: "no — state preemption: Iowa Code §364.3(9) (2026 Code numbering; often cited as 364.3(12) in secondary sources — the 2026 text places the rent limitation at subsection 9) bars any city ordinance limiting the rent charged for private residential or commercial property; §364.3(11) also bars city ordinances conflicting with §562A.27B/562B.25B (source-of-income/voucher refusals); §364.3(3)(d) bars point-of-sale compliance/fee requirements"
+  just_cause_eviction: "no — Iowa Code §562A.34: month-to-month tenancy terminable by either party on 30 days' written notice without cause (10 days week-to-week); §562A.27: 3-day notice to pay or quit for nonpayment, 7-day notice with right to cure for other material noncompliance (7-day no-cure if repeated within 6 months); §562A.27A clear-and-present-danger 3-day"
+  eviction_timeline_days: 21   # 3-day notice + FED hearing set no later than 8 days from filing (15 with plaintiff consent), Iowa Code §648.5; writ/removal after judgment adds days — a 3-4 week uncontested path is the statutory shape, not a measured median
+  rental_licensing: "yes — City of Iowa City rental permit required for every rental dwelling (Housing Inspection Services, Iowa City Code Title 17 Ch. 5 Housing Code; fees set by council resolution); fee components reported as $9 per bedroom + $40 first-time Certificate of Structural Compliance (city page snippet, undated); Gazette example $218 for a 4-bedroom house — city page and amlegal code returned 403, so the current schedule is UNKNOWN"
+  rental_license_fee_annual: null
+  inspection_frequency: "periodic Housing Inspection Services inspection tied to permit renewal; Gazette reported the council voted to move from every 2 years to annual (article not readable; date unknown); the 2018 rental code update 'increased the frequency' per the city page snippet — current cycle UNKNOWN"
+  lead_rules: "federal only found: pre-1978 lead-based paint disclosure (42 U.S.C. 4852d; 24 CFR 35 / 40 CFR 745); no Iowa City lead ordinance located; Iowa Code ch. 135 lead program not reviewed"
+  certificate_of_occupancy_rules: "no point-of-sale inspection — Iowa Code §364.3(3)(d) prohibits cities from conditioning sale/refinance/transfer on compliance actions or fees; Iowa City requires a one-time Certificate of Structural Compliance when a dwelling first becomes a rental ($40 per city page snippet)"
+  security_deposit_limits: "max 2 months' rent (Iowa Code §562A.12(1)); held in a federally insured account, not commingled; return or itemized statement within 30 days of termination and receipt of tenant's forwarding address (§562A.12(3)); failure to furnish the statement forfeits all right to withhold; bad-faith retention = punitive damages up to 2x monthly rent + actual damages (§562A.12(7))"
+  local_landlord_taxes_fees: "rental permit fees (above; schedule UNKNOWN); no city rental tax; property tax: residential class incl. 2-4 units taxed on rollback value (44.5345% of assessed for AY2025 / FY26-27) x local levy; no state income-tax surcharge on rental income (flat 3.8%)"
+  utility_obligations: "Iowa Code §476.20: regulated gas/electric utilities may not disconnect Nov 1 - Apr 1 a residence with a resident certified LIHEAP/weatherization-eligible head of household (not a blanket moratorium), and disconnection notices must carry LIHEAP information; landlord duties to maintain and supply running water, hot water and heat where landlord-furnished under §562A.15 (not read); §562A.27(4) lets a tenant repair-and-deduct up to one month's rent as a nonpayment defense after 7 days' notice"
+  sources:
+    - "https://www.legis.iowa.gov/docs/code/2026/364.3.pdf"
+    - "https://www.legis.iowa.gov/docs/code/2026/562A.12.pdf"
+    - "https://www.legis.iowa.gov/docs/code/2026/562A.27.pdf"
+    - "https://www.legis.iowa.gov/docs/code/2026/562A.34.pdf"
+    - "https://www.legis.iowa.gov/docs/code/2026/648.5.pdf"
+    - "https://www.legis.iowa.gov/docs/code/2026/476.20.pdf"
+    - "https://icgov.org/government/departments-and-divisions/neighborhood-and-development-services/neighborhood-services/housing-inspection-services/rental-permit-requirements"
+    - "https://codelibrary.amlegal.com/codes/iowacityia/latest/iowacity_ia/0-0-0-15691"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "No reassessment-on-sale and no transfer-triggered cap reset. Iowa law reassesses all real property in ODD-numbered years (2023, 2025, 2027): the assessor reviews recent sales and re-estimates market value for all parcels in an area, so a buyer's purchase price enters the comparable-sales pool for the next odd-year revaluation rather than resetting that parcel alone. Iowa City has its OWN City Assessor (iowacity.iowaassessors.com — site returned 403); the Johnson County Assessor covers the rest of the county and runs a revolving 8-10 year physical reappraisal (2023-2030 schedule). Assessed value is then multiplied by the statewide residential ROLLBACK set by the Iowa Dept. of Revenue (AY2025: 44.5345% for FY26-27; AY2024: 47.4316%; AY2023: 46.3428%), which limits statewide aggregate residential taxable-value growth, not any individual parcel; 2-4 unit dwellings are in the residential class. Timing lag: 1/1/2025 assessments appear on bills due Sept 2026 and Mar 2027; Johnson County Treasurer collects in halves due Sept 1 and Mar 1 (penalty-free through Sept 30 / Mar 31; 1.5%/month late). Protest window to the Board of Review in spring of the assessment year."
+  risk: "MEDIUM"
+  assessor_url: "https://iowacity.iowaassessors.com/"
+  treasurer_url: "https://johnsoncountyiowa.gov/treasurer"
+  source_url: "https://johnsoncountyiowa.gov/county-reappraisal"
+
+listings: {}

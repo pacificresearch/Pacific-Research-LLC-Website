@@ -1,0 +1,105 @@
+# research/markets/47580.yaml — Warner Robins, GA (Houston County). Filled 2026-11-23 from primary sources where marked verified.
+cbsa: "47580"
+name: "Warner Robins, GA"
+retrieved_at: "2026-11-23"
+cities: ["Warner Robins"]
+single_employer_dependence: true
+energy_boom_watch: false
+risks:
+  - "single-employer (Robins AFB) concentration — >21,000 on-base workers and $4.48B FY2025 impact in a county of ~170K; Georgia Trend puts Robins at ~24,500 workers and roughly half of county wages; exposed to DoD budget/BRAC and program swings (E-7 Wedgetail zeroed in FY2027 request, restored by Congress)"
+  - "Georgia caps next-year fair market value at the arm's-length sale price (O.C.G.A. 48-5-2(3)) — buyer's assessment typically moves to the purchase price; seller's bill is not the buyer's bill"
+  - "Audi $4B plant is in adjacent Peach County, grading 2027 / production 2031 — long-dated, not yet under construction"
+  - "Jack Link's $450M Perry plant missed its 2023 and fall-2024 opening targets; opening date UNKNOWN"
+  - "No Warner Robins rental registration/inspection ordinance found — UNKNOWN, confirm with city Code Enforcement before purchase"
+major_employers:
+  - "Robins Air Force Base (defense, ~21,000+ per 2026 State of the Base coverage; $4.48B FY2025 impact per City of Perry) — https://www.perry-ga.gov/news/robins-air-force-base-drives-readiness-and-growth-in-middle-georgia"
+  - "Emory Hospital Warner Robins / Houston Healthcare (hospital, ~2,500 per Emory 2025 release) — https://www.emoryhealthcare.org/newsroom/2025/06/emory-healthcare-officially-welcomes-houston-healthcare-to-the-family"
+  - "Perdue Farms, Perry (food manufacturing, ~2,267 per Perry Development Authority, undated) — https://www.perry-ga.gov/development-authority/major-employers"
+  - "Frito-Lay, Perry (food manufacturing, ~1,352 per Perry Development Authority, undated) — https://www.perry-ga.gov/development-authority/major-employers"
+  - "Houston County Board of Education (schools, county-wide headcount UNKNOWN; 763 in Perry per Perry Development Authority) — https://www.perry-ga.gov/development-authority/major-employers"
+state_income_tax: "flat 4.99% for TY2026 (HB 463, retroactive to 2026-01-01; GA DOR Important Tax Updates) — https://dor.georgia.gov/important-tax-updates"
+cost_of_living: ""
+
+catalysts:
+  - name: "Audi AG first US manufacturing plant (Middle Georgia Megasite, Peach County — Mid-Georgia Gateway JDA incl. Houston County)"
+    company: "Audi AG"
+    sector: "manufacturing"
+    investment_usd: 4000000000
+    jobs: 4500
+    avg_wage: null
+    announced: "2026-10"
+    start: "2028"
+    completion: "2031"
+    status: announced
+    source_url: "https://georgia.org/press-releases/audi-ag-selects-georgia-invest-4-billion-first-us-manufacturing-facility"
+    verified: true
+  - name: "Jack Link's meat-snack manufacturing plant (720 Perry Parkway, Perry)"
+    company: "Jack Link's (Link Snacks, Inc.)"
+    sector: "manufacturing"
+    investment_usd: 450000000
+    jobs: 800
+    avg_wage: null
+    announced: "2022-04"
+    start: "2022"
+    completion: ""
+    status: under_construction
+    source_url: "https://georgia.org/press-releases/2022/jack-links-create-800-jobs-georgia-manufacturing-facility-houston-county"
+    verified: true
+  - name: "Robins AFB new-mission construction and renovations (construction spending up $120M in 2025)"
+    company: "US Air Force / Robins AFB"
+    sector: "defense"
+    investment_usd: 120000000
+    jobs: 0
+    avg_wage: null
+    announced: "2026-04"
+    start: "2025"
+    completion: ""
+    status: under_construction
+    source_url: "https://www.41nbc.com/?p=1928554"
+    verified: false
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: "Georgia Dream Homeownership Program — Standard down payment assistance (GA DCA), 0% deferred second mortgage; statewide incl. Houston County"
+    dollar_value: 10000
+    cash_or_noncash: cash
+    eligibility: "first-time homebuyers; household income limits by MSA/county (DCA lists $137,555 for 1-2 persons, $158,188 for 3+); minimum 640 credit score (660 manufactured); FHA/VA/USDA/conventional first mortgage through a participating lender; PEN (protectors/educators/nurses) and CHOICE (disability) tiers up to $12,500; 2-4 unit eligibility UNKNOWN (see DCA Seller Guide)"
+    minimum_income: "none stated; maximum household income limits apply"
+    employment_requirement: "none for Standard tier; PEN tier requires protector/educator/nurse occupation"
+    home_purchase_requirement: "purchase-money, 30-year fixed first mortgage; sales price up to $625,000 or MSA/county maximum; 5% of price or $10,000, whichever is less"
+    residency_requirement: "primary residence only"
+    minimum_stay: "deferred repayment — second mortgage repaid on sale, refinance or move-out (not forgiven)"
+    application_deadline: "none; lender reserves funds via DCA portal (75-day reservation)"
+    funding_availability: "open as of matrix v. 2026-7-8"
+    source_url: "https://dca.georgia.gov/document/resources/georgia-dream-standard-matrix/download"
+    verified: true
+
+landlord_law:
+  verified: false
+  rent_control: "no — state preemption, O.C.G.A. 44-7-19 (no county or municipality may regulate the amount of rent on privately owned residential rental property)"
+  just_cause_eviction: "no — Georgia has no just-cause requirement; tenancy at will / holdover and nonpayment proceed under O.C.G.A. 44-7-50"
+  eviction_timeline_days: 30
+  rental_licensing: "none found — no rental registration, rental license or rental inspection ordinance located for City of Warner Robins (UNKNOWN; confirm with city Code Enforcement and business license office)"
+  rental_license_fee_annual: null
+  inspection_frequency: "none found — complaint-based code enforcement only"
+  lead_rules: "federal only (pre-1978 housing: EPA/HUD Section 1018 disclosure — pamphlet, known-hazard disclosure, Lead Warning Statement, records kept 3 years); no local lead ordinance found"
+  certificate_of_occupancy_rules: "none found — no point-of-sale CO or rental inspection located for Warner Robins or Houston County"
+  security_deposit_limits: "capped at two months' rent for leases entered/renewed on or after 2024-07-01 (O.C.G.A. 44-7-30.1, HB 404 Safe at Home Act)"
+  local_landlord_taxes_fees: "none found; Georgia assesses all real property at 40% of FMV with no owner-occupied vs rental ratio split"
+  utility_obligations: "landlord must keep premises fit for human habitation (44-7-13, HB 404) and cannot cut off 'utilities' defined as cooling, heat, light and water (44-7-14.1); nonpayment eviction requires a 3-business-day notice to pay or vacate before filing (44-7-50(c)), then 7-day answer after summons (44-7-51)"
+  sources:
+    - "https://www.legis.ga.gov/api/legislation/document/20232024/229083"
+    - "https://codes.findlaw.com/ga/title-44-property/ga-code-sect-44-7-19.html"
+    - "https://codes.findlaw.com/ga/title-44-property/ga-code-sect-44-7-51.html"
+    - "https://codes.findlaw.com/ga/title-44-property/ga-code-sect-44-7-50.html"
+    - "https://www.epa.gov/lead/real-estate-disclosures-about-potential-lead-hazards"
+    - "https://www.wrga.gov/page/wr-code-enforcement"
+
+tax_rules:
+  verified: false
+  post_sale_treatment: "Georgia assesses at 40% of fair market value (O.C.G.A. 48-5-7), set by the county Board of Tax Assessors each year; the most recent arm's-length bona fide sale price is the maximum allowable FMV for the next taxable year (48-5-2(3)), and assessors commonly move value to the sale price, so a buyer paying above the prior assessment should expect the assessment to rise toward the purchase price. No separate rental ratio. HB 581's inflation-indexed floating homestead cap applies to homesteads only (Houston County Board of Education opted out in 2025) — no cap on non-homestead rental property. Every parcel must be appraised at least every three years."
+  risk: "MEDIUM"
+  assessor_url: "https://www.houstoncountyga.gov/residents/tax-assessor.cms"
+  treasurer_url: "https://www.houstoncountytax.com/"
+  source_url: "https://codes.findlaw.com/ga/title-48-revenue-and-taxation/ga-code-sect-48-5-2.html"
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}

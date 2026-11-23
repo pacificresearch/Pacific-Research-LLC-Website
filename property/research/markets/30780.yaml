@@ -1,0 +1,136 @@
+# research/markets/30780.yaml — Little Rock-North Little Rock-Conway, AR (Pulaski County). Filled 2026-11-23 from web reading only; UNKNOWN beats a guess.
+cbsa: "30780"
+name: "Little Rock-North Little Rock-Conway, AR"
+retrieved_at: "2026-11-23"
+cities: ["Little Rock", "North Little Rock", "Conway"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "Property-tax reset on purchase: Ark. Code 26-26-1123 assesses a sold parcel at 20% of full appraised value at the next assessment date and denies the buyer any Amendment 79 cap until the second assessment date after transfer — the seller's capped taxable value is irrelevant to the buyer's bill"
+  - "Pulaski County's 4-year reappraisal cycle ended in 2026 (AACD 2025 report), so 2026/2027 bills carry freshly reappraised values; model the bill from the purchase price, not the current owner's bill"
+  - "AVAIO Digital Leo data center ($6B phase 1, 500+ jobs) was announced 2026-01 with construction slated for Q1 2026; construction start not independently confirmed and a Wrightsville town hall (KATV) shows local opposition — treat as speculative upside"
+  - "Trex Little Rock plant is still ramping (50% of decking capacity by YE2026; efficiency benefits not until 2H2027 per company) — the 500-job figure is a build-out target, not current payroll"
+  - "Employment base is government/healthcare heavy (State of Arkansas, UAMS, Baptist Health, Arkansas Children's): stable but low-growth; state income tax applies to rental income (top 3.7%)"
+major_employers:
+  - "University of Arkansas for Medical Sciences (hospital/university, 12,635 employees; largest public employer in Arkansas) — https://web.uams.edu/uams-welcomes-you/about-uams/workforce/"
+  - "State of Arkansas (state government, capital city; jobs n/a) — https://portal.arkansas.gov/"
+  - "Baptist Health (hospital system HQ Little Rock, jobs n/a) — https://www.baptist-health.com/"
+  - "Arkansas Children's Hospital (hospital, jobs n/a) — https://www.archildrens.org/"
+  - "Dillard's Inc. (retail HQ, jobs n/a) — https://www.dillards.com/"
+  - "Amazon Port of Little Rock logistics facility (logistics, 1,000+ jobs when operational 2027) — https://www.arkansasedc.com/news-events/newsroom/detail/2025/07/29/amazon-breaks-ground-on-state-of-the-art-logistics-facility-in-little-rock"
+state_income_tax: "graduated; top individual rate 3.7% effective tax year 2026 (cut from 3.9% by HB1001/SB1, First Extraordinary Session, signed May 2026, retroactive to 2026-01-01; top corporate rate 4.1% from 2027) — https://senate.arkansas.gov/?p=12542 (Arkansas Senate release; the DFA individual income tax landing page does not print the rate)"
+cost_of_living: ""
+
+catalysts:
+  - name: "Amazon logistics facility at the Port of Little Rock (930,000+ sf; 1,000+ full- and part-time jobs once fully operational; operational 2027)"
+    company: "Amazon"
+    sector: "logistics"
+    investment_usd: 0
+    jobs: 1000
+    avg_wage: null
+    announced: "2025-07"
+    start: "2025-07"
+    completion: "2027"
+    status: under_construction
+    source_url: "https://www.arkansasedc.com/news-events/newsroom/detail/2025/07/29/amazon-breaks-ground-on-state-of-the-art-logistics-facility-in-little-rock"
+    verified: true    # AEDC release 2025-07-29 read; groundbreaking held; release gives no project-specific dollar figure (only $2.6B statewide since 2010)
+  - name: "AVAIO Digital Leo AI data center and power campus, 760 acres off 145th St near Wrightsville, SE Pulaski County: $6B phase 1 (over $21B through full development), 500+ permanent operations jobs over five years, 150 MW contracted from Entergy Arkansas rising toward 1 GW; phase 1 construction slated Q1 2026, energized June 2027"
+    company: "AVAIO Digital Partners"
+    sector: "data_center"
+    investment_usd: 6000000000
+    jobs: 500
+    avg_wage: null
+    announced: "2026-01"
+    start: "2026-03"
+    completion: "2027-06"
+    status: announced
+    source_url: "https://www.metrolittlerockalliance.com/news/avaio-digital-announces-new-large-scale-ai-ready-data-center-and-power-campus-in-little-rock-arkansas"
+    verified: true    # company press release (2026-01-12, Little Rock dateline) read as reposted by the Metro Little Rock Alliance (regional EDO); AEDC newsroom copy not located; construction start not independently confirmed — status kept at announced
+  - name: "Eaton (Fibrebond business) customized electrical-enclosure manufacturing facility, North Little Rock: 1,000,000 sf, $242M+, 1,200 new jobs serving data center / utility / industrial markets"
+    company: "Eaton Corporation"
+    sector: "manufacturing"
+    investment_usd: 242000000
+    jobs: 1200
+    avg_wage: null
+    announced: "2026-09"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.arkansasedc.com/news-events/newsroom/detail/2026/09/02/eaton-locates--242--million-state-of-the-art-manufacturing-facility-in-north-little-rock--arkansas"
+    verified: true    # AEDC release 2026-09-02 read; 'intends to locate'; construction start and operational date not stated; hiring not yet open
+  - name: "Trex Company composite-decking and plastic-recycling plant, Port of Little Rock (~$400M over five years, 500+ jobs at build-out; announced 2021-10, steel topping-out 2024-08; production ramp began 2026, ~50% of decking capacity operational by year-end 2026, full efficiency benefits expected 2H2027)"
+    company: "Trex Company, Inc."
+    sector: "manufacturing"
+    investment_usd: 400000000
+    jobs: 500
+    avg_wage: null
+    announced: "2021-10"
+    start: "2022"
+    completion: "2027"
+    status: under_construction
+    source_url: "https://finviz.com/news/415172/trex-company-reports-strong-third-quarter-2026-results-delivering-back-to-back-record-quarters"
+    verified: false   # Q3 2026 earnings release (Business Wire 2026-11-04) read only as a Finviz repost (Trex IR site returned 403); $400M/500 jobs are the 2021 company announcement figures as reported by AEDC-linked coverage; production is partial, so kept at under_construction
+
+incentives:
+  - program: "City of Little Rock Down Payment Assistance Program (HUD HOME-funded): up to 6% of purchase price, max $10,000, forgiven in equal monthly installments over 60 months"
+    dollar_value: 10000
+    cash_or_noncash: cash
+    eligibility: "First-time homebuyer (no residential property owned in the last 3 years); household income at or below 80% AMI (2025 limits effective 2025-04-01: 1 person $51,950, 2 $59,350, 3 $66,750, 4 $74,150); homebuyer counseling course acceptable to the City; approved 1st mortgage from a lender with a physical Arkansas location; all repairs completed before approval; no cash back at closing"
+    minimum_income: ""
+    employment_requirement: ""
+    home_purchase_requirement: "Owner-occupied residential property within Little Rock city limits (a 2-4 unit qualifies only if Andrew occupies a unit and meets the first-time-buyer test); request made through the mortgage lender"
+    residency_requirement: ""
+    minimum_stay: "own and occupy a minimum of 5 years (Affordability Period); loan forgiven monthly over 60 months, repayable if the buyer leaves early"
+    application_deadline: ""
+    funding_availability: "Allocated HOME funds; lender contacts Housing & Neighborhood Programs, Community Development Division, 501-371-6825; no funding balance published"
+    source_url: "https://www.littlerock.gov/media/23767/dpa-flyer-updated-income-limits-2025.pdf"
+    verified: true    # City of Little Rock 2025 DPA flyer read 2026-11-23 (income limits effective 2025-04-01 'until superseded')
+
+  - program: "Arkansas Development Finance Authority (ADFA) Down Payment Assistance (DPA) Loan Program — statewide: $1,000-$15,000 for down payment and closing costs as a second mortgage with a 10-year term, available only with an ADFA StartSmart or Move-Up first mortgage"
+    dollar_value: 15000
+    cash_or_noncash: cash
+    eligibility: "Must qualify for an ADFA StartSmart or ADFA Move-Up first mortgage through a participating lender (adfa.arkansas.gov/find-a-lender); income/purchase-price limits, first-time-buyer status and eligible property types are set by the first-mortgage program and are not printed on the DPA page"
+    minimum_income: ""
+    employment_requirement: ""
+    home_purchase_requirement: "Paired with an ADFA first mortgage (owner-occupied financing — a 2-4 unit qualifies only if Andrew occupies a unit and the first-mortgage program allows the property type; not confirmed on the page)"
+    residency_requirement: ""
+    minimum_stay: ""
+    application_deadline: ""
+    funding_availability: "Ongoing program; no funding balance published; ADFA Single Family contact 501-682-5466"
+    source_url: "https://adfa.arkansas.gov/programs/homeloans/down-payment-assistance-program"
+    verified: true    # ADFA program page read 2026-11-23; repayable 10-year second mortgage, not a grant — year-1 benefit is liquidity, not free money
+
+landlord_law:
+  verified: false    # city ordinance/registration documents read on littlerock.gov and the AG page read directly; state statute texts read on FindLaw (current as of 2024-03-28), not on the official arkleg.state.ar.us code — so not marked verified
+  rent_control: "no — Ark. Code 14-16-601 and 14-54-1409: a local governmental unit (county, city, village, township) shall not enact, maintain, or enforce an ordinance or resolution that would have the effect of controlling the amount of rent charged for leasing private residential or commercial property; no local rent control exists"
+  just_cause_eviction: "no — civil unlawful detainer, Ark. Code 18-60-304: holdover after the term, holdover after written demand, or nonpayment plus three (3) days' notice to quit and written demand for possession; tenant has 5 days after summons to file a written objection or the sheriff may remove (Arkansas AG); separate criminal failure-to-vacate statute, Ark. Code 18-16-101: 10 days' written notice to vacate, willful refusal is a misdemeanor, $1-$25 per day, each day a separate offense"
+  eviction_timeline_days: null
+  rental_licensing: "yes — City of Little Rock Rental Housing Registration Program (Housing & Neighborhood Programs): every rental dwelling unit registered annually (registration good until Dec 31); owner/manager with 3 or fewer units pays $35/yr flat; 4 or more units pays $200 base + $7/unit for the first 100 units (+$3.50/unit beyond); duplex = 2 units, triplex = 3; failure to register = penalties/municipal fine. Fee schedule from a 2014 city flyer — confirm current amounts at 501-371-4849"
+  rental_license_fee_annual: 35
+  inspection_frequency: "Systematic Rental Inspection Program, Little Rock Rev. Code ch. 8 art. IX §§ 8-577 to 8-586 (Ord. 16,659 of 1994, amended 2019-09-17 effective 2020-01-01): random systematic inspection of 20% of registered rental units each year (about a 5-year cycle); additional inspection when title to the unit is conveyed or transferred (§ 8-582(4)), on complaint, after fire/storm, or at owner request; newly built units exempt from the random cycle for 5 years"
+  lead_rules: "federal only found: pre-1978 lead-based paint disclosure (42 U.S.C. 4852d; 24 CFR 35 / 40 CFR 745); no Little Rock-specific lead ordinance located"
+  certificate_of_occupancy_rules: "no certificate-of-occupancy-on-sale requirement found; but § 8-582(4) subjects a rental unit to a city rental inspection when title is conveyed or transferred, so a purchased 2-4 unit should expect an inspection against the Housing Code (ch. 8 art. V)"
+  security_deposit_limits: "Ark. Code 18-16-304: no more than two (2) months' periodic rent, however denominated; 18-16-305: return within 60 days of termination with itemized deductions (per Arkansas AG); 18-16-303: the subchapter does not apply to an individual owning five or fewer dwelling units unless a third party manages/collects rent for a fee — a self-managed 2-4 unit is outside the cap"
+  local_landlord_taxes_fees: "none found beyond the annual rental registration fee; no city rental-income or per-unit tax located; real property assessed at 20% of market value statewide; Pulaski County millage applies"
+  utility_obligations: "Ark. Code 18-17-502 (Act 1052 of 2021; leases entered/renewed after 2021-11-01): landlord must supply hot and cold running water, electricity, potable water, sanitary sewer/plumbing to code, a functioning roof and building envelope, and functioning heating and A/C to the extent they served the premises at signing; tenant gives written notice (certified mail) and, if rent is current and the landlord does not remedy within 30 calendar days, the tenant's sole remedy is termination without penalty plus deposit refund — no rent withholding; stricter local housing codes still apply (18-17-502(h))"
+  sources:
+    - "https://codes.findlaw.com/ar/title-14-local-government/ar-code-sect-14-16-601/"
+    - "https://codes.findlaw.com/ar/title-14-local-government/ar-code-sect-14-54-1409/"
+    - "https://codes.findlaw.com/ar/title-18-property/ar-code-sect-18-60-304/"
+    - "https://codes.findlaw.com/ar/title-18-property/ar-code-sect-18-16-101/"
+    - "https://codes.findlaw.com/ar/title-18-property/ar-code-sect-18-16-304/"
+    - "https://codes.findlaw.com/ar/title-18-property/ar-code-sect-18-16-303/"
+    - "https://codes.findlaw.com/ar/title-18-property/ar-code-sect-18-17-502/"
+    - "https://arkansasag.gov/divisions/public-protection/homes/landlord-and-tenant-rights/"
+    - "https://www.littlerock.gov/!userfiles/editor/docs/Finance/City of Little Rock Rental Housing Registration Program (2).pdf"
+    - "https://www.littlerock.gov/city-administration/board-of-directors/meeting-agenda/AGENDA%20-%20WEB%20-%209-17-2019/O%20-%20Revised%20Rental%20Inspection.pdf"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "Arkansas assesses real property at 20% of market value, reappraised county-wide every 4 years (Act 139 of 2023; Pulaski County's current cycle ended 2026 per the AACD 2025 Annual Report). Amendment 79 § 1(b) limits a NON-homestead parcel's taxable-value increase after reappraisal to 10%/yr, but the cap belongs to the seller: Ark. Code 26-26-1123(a)-(b) requires the assessor to assess a sold parcel at 20% of full appraised value at the next assessment date after transfer, and the new owner is not entitled to claim any limitation until the second assessment date after transfer (ACD Amendment 79 Assessor's Guide states the same rule). A 2-4 unit bought from a long-held owner therefore resets to full market value the following Jan 1 — the current owner's bill is never the post-purchase bill. Homestead credit ($500, $600 from 2026 bills) and 5% cap apply only to an owner-occupied unit."
+  risk: "HIGH"
+  assessor_url: "https://pulaskicountyassessor.net/"
+  treasurer_url: "https://www.pulaskicountytreasurer.net/"
+  source_url: "https://www.dfa.arkansas.gov/wp-content/uploads/AACD_AnnualReport_2025.pdf"
+
+listings: {}

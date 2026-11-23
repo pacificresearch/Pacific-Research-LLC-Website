@@ -1,0 +1,135 @@
+# research/markets/37980.yaml — Philadelphia-Camden-Wilmington, PA-NJ-DE-MD (principal county: Philadelphia). Filled 2026-11-23 from primary sources where marked verified.
+cbsa: "37980"
+name: "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD"
+retrieved_at: "2026-11-23"
+cities: ["Philadelphia", "Upper Darby", "Norristown"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "Philadelphia Wage/Earnings Tax (3.74% resident from 2025-07-01, 3.735% from 2026-07-01) stacks on the 3.07% PA flat tax — an owner-occupant investor pays both; rental net profits are also subject to the city Net Profits Tax/BIRT"
+  - "Good-cause tenancy rule (Code 9-804(12), Bill 250330-AA eff. 2026-11-01) now covers ALL residential leases at expiration, not just leases under one year; the only exemption is a landlord who lives in the same individual unit — a 2-4 unit owner-occupant does NOT qualify. Non-renewal to re-tenant at market rent needs a listed good cause or 60-day notice tied to a bona fide owner-occupant sale"
+  - "Mandatory Eviction Diversion Program (Code 9-811): landlord must serve a Notice of Diversion Rights and wait 30 days before filing in Municipal Court — adds a month to every nonpayment eviction"
+  - "Philadelphia OPA citywide revaluations (TY2025, TY2027) are driven by sales; some neighborhoods saw assessment jumps over 50% for TY2027 — a purchase above current assessment is likely to be marked up at the next revaluation"
+  - "76ers Market East arena ($1.3B) was CANCELLED 2025-01; the replacement South Philadelphia arena (Comcast Spectacor JV, target 2031) has no approvals or construction yet"
+  - "Spark Therapeutics (Roche) cut 337 of ~650 Philadelphia jobs in 2025 while finishing its $575M Gene Therapy Innovation Center — life-sciences employment is softer than the construction pipeline suggests"
+  - "FIFA World Cup 2026 matches and the 2026 semiquincentennial (America250) are ONE-TIME events — hospitality demand bump only; never model as recurring rent support"
+  - "Rental License requires proof of legal occupancy (CO, prior rental license within 3 years, or zoning permit + Affidavit of Continuous Use) — an unlicensed 'triplex' may not be legally licensable at that unit count"
+major_employers:
+  - "Trustees of the University of Pennsylvania (university/health system, headcount not published in list; #1 in Philadelphia County QCEW Q4-2023) — https://pa.gov/content/dam/copapwp-pagov/en/dli/documents/workstats/top-50/Philadelphia_County_Top_50.pdf"
+  - "Federal Government (federal, #2 Philadelphia County QCEW Q4-2023; headcount UNKNOWN) — https://pa.gov/content/dam/copapwp-pagov/en/dli/documents/workstats/top-50/Philadelphia_County_Top_50.pdf"
+  - "City of Philadelphia (local government, #3 Q4-2023; headcount UNKNOWN) — https://pa.gov/content/dam/copapwp-pagov/en/dli/documents/workstats/top-50/Philadelphia_County_Top_50.pdf"
+  - "The Children's Hospital of Philadelphia (hospital, #5 Q4-2023; headcount UNKNOWN) — https://pa.gov/content/dam/copapwp-pagov/en/dli/documents/workstats/top-50/Philadelphia_County_Top_50.pdf"
+  - "Thomas Jefferson University Hospital / Thomas Jefferson University (hospital/university, #7 and #12 Q4-2023; headcount UNKNOWN) — https://pa.gov/content/dam/copapwp-pagov/en/dli/documents/workstats/top-50/Philadelphia_County_Top_50.pdf"
+  - "Comcast Cablevision Corp (PA) (telecom/media, #10 Q4-2023; headcount UNKNOWN) — https://pa.gov/content/dam/copapwp-pagov/en/dli/documents/workstats/top-50/Philadelphia_County_Top_50.pdf"
+state_income_tax: "flat 3.07% PA Personal Income Tax (PA DOR, https://www.pa.gov/agencies/revenue/resources/tax-rates.html) PLUS Philadelphia Wage/Earnings Tax: 3.74% resident / 3.43% non-resident from 2025-07-01, 3.735% / 3.425% from 2026-07-01, further cuts scheduled over five years (https://www.phila.gov/services/payments-assistance-taxes/business-taxes/wage-tax-employers/)"
+cost_of_living: ""
+
+catalysts:
+  - name: "Philadelphia Navy Yard redevelopment (Ensemble/Mosaic) — Greenway District site prep funded by $30M PA SITES grant; broader $6B plan, 12,000 new jobs"
+    company: "Ensemble/Mosaic Navy Yard LLC with PIDC; Commonwealth of PA (PA SITES)"
+    sector: "other"
+    investment_usd: 6000000000
+    jobs: 12000
+    avg_wage: null
+    announced: "2025-05"
+    start: "2025"
+    completion: ""
+    status: under_construction
+    source_url: "https://www.pa.gov/governor/newsroom/2025-press-releases/gov-shapiro-highlights--30m-investment-philadelphia-navy-yard-dc.html"
+    verified: true
+  - name: "CHOP Roberts Children's Health inpatient tower (University City) — 1.3M sq ft, 700+ private rooms, 20+ stories, opening 2028; $125M Roberts gift 2025-03"
+    company: "Children's Hospital of Philadelphia"
+    sector: "hospital"
+    investment_usd: 2590000000   # $2.59B figure is from Philadelphia Inquirer 2024-10-21 (https://inquirer.com/health/chop-new-patient-tower-philadelphia-259-billion-20241021.html); CHOP pages give no cost
+    jobs: 0
+    avg_wage: null
+    announced: "2024-10"
+    start: "2024-10"
+    completion: "2028"
+    status: under_construction
+    source_url: "https://www.chop.edu/giving/news/chop-receives-largest-single-gift-roberts-childrens-health"
+    verified: false
+  - name: "Spark Therapeutics Gene Therapy Innovation Center (30th & Chestnut, Drexel campus) — 500,000 sq ft; NOTE 337 Spark layoffs 2025"
+    company: "Spark Therapeutics (Roche)"
+    sector: "biotech"
+    investment_usd: 575000000
+    jobs: 0
+    avg_wage: null
+    announced: "2021-12"
+    start: "2023-03"
+    completion: "2026"
+    status: under_construction
+    source_url: "https://drexel.edu/news/archive/2021/december/spark-therapeutics-gene-therapy-innovation-center"
+    verified: true
+  - name: "William H. Gray III 30th Street Station restoration (Amtrak / Plenary Infrastructure Philadelphia P3) — retail, offices, Porch; completion slipped to 2027"
+    company: "Amtrak; Plenary Infrastructure Philadelphia"
+    sector: "transport"
+    investment_usd: 550000000   # $550M per ENR trade press (https://enr.com/articles/58070-550m-philadelphia-amtrak-station-upgrade-has-new-timeline); Amtrak release states no cost
+    jobs: 0
+    avg_wage: null
+    announced: "2021-09"
+    start: "2024-01"
+    completion: "2027"
+    status: under_construction
+    source_url: "https://media.amtrak.com/2025/04/amtrak-continues-progress-on-philadelphia-station-restoration-renovation-project/"
+    verified: false
+  - name: "76 Place at Market East arena (Center City) — CANCELLED 2025-01-13; team to build with Comcast Spectacor in South Philadelphia sports complex, target 2031"
+    company: "Philadelphia 76ers / Harris Blitzer Sports & Entertainment; Comcast Spectacor"
+    sector: "other"
+    investment_usd: 1300000000
+    jobs: 0
+    avg_wage: null
+    announced: "2022-07"
+    start: ""
+    completion: ""
+    status: cancelled
+    source_url: "https://whyy.org/articles/sixers-staying-south-philadelphia/"
+    verified: false
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: "Philly First Home (City of Philadelphia DHCD / PHDC) — homebuyer assistance grant; single-family OR DUPLEX eligible (condos excluded) — applies to an owner-occupied 2-unit purchase"
+    dollar_value: 10000
+    cash_or_noncash: cash
+    eligibility: "First-time buyer or no home owned in the last 3 years; must meet DHCD income guidelines (limits not on program page — see https://www.phila.gov/departments/division-of-housing-and-community-development/about/income-guidelines/); must complete City-funded homeownership counseling BEFORE signing the agreement of sale"
+    minimum_income: "none stated; maximum household income per DHCD income guidelines"
+    employment_requirement: "none"
+    home_purchase_requirement: "single-family home or duplex in Philadelphia; condominiums not eligible; grant = lesser of $10,000 or 6% of purchase price, paid at closing toward down payment and/or closing costs; cannot be combined with First Front Door or PHFA K-FIT grants (per DHCD/PHDC program materials)"
+    residency_requirement: "must occupy as primary residence"
+    minimum_stay: "15 years — grant must be repaid if buyer moves, sells, leases, or cash-out refinances within 15 years"
+    application_deadline: "none listed; apply through a City-funded housing counseling agency before agreement of sale"
+    funding_availability: "while funding is available (page gives no current status as of 2026-11)"
+    source_url: "https://phila.gov/services/property-lots-housing/buy-sell-or-rent-a-property/buy-my-first-home/"
+    verified: true
+
+landlord_law:
+  verified: false                # most items trace to phila.gov / Municipal Court / certified bill text read this run; rent_control (absence of a PA statute), the 30-day deposit return cite, and 4-year lead-cert validity were not read from a primary page this run
+  rent_control: "no — Philadelphia has no rent control. Pennsylvania has NO statewide rent-control preemption statute (preemption bills HB 2190 of 2019-20 and HB 136 of 2021-22 died in committee); municipal authority to enact rent control is untested rather than barred"
+  just_cause_eviction: "yes — Philadelphia Code 9-804(12) 'Good cause required': as amended by Bill 250330-AA (passed 2026-04-23, signed 2026-05-07, effective 2026-11-01) a landlord may not take any action to terminate ANY residential tenancy at lease expiration (notice to vacate/non-renewal, Notice of Diversion Rights, or filing for possession) without listed good cause and written notice of the cause on the rent-increase notice schedule; failure to notice renews the lease month-to-month. Good causes include 68 P.S. 250.501(a)(2)/(3) grounds and a bona fide arm's-length sale to a purchaser who will owner-occupy within 90 days (60 days' notice + documents). Sole exemption: landlord occupies the SAME individual rental unit as primary residence since tenancy start — a 2-4 unit owner-occupant is NOT exempt. Remedies: statutory $1,000/violation, treble for willful, attorney fees, rental-license suspension"
+  eviction_timeline_days: null   # components read from primary: notice to quit 10 days (nonpayment) / 15 days (lease <= 1 yr, other breach or expiry) / 30 days (lease > 1 yr) under 68 P.S. 250.501 unless lease waives; THEN mandatory Eviction Diversion Program with 30-day wait before filing (60 days if TFA rent assistance paid); then Municipal Court hearing, judgment, writ. Total filing-to-lockout not published — UNKNOWN
+  rental_licensing: "yes — Rental License $69/unit/yr, maximum $27,830 per building, no fee for owner-occupied units; renewed annually (late fee 1.5%/month after 60 days). Prerequisites: BIRT tax account + Commercial Activity License (Activity License Number only if owner-occupies and rents 3 or fewer units), zoning approval, proof of legal occupancy, named local managing agent"
+  rental_license_fee_annual: 69
+  inspection_frequency: "no routine city inspection cycle — L&I inspects on complaint. Owner must obtain a Certificate of Rental Suitability from L&I issued no more than 60 days before lease start and give it, with the Partners in Good Housing handbook, to every new tenant (not renewals); also bed-bug notice/120-day history and smoking policy (3+ units)"
+  lead_rules: "federal pre-1978 disclosure PLUS Philadelphia Lead Paint Disclosure and Certification Law: any rental built before March 1978 must be certified lead-safe or lead-free (certified inspector report filed with Dept. of Public Health) to obtain/renew the Rental License and at each new lease — phase-in to ALL rentals complete since 2020-10-01; post-March-1978 buildings file an exemption. Lead-safe certificate validity 4 years per phila.gov Nov-2023 Rental License Requirements sheet (lead-free is permanent)"
+  certificate_of_occupancy_rules: "no point-of-sale inspection or transfer CO. To license units an owner must prove legal occupancy: Certificate of Occupancy, OR a rental license issued within the past 3 years for the same unit count with no occupancy change, OR (use established before 2000) zoning permit + Affidavit of Continuous Use. Rental License is not transferred on sale — buyer re-licenses; Code 9-804(3): transfer of title does not alter the new owner's obligations under Ch. 9-800"
+  security_deposit_limits: "68 P.S. 250.511a: max 2 months' rent in first lease year, 1 month in second and later years; after 5 years' occupancy rent increases cannot require a deposit increase; residential only, tenant waiver void. Return with itemized list within 30 days (250.512; double damages for wrongful withholding) and escrow/interest rules for deposits held over 2 years (250.511b) — 512/511b not read this run"
+  local_landlord_taxes_fees: "Philadelphia Business Income & Receipts Tax (BIRT) and Net Profits Tax on rental income (BIRT account required for the Rental License unless owner-occupied with 3 or fewer rented units); School Income Tax on resident unearned income; Rental License $69/unit; lead certification inspection cost; Realty Transfer Tax (city + state) on purchase — rate not verified this run"
+  utility_obligations: "Partners in Good Housing / Property Maintenance Code: owner must provide and maintain heating, hot and cold water, plumbing and electrical systems and pay for any utility not expressly assigned to the tenant in the lease; Philadelphia Water Department charges lien the property regardless of who is billed — specific code sections not read this run"
+  sources:
+    - "https://www.phila.gov/services/permits-violations-licenses/get-a-license/business-licenses/rental-and-property/get-a-rental-license/"
+    - "https://www.phila.gov/services/property-lots-housing/buy-sell-or-rent-a-property/information-about-renting/rent-your-property-long-term/"
+    - "https://phila.gov/departments/fair-housing-commission/tenant-protections/rental-suitability"
+    - "https://files.amlegal.com/pdffiles/Philadelphia/250330-AA.pdf"
+    - "https://www.courts.phila.gov/pdf/brochures/mc/LANDLORD-TENANT-PAMPHLET.pdf"
+    - "https://www.phila.gov/media/20260212170051/landlord-gateway-eviction-diversion-program-presentation-2026-01-08.pdf"
+    - "https://codes.findlaw.com/pa/title-68-ps-real-and-personal-property/pa-st-sect-68-250-511a.html"
+    - "https://www.phila.gov/media/20231204173843/Rental-License-Requirements_Nov-2023.pdf"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "No sale-triggered reassessment and no assessment caps: Pennsylvania's Uniformity Clause bars reassessing a parcel on transfer, so the purchase price is not written in at closing. Instead the Office of Property Assessment runs periodic citywide mass revaluations (CAMA models driven by recent sales — TY2025 and TY2027 revalued, TY2026 skipped) and a recent arm's-length sale above the current assessment is exactly the market evidence that lifts the next value. TY2027: median residential bill change ~$97, but nearly 6,000 homes rose over 50% vs two years earlier (Inquirer). Appeals: First Level Review with OPA (TY2027 deadline 2026-09-01), formal BRT appeal (2026-10-05). Homestead Exemption ($100,000 off assessed value in TY2027) is owner-occupied only — covers an owner-occupied 2-4 unit's residence share; LOOP requires 10 years' ownership. Assume the seller's bill understates the buyer's within 1-2 revaluation cycles."
+  risk: "MEDIUM"
+  assessor_url: "https://www.phila.gov/departments/office-of-property-assessment/"
+  treasurer_url: "https://www.phila.gov/services/payments-assistance-taxes/property-taxes/real-estate-tax/"
+  source_url: "https://www.phila.gov/2026-06-30-city-of-philadelphia-to-mail-2027-property-assessments-and-launch-expanded-outreach-to-connect-homeowners-to-tax-relief/"
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}

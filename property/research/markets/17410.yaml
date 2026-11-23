@@ -1,0 +1,132 @@
+# research/markets/17410.yaml — Cleveland, OH (Cuyahoga principal county; CBSA also Lake, Lorain, Medina, Geauga). Filled 2026-11-23 from primary sources where marked verified.
+cbsa: "17410"
+name: "Cleveland, OH"
+retrieved_at: "2026-11-23"
+cities: ["Cleveland", "Lakewood", "Parma"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "healthcare concentration — Cleveland Clinic (56,986 Ohio headcount) and University Hospitals (30,891) are the two largest employers; MetroHealth adds 8,034 (Ohio Dev. Services Agency Major Employers Report, 2022-12) — hospital margins/Medicaid policy move the regional job base"
+  - "Browns stadium $600M state share is litigated: Ohio funded it from escheated unclaimed funds (HB 96) and press reports a temporary court block in 2025-26; private $2B+ commitment stands but public-infrastructure cost and timeline risk remain"
+  - "Cuyahoga 2024 sexennial reappraisal already repriced values (county presented ~32% residential rise per local press); next reappraisal pushed to 2031 by ODT (2026-01) — the interim triennial update year is not published and buyers should assume a 2027 update"
+  - "City of Cleveland rentals carry the heaviest small-landlord compliance load on the board: $70/unit/yr registration + Lead Safe Certificate (pre-1978, risk assessment every 2 years, ~$350+ assessor cost) + HVAC certificate for 4+ unit buildings; Lakewood adds a point-of-sale code-compliance inspection on non-owner-occupied sales"
+  - "Non-owner-occupied units lose Ohio's 2.5% owner-occupancy credit (county Fiscal Officer lists the credit as owner-occupied only), so an investor's bill exceeds the homesteaded seller's bill before any value change"
+major_employers:
+  - "Cleveland Clinic Foundation (hospital, 56,986 Ohio headcount — #1 in Ohio) — https://dam.assets.ohio.gov/image/upload/development.ohio.gov/research/obs/Ohio-Major-Employers-Report.pdf"
+  - "University Hospitals Health System (hospital, 30,891 Ohio headcount) — https://dam.assets.ohio.gov/image/upload/development.ohio.gov/research/obs/Ohio-Major-Employers-Report.pdf"
+  - "Progressive Corporation (insurance, 13,236 Ohio headcount; HQ Mayfield) — https://dam.assets.ohio.gov/image/upload/development.ohio.gov/research/obs/Ohio-Major-Employers-Report.pdf"
+  - "MetroHealth System (hospital, 8,034 Ohio headcount) — https://dam.assets.ohio.gov/image/upload/development.ohio.gov/research/obs/Ohio-Major-Employers-Report.pdf"
+  - "KeyCorp (banking, 6,777 Ohio headcount) — https://dam.assets.ohio.gov/image/upload/development.ohio.gov/research/obs/Ohio-Major-Employers-Report.pdf"
+  - "Sherwin-Williams (manufacturing/paints, 6,211 Ohio headcount in 2022; ~4,000 at new HQ + Brecksville R&D center per company FAQ) — https://corporate.sherwin-williams.com/us/en/media-center/building-our-future/FAQs.html"
+state_income_tax: "flat 2.75% on nonbusiness income above $26,050 for taxable years beginning in 2026 (HB 96, 136th GA; ORC 5747.02(A)(3)(c): $332 + 2.75% of amount over $26,050; first $26,050 exempt; business income taxed at flat 3%) — https://codes.ohio.gov/ohio-revised-code/section-5747.02"
+cost_of_living: ""
+
+catalysts:
+  - name: "Enclosed Huntington Bank Field (Browns dome) + adjoining mixed-use district, Brook Park — HSG commits >$2B private capital (≥$1.2B to the stadium) and Ohio HB 96 authorizes $600M from escheated unclaimed funds as a performance grant; the $2.6B total is HSG private + state share (Brook Park's ~$245M, per local press, not included); state share under litigation"
+    company: "Haslam Sports Group / Cleveland Browns"
+    sector: "other"
+    investment_usd: 2600000000
+    jobs: 0
+    avg_wage: null
+    announced: "2025-03"
+    start: "2026-04"
+    completion: "2029"
+    status: under_construction
+    source_url: "https://www.lsc.ohio.gov/assets/legislation/136/hb96/en0/files/hb96-othersports-facilities-and-unclaimed-funds-bill-analysis-as-enacted-136th-general-assembly.pdf"
+    verified: true
+  - name: "Cleveland Clinic main-campus capital program — 1,000,000 sq ft Neurological Institute building (210 beds expanding to 300; 14 ORs) opening January 2027, part of the $1.3B program announced 2022-05 (jobs figure is the program total: 2,000 direct / 7,500 indirect)"
+    company: "Cleveland Clinic"
+    sector: "hospital"
+    investment_usd: 1300000000
+    jobs: 2000
+    avg_wage: null
+    announced: "2022-05"
+    start: "2022"
+    completion: "2027-01"
+    status: under_construction
+    source_url: "https://newsroom.clevelandclinic.org/2022/05/13/cleveland-clinic-announces-details-of-1-3-billion-in-capital-investments/"
+    verified: true
+  - name: "Sherwin-Williams global headquarters (downtown, ~1,000,000 sq ft) + Morikis Global Technology Center (Brecksville, ~600,000 sq ft) — combined construction cost $860M; ~4,000 employees housed; incentive package = retain ~4,000 jobs + create at least 400; HQ move-in completed 2026-04, ribbon-cutting 2026-05-11"
+    company: "The Sherwin-Williams Company"
+    sector: "manufacturing"
+    investment_usd: 860000000
+    jobs: 400
+    avg_wage: null
+    announced: "2020-02"
+    start: "2021-10"
+    completion: "2026-04"
+    status: completed
+    source_url: "https://corporate.sherwin-williams.com/us/en/media-center/building-our-future/FAQs.html"
+    verified: true
+  - name: "Bedrock Cuyahoga Riverfront (35 acres, downtown) — $3.5B public+private master plan under the City–Bedrock Master Development Agreement (2023-09); bulkhead/public infrastructure began 2023-10; Cleveland Clinic/Cavaliers sports-medicine facility (2024) and 6,200-seat Riverfront Amphitheater (groundbreaking 2026-11) are the first vertical components; Bedrock frames delivery over 15-20 years"
+    company: "Bedrock (Rock Ventures) / City of Cleveland"
+    sector: "other"
+    investment_usd: 3500000000
+    jobs: 0
+    avg_wage: null
+    announced: "2023-09"
+    start: "2023-10"
+    completion: ""
+    status: under_construction
+    source_url: "https://www.clevelandohio.gov/news/city-cleveland-bedrock-mda-paves-way-35-billion-cuyahoga-riverfront-transformation"
+    verified: true
+  - name: "Cleveland Clinic Mentor Hospital (Lake County) — ~$80M, 34 inpatient/observation rooms, 19 ED beds; broke ground 2021-09-20, opened 2023-07-11"
+    company: "Cleveland Clinic"
+    sector: "hospital"
+    investment_usd: 80000000
+    jobs: 0
+    avg_wage: null
+    announced: "2021-09"
+    start: "2021-09"
+    completion: "2023-07"
+    status: completed
+    source_url: "https://newsroom.clevelandclinic.org/2021/09/20/cleveland-clinic-breaks-ground-on-new-mentor-hospital-set-to-open-in-early-2023/"
+    verified: true
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: "Cuyahoga County Down Payment Assistance (DPA) Program, administered by Believe Mortgage (CHN Housing Partners' lending arm); parallel City of Parma DPA Program with identical eligibility for purchases in Parma. NOTE: county release says 'single-family home to be their primary residence' — eligibility of an owner-occupied 2-4 unit is UNKNOWN; loan terms (deferral/forgiveness schedule) are not published on the county page"
+    dollar_value: 20900
+    cash_or_noncash: cash
+    eligibility: "household income at or below 80% of area median income; must not have owned a home in the last three years (not limited to first-time buyers); complete CHN homeownership classes (free)"
+    minimum_income: "none stated; maximum = 80% AMI"
+    employment_requirement: "none"
+    home_purchase_requirement: "purchase of a single-family home as primary residence in one of the 51 eligible 'urban county' Cuyahoga communities — EXCLUDES Cleveland, Cleveland Heights, East Cleveland, Euclid and Lakewood (Parma covered by the Parma DPA); assistance up to 10% of purchase price, capped at $20,900"
+    residency_requirement: "primary residence"
+    minimum_stay: "UNKNOWN — not stated on county page"
+    application_deadline: "none listed; apply via believemortgage.org/dpa or 855-764-5626"
+    funding_availability: "funds announced available 2025-09-08 (county funding); county housing page also lists an RFP for a new HOME-funded DPA administrator, so the administrator may change"
+    source_url: "https://cuyahogacounty.gov/county-news/county-news-detail/2025/09/15/down-payment-assistance-is-available-for-cuyahoga-county-residents"
+    verified: true
+
+landlord_law:
+  verified: true
+  rent_control: "no — state preemption, ORC 5321.19(A) as amended by HB 430 (134th GA, eff. 2022-09-23): political subdivisions may not regulate rental terms 'including, without limitation, by any way imposing or requiring rent control or rent stabilization'; ORC 5321.20 declares it a matter of statewide concern"
+  just_cause_eviction: "no — Ohio has no just-cause requirement; forcible entry and detainer (ORC Ch. 1923) requires a 3-day notice to leave with statutory language (ORC 1923.04(A)); hearing on possession set per local court rules but not sooner than 7 days after service is complete (ORC 1923.06(H)(1))"
+  eviction_timeline_days: 21   # statutory shape: 3-day notice (1923.04) + service + hearing ≥7 days after service (1923.06) + writ/set-out — a ~3-week uncontested path is the statutory floor, not a measured median
+  rental_licensing: "yes — City of Cleveland Rental Registration, all non-owner-occupied residential units, $70 per unit per year (city rental-registration page; codified at CCO 365.03 per search result, code page not retrievable), renew annually with fees due by March 31; Certificate Approving Rental Occupancy required to rent in good standing; HVAC certificate/inspection for 4+ unit buildings; Lakewood: annual 'housing license' renewal due November 1 (fee not published on page); Parma: registration/inspection per Parma Codified Ordinances Ch. 1345 reported by a third-party guide — NOT confirmed on a city page (UNKNOWN)"
+  rental_license_fee_annual: 70
+  inspection_frequency: "Cleveland: no routine interior inspection cycle on 1-3 unit rentals found; lead risk assessment every 2 years for pre-1978 rentals (Lead Safe Certificate) and HVAC inspection only for 4+ unit buildings; otherwise complaint-based Building & Housing enforcement. Lakewood: point-of-sale, rental and complaint-based inspections (no fixed cycle stated)"
+  lead_rules: "federal pre-1978 disclosure (EPA/HUD) PLUS City of Cleveland Lead Safe Certification (2019 council legislation): every pre-1978 non-owner-occupied rental unit must hold a Lead Safe Certificate or exemption — risk assessment by a licensed assessor (inspections start ~$350), certificate valid 2 years then re-apply, or 20-year exemption after full abatement + LIRA; no city application fee; remediation plan due within 90 days if hazards found; LSC# needed to finalize rental registration; an owner-occupied unit in a multi-unit building is exempt (other units are not)"
+  certificate_of_occupancy_rules: "Cleveland: no point-of-sale inspection found; Certificate Approving Rental Occupancy issued through registration. Lakewood: since 2019-09-01 a certificate of code compliance (formerly CO) is required before selling a non-owner-occupied residential rental, after a point-of-sale inspection of interior, exterior and yard (L.C.O. 1173.01 / 1306.53). Parma: UNKNOWN"
+  security_deposit_limits: "no statutory cap (ORC 5321.16); 5% annual interest owed on any portion exceeding the greater of $50 or one month's rent if tenancy lasts 6+ months; itemized deductions and balance returned within 30 days of termination + delivery of possession; wrongful withholding = amount withheld as damages plus attorney fees (tenant must give forwarding address)"
+  local_landlord_taxes_fees: "no landlord-specific tax found; $70/unit/yr Cleveland rental registration; non-owner-occupied units are not eligible for Ohio's owner-occupancy credit (2.5% rollback) listed by the County Fiscal Officer"
+  utility_obligations: "landlord must supply running water, reasonable amounts of hot water and reasonable heat at all times, except where the tenant controls the heat/hot-water installation supplied by a direct public utility connection, and must keep all electrical, plumbing, sanitary, heating, ventilating and A/C fixtures the landlord supplies in good and safe working order (ORC 5321.04(A)(4),(6))"
+  sources:
+    - "https://codes.ohio.gov/ohio-revised-code/section-5321.19"
+    - "https://codes.ohio.gov/ohio-revised-code/section-1923.04"
+    - "https://codes.ohio.gov/ohio-revised-code/section-1923.06"
+    - "https://codes.ohio.gov/ohio-revised-code/section-5321.16"
+    - "https://codes.ohio.gov/ohio-revised-code/section-5321.04"
+    - "https://www.clevelandohio.gov/city-hall/departments/building-housing/divisions/records-administration/rental-registration"
+    - "https://www.clevelandohio.gov/city-hall/departments/public-health/programs-services/lead-safe/landlords-owners"
+    - "https://lakewoodoh.gov/housing-and-building/landlords/"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "No sale-triggered reassessment in Ohio. Cuyahoga County reappraises all real property every six years by state-licensed appraisers (last sexennial reappraisal 2024, values effective tax year 2024 / bills payable 2025) with a triennial update between; the Ohio Department of Taxation's 2026-01-15 bulletin moved Cuyahoga's next reappraisal to 2031, and the interim update year is not stated (assume 2027). Market sales feed neighborhood-level mass appraisal at those updates, not a per-parcel reset at closing. A buyer's own arm's-length price can still be used against them only through a Board of Revision complaint: HB 126 (134th GA, 2022) bars school boards from filing original complaints unless the sale was in the prior year AND exceeded the auditor's value by both >10% and >$500,000 (indexed), so a sub-$400K 2-4 unit purchase is effectively shielded from school-board price complaints. Owners may file their own complaint Jan 1-Mar 31 (DTE Form 1). Two things do move the buyer's bill at once: loss of the 2.5% owner-occupancy credit if the seller was owner-occupied, and any homestead exemption the seller held. Taxes are paid in arrears (first half due ~Jan/Feb, second half ~Jul)."
+  risk: "LOW"
+  assessor_url: "https://www.cuyahogacounty.gov/fiscal-officer"
+  treasurer_url: "https://cuyahogacounty.gov/treasury"
+  source_url: "https://content.govdelivery.com/accounts/OHTAX/bulletins/4048d9f"
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}

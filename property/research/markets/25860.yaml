@@ -1,0 +1,157 @@
+# research/markets/25860.yaml — Hickory-Lenoir-Morganton, NC (Catawba, Burke, Caldwell counties). Filled 2026-11-23 from primary sources where read; UNKNOWN left blank.
+cbsa: "25860"
+name: "Hickory-Lenoir-Morganton, NC"
+retrieved_at: "2026-11-23"
+cities: ["Hickory", "Lenoir", "Morganton"]   # RentCast city search terms
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "sector concentration in fiber-optic/data-center supply chain (Corning, CommScope, Prysmian, US Conec) — hyperscaler capex cycle risk; Corning Hickory expansion is anchored on a single customer (Meta)"
+  - "Catawba County revaluation effective 2027-01-01 (4-year cycle, last 2023-01-01) — assessed values reset within weeks of this run; FY2027-28 bills will reflect 2023→2027 appreciation"
+  - "Microsoft data centers (4 sites, $1B+) create ~50 permanent jobs — large capex, small payroll; do not model as a jobs catalyst"
+  - "legacy furniture/textile manufacturing base still cyclical (Century, McCreary Modern, Lee Industries)"
+  - "Burke and Caldwell counties (Morganton, Lenoir) not researched for assessor cycle or local programs this run — Catawba County only"
+major_employers:
+  - "Catawba County Schools (K-12 education, county's largest employer per county profile; headcount not pulled) — https://www.catawbaedc.org/largest-employers"
+  - "Corning Optical Communications (fiber-optic manufacturing, Hickory; ~5,000 statewide per company, Hickory headcount UNKNOWN) — https://www.catawbaedc.org/largest-employers"
+  - "CommScope (fiber-optic cable / telecom equipment, Hickory-founded; headcount UNKNOWN) — https://www.catawbaedc.org/largest-employers"
+  - "Catawba Valley Medical Center (hospital; headcount UNKNOWN) — https://www.catawbaedc.org/largest-employers"
+  - "Frye Regional Medical Center (hospital; headcount UNKNOWN) — https://www.catawbaedc.org/largest-employers"
+  - "Prysmian (fiber-optic / cable manufacturing, Claremont; headcount UNKNOWN) — https://www.catawbaedc.org/largest-employers"
+state_income_tax: "flat 3.99% for tax years after 2025 (NCDOR Tax Rate Schedules: 'For Taxable Years after 2025, the North Carolina individual income tax rate is 3.99%'); NCDOR notes further trigger-based cuts may apply from TY2027 — https://www.ncdor.gov/taxes-forms/individual-income-tax/tax-rate-schedules"
+cost_of_living: ""               # no reliable index read this run
+
+catalysts:
+  - name: "Prysmian — $1B+ expansion of Claremont fiber-optic/glass plant (largest capital investment in Catawba County in 11 years of EDPNC tracking)"
+    company: "Prysmian Cables and Systems USA, LLC"
+    sector: "manufacturing"
+    investment_usd: 1000000000
+    jobs: 385
+    avg_wage: 60870
+    announced: "2026-08"
+    start: "2026-09"              # groundbreaking posted 2026-09-09 on Catawba EDC news page
+    completion: ""
+    status: under_construction
+    source_url: "https://www.commerce.nc.gov/news/press-releases/2026/08/12/governor-stein-announces-1-billion-expansion-prysmians-claremont-facility-adding-385-new-jobs"
+    verified: true
+  - name: "Microsoft — four data centers in Conover, Hickory and Maiden (phased over 10 years)"
+    company: "Microsoft Corp."
+    sector: "data_center"
+    investment_usd: 1000000000     # 'a minimum of $1 billion'
+    jobs: 50                       # 'at least 50 new jobs'
+    avg_wage: null
+    announced: "2022-11"
+    start: ""
+    completion: ""
+    status: under_construction     # 2026-06-23 joint county/city statement: sites 'both existing and under construction'
+    source_url: "https://catawbacountync.gov/news/microsoft-to-invest-1b-in-technology-facilities-in-catawba-county/"
+    verified: true                 # also read https://www.catawbacountync.gov/news/joint-statement-on-microsoft-data-center-development-in-catawba-county/
+  - name: "CommScope — fiber-optic cable capacity expansion, Catawba County"
+    company: "CommScope"
+    sector: "manufacturing"
+    investment_usd: 60300000
+    jobs: 250
+    avg_wage: 57444
+    announced: "2023-07"
+    start: ""
+    completion: "2027"             # CEO: investment and hiring 'over the next four years' from 2023
+    status: announced
+    source_url: "https://governor.nc.gov/news/press-releases/2023/07/25/governor-cooper-announces-commscope-add-250-new-jobs-60-million-investment-fiber-optic-cable"
+    verified: true
+  - name: "Goldhofer Inc. — US HQ and first North American production facility, Trivium Corporate Center, Hickory"
+    company: "Goldhofer Inc."
+    sector: "manufacturing"
+    investment_usd: 19500000
+    jobs: 80
+    avg_wage: null
+    announced: "2026-06"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://governor.nc.gov/news/press-releases/2026/06/30/goldhofer-inc-selects-hickory-its-us-headquarters-and-first-north-american-production-facility"
+    verified: true
+  - name: "Corning Optical Communications — Hickory optical-cable plant expansion at Trivium (Meta anchor customer; $6B multi-year supply deal)"
+    company: "Corning Incorporated"
+    sector: "manufacturing"
+    investment_usd: 170000000      # local agreement range $170M–$267.9M (Catawba EDC, Oct 2025); low end used
+    jobs: 132                      # minimum under the local agreement; company says Meta deal supports 15-20% NC-wide growth (~750-1,000 jobs statewide, not Hickory-specific)
+    avg_wage: 65000                # 'to exceed $65,000' per Catawba EDC release (headline only read)
+    announced: "2025-10"
+    start: "2026-03"               # construction start marked 2026-03-31 per local press
+    completion: ""
+    status: under_construction
+    source_url: "https://www.catawbaedc.org/post/corning-to-expand-operations-in-trivium-with-plans-to-add-132-jobs-and-invest-170-000-000-to-267-9"
+    verified: false                # EDC page rendered headline only; Meta deal details from WFAE (2026-01-27); Corning blog returned 403; no state release found
+  - name: "US Conec — 200,000 sf optical-interconnect manufacturing facility, Hickory"
+    company: "US Conec Ltd."
+    sector: "manufacturing"
+    investment_usd: 149700000
+    jobs: 224
+    avg_wage: null                 # 'above $56,937 county average' per EDC summary
+    announced: "2026-10"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.catawbaedc.org/news"
+    verified: false                # governor.nc.gov release not located; figures from Catawba EDC news summary + WSOC/Area Development (2026-10-24)
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: "Unifour Consortium Down-Payment Assistance Program (WPCOG, HUD HOME consortium: Alexander, Burke, Caldwell, Catawba counties)"
+    dollar_value: 20000           # 15% of purchase price, capped at $20,000; 0% deferred loan, no monthly payment
+    cash_or_noncash: cash
+    eligibility: "first-time homebuyer (no ownership in last 3 years); total gross household income within program limits (chart on WPCOG page, not legible this run); manufactured homes excluded; $500 minimum buyer contribution; loan from participating lender"
+    minimum_income: ""
+    employment_requirement: ""
+    home_purchase_requirement: "home in Alexander, Burke, Caldwell or Catawba County; separate maximum purchase prices for existing and new construction (WPCOG says caps subject to change)"
+    residency_requirement: "owner-occupied; repayment triggered on sale, refinance or transfer (subordination possible on refinance)"
+    minimum_stay: "half of loan forgiven at 10-year anniversary; balance repaid on sale/refinance/transfer"
+    application_deadline: ""
+    funding_availability: ""      # UNKNOWN — HOME allocation dependent
+    source_url: "https://www.wpcog.org/unifour-consortium-homebuyer"
+    verified: true
+  - program: "NCHFA Community Partners Loan Program (CPLP) via WPCOG — up to 25% of sales price (max $50,000) with NC Home Advantage Mortgage, or up to 10% with USDA 502 Direct"
+    dollar_value: 50000
+    cash_or_noncash: cash
+    eligibility: "buyer and property requirements set by NC Housing Finance Agency (not read this run); 0% deferred second, repaid at sale or end of term; stackable with other DPA"
+    minimum_income: ""
+    employment_requirement: ""
+    home_purchase_requirement: "must pair with NC Home Advantage Mortgage or USDA 502 Direct loan; WPCOG is the local administering partner"
+    residency_requirement: "owner-occupied"
+    minimum_stay: ""
+    application_deadline: ""
+    funding_availability: ""
+    source_url: "https://www.wpcog.org/unifour-consortium-homebuyer"
+    verified: false               # WPCOG page read; NCHFA program page (eligibility/caps) returned 404 this run
+
+landlord_law:
+  verified: false                 # every item below traces to a primary statute/agency page read this run EXCEPT the 10-day appeal period (UNC School of Government summaries, G.S. 7A-228 not opened) and the 'no local program found' negatives
+  rent_control: "no — state preemption, G.S. 42-14.1(a): no county or city may enact, maintain, or enforce any ordinance regulating the amount of rent for privately owned residential or commercial rental property"
+  just_cause_eviction: "no — no just-cause statute in NC Ch. 42 and no Hickory/Catawba ordinance found; landlord uses summary ejectment (G.S. 42-26 et seq.) for breach, holdover or lease expiry"
+  eviction_timeline_days: 30      # statutory floor ≈ summons appearance ≤7 business days from issuance (G.S. 42-28) + 10-day appeal window (G.S. 7A-228, per UNC SOG) + sheriff executes writ ≤5 days of receipt (G.S. 42-36.2) + notice/filing time; uncontested cases typically ~3-5 weeks
+  rental_licensing: "no — no City of Hickory rental registration/permit program found (city code search returned only the Land Development Code); G.S. 160D-1207(c) bars local permits-to-lease and general rental registration; registration + fee allowed ONLY for individual properties with >4 verified violations/12 mo, 2+ in 30 days, or top-10% crime/disorder"
+  rental_license_fee_annual: null  # none; statutory cap $500/12-month period applies only to violation-flagged properties (G.S. 160D-1207)
+  inspection_frequency: "none periodic — G.S. 160D-1207(a) limits inspections to reasonable cause (complaint, visible violation, >2 verified violations/12 mo) or designated blighted areas; Hickory minimum-housing enforcement is complaint-driven (city ordinance not read this run)"
+  lead_rules: "federal only — pre-1978 units: EPA/HUD Lead Disclosure Rule (Title X §1018): EPA pamphlet, disclosure of known LBP/hazards and records, Lead Warning Statement in lease, keep 3 years; no Hickory/Catawba lead rental ordinance found"
+  certificate_of_occupancy_rules: "none on sale or re-rent — no point-of-sale/rental CO inspection in Hickory found; G.S. 160D-1207(c) bars conditioning a CO on enrollment in any rental program or inspection before utility service"
+  security_deposit_limits: "G.S. 42-51(b): max 1.5 months' rent for month-to-month tenancies, 2 months' rent for terms longer than month-to-month; must be held in NC trust account or bonded"
+  local_landlord_taxes_fees: "none rental-specific — G.S. 160D-1207(c) bars fees/taxes levied only on rental property; ordinary Catawba County + City of Hickory ad valorem property tax applies (2026 rates on county Tax Office page, not pulled)"
+  utility_obligations: "G.S. 42-42: landlord must maintain electrical, plumbing, sanitary, heating, ventilating and A/C systems; heat capable of 65°F Nov 1-Mar 31; smoke alarms (10-yr lithium on replacement) and CO alarm per level where fossil-fuel appliance or attached garage; landlord may bill tenants for water/sewer under G.S. 42-42.1; City of Hickory is the water provider — no master-metering rule found"
+  sources:
+    - "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_42/GS_42-14.1.html"
+    - "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_42/GS_42-51.html"
+    - "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_42/GS_42-28.html"
+    - "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_42/GS_42-36.2.html"
+    - "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_42/GS_42-42.html"
+    - "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_160D/GS_160D-1207.html"
+    - "https://www.epa.gov/lead/real-estate-disclosures-about-potential-lead-hazards"
+    - "https://www.sog.unc.edu/sites/default/files/course_materials/Proc%20for%20LLs.pdf"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "No reassessment on sale. NC counties hold the value set at the last general revaluation until the next one; G.S. 105-287(b) forbids interim changes for 'inflation, deflation, or other economic changes affecting the county in general' (only physical changes, use changes or errors). Catawba County revalues every 4 years (statutory max 8, G.S. 105-286); current values effective 2023-01-01; next revaluation effective 2027-01-01 with new-value notices mailing January 2027 and appeals to the Board of E&R in 2027. The 2027 Schedule of Values is already posted. Burke and Caldwell county cycles not checked."
+  risk: "HIGH"                    # revaluation lands ~5 weeks after this run; a 2026 purchase at market will see its assessed value move from a 2021-22 sales base to a 2026 base on the FY2027-28 bill; commissioners set the rate each June and may not hold it revenue-neutral
+  assessor_url: "https://catawbacountync.gov/county-services/tax/revaluation/"
+  treasurer_url: "https://www.catawbacountync.gov/county-services/tax/pay-online/"
+  source_url: "https://catawbacountync.gov/county-services/tax/revaluation/"
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}

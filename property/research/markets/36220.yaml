@@ -1,0 +1,116 @@
+# research/markets/36220.yaml — Odessa, TX (Ector County). Filled 2026-11-23 from web reading only; UNKNOWN beats a guess.
+cbsa: "36220"
+name: "Odessa, TX"
+retrieved_at: "2026-11-23"
+cities: ["Odessa"]
+single_employer_dependence: false
+energy_boom_watch: true
+risks:
+  - "Oil/gas boom-bust exposure, heavier than Midland: Odessa's largest private employers are oilfield-service and industrial-construction firms (Saulsbury, Halliburton, NexTier — Dallas Fed); energy & mining cluster >25% of Midland-Odessa jobs; payrolls and rents follow WTI and the Permian rig count"
+  - "Dallas Fed Permian Basin Economic Indicators Q2 2026: Odessa unemployment 4.3% (vs Midland 3.4%); Midland-Odessa median sale price $337K flat y/y (-1.9% real)"
+  - "Texas Critical Data Centers (Ector County) is pre-tenant: Phase 1 lease under a non-binding LOI, Phase 2 power agreements non-binding, ready-for-service not before Q4 2027 — treat as speculative upside, not current demand"
+  - "Texas property tax: Ector CAD is on an ANNUAL reappraisal cycle at market value; sale price is used directly in the next appraisal; 20% non-homestead circuit-breaker cap (Tax Code 23.231) expires 2026-12-31 unless renewed"
+  - "High Texas property tax rates offset the absence of a state income tax"
+major_employers:
+  - "Saulsbury Industries (industrial construction/midstream, ~4,000 nationwide; Odessa's largest private employer per Dallas Fed) — https://www.dallasfed.org/research/heart/midland"
+  - "Halliburton + NexTier/Keane (oilfield services, ~4,300 combined, 2017) — https://www.dallasfed.org/research/heart/midland"
+  - "Medical Center Health System / Ector County Hospital District (hospital, jobs n/a) — https://www.tdlr.texas.gov/TABS/Projects/TABS2025017855"
+  - "Ector County Independent School District (education, jobs n/a) — https://www.ectorcountyisd.org/"
+  - "University of Texas Permian Basin (university, jobs n/a) — https://www.utpb.edu/"
+  - "Liberty Energy regional HQ, 7401 Groening St (oilfield services; ~1,000 employees consolidated per local press) — https://www.tdlr.texas.gov/TABS/Projects/TABS2024007294"
+state_income_tax: "none (Texas has no personal income tax — https://comptroller.texas.gov/taxes/)"
+cost_of_living: ""
+
+catalysts:
+  - name: "Texas Critical Data Centers AI/HPC campus, Ector County (New Era Energy & Digital): Phase 1 200-207 MW firm power under 20-yr PPA with Luminant/Vistra affiliate, 493 acres owned + 99 under contract, Phase 2 ~550 MW behind-the-meter gas generation planned (Thunderhead); power Q3 2027, initial ready-for-service Q4 2027; tenant not yet signed"
+    company: "New Era Energy & Digital, Inc. (TCDC; formerly 50/50 JV with Sharon AI)"
+    sector: "data_center"
+    investment_usd: 0
+    jobs: 0
+    avg_wage: null
+    announced: "2025-02"
+    start: ""
+    completion: "2027-12"
+    status: announced
+    source_url: "https://www.sec.gov/Archives/edgar/data/2028336/000121390026118324/ea031194701ex99-1.htm"
+    verified: true    # SEC 8-K exhibit (Q3 2026 business update, 2026-11-12) read; capex and jobs not disclosed by the company; site prep under way but no formal construction start
+  - name: "Liberty Energy regional headquarters / vehicle maintenance facility, 7401 Groening St, Leeco industrial park (200,000 sf; total project reported locally at ~$50M with ~1,000 jobs retained and ~450-500 added; ODC $2.5M grant) — only the $35M TDLR-filed component is verified"
+    company: "Liberty Energy (LOS Odessa RE Investments LLC)"
+    sector: "energy"
+    investment_usd: 35000000
+    jobs: 0
+    avg_wage: null
+    announced: "2024-03"
+    start: "2024-02"
+    completion: "2025-06"
+    status: completed
+    source_url: "https://www.tdlr.texas.gov/TABS/Projects/TABS2024007294"
+    verified: true    # TDLR state project filing read ($35,000,000; 2/5/2024 - 6/2/2025); note TDLR lists the parcel's county as Midland (Odessa city limits extend into Midland County)
+  - name: "Medical Center Hospital 4-Central Universal Care Suite renovation, 500 W 4th St (13,369 sf)"
+    company: "Ector County Hospital District - Medical Center Health System"
+    sector: "hospital"
+    investment_usd: 12000000
+    jobs: 0
+    avg_wage: null
+    announced: "2025-06"
+    start: "2025-06"
+    completion: "2026-05"
+    status: completed
+    source_url: "https://www.tdlr.texas.gov/TABS/Projects/TABS2025017855"
+    verified: true    # TDLR filing read ($12,000,000; 6/2/2025 - 5/31/2026); completion per filed schedule, opening not independently confirmed
+  - name: "Medical Center Health System Center for Health & Wellness two-story addition ($10,035,000 guaranteed-maximum-price contract approved by Ector County Hospital District board)"
+    company: "Ector County Hospital District - Medical Center Health System"
+    sector: "hospital"
+    investment_usd: 10035000
+    jobs: 0
+    avg_wage: null
+    announced: ""
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.ttuhsc.edu/stories/echd-considers-10-million-expansion-contract-odessa-american"
+    verified: false   # Odessa American report (reposted by TTUHSC); board minutes / TDLR filing not located; dates unknown
+
+incentives:
+  - program: "City of Odessa Homebuyer Assistance Program (Community Development): down payment 5% or 10% of price + up to $3,500 closing costs, combined max $13,500 for an existing home (new construction: DPA $2,500-$20,000 + up to $4,000 closing, max $24,000); zero-interest deferred-payment loan"
+    dollar_value: 13500
+    cash_or_noncash: cash
+    eligibility: "Household income below HUD annual limits (updated June/July); credit score above 580; pre-approval from an approved lender; buyer contributes 1% of purchase price and holds 2 months P&I in savings; Homebuyer Education Course after approval; City recorded as second lien holder"
+    minimum_income: ""
+    employment_requirement: ""
+    home_purchase_requirement: "Pre-approved property inside Odessa city limits meeting Housing Quality Standards; existing homes priced up to $270,632 (HOME limit); new construction <=95% of HUD max; owner-financed, manufactured and mobile homes excluded; must be buyer's primary residence with annual reporting (a 2-4 unit qualifies only if Andrew occupies a unit)"
+    residency_requirement: ""
+    minimum_stay: "primary residence with annual occupancy reporting (deferred loan; term not stated)"
+    application_deadline: ""
+    funding_availability: "Approval letter does not guarantee disbursement; 7-10 business day processing; contact 432-335-4820 / cd@odessa-tx.gov"
+    source_url: "https://www.odessa-tx.gov/1421/Community-Development"
+    verified: true    # City of Odessa Community Development page read 2026-11-23
+
+landlord_law:
+  verified: false
+  rent_control: "no — Tex. Loc. Gov't Code §214.902 allows a city rent-control ordinance only on a finding of a housing emergency due to a disaster AND with the governor's approval"
+  just_cause_eviction: "no — Tex. Prop. Code §24.005: 3-day written notice to vacate (lease may set shorter/longer); nonpayment, lease breach or holdover suffice; 2025 amendments (eff. 2026-01-01) add §24.0042 time computation and summary-disposition procedure §24.005106"
+  eviction_timeline_days: 30
+  rental_licensing: ""
+  rental_license_fee_annual: null
+  inspection_frequency: ""
+  lead_rules: "federal only found: pre-1978 lead-based paint disclosure (42 U.S.C. 4852d; 24 CFR 35 / 40 CFR 745); no Odessa-specific lead ordinance located"
+  certificate_of_occupancy_rules: ""
+  security_deposit_limits: "no statutory cap on amount; refund within 30 days of surrender with itemized deductions (Tex. Prop. Code §92.103-.104); bad-faith retention = $100 + 3x deposit + attorney fees (§92.109)"
+  local_landlord_taxes_fees: "none found — no state income tax; City of Odessa Code Enforcement page lists no rental registration/inspection program (only a Texas tenant-rights handout)"
+  utility_obligations: "landlord may not interrupt tenant-paid or landlord-furnished water/wastewater/gas/electric except for bona fide repairs or emergency (Tex. Prop. Code §92.008; penalty one month's rent + $1,000); duty to repair conditions affecting health/safety and hot water >=120F (§92.052)"
+  sources:
+    - "https://tcss.legis.texas.gov/resources/lg/htm/lg.214.htm"
+    - "https://tcss.legis.texas.gov/resources/pr/htm/pr.24.htm"
+    - "https://tcss.legis.texas.gov/resources/pr/htm/pr.92.htm"
+    - "https://www.odessa-tx.gov/171/Code-Enforcement"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "No reassessment-on-sale event, but Ector CAD states it 'uses an annual reappraisal cycle' — every property is appraised each year at market value as of Jan 1 by comparison to recent sales (ECAD FAQ; Reappraisal Plan 2027/2028), so a recorded sale price feeds the next Jan 1 appraisal. The 10% homestead cap belongs to an owner-occupant seller and 'automatically expires as of January 1st of the year following the sale' with the property appraised at market (ECAD plan; Tax Code §23.23), so a 2-4 unit bought from a homesteaded owner can jump. Non-homestead real property <= ~$5M (CPI-adjusted) gets a 20% annual circuit-breaker cap (§23.231) but not in the first year of new ownership, and the statute expires 2026-12-31 unless extended."
+  risk: "HIGH"
+  assessor_url: "https://www.ectorcad.org/"
+  treasurer_url: "https://www.ectorcad.org/index.php"    # county Tax Assessor-Collector page (ectorcountytx.gov/189) points property-tax matters to ECAD; county office handles motor vehicles/HOT
+  source_url: "https://www.ectorcad.org/pdf/faq.pdf"
+
+listings: {}

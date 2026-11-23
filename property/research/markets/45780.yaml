@@ -1,0 +1,122 @@
+# research/markets/45780.yaml — Toledo, OH (Lucas principal county; CBSA also Wood, Fulton, Ottawa). Filled 2026-11-23 from primary sources where marked verified.
+cbsa: "45780"
+name: "Toledo, OH"
+retrieved_at: "2026-11-23"
+cities: ["Toledo"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "auto-cycle exposure — Stellantis Toledo Assembly (Wrangler/Gladiator; 6,600 Ohio headcount in 2022 state report), GM Toledo Propulsion (~2,036) and Dana (~1,549) ride vehicle demand and UAW contract cycles; the 900-job Stellantis midsize-truck launch is not due until 2028"
+  - "healthcare is the largest employer block (ProMedica ~15,000 NW Ohio, Mercy Health ~8,800) — ProMedica's system-level finances are not evaluated here (UNKNOWN)"
+  - "Lucas 2024 reappraisal already repriced residential values (~29% per local press); ODT (2026-01) moved the next reappraisal to 2028, so the normal 3-year update cadence is disrupted and the next value change date is not published"
+  - "Toledo pre-1978 1-4 unit rentals need a Lead-Safe Certificate (clearance exam ~$400 + $25 city fee) before any new tenant — budget it on every pre-1978 unit turn; full phase-in deadline 2026-12-31"
+  - "First Solar's newest $488M center is in Wood County (Perrysburg area), inside the CBSA but outside Lucas County/Toledo city rentals"
+major_employers:
+  - "ProMedica Health System (hospital, ~15,000 NW Ohio per RGP 2024-04; 18,712 Ohio headcount in 2022 state report) — https://rgp.org/major-employers-northwest-ohio/"
+  - "Mercy Health – Toledo (hospital, ~8,800 Lucas County) — https://rgp.org/major-employers-northwest-ohio/"
+  - "University of Toledo incl. UTMC (university, ~5,700) — https://rgp.org/major-employers-northwest-ohio/"
+  - "Stellantis Toledo Assembly Complex / Toledo Machining (manufacturing, 6,600 Ohio headcount in 2022 state report; RGP lists 600, which appears understated) — https://dam.assets.ohio.gov/image/upload/development.ohio.gov/research/obs/Ohio-Major-Employers-Report.pdf"
+  - "First Solar (manufacturing, ~2,400, Wood County) — https://rgp.org/major-employers-northwest-ohio/"
+  - "GM Toledo Propulsion Systems (manufacturing, ~2,036) — https://rgp.org/major-employers-northwest-ohio/"
+state_income_tax: "flat 2.75% on nonbusiness income above $26,050 for taxable years beginning in 2026 (HB 96, 136th GA; ORC 5747.02(A)(3)(c): $332 + 2.75% of amount over $26,050; first $26,050 exempt; business income taxed at flat 3%) — https://codes.ohio.gov/ohio-revised-code/section-5747.02"
+cost_of_living: ""
+
+catalysts:
+  - name: "Stellantis Toledo Assembly Complex — nearly $400M to add an all-new midsize truck (moved from Belvidere) alongside Jeep Wrangler and Gladiator; >900 jobs; launch 2028; part of the $13B / 5,000-job four-year U.S. plan"
+    company: "Stellantis N.V."
+    sector: "manufacturing"
+    investment_usd: 400000000
+    jobs: 900
+    avg_wage: null
+    announced: "2025-10"
+    start: ""
+    completion: "2028"
+    status: announced
+    source_url: "https://www.sec.gov/Archives/edgar/data/1605484/000160548425000081/a99110142025_stla.htm"
+    verified: true
+  - name: "First Solar Jim Nolan Center for Solar Innovation — 1.3M sq ft R&D center producing full-size prototype thin-film/tandem modules plus production-line R&D and warehousing, Wood County near Perrysburg; $488M, 180 new jobs, $16M payroll (JobsOhio success story 2026-02 describes the center as operating; opening date not stated — originally announced 2022-10 as a $270M R&D center)"
+    company: "First Solar, Inc."
+    sector: "energy"
+    investment_usd: 488000000
+    jobs: 180
+    avg_wage: null
+    announced: "2022-10"
+    start: ""
+    completion: ""
+    status: completed
+    source_url: "https://www.jobsohio.com/newsroom/ohio-success/first-solar-invests-in-glass-capital-of-the-world"
+    verified: true
+  - name: "GM Toledo Propulsion Systems — ~$40M for added capacity and a new transmission variant for Chevrolet Equinox and GMC vehicles (plant has received >$1B since 2011); jobs not specified"
+    company: "General Motors"
+    sector: "manufacturing"
+    investment_usd: 40000000
+    jobs: 0
+    avg_wage: null
+    announced: "2026-03"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.ohiohouse.gov/members/eric-synenberg/news/rep-rogers-announces-general-motors-investment-in-toledo-142647"
+    verified: true
+  - name: "Ukrainian Defense Drones (UDD / F-Drones) first U.S. assembly and manufacturing center, Village of Holland, Lucas County — 'multimillion-dollar' investment (amount not disclosed), at least 300 new jobs; no construction/opening timeline given"
+    company: "Ukrainian Defense Drones (UDD)"
+    sector: "defense"
+    investment_usd: 0
+    jobs: 300
+    avg_wage: null
+    announced: "2026-06"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.jobsohio.com/newsroom/news-press/leading-ukrainian-drone-manufacturer-selects-northwest-ohio"
+    verified: true
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: "City of Toledo Home at Last — down payment / closing-cost grant for first-time buyers inside Toledo city limits: up to $12,500 citywide, up to $20,000 in the Englewood, Junction, Old South End and East Toledo NRSAs. NOTE: program page says 'single-family or condominium homes only' — a 2-4 unit purchase appears INELIGIBLE; confirm with the city before modelling"
+    dollar_value: 12500
+    cash_or_noncash: cash
+    eligibility: "first-time buyer (no home owned/purchased in past 3 years), credit-worthy, pre-approved for a fixed-rate mortgage with a participating lender, household income at or below 80% of HUD AMI adjusted for family size; HUD-approved homeownership counseling required first; minimum $500 buyer contribution (includes required home inspection)"
+    minimum_income: "none stated; maximum = 80% HUD AMI"
+    employment_requirement: "none"
+    home_purchase_requirement: "single-family or condominium home within Toledo city limits; city inspection incl. lead-paint inspection by licensed risk assessor; grant funded at the title company at closing"
+    residency_requirement: "owner-occupancy not stated on page (program is for home buyers; assume primary residence)"
+    minimum_stay: "UNKNOWN — recapture/forgiveness terms not stated on page"
+    application_deadline: "none listed; rolling via participating lenders, ~21 business days to close"
+    funding_availability: "active — page last updated 2026-10-15; 2025 results: 35 buyers, average grant $7,540 (city news 2026-01-13); funding source not stated"
+    source_url: "https://toledo.oh.gov/services/neighborhood-and-business-development/housing/programs/home-at-last/"
+    verified: true
+
+landlord_law:
+  verified: false
+  rent_control: "no — state preemption, ORC 5321.19(A) as amended by HB 430 (134th GA, eff. 2022-09-23): political subdivisions may not regulate rental terms 'including, without limitation, by any way imposing or requiring rent control or rent stabilization'; ORC 5321.20 declares it a matter of statewide concern"
+  just_cause_eviction: "no — Ohio has no just-cause requirement; forcible entry and detainer (ORC Ch. 1923) requires a 3-day notice to leave with statutory language (ORC 1923.04(A)); hearing on possession set per local court rules but not sooner than 7 days after service is complete (ORC 1923.06(H)(1))"
+  eviction_timeline_days: 21   # statutory shape: 3-day notice (1923.04) + service + hearing ≥7 days after service (1923.06) + writ/set-out — a ~3-week uncontested path is the statutory floor, not a measured median
+  rental_licensing: "yes — registration of every Toledo residential rental on the Lucas County Auditor's rental registry (city ordinances of 2020-10; enforcement by Toledo Code Enforcement under TMC Ch. 1767); registration itself carries NO fee per the code chapter as surfaced in search (code library page not directly retrievable — UNVERIFIED); the substantive cost is the Lead-Safe Certificate on pre-1978 1-4 unit rentals ($25 city fee per unit, 2024 city release) plus the private clearance exam"
+  rental_license_fee_annual: 0
+  inspection_frequency: "no periodic city rental inspection cycle found; complaint-based code enforcement; lead clearance examination required before each new tenancy on uncertified pre-1978 1-4 unit rentals (certificate validity period not stated on city pages — UNKNOWN)"
+  lead_rules: "federal pre-1978 disclosure (EPA/HUD) PLUS Lead Safe Toledo ordinance: residential rentals of 1-4 units built before 1978 (and family child-care homes) must obtain and maintain a valid Lead-Safe Certificate before being rented or re-rented — register on the Auditor's registry, hire a State-licensed and city-registered lead inspector/risk assessor/clearance technician (~$400 in Toledo), correct hazards, pass a clearance exam with dust-wipe sampling, apply via the city permit portal ($25 non-refundable certificate fee, 2024 release); landlord must give tenant the certificate copy with the EPA pamphlet; phase-in began 2022-06-30 with all covered properties due by 2026-12-31; non-compliance referred to Housing Court; land-contract sales generally exempt, lease-purchase covered"
+  certificate_of_occupancy_rules: "no point-of-sale or certificate-of-occupancy inspection requirement for residential sales found on City of Toledo pages (not exhaustively confirmed — UNKNOWN)"
+  security_deposit_limits: "no statutory cap (ORC 5321.16); 5% annual interest owed on any portion exceeding the greater of $50 or one month's rent if tenancy lasts 6+ months; itemized deductions and balance returned within 30 days of termination + delivery of possession; wrongful withholding = amount withheld as damages plus attorney fees (tenant must give forwarding address)"
+  local_landlord_taxes_fees: "no landlord-specific tax found; $25 Lead-Safe Certificate fee per covered unit; non-owner-occupied units are not eligible for Ohio's owner-occupancy credit (2.5% rollback)"
+  utility_obligations: "landlord must supply running water, reasonable amounts of hot water and reasonable heat at all times, except where the tenant controls the heat/hot-water installation supplied by a direct public utility connection, and must keep all electrical, plumbing, sanitary, heating, ventilating and A/C fixtures the landlord supplies in good and safe working order (ORC 5321.04(A)(4),(6))"
+  sources:
+    - "https://codes.ohio.gov/ohio-revised-code/section-5321.19"
+    - "https://codes.ohio.gov/ohio-revised-code/section-1923.04"
+    - "https://codes.ohio.gov/ohio-revised-code/section-1923.06"
+    - "https://codes.ohio.gov/ohio-revised-code/section-5321.16"
+    - "https://codes.ohio.gov/ohio-revised-code/section-5321.04"
+    - "https://toledo.oh.gov/residents/landlord-tenant-resources/toledo-lead-safe/property-owners-lead-safe"
+    - "https://toledo.oh.gov/residents/landlord-tenant-resources/toledo-lead-safe/lead-safe-certificate"
+    - "https://toledo.oh.gov/news/2021/06/25/lead-safety-compliance-rental-registration-deadline-approaching"
+    - "https://toledo.oh.gov/news/2024/04/18/city-of-toledos-department-of-housing-and-community-development-announces-lead-stabilization-grant-program"
+    - "https://codelibrary.amlegal.com/codes/toledo/latest/toledo_oh/0-0-0-160811"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "No sale-triggered reassessment in Ohio. Lucas County values twice in a six-year cycle — a full revaluation then a triennial update three years later (Auditor: 'The last Lucas County Revaluation was 2024, and 2021 was the last Triennial'); the Ohio Department of Taxation's 2026-01-15 bulletin moved Lucas's next reappraisal to 2028, so the cadence is disrupted and the next update year is not published. Valid arm's-length sales feed neighborhood-scale mass appraisal (sales-ratio studies to the 90-110% IAAO band) at those updates, not a per-parcel reset at closing. A buyer's own price can be used against them only through a Board of Revision complaint (filing window Jan 1-Mar 31; one challenge per 3-year cycle): HB 126 (134th GA, 2022) bars school boards from original complaints unless the sale was in the prior year AND exceeded the auditor's value by both >10% and >$500,000 (indexed), so a sub-$400K 2-4 unit purchase is effectively shielded. Immediate bill movers: loss of the 2.5% owner-occupancy credit if the seller was owner-occupied, and any homestead exemption the seller held. Taxes paid in arrears, semi-annual."
+  risk: "LOW"
+  assessor_url: "https://www.lucascountyohioauditor.gov/"
+  treasurer_url: "https://www.lucascountytreasurer.org/"
+  source_url: "https://content.govdelivery.com/accounts/OHTAX/bulletins/4048d9f"
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}

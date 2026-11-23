@@ -1,0 +1,117 @@
+# research/markets/31140.yaml — Louisville/Jefferson County, KY-IN. Filled 2026-11-23 from primary sources where marked verified.
+# NOTE: louisvilleky.gov and codelibrary.amlegal.com (Metro Code) sit behind Cloudflare and returned 403 to this session; Metro Code
+# items below are drawn from search excerpts of the code text and local press and are therefore marked verified: false.
+cbsa: "31140"
+name: "Louisville/Jefferson County, KY-IN"
+retrieved_at: "2026-11-23"
+cities: ["Louisville"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "Ford Louisville Assembly $1.9B retool is a job-RETENTION play (2,200 existing jobs secured, no new jobs stated) and Ford's CEO called the $30K EV truck 'a bet'; the plant's 2027 restart is the catalyst, not headcount growth"
+  - "Jefferson County PVA treats a valid arm's-length sale price as the property's value for ~2 years and assigns a field inspection on every sale — the buyer's assessment resets toward purchase price, so the seller's bill is never the buyer's bill"
+  - "Louisville Metro has the heaviest local rental compliance stack in the screen: Chapter 119 rental registry ($50/yr unless violation-free), proactive inspections in 11 high-renter market areas since 2024-06, and the Chapter 167 Lead-Safe Housing Registry requiring a state-certified risk assessor evaluation on every pre-1978 rental (1940-1965 units due by 2026-11-30, 1966-1977 by 2027-11-30)"
+  - "BlueOval SK battery park (Glendale, Hardin County) is ~50 miles south and is NOT a Louisville-metro catalyst; GE Appliances' $1B 2026 announcement states no new-job figure"
+major_employers:
+  - "United Parcel Service / Worldport (logistics, ~25,090 local per Business First 2020-12 via Greater Louisville Inc.) — https://www.greaterlouisville.com/talent/major-employers/"
+  - "Norton Healthcare (hospital, ~13,828 per Business First 2020-12 via GLI) — https://www.greaterlouisville.com/talent/major-employers/"
+  - "Ford Motor Co. — Louisville Assembly + Kentucky Truck Plant (manufacturing, ~13,020 per Business First 2020-12 via GLI) — https://www.greaterlouisville.com/talent/major-employers/"
+  - "Humana Inc. (health insurance HQ, ~12,360 per Business First 2020-12 via GLI) — https://www.greaterlouisville.com/talent/major-employers/"
+  - "UofL Health (hospital, ~12,000 per Business First 2020-12 via GLI) — https://www.greaterlouisville.com/talent/major-employers/"
+  - "GE Appliances, a Haier company (manufacturing, 'more than 8,000 full-time at Appliance Park and a nearby call center' per KY Cabinet for Economic Development 2026-09-02) — https://newkentuckyhome.ky.gov/Newsroom/NewsPage/20260902_GE_IUECWA"
+state_income_tax: "flat 3.5% for tax years beginning on/after 2026-01-01 (down from 4% in 2025) — KRS 141.020 as amended by 2025 HB 1; KY DOR 2026 withholding tables — https://apps.legislature.ky.gov/law/statutes/statute.aspx?id=56339 ; https://revenue.ky.gov/Forms/2026%20WH%20Tax%20Tables.pdf"
+cost_of_living: ""
+
+catalysts:
+  - name: "Ford Louisville Assembly Plant retool for Universal EV Platform / midsize electric pickup (~$30K target price)"
+    company: "Ford Motor Company"
+    sector: "manufacturing"
+    investment_usd: 1900000000
+    jobs: 2200
+    avg_wage: null
+    announced: "2025-08"
+    start: "2025"
+    completion: "2027"
+    status: under_construction
+    source_url: "https://newkentuckyhome.ky.gov/Newsroom/NewsPage/20250811_FordEV"
+    verified: true
+    # jobs = 2,200 EXISTING full-time jobs secured (state release); no new jobs stated. KEDFA: up to $550M cumulative tax incentives (KJRA supplement). Platform completion target Q2 2027.
+  - name: "GE Appliances Appliance Park Building 2 front-load washer / combo washer-dryer reshoring (from China)"
+    company: "GE Appliances, a Haier company"
+    sector: "manufacturing"
+    investment_usd: 490000000
+    jobs: 800
+    avg_wage: null
+    announced: "2025-06"
+    start: "2025"
+    completion: "2027"
+    status: under_construction
+    source_url: "https://newkentuckyhome.ky.gov/Newsroom/NewsPage/20250626_GEAppliances"
+    verified: true
+    # 800 new full-time jobs; production slated to begin 2027; KEDFA up to $113.5M cumulative (KJRA supplement) tied to $1.2B+ cumulative investment and up to 8,000 jobs.
+  - name: "GE Appliances $1B Appliance Park laundry expansion — Building 5 dryer line (>$400M, moved from Mexico) + Building 1 washer/dryer platforms (~$112M); includes the already-announced $490M Building 2"
+    company: "GE Appliances, a Haier company"
+    sector: "manufacturing"
+    investment_usd: 1000000000
+    jobs: 0
+    avg_wage: null
+    announced: "2026-09"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://newkentuckyhome.ky.gov/Newsroom/NewsPage/20260902_GE_IUECWA"
+    verified: true
+    # jobs: release states NO new-job figure for the $1B (only restates 800 from 2025-06 and 30 water-filter jobs from 2026-01); press reports of 800 new / 4,700 secured are unconfirmed. $1B overlaps the $490M item above — do not sum.
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: "Louisville Metro Office of Housing & Community Development — Down Payment Assistance Program (partially forgivable 0% second mortgage). NOTE: handbook states 'Homebuyers purchasing a rental/investment property are NOT eligible'; eligible home types listed are single-family, condo, co-op, yet the HUD HOME value-limit table lists 2-unit/3-unit/4-unit prices — eligibility of an OWNER-OCCUPIED duplex-fourplex is UNKNOWN and must be confirmed with the Office before underwriting"
+    dollar_value: 30000
+    cash_or_noncash: cash
+    eligibility: "household income <= 80% AMI (HUD, by household size — FY24 handbook: $50,250 for 1 person to $94,750 for 8); clean credit (no unpaid collections/charge-offs, bankruptcy discharged >= 1 yr; up to $10K medical collections allowed); pre-approval with a local or FHA-approved lender; no co-signer; not a first-time-buyer program but may not have owned a home in the prior 12 months; homeownership counseling required (both spouses if married)"
+    minimum_income: "none stated; maximum = 80% of HUD area median income adjusted for family size"
+    employment_requirement: "none (income verified with employer)"
+    home_purchase_requirement: "existing or new home in Louisville Metro within HUD HOME value limits (FY24: $235,000 1-unit existing up to $410,000 4-unit existing; $315,000-$574,000 new); buyer contributes minimum $500 + recording fee, Metro encourages >= 2% down; liquid assets over $15,000 must go toward purchase"
+    residency_requirement: "must occupy as principal residence for the affordability period"
+    minimum_stay: "5 years (loans <= $14,999: 50% forgiven at year 5) / 10 years ($15,000-$40,000: 10%/yr forgiven years 6-10 to 50%) / 15 years (> $40,000); remaining principal due at sale, 0% interest"
+    application_deadline: "rolling while funds last; secondary source reports program reopened for applications 2026-08-17 (unverified — louisvilleky.gov program page returned 403 to this session)"
+    funding_availability: "UNKNOWN from primary source for FY27; program was paused mid-2020s and reportedly reopened 2026-08-17 'as long as funding remains available' (secondary). $30,000 maximum is from the secondary report of the FY27 handbook; the FY24 handbook read here sizes loans by need with tiers above $40,000 and states no flat cap"
+    source_url: "https://benevate.blob.core.windows.net/louisvilleky-public/DPA%20Handbook%20FY24%207-21-23.pdf"
+    verified: false
+
+landlord_law:
+  verified: false
+  rent_control: "no — state preemption, KRS 65.875 ('only the General Assembly shall enact legislation which would control rents on private property', created 1992); also KRS 383.198 prohibits local landlord-tenant ordinances in conflict with state law. Louisville Metro has adopted the URLTA (KRS 383.500-383.705) as Metro Code Chapter 151"
+  just_cause_eviction: "no — URLTA (adopted by Louisville Metro) has no just-cause requirement; nonpayment: 7-day written notice (KRS 383.660(2)); other material breach: 14-day notice to cure, 14-day notice to quit on repeat within 6 months (KRS 383.660(1)); month-to-month terminable on 30 days' written notice (KRS 383.695(2))"
+  eviction_timeline_days: 7
+  rental_licensing: "yes — Louisville Metro Code Chapter 119 Rental Housing Registry (Ord. 174-2016, overhauled 2022): all rental units register online with Codes & Regulations; one registration/fee per multi-unit facility; initial fee $25-$250 by zoning class ($25 for R-4/R-5); $50 nonrefundable annual renewal, WAIVED if no Ch. 156/119 violations in prior 12 months; change of ownership voids the registration after 30 days; failure to register $100/unit first offense, each day a separate offense"
+  rental_license_fee_annual: 50
+  inspection_frequency: "proactive (random) inspections since 2024-06-01 limited to 11 market areas where >33% of residents rent (2019 Housing Needs Assessment); new construction exempt 10 yrs, renovated units 5 yrs; elsewhere complaint-based; entry only with URLTA notice (KRS 383.615/383.665), administrative warrant, or occupant consent; Metro reported ~7,000 inspections planned in year one"
+  lead_rules: "federal pre-1978 disclosure (EPA/HUD Section 1018) PLUS Louisville Metro Code Chapter 167 Lead-Safe Housing Registry (Ord. 183-2022): every pre-1978 rental unit registers with Public Health & Wellness ($30 initial fee per unit or per multi-unit facility; renewal fee not to exceed $50; renew by Dec 31 yearly; register within 30 days of acquisition), and must have a Lead-Hazard Evaluation + Lead-Hazard Control Report by a Kentucky-certified Lead-Hazard Risk Assessor — pre-1940 units within 12 months of effect, 1940-1965 within 24 months, 1966-1977 within 36 months (press: deadlines 2025-11-30 / 2026-11-30 / 2027-11-30); renovation/RRP-based exemption available; notice of noncompliance then citation after 30 days"
+  certificate_of_occupancy_rules: "no point-of-sale CO or rental inspection-on-sale requirement found for Louisville Metro; the Ch. 119 registration must be re-filed by the new owner within 30 days of transfer and a Ch. 167 lead registration within 30 days of acquisition"
+  security_deposit_limits: "no statutory cap on amount (KRS 383.580); deposit must be held in a separate account at a KY- or federally-regulated institution and tenant told the location and account number; signed move-in and move-out damage listings required or landlord forfeits right to retain ANY of the deposit (383.580(4)); landlord may apply deposit to unpaid rent after 30 days; refund notice to last known address, deposit retained if no response in 60 days"
+  local_landlord_taxes_fees: "Ch. 119 registry $50/yr (waivable) + Ch. 167 lead registry $30 initial / <= $50 renewal for pre-1978 units; no Louisville-specific landlord tax found; Louisville Metro occupational license tax applies to net profits of businesses (rate for rental income not researched — UNKNOWN)"
+  utility_obligations: "landlord must maintain electrical, plumbing, sanitary, heating, ventilating, A/C and supplied appliances, and supply running water, reasonable hot water at all times and reasonable heat Oct 1-May 1 unless the unit's heat/hot water is generated by an installation under the tenant's exclusive control with a direct public-utility connection (KRS 383.595(1)(d)-(e)); single-family tenants may assume these duties by good-faith written agreement (383.595(3))"
+  sources:
+    - "https://law.justia.com/codes/kentucky/chapter-65/section-65-875/"
+    - "https://apps.legislature.ky.gov/law/statutes/statute.aspx?id=54458"
+    - "https://apps.legislature.ky.gov/law/statutes/statute.aspx?id=35749"
+    - "https://apps.legislature.ky.gov/law/statutes/statute.aspx?id=35733"
+    - "https://apps.legislature.ky.gov/law/statutes/statute.aspx?id=35736"
+    - "https://apps.legislature.ky.gov/law/statutes/statute.aspx?id=35756"
+    - "https://codelibrary.amlegal.com/codes/louisvillemetro/latest/loukymetro/0-0-0-65113"
+    - "https://codelibrary.amlegal.com/codes/louisvillemetro/latest/loukymetro/0-0-0-15776"
+    - "https://codelibrary.amlegal.com/codes/louisvillemetro/latest/loukymetro/0-0-0-71090"
+    - "https://www.nlc.org/wp-content/uploads/2025/09/louisvillemetro-ky-2.pdf"
+    - "https://louisvilleky.gov/government/codes-regulations/register-your-rental-property"
+    - "https://lpm.org/news/2024-04-22/louisville-to-start-proactive-inspections-of-rental-properties-june-1"
+    - "https://www.epa.gov/lead/real-estate-disclosures-about-potential-lead-hazards"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "Kentucky assesses at 100% fair cash value as of Jan 1 (KY Const. s.172). Jefferson County PVA values ~260,000 residential parcels annually by a sales (market) approach: sales are researched and verified every year, valid arm's-length sales feed the CAMA model, and per the PVA 'an accepted sale price represents the property value for approximately 2 years.' A sale also automatically assigns a PVA field inspection (exterior measure/photo; no interior entry). Separately the DOR-approved Quadrennial Plan physically reviews every parcel at least once every 4 years (KRS 132.690(1)) and Louisville Metro neighborhoods are reviewed annually. Net effect: the buyer's assessment moves to roughly the purchase price in the first or second assessment year after closing — a seller's under-assessed bill is never the buyer's. No rental vs. owner-occupied classification difference in KY (homestead exemption only for 65+/disabled). Bills issued by the Jefferson County Sheriff ~Nov 1 (2% discount through Dec 1; unpaid after Apr 15 go to County Clerk)."
+  risk: "HIGH"
+  assessor_url: "https://jeffersonpva.ky.gov/"
+  treasurer_url: "https://jeffersonsheriffky.gov/property-tax"
+  source_url: "https://jeffersonpva.ky.gov/property-assessment/residential-property/"
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}

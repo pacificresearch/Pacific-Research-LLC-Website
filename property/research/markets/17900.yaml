@@ -1,0 +1,127 @@
+# research/markets/17900.yaml — Columbia, SC (Richland + Lexington counties). Filled 2026-11-23 from primary sources where marked verified.
+cbsa: "17900"
+name: "Columbia, SC"
+retrieved_at: "2026-11-23"
+cities: ["Columbia", "West Columbia"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "SC taxes non-owner-occupied residential at a 6% assessment ratio (owner-occupied legal residence 4%); an arm's-length sale is an Assessable Transfer of Interest that resets taxable value to market (SC Code 12-37-3140) — buyer's bill will not match seller's"
+  - "Scout Motors (2027 production ramp) is the dominant private catalyst; EV-demand/execution risk concentrated in one plant"
+  - "Employment base is government-heavy (State of SC, Fort Jackson/DoD, UofSC) — stable but exposed to state/federal budget cycles"
+major_employers:
+  - "State of South Carolina (state government, ~32,000 per COLAtoday, undated) — https://colatoday.6amcity.com/columbia-sc-largest-employers"
+  - "Prisma Health Midlands (hospital, ~15,000 per COLAtoday, undated) — https://colatoday.6amcity.com/columbia-sc-largest-employers"
+  - "Fort Jackson / Dept of Defense (defense, headcount UNKNOWN; Columbia Chamber cites $4.2B regional impact) — https://columbiachamber.com/node/477"
+  - "University of South Carolina (university, headcount UNKNOWN; in SC LMI top-20 list) — https://lmi.sc.gov/_docs/Community-Profiles/21017900_Columbia_MSA.pdf"
+  - "BlueCross BlueShield of SC (insurance, headcount UNKNOWN; in SC LMI top-20 list) — https://lmi.sc.gov/_docs/Community-Profiles/21017900_Columbia_MSA.pdf"
+state_income_tax: "TY2026 two brackets: 1.99% on taxable income to $29,999, 5.21% at $30,000+ (minus $966); Act 110 of 2026, SC DOR Information Letter #26-20 — https://dor.sc.gov/sites/dor/files/policies/IL26-20.pdf"
+cost_of_living: ""
+
+catalysts:
+  - name: "Scout Motors production center (Blythewood)"
+    company: "Scout Motors Inc. (Volkswagen Group)"
+    sector: "manufacturing"
+    investment_usd: 2000000000
+    jobs: 4000
+    avg_wage: null
+    announced: "2023-03"
+    start: "2024-02"
+    completion: "2027"
+    status: under_construction
+    source_url: "https://governor.sc.gov/node/2386"
+    verified: true
+  - name: "Scout Motors Supplier Park (Blythewood)"
+    company: "Scout Motors Inc. and suppliers"
+    sector: "manufacturing"
+    investment_usd: 300000000
+    jobs: 1000
+    avg_wage: null
+    announced: "2025-09"
+    start: ""
+    completion: ""
+    status: under_construction
+    source_url: "https://blog.scoutmotors.com/?p=21972"
+    verified: true
+  - name: "AMAROK new headquarters (BullStreet District, Columbia)"
+    company: "AMAROK, LLC"
+    sector: "other"
+    investment_usd: 69000000
+    jobs: 296
+    avg_wage: null
+    announced: "2026-03"
+    start: ""
+    completion: "2028"
+    status: announced
+    source_url: "https://governor.sc.gov/node/6001"
+    verified: true
+  - name: "Cardiff Products aseptic co-packaging plant (West Columbia)"
+    company: "Cardiff Products Corporation"
+    sector: "manufacturing"
+    investment_usd: 99600000
+    jobs: 94
+    avg_wage: null
+    announced: "2025-01"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.governor.sc.gov/news/2025-01/cardiff-products-corporation-selects-lexington-county-first-south-carolina-operation"
+    verified: true
+  - name: "AVANTech expansion (Columbia)"
+    company: "AVANTech, LLC"
+    sector: "manufacturing"
+    investment_usd: 3700000
+    jobs: 65
+    avg_wage: null
+    announced: "2025-12"
+    start: ""
+    completion: "2026-02"
+    status: announced
+    source_url: "https://www.governor.sc.gov/node/5776"
+    verified: true
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: "Richland County Homeownership Assistance Program (RCHAP) — deferred forgivable second mortgage; NOTE: single-family detached only, so NOT applicable to a 2-4 unit purchase"
+    dollar_value: 24500
+    cash_or_noncash: cash
+    eligibility: "SC resident; first-time buyer or no home ownership in last 3 years; HUD low/moderate income limits (2026 Columbia metro: $51,750 for 1 person to $97,550 for 8); must qualify for mortgage without co-signer; property in unincorporated Richland County or Town of Blythewood; single-family detached only (no townhomes/condos/mobile; no 2-4 unit)"
+    minimum_income: "none stated; maximum gross household income per HUD limits applies"
+    employment_requirement: "none"
+    home_purchase_requirement: "single-family detached built after 1978; price cap $228,000 existing / $273,000 new; third-party, HVAC, CL-100 and county inspections; buyer contributes at least $500; contract cannot be ratified before application"
+    residency_requirement: "must occupy as primary residence"
+    minimum_stay: "5 years (assistance <= $14,999) or 10 years (>= $15,000); prorated recapture if sold earlier"
+    application_deadline: "none listed; in-person application by appointment, $50 fee"
+    funding_availability: "HUD-funded; open as of 2026-11 (workshops scheduled through 2027-10)"
+    source_url: "https://www.richlandcountysc.gov/Property-Business/Homes-and-Communities/Grants/Homeownership-Assistance"
+    verified: true
+
+landlord_law:
+  verified: true
+  rent_control: "no — state preemption, SC Code 27-39-60 (no county or municipality may regulate the amount of rent on private residential or commercial rentals; 1985 Act 184)"
+  just_cause_eviction: "no — SC Residential Landlord and Tenant Act (SC Code Title 27 Ch. 40) contains no just-cause requirement; only anti-retaliation limits (27-40-910)"
+  eviction_timeline_days: 30
+  rental_licensing: "yes — City of Columbia residential rental permit, $25/unit/yr, Ordinance 2015-099 (eff. 2016-07-01); owner or local agent within 45 miles must apply; permit non-transferable; business license required at 5+ units; fee waived for licensed professional management companies"
+  rental_license_fee_annual: 25
+  inspection_frequency: "no routine cycle — owner self-certifies minimum safety standards at permit; Code Enforcement inspects on request or complaint"
+  lead_rules: "federal only (pre-1978 housing: EPA/HUD Section 1018 disclosure — pamphlet, known-hazard disclosure, Lead Warning Statement, records kept 3 years); no City of Columbia or Richland County lead ordinance found"
+  certificate_of_occupancy_rules: "no point-of-sale CO or rental inspection found for City of Columbia; rental permits are non-transferable so a new owner must re-permit"
+  security_deposit_limits: "no statutory cap; itemized return within 30 days of termination/possession/demand (27-40-410); treble damages plus attorney fees for wrongful withholding"
+  local_landlord_taxes_fees: "City of Columbia business license for owners/managers of 5+ units; Richland County assesses non-owner-occupied residential at 6% vs 4% legal residence"
+  utility_obligations: "landlord must supply running water, reasonable hot water and reasonable heat and maintain electrical, gas, plumbing and other facilities (27-40-440); essential services defined 27-40-210(17)"
+  sources:
+    - "https://www.scstatehouse.gov/code/t27c039.php"
+    - "https://www.scstatehouse.gov/code/t27c040.php"
+    - "https://www.scstatehouse.gov/code/t27c037.php"
+    - "https://columbiapd.net/?p=1239"
+    - "https://www.epa.gov/lead/real-estate-disclosures-about-potential-lead-hazards"
+    - "https://www.richlandcountysc.gov/Property-Business/Property-Valuation"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "Arm's-length sale is an Assessable Transfer of Interest (SC Code 12-37-3140): Richland County reappraises the parcel at current fair market value for the next tax year, outside the 15% cap that otherwise limits increases in a five-year reassessment cycle (county-wide reassessment in years ending 4 and 9). Non-owner-occupied residential is assessed at 6% (legal residence 4%). A partial ATI exemption of up to 25% of ATI fair market value is available on application (12-37-3135); deadline per Assessor. Seller's bill (often 4%, pre-sale value) is never the buyer's bill."
+  risk: "HIGH"
+  assessor_url: "https://richlandcountysc.gov/government/departments/taxes/assessor"
+  treasurer_url: "https://www.richlandcountysc.gov/Government/Departments/Taxes/Treasurer"
+  source_url: "https://www.richlandcountysc.gov/Property-Business/Property-Valuation"
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}
