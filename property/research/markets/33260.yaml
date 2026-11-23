@@ -1,0 +1,116 @@
+# research/markets/33260.yaml — Midland, TX (Midland County). Filled 2026-11-23 from web reading only; UNKNOWN beats a guess.
+cbsa: "33260"
+name: "Midland, TX"
+retrieved_at: "2026-11-23"
+cities: ["Midland"]
+single_employer_dependence: false
+energy_boom_watch: true
+risks:
+  - "Oil/gas boom-bust exposure: energy & mining cluster is >25% of Midland-Odessa jobs (Dallas Fed); Permian rig count and payrolls swing with WTI (Q2 2026 WTI avg $93 after a 2025 downturn at $55-60) — rents and vacancy follow"
+  - "Dallas Fed Permian Basin Economic Indicators Q2 2026: Midland avg hourly earnings down 14.6% y/y, single-family permits down 30.5% Mar-Jun, Midland-Odessa median sale price $337K flat y/y (-1.9% real)"
+  - "Texas property tax: MCAD sets market value every year and conducts general reappraisals on a two-year cycle; sale price feeds the next appraisal; 20% non-homestead circuit-breaker cap (Tax Code 23.231) expires 2026-12-31 unless renewed"
+  - "AST SpaceMobile 1,800-job figure is a full-build-out projection under a performance-based agreement, not a contractual floor"
+  - "High Texas property tax rates offset the absence of a state income tax"
+major_employers:
+  - "Chevron (energy, jobs n/a) — https://golf.midlandtexas.gov/1120/midland-fast-facts"
+  - "Diamondback Energy (energy HQ, jobs n/a) — https://golf.midlandtexas.gov/1120/midland-fast-facts"
+  - "Midland Independent School District (education, jobs n/a) — https://golf.midlandtexas.gov/1120/midland-fast-facts"
+  - "Midland Health / Midland Memorial Hospital (hospital, jobs n/a) — https://golf.midlandtexas.gov/1120/midland-fast-facts"
+  - "City of Midland (government, jobs n/a) — https://golf.midlandtexas.gov/1120/midland-fast-facts"
+  - "ConocoPhillips / XTO Energy (ExxonMobil) regional operations (energy, jobs n/a) — https://www.dallasfed.org/research/heart/midland"
+state_income_tax: "none (Texas has no personal income tax — https://comptroller.texas.gov/taxes/)"
+cost_of_living: ""
+
+catalysts:
+  - name: "AST SpaceMobile 400,000+ sf satellite manufacturing facility at Midland Spaceport Business Park (MDC performance-based incentive up to $66M/30 yrs approved 2026-07-21; 1,800 FTE and $144M annual payroll projected at full build-out)"
+    company: "AST SpaceMobile"
+    sector: "aerospace"
+    investment_usd: 100000000
+    jobs: 1800
+    avg_wage: null
+    announced: "2026-07"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://texasedc.org/news/member-news/2026-07-22/midland-development-corporation-approves-incentive-to-support-ast-spacemobile-expansion"
+    verified: false   # MDC release read only as a Texas EDC repost; no MDC/city page or SEC filing located; later press cites up to $150M capex
+  - name: "Midland International Air & Space Port Terminal Expansion & Modernization (part of $150M airport/Airpark improvement program, ~73% grant-funded; groundbreaking 2025-10-29; completion as early as spring 2027)"
+    company: "City of Midland (Midland International Air & Space Port)"
+    sector: "transport"
+    investment_usd: 150000000
+    jobs: 0
+    avg_wage: null
+    announced: "2025-10"
+    start: "2025-10"
+    completion: "2027-03"
+    status: under_construction
+    source_url: "https://golf.midlandtexas.gov/CivicAlerts.asp?AID=1810"
+    verified: true    # City of Midland news release read
+  - name: "Midland Memorial Hospital 'Infill' renovation, 400 Rosalind Redfern Grover Pkwy (18,600 sf; component of the ~$156.8M Master Facility Plan the hospital board approved in 2023 per trade press — only this $31.6M component verified)"
+    company: "Midland County Hospital District / Midland Health"
+    sector: "hospital"
+    investment_usd: 31600000
+    jobs: 0
+    avg_wage: null
+    announced: "2023-11"
+    start: "2024-02"
+    completion: "2026-03"
+    status: completed
+    source_url: "https://www.tdlr.texas.gov/TABS/Projects/TABS2024006022"
+    verified: true    # TDLR state project filing read ($31,600,000; 2/5/2024 - 3/30/2026)
+  - name: "Starfighters Space second launch facility / hypersonic test base at Midland Spaceport (MDC economic development agreement; 23 FTE by 2033; capital investment 'millions' by 2027, amount not stated)"
+    company: "Starfighters Space Inc."
+    sector: "aerospace"
+    investment_usd: 0
+    jobs: 23
+    avg_wage: null
+    announced: "2024-10"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.tradeandindustrydev.com/region/texas/news/tx-starfighters-space-inc-expands-midland-33698.md"
+    verified: false   # trade-press repost of company release; MDC agreement page not located
+
+incentives:
+  - program: "City of Midland Homebuyer Assistance Program (CDBG First-Time Homeowner Program; PY24 Action Plan budgets 10 grants at $15,000)"
+    dollar_value: 15000
+    cash_or_noncash: cash
+    eligibility: "Low-income first-time homebuyer (CDBG: household at or below 80% of area median income per PY24 Action Plan); must complete homeownership training and qualify for a primary mortgage; U.S. citizen; buyer contributes minimum $1,000"
+    minimum_income: ""
+    employment_requirement: ""
+    home_purchase_requirement: "Decent, safe and sanitary home inside Midland city limits; pre-owned or new construction; owner-occupied (program is for homebuyers, so a 2-4 unit qualifies only if Andrew occupies a unit)"
+    residency_requirement: "Midland resident"
+    minimum_stay: ""
+    application_deadline: ""
+    funding_availability: "PY24 plan: 10 grants ($150,000); call Community Development Office 432-685-7472 — availability not confirmed for 2026"
+    source_url: "https://golf.midlandtexas.gov/1281/Housing-Programs"
+    verified: true    # city Housing Programs page + PY24 Fifth Year Action Plan (midlandtexas.gov/DocumentCenter/View/10252) read
+
+landlord_law:
+  verified: false
+  rent_control: "no — Tex. Loc. Gov't Code §214.902 allows a city rent-control ordinance only on a finding of a housing emergency due to a disaster AND with the governor's approval"
+  just_cause_eviction: "no — Tex. Prop. Code §24.005: 3-day written notice to vacate (lease may set shorter/longer); nonpayment, lease breach or holdover suffice; 2025 amendments (eff. 2026-01-01) add §24.0042 time computation and summary-disposition procedure §24.005106"
+  eviction_timeline_days: 30
+  rental_licensing: ""
+  rental_license_fee_annual: null
+  inspection_frequency: ""
+  lead_rules: "federal only found: pre-1978 lead-based paint disclosure (42 U.S.C. 4852d; 24 CFR 35 / 40 CFR 745); no Midland-specific lead ordinance located"
+  certificate_of_occupancy_rules: ""
+  security_deposit_limits: "no statutory cap on amount; refund within 30 days of surrender with itemized deductions (Tex. Prop. Code §92.103-.104); bad-faith retention = $100 + 3x deposit + attorney fees (§92.109)"
+  local_landlord_taxes_fees: "none found for long-term rentals — no state income tax; City of Midland regulates/registers SHORT-TERM rentals only (since 2022-02-01, Finance Dept.)"
+  utility_obligations: "landlord may not interrupt tenant-paid or landlord-furnished water/wastewater/gas/electric except for bona fide repairs or emergency (Tex. Prop. Code §92.008; penalty one month's rent + $1,000); duty to repair conditions affecting health/safety and hot water >=120F (§92.052)"
+  sources:
+    - "https://tcss.legis.texas.gov/resources/lg/htm/lg.214.htm"
+    - "https://tcss.legis.texas.gov/resources/pr/htm/pr.24.htm"
+    - "https://tcss.legis.texas.gov/resources/pr/htm/pr.92.htm"
+    - "https://golf.midlandtexas.gov/1029/Short-Term-Rental"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "No reassessment-on-sale event, but Midland CAD must set fair market value for all property each year (Tax Code §23.01) and its board policy (2023-2024 Reappraisal Plan) is a general reappraisal of all property on a two-year cycle with field review of a portion of the county every year and sales data reviewed annually, so a recorded sale price feeds the next Jan 1 appraisal. The 10% homestead cap belongs to an owner-occupant seller and expires Jan 1 after a sale (Tax Code §23.23), so a 2-4 unit bought from a homesteaded owner can jump to market. Non-homestead real property <= ~$5M (CPI-adjusted) gets a 20% annual circuit-breaker cap (§23.231) but not in the first year of new ownership, and the statute expires 2026-12-31 unless extended."
+  risk: "HIGH"
+  assessor_url: "https://www.midcad.org/"
+  treasurer_url: "https://midlandcad.propertytaxpayments.net/"    # Midland CAD collects property tax; county Tax Assessor-Collector (co.midland.tx.us/235/Tax-Office) handles motor vehicles only
+  source_url: "https://iswdataclient.azurewebsites.net/pubs/MIDLANDCAD/Biennial%20Reappraisal/2023-2024_Reappraisal_Plan.pdf"
+
+listings: {}
