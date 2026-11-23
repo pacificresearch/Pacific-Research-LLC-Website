@@ -1,0 +1,139 @@
+# research/markets/23060.yaml — Fort Wayne, IN (Allen County). Filled 2026-11-23 from primary sources where marked verified.
+# NOTE: allencounty.us was unreachable through this session's proxy and cityoffortwayne.in.gov returned 403 (Cloudflare);
+# items that depend on those two sites are marked verified: false and say so.
+cbsa: "23060"
+name: "Fort Wayne, IN"
+retrieved_at: "2026-11-23"
+cities: ["Fort Wayne"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "Headline catalyst (Google $2B data center) delivers only ~200 permanent jobs; the near-term housing demand is ~1,000 daily construction workers on a ~10-year build (Site Selection 2025-12) — transient, not tenant-base growth"
+  - "GM Fort Wayne Assembly (~4,000 jobs, full-size ICE pickups) is the largest single manufacturing payroll; 2023 $632M retool created no new jobs and the plant rides Detroit's truck cycle"
+  - "Indiana circuit-breaker caps: a rental is capped at 2% of gross AV (homestead 1%) and loses the homestead standard/supplemental deductions — a duplex bought from an owner-occupant can see its bill roughly double before any value change; Allen County also values residential rentals on a gross-rent-multiplier model, so verified rents feed the assessment"
+  - "Wayne Township (oldest core of Fort Wayne, where most 2-4 unit stock sits) is flagged by the county assessor for widespread unpermitted remodels and effective-age corrections found during sale validation — assessment catch-up risk on acquisition"
+  - "2025 Allen County attraction/expansion total was modest ($120.3M capital, 550 jobs across 17 projects) after the Google-driven $2.6B 2024 — the pipeline is thin behind the headline"
+major_employers:
+  - "Parkview Health (hospital, 20,000+ co-workers system-wide across 16 hospitals; Allen County headcount UNKNOWN — Purdue FW CRI puts Parkview + Lutheran combined at ~12,626 in Allen County) — https://www.parkview.com/about-us"
+  - "Lutheran Health Network (hospital, Allen County headcount UNKNOWN from primary; #4 on GFW Inc. private-employer list) — https://www.greaterfortwayneinc.com/economic-development/doing-business-in-allen-county/major-employers/"
+  - "General Motors Fort Wayne Assembly (manufacturing, ~4,000 per IEDC 2023-06 release; #3 on GFW list) — https://www.iedc.in.gov/events/news/details/2023/06/12/gm-underscores-commitment-to-indiana-with-632-million-investment-in-fort-wayne-assembly"
+  - "Amazon (logistics, headcount UNKNOWN; #2 on GFW Inc. list) — https://www.greaterfortwayneinc.com/economic-development/doing-business-in-allen-county/major-employers/"
+  - "Sweetwater Sound (e-commerce/retail HQ, headcount UNKNOWN; #5 on GFW list, #2 on Hoosiers by the Numbers Allen County) — https://hoosierdata.in.gov/major_employers.asp?areaID=003"
+  - "Lincoln Financial Group / BAE Systems / Steel Dynamics / Fort Wayne Metals (insurance, defense, steel, medical devices; GFW list ranks 6-11; headcounts UNKNOWN) — https://www.greaterfortwayneinc.com/economic-development/doing-business-in-allen-county/major-employers/"
+state_income_tax: "flat 2.95% for 2026 (adjusts to 2.90% in 2027) — Indiana DOR rates page — https://www.in.gov/dor/resources/tax-rates-and-reports/rates-fees-and-penalties/ ; Allen County local income tax is additional (rate not researched — UNKNOWN; see DOR Departmental Notice #1)"
+cost_of_living: ""
+
+catalysts:
+  - name: "Google data center + operational support complex, 700-acre campus (SE Fort Wayne, E. Tillman Rd / Adams Center Rd)"
+    company: "Google"
+    sector: "data_center"
+    investment_usd: 2000000000
+    jobs: 200
+    avg_wage: null
+    announced: "2024-04"
+    start: "2024-04"
+    completion: ""
+    status: under_construction
+    source_url: "https://iedc.in.gov/events/news/details/2024/04/26/gov.-holcomb-announces-google-is-building-a-2b-data-center-in-northeast-indiana"
+    verified: true
+    # IEDC: ground broken 2024-04-26; 'up to 200 new jobs'; 35-yr data-center sales-tax exemption on >= $800M, extendable to 50 yrs. Site Selection 2025-12: first phase under way, county plans show up to 12 facilities, ~10-year build, I&M/IURC power approval expected Q1 2026 (secondary).
+  - name: "GM Fort Wayne Assembly retool for next-generation ICE full-size pickups (body shop + general assembly conveyors/tooling)"
+    company: "General Motors"
+    sector: "manufacturing"
+    investment_usd: 632000000
+    jobs: 0
+    avg_wage: null
+    announced: "2023-06"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.iedc.in.gov/events/news/details/2023/06/12/gm-underscores-commitment-to-indiana-with-632-million-investment-in-fort-wayne-assembly"
+    verified: true
+    # Retention only — no new jobs; supports ~4,000 existing. IEDC: up to $1M training grants, $200K Manufacturing Readiness Grant, up to $10M conditional performance payments. Completion status UNKNOWN (no later release found).
+  - name: "Bombardier business-jet service center, Fort Wayne International Airport (64,500 sq ft)"
+    company: "Bombardier"
+    sector: "aerospace"
+    investment_usd: 0
+    jobs: 100
+    avg_wage: null
+    announced: "2025"
+    start: ""
+    completion: "2026"
+    status: under_construction
+    source_url: "https://www.greaterfortwayneinc.com/news/allen-county-continues-growth-in-2025/"
+    verified: true
+    # 'up to 100 jobs', opens second half of 2026; investment $ not stated by GFW Inc. (0 = UNKNOWN).
+  - name: "Tau Wire Corp (Tretau Group) first plant outside Europe"
+    company: "Tretau Group / Tau Wire Corp"
+    sector: "manufacturing"
+    investment_usd: 18000000
+    jobs: 70
+    avg_wage: null
+    announced: "2025"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.greaterfortwayneinc.com/news/allen-county-continues-growth-in-2025/"
+    verified: true
+    # 'over $18 million', 'up to 70' jobs over four years.
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: "MakeMyMove 'Fort Wayne, Indiana' remote-worker relocation package (sponsored by Northeast Indiana Regional Partnership with IEDC support) — NON-CASH perks only: 1-month Fort Wayne Museum of Art family membership + invitation to 'Meet Me at 5:05' networking; NO cash grant listed (a 2026 MakeMyMove article's '$11,700-$14,480' figure is not on the program page and is not relied on)"
+    dollar_value: 0
+    cash_or_noncash: noncash
+    eligibility: "remote worker employed full-time (able to keep current job) or self-employed (able to keep clients); income >= $50,000/yr; age 18+; currently reside outside Indiana; proof of eligibility"
+    minimum_income: "$50,000 annual"
+    employment_requirement: "retain existing full-time remote job or self-employment"
+    home_purchase_requirement: "none stated (rent or buy)"
+    residency_requirement: "relocate primary residence to Fort Wayne within 6 months of approval"
+    minimum_stay: "none stated"
+    application_deadline: "none stated; QuickApply with pre-approval in 1 business day"
+    funding_availability: "listed as open 2026-11 on makemymove.com; number of spots not stated"
+    source_url: "https://www.makemymove.com/get-paid/fort-wayne-indiana"
+    verified: false
+  - program: "Hoosier Homes down payment assistance (Fort Wayne Housing Authority with Club 720; launched 2024-04) — forgivable second mortgage up to 5% of loan amount in targeted areas / up to 3% elsewhere, for down payment, closing costs or rate buy-down. Lender program sheet lists eligible property types as 1-2 unit single-family, condo, townhouse, manufactured — triplex/fourplex NOT listed; forgiveness period and Allen County income limits UNKNOWN from a primary source (fwha.org not reached)"
+    dollar_value: 0
+    cash_or_noncash: cash
+    eligibility: "first-time and repeat buyers; min credit 620 (lender) / 640 (FWHA press); max DTI 50%; income limits vary by county/city (not published in sources read); first-time buyers complete homebuyer education"
+    minimum_income: "none stated; maximum varies by county (UNKNOWN for Allen)"
+    employment_requirement: "none stated"
+    home_purchase_requirement: "purchase only; FHA/VA/USDA/conventional 30-yr fixed first mortgage through a participating lender; 1-2 unit owner-occupied (3-4 unit not listed)"
+    residency_requirement: "primary residence, occupy within 60 days of closing"
+    minimum_stay: "UNKNOWN (forgiveness schedule not published in sources read)"
+    application_deadline: "rolling"
+    funding_availability: "UNKNOWN — program active per lender page 2026; FWHA funding level not found"
+    source_url: "https://www.wboi.org/news/2024-04-12/fort-wayne-housing-authority-creates-hoosier-homes-program"
+    verified: false
+
+landlord_law:
+  verified: false
+  rent_control: "no — state preemption, IC 32-31-1-20(b): a unit may not regulate rental rates for privately owned real property (including through zoning) unless authorized by state act; (c) also bars local regulation of tenant screening, security deposits, lease applications/terms, disclosures, and landlord fees — any violating ordinance 'is void and unenforceable'"
+  just_cause_eviction: "no — no just-cause statute; nonpayment: landlord may terminate on not less than 10 days' written notice unless the lease provides otherwise or rent is paid within the period (IC 32-31-1-6); month-to-month tenancy terminable on at least one month's notice (IC 32-31-1-1); court (ejectment/small-claims) timeline after notice UNKNOWN from a primary source"
+  eviction_timeline_days: 10
+  rental_licensing: "yes — City of Fort Wayne Neighborhood Code Compliance: 'all owners of residential property who do not occupy the property themselves must register the property' by filing a Housing Registration Form 'required by City ordinance' (cited by secondary sources as City Code Ch. 150); fee amount, renewal cycle and out-of-state local-agent rule NOT confirmed from the city page (403 to this session) — UNKNOWN"
+  rental_license_fee_annual: null
+  inspection_frequency: "complaint-based Neighborhood Code enforcement; no periodic rental inspection program found (Indiana IC 36-1-20 limits municipal rental inspection/registration programs statewide); a secondary site claims exterior inspection at registration — unverified"
+  lead_rules: "federal only (pre-1978 housing: EPA/HUD Section 1018 disclosure — pamphlet, known-hazard disclosure, Lead Warning Statement, records kept 3 years); no Fort Wayne or Allen County lead-registry ordinance found"
+  certificate_of_occupancy_rules: "no point-of-sale certificate of occupancy or rental inspection-on-sale requirement found for Fort Wayne; the Housing Registration Form must be filed by the new non-occupant owner"
+  security_deposit_limits: "no statutory cap on amount; landlord must return the deposit less itemized deductions (unpaid rent, tenant-caused damage, unpaid tenant utilities/sewer) with a written itemized notice within 45 days of termination and delivery of possession, once tenant supplies a mailing address; noncompliance forfeits the right to withhold anything and exposes landlord to the full deposit plus attorney's fees (IC 32-31-3-12 to -14); successor owner is bound"
+  local_landlord_taxes_fees: "no Fort Wayne landlord tax found; rentals are capped at 2% of gross AV (homestead 1%) and do not receive the homestead deductions — the main 'landlord premium' is property-tax classification, not a fee; registration fee UNKNOWN"
+  utility_obligations: "landlord must deliver the unit 'in a safe, clean, and habitable condition', comply with health/housing codes, and keep in good and safe working order the electrical, plumbing (reasonable hot and cold water at all times), sanitary, HVAC (heat 'at all times') systems, elevators and inducement appliances supplied at signing (IC 32-31-8-5); who pays utility bills is left to the lease; tenant utility arrears may be deducted from the deposit (IC 32-31-3-13)"
+  sources:
+    - "https://iga.in.gov/laws/2025/ic/titles/32#32-31-1-20"
+    - "https://codes.findlaw.com/in/title-32-property/in-code-sect-32-31-1-20/"
+    - "https://codes.findlaw.com/in/title-32-property/in-code-sect-32-31-1-6/"
+    - "https://codes.findlaw.com/in/title-32-property/in-code-sect-32-31-3-12/"
+    - "https://codes.findlaw.com/in/title-32-property/in-code-sect-32-31-8-5/"
+    - "https://www.cityoffortwayne.in.gov/code-compliance"
+    - "https://www.epa.gov/lead/real-estate-disclosures-about-potential-lead-hazards"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "Indiana has no sale-triggered reassessment to price: assessed value (Jan 1, market value-in-use) is 'trended' every year by a neighborhood factor derived from the prior calendar year's valid sales (DLGF Annual Adjustment fact sheet 2025-11; Allen County used 1/1/2025-12/31/2025 sales for the 2026 roll), and every parcel is physically inspected once per 4-year cyclical reassessment (25%/yr; Wayne Township — core Fort Wayne — was in Phase 4 for 2026). BUT the sale itself matters three ways: (1) every Sales Disclosure Form is validated with buyer/seller calls, MLS review and a mandatory field inspection (50 IAC 27-3-1), and the assessor 'has no choice but to update' the record for unpermitted finish, remodels and basement finish found — effective-age recalculation is 'more widespread' in Wayne Township; (2) Allen County values residential RENTAL property on a gross-rent-multiplier model, so disclosed rents drive the number; (3) classification: a non-owner-occupied unit loses the homestead standard + supplemental deductions and moves from the 1% to the 2% circuit-breaker cap (owner-occupied 2-4 unit: homestead/1% on the owner's dwelling share only), so a duplex bought from a homesteaded seller can roughly double in tax before any AV change. Bills are paid in arrears in two installments (~May 10 / Nov 10) to the Allen County Treasurer."
+  risk: "MEDIUM"
+  assessor_url: "https://www.allencounty.us/assessor"
+  treasurer_url: "https://www.allencounty.us/treasurer"
+  source_url: "https://www.in.gov/dlgf/files/2027-reports/2026-ratio-studies/ALLEN-2026-NARRATIVE.pdf"
+  # risk is HIGH when the seller was homesteaded (1%->2% cap + lost deductions), LOW-MEDIUM when buying from another investor. allencounty.us was unreachable from this session; the two county URLs above are the department landing paths and were not opened — the DLGF-published Allen County narrative (source_url) and DLGF fact sheets https://www.in.gov/dlgf/files/user-guides/251113-Fact-Sheet-Annual-Adjustments.pdf and https://www.in.gov/dlgf/files/user-guides/251113-Fact-Sheet-Circuit-Breaker-Caps.pdf were read.
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}
