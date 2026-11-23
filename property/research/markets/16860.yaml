@@ -1,0 +1,145 @@
+# research/markets/16860.yaml — Chattanooga, TN-GA (Hamilton County). Filled 2026-11-23 from primary sources where marked verified.
+cbsa: "16860"
+name: "Chattanooga, TN-GA"
+retrieved_at: "2026-11-23"
+cities: ["Chattanooga"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "Volkswagen Chattanooga (3,937 FT, largest private manufacturer) ended ID.4 EV assembly in April 2026 and retooled to the 2027 Atlas; first UAW contract ratified Feb 2026. No layoffs reported, but product-cycle and labor-cost risk is now concentrated in one plant"
+  - "NOVONIX Enterprise South ($1B-class, 450-500 jobs) still hinged on a CONDITIONAL DOE loan (up to $754.8M) as of the company's Nov 2025 investor day; land closing deferred until loan conditions are met. NOVONIX also missed its 2021 Riverside job target (85 of 290 jobs) and must repay a $3M state grant per local press — treat the 2028 jobs as speculative until financial close"
+  - "Hamilton County reappraised 2025-01-01 (4-year cycle, next 2029-01-01); 2026 appraisal ratio 1.0000 — values are current, so the 2029 reset should be moderate, but Chattanooga's post-2020 price run-up means 2029 could still reprice"
+  - "City code enforcement moved from complaint-only to proactive district-by-district sweeps (Nov 2025-Jan 2026), raising violation exposure for deferred-maintenance rentals"
+  - "GA side of the CBSA (Catoosa, Dade, Walker counties) is under Georgia law and assessment rules — this file's law/tax sections cover Hamilton County, TN only"
+major_employers:
+  - "BlueCross BlueShield of Tennessee (health insurance, 6,303 FT as of 2025-12-31) — https://chattanoogachamber.com/wp-content/uploads/2026/07/Major-Employers.pdf"
+  - "Erlanger Health (hospital, 5,681 FT + 1,400 PT) — https://chattanoogachamber.com/wp-content/uploads/2026/07/Major-Employers.pdf"
+  - "Hamilton County Schools (education, 5,605 FT) — https://chattanoogachamber.com/wp-content/uploads/2026/07/Major-Employers.pdf"
+  - "Volkswagen Group of America Chattanooga Plant (automotive manufacturing, 3,937 FT) — https://chattanoogachamber.com/wp-content/uploads/2026/07/Major-Employers.pdf"
+  - "Tennessee Valley Authority (federal utility, 3,748 FT) — https://chattanoogachamber.com/wp-content/uploads/2026/07/Major-Employers.pdf"
+  - "CHI Memorial (hospital, 3,645 FT + 938 PT) — https://chattanoogachamber.com/wp-content/uploads/2026/07/Major-Employers.pdf"
+  - "Unum Group (insurance, 3,219 FT) — https://chattanoogachamber.com/wp-content/uploads/2026/07/Major-Employers.pdf"
+state_income_tax: "none — Tennessee levies no tax on wages or salaries; the Hall tax on interest/dividends was repealed for tax periods beginning 2021-01-01 (TN Dept. of Revenue) — https://www.tn.gov/revenue/taxes/hall-income-tax.html"
+cost_of_living: ""
+
+catalysts:
+  - name: "NOVONIX Enterprise South synthetic graphite anode plant (31,500 tpa; 2nd Chattanooga plant). $1B figure is Chattanooga Chamber/local press (Dec 2024) — company release states only a DOE Loan Programs Office CONDITIONAL commitment of up to $754.8M and 500 FT jobs (later 450 operational + 500 construction); land purchase from City/County contingent on DOE loan close; full capacity targeted end-2028"
+    company: "NOVONIX Limited"
+    sector: "battery"
+    investment_usd: 1000000000
+    jobs: 500
+    avg_wage: null
+    announced: "2024-12"
+    start: ""
+    completion: "2028"
+    status: announced
+    source_url: "https://www.novonixgroup.com/news/nvx-enterprise-south-announcement/"
+    verified: false
+  - name: "West Star Aviation MRO expansion (Chattanooga Metropolitan Airport; maintenance, paint, interiors, avionics)"
+    company: "West Star Aviation, LLC"
+    sector: "aerospace"
+    investment_usd: 32000000
+    jobs: 200
+    avg_wage: null
+    announced: "2025-02"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://tnecd.com/news/governor-lee-commissioner-mcwhorter-announce-west-star-aviation-llc-to-expand-in-hamilton-county/"
+    verified: true
+  - name: "EPB Quantum Center — IonQ Forte Enterprise quantum computer launched 2026-09-18 (open for business Oct 2026, UTC first customer); IonQ investing $15M in a Tennessee Quantum Communications Research Center in Chattanooga (~24 jobs); $4M NIST grant for EPB Quantum Computing Fellows; underlying 2025 EPB-IonQ deal $22M"
+    company: "EPB (Chattanooga municipal utility) / IonQ"
+    sector: "other"
+    investment_usd: 15000000
+    jobs: 24
+    avg_wage: null
+    announced: "2025-04"
+    start: ""
+    completion: "2026-09"
+    status: completed
+    source_url: "https://epb.com/newsroom/press-releases/epb-launches-quantum-computer/"
+    verified: true
+  - name: "Master Machine nuclear-focused manufacturing/engineering expansion (new machinery in existing Chattanooga facility; DOE, naval nuclear and utility customers)"
+    company: "Master Machine, LLC (Fusion Enterprises)"
+    sector: "manufacturing"
+    investment_usd: 11700000
+    jobs: 44
+    avg_wage: null
+    announced: "2025-07"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://tnecd.com/news/master-machine-llc-to-expand-manufacturing-operations-in-hamilton-county/"
+    verified: true
+  - name: "Microtex Composites first U.S. facility (prepreg composites for automotive/aerospace)"
+    company: "Microtex Composites, Inc. (Italy)"
+    sector: "manufacturing"
+    investment_usd: 3800000
+    jobs: 26
+    avg_wage: null
+    announced: "2025-01"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.tn.gov/ecd/news/2025/1/7/governor-lee--commissioner-mcwhorter-announce-microtex-composites--inc--to-locate-first-u-s--facility-in-hamilton-county.html"
+    verified: true
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: "City of Chattanooga Down Payment Assistance Program — deferred, forgivable 0% subordinate mortgage, forgiven in full after 30 years. NOTE: eligible property types are single-family detached, townhomes, condos, manufactured homes and single-family with ADU (case-by-case); 2-4 UNIT PROPERTIES ARE NOT LISTED, so NOT applicable to a duplex/triplex/fourplex purchase"
+    dollar_value: 15000
+    cash_or_noncash: cash
+    eligibility: "First-time homebuyer (no ownership interest in 3 years; displaced-homemaker/single-parent exceptions per HUD; THDA first-time definition accepted); household income <= 120% AMI for Chattanooga TN-GA MSA (presentation: $81,800 for 1 person from 2026-06-01); credit 620+ (or first-mortgage minimum if higher); DTI <= 45%; THDA-approved homebuyer education within 12 months of closing; escrow for taxes/insurance required"
+    minimum_income: "none stated; maximum 120% AMI applies"
+    employment_requirement: "none"
+    home_purchase_requirement: "property inside City of Chattanooga corporate limits; lesser of price or appraised value <= $400,000; eligible types listed above (no 2-4 unit); no commercial component; licensed home inspection required; borrower contributes >= $1,000 own funds (no gifts); funds cover only verified closing gap"
+    residency_requirement: "owner-occupied primary residence within 60 days of closing and for the full loan term; notify City within 30 days of any occupancy change"
+    minimum_stay: "30 years for forgiveness (not prorated); sale, transfer, cash-out refi, or ceasing primary residence triggers full repayment"
+    application_deadline: "none; submitted by a participating lender with the first-mortgage package"
+    funding_availability: "subject to fund availability; guidelines effective 2026-05-08; program launched April 2026"
+    source_url: "https://register.chattanooga.gov/sites/default/files/2026-06/Chattanooga-DPA-Program-Guidelines_revised-05082026_0.pdf"
+    verified: true
+  - program: "THDA Great Choice Plus down payment assistance (STATEWIDE, Tennessee Housing Development Agency) — second mortgage paired with a THDA Great Choice 30-yr fixed first mortgage. DOLLAR AMOUNT NOT VERIFIED: THDA's homebuyer page read 2026-11-23 states no amount; the 2026 lender notice (Plus-No Payment tier, pilot) returned HTTP 403. 2-4 unit eligibility NOT verified from a THDA page"
+    dollar_value: 0
+    cash_or_noncash: cash
+    eligibility: "Primarily first-time homebuyers (no ownership in 3 years); repeat buyers eligible in 43 targeted counties / designated areas or if qualified military/veteran (Homeownership for Heroes); all borrowers 640+ credit; county income and purchase-price limits apply (chart not read)"
+    minimum_income: "none stated; maximum household income by county applies"
+    employment_requirement: "none"
+    home_purchase_requirement: "must use a THDA Great Choice first mortgage through a THDA-approved lender; property type rules per THDA Originating Agents Guide (not read)"
+    residency_requirement: "primary residence (THDA program; occupancy terms not read)"
+    minimum_stay: "UNKNOWN"
+    application_deadline: "none; continuous through approved lenders"
+    funding_availability: "program open as of 2026-11 per THDA site"
+    source_url: "https://thda.org/homebuyers/first-time"
+    verified: false
+
+landlord_law:
+  verified: false                # statute text read from a code-publisher compilation (CAATN URLTA 2025 PDF; FindLaw for 66-35-102), not capitol.tn.gov; city items from chattanooga.gov pages. Chattanooga City Code not searched section-by-section.
+  rent_control: "no — state preemption, Tenn. Code Ann. 66-35-102(a): a local governmental unit shall not enact, maintain or enforce an ordinance or resolution controlling the amount of rent for private residential or commercial property; subsection (b) (added 2024, Pub. Ch. 1051, eff. 2024-07-01) also bars mandatory below-market / inclusionary requirements; voluntary incentive programs allowed"
+  just_cause_eviction: "no — Tennessee URLTA (66-28, applies in Hamilton County: counties >75,000 pop. per 2010 census, 66-28-102) has no just-cause requirement. Month-to-month terminable by either party on 30 days' written notice (66-28-512(b)); week-to-week 10 days. Nonpayment/curable breach: 14-day notice to cure or terminate (66-28-505(a)(2)), 7 days on repeat within 6 months; non-curable breach 14 days (505(a)(3)); 3-day termination for violence, drug activity or hazardous conditions (66-28-517). 2025 bills HB1345/SB1088 to cut 14 days to 7 FAILED. Court (detainer warrant, Hamilton County General Sessions) timeline after notice: UNKNOWN"
+  eviction_timeline_days: null
+  rental_licensing: "no — no City of Chattanooga long-term rental registration, license or periodic rental-inspection program found on city pages (Code Enforcement is a division of the Land Development Office enforcing the minimum housing code; short-term vacation rentals are a separate certificate under Ordinance 13981). State landlord-registration statute 66-28-107 applies ONLY to metropolitan governments >500,000 (66-28-107(c)) — Nashville, not Chattanooga"
+  rental_license_fee_annual: null
+  inspection_frequency: "no routine rental inspection cycle. Complaint-driven via 311 (notice of violation; 10 days to cure, 30 for housing; re-inspection; then citation to court). From 2025-11 the City runs proactive two-day inspection sweeps by Council district (Districts 1,2,7,3,4,8 scheduled Nov 2025-Jan 2026) issuing NOVs for litter, overgrowth, inoperable vehicles and structure violations, with two weeks to correct"
+  lead_rules: "federal only (pre-1978 housing: EPA/HUD Section 1018 — EPA pamphlet, disclosure of known lead-based paint/hazards and records, Lead Warning Statement in lease, records kept 3 years); no City of Chattanooga or Hamilton County lead ordinance found"
+  certificate_of_occupancy_rules: "no point-of-sale certificate of occupancy or rental inspection on sale found for Chattanooga (city code enforcement pages silent) — UNKNOWN pending a City Code check"
+  security_deposit_limits: "no statutory cap. Deposits must be held in a dedicated account at a TN/federally regulated institution and the tenant told the account location at signing (66-28-301(a),(h)); tenant has right to a move-out inspection and itemized damage list; landlord forfeits right to retain any deposit if not held in the required account or no damage list (301(c)); refund notice to last known address, unclaimed after 60 days reverts to landlord (301(f)); later-discovered damage recoverable only if found within 30 days of vacancy or 7 days after a new tenant (301(g))"
+  local_landlord_taxes_fees: "none Chattanooga-specific found for long-term rentals (STR certificate fee applies only to short-term rentals). Statewide: 66-28-302 (as amended by the 2024 'Landlord Transparency Act', SB1694/HB1814, eff. 2025-01-01 — chaptered text not read) requires written disclosure of managing agent, owner/agent for service of process, and a maintenance phone/email or online portal. Property tax: Hamilton County + City of Chattanooga both levy; 2026 rates not read (Trustee links a 'Current Property Tax Rates' PDF) — UNKNOWN"
+  utility_obligations: "URLTA 66-28-304(a): landlord must comply with building/housing codes affecting health and safety, keep premises fit and habitable, keep common areas clean and safe, and in complexes of 4+ units provide waste receptacles; no statutory requirement that landlord pay utilities — allocation is by lease. EPB (municipal) supplies electric and fiber; water provider (Tennessee American Water) tariffs not read"
+  sources:
+    - "https://codes.findlaw.com/tn/title-66-property/tn-code-sect-66-35-102/"
+    - "https://assets-002.noviams.com/novi-file-uploads/caatn/URLTA_2025.pdf"
+    - "https://wapp.capitol.tn.gov/apps/BillInfo/Default.aspx?BillNumber=SB1088&GA=114"
+    - "https://chattanooga.gov/government/public-works/code-enforcement"
+    - "https://register.chattanooga.gov/stay-informed/latest-news/city-announces-comprehensive-code-enforcement-inspection-schedule-enhance"
+    - "https://chattanooga.gov/public-works/land-development-office/short-term-vacation"
+    - "https://www.epa.gov/lead/real-estate-disclosures-about-potential-lead-hazards"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "No sale-triggered reassessment in Tennessee. Hamilton County reappraises every four years: last reappraisal 2025, next 2029-01-01 (Assessor: 'NEXT PROPERTY VALUE REAPPRAISAL IS JANUARY 1, 2029'; Comptroller schedule: LAST 2025 / NEXT 2029 / cycle 4). Between reappraisals value changes only for physical changes; market value is set from comparable arm's-length sales at reappraisal. Residential/rental real property assessed at 25% of appraised value. Comptroller 2026 appraisal ratio 1.0000 (values at market after the 2025 reappraisal), so a 2026-27 buyer's bill should track the seller's until the 2029 reset, when the county/city rates are recertified revenue-neutral (67-5-1701). Trustee collects Oct 1 through last day of Feb; delinquent Mar 1 at 1.5%/month"
+  risk: "LOW"
+  assessor_url: "https://hamiltontn.gov/AssessorOfProperty.aspx"
+  treasurer_url: "https://hamiltontn.gov/Trustee.aspx"
+  source_url: "https://comptroller.tn.gov/office-functions/pa/tax-resources/assessment-information-for-each-county/reappraisal-schedule.html"
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}
