@@ -1,0 +1,102 @@
+# research/markets/10180.yaml — Abilene, TX (Taylor County). Filled 2026-11-23 from web reading only; UNKNOWN beats a guess.
+cbsa: "10180"
+name: "Abilene, TX"
+retrieved_at: "2026-11-23"
+cities: ["Abilene"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "Dyess AFB mission dependence: B-21 beddown is a decade-long federal program; timing of aircraft arrival not announced"
+  - "Stargate/Crusoe data-center construction boom: up to ~10,000 temporary construction workers; rents reported up ~25% in a year and inventory ~2 months (Stars and Stripes 2026-11-17) — risk of rent reversion when construction winds down"
+  - "Texas property tax: Taylor CAD reappraises all real property at market value every year; sale price is treated as strong evidence of market value; the 20% non-homestead circuit-breaker cap (Tax Code 23.231) expires 2026-12-31 unless renewed"
+  - "High Texas property tax rates offset the absence of a state income tax"
+  - "City first-time homebuyer program could not be verified on an official page — treat as none"
+major_employers:
+  - "Hendrick Health (healthcare, ~3,000) — https://developabilene.com/abilene-health-and-life-sciences"
+  - "Dyess Air Force Base (defense, ~4,400 active duty / ~14,800 incl. families, retirees, civilians per base commander) — https://www.stripes.com/branches/air_force/2026-11-17/housing-shortage-dyess-air-force-base-23485291.html"
+  - "Abilene Christian University (university, jobs n/a) — https://developabilene.com/abilene-major-employers"
+  - "Abilene Independent School District (education, jobs n/a) — https://developabilene.com/abilene-major-employers"
+  - "Great Lakes Cheese (food manufacturing, jobs n/a) — https://developabilene.com/abilene-major-employers"
+  - "Blue Cross Blue Shield of Texas (back office, jobs n/a) — https://developabilene.com/abilene-back-office-support-services/"
+state_income_tax: "none (Texas has no personal income tax — https://comptroller.texas.gov/taxes/)"
+cost_of_living: ""
+
+catalysts:
+  - name: "Dyess AFB B-21 Raider beddown (third Main Operating Base): 24+ construction/renovation projects over the next decade; first B-21-dedicated facility ($78M, 46,000 sf mission-planning facility) broke ground Nov 2026"
+    company: "U.S. Air Force / Air Force Global Strike Command (Dyess AFB)"
+    sector: "defense"
+    investment_usd: 1600000000
+    jobs: 0
+    avg_wage: null
+    announced: "2025-12"
+    start: "2026-11"
+    completion: ""
+    status: under_construction
+    source_url: "https://www.dyess.af.mil/News/Article/4361333/industry-day-advances-dyess-b-21-beddown/"
+    verified: false   # af.mil pages returned 403; $1.6B/24 projects confirmed only via DVIDS photo captions + Stars and Stripes; a separate Oct 2026 summit report cites ~$2B
+  - name: "Crusoe / Stargate Abilene AI data-center campus, phase 2 on the Lancium Clean Campus: 6 new buildings (8 total), ~4M sf, 1.2 GW; ~2,000 construction workers daily rising to ~5,000 at peak (permanent headcount not disclosed)"
+    company: "Crusoe (with Lancium; tenant Oracle/OpenAI Stargate)"
+    sector: "data_center"
+    investment_usd: 11600000000
+    jobs: 0
+    avg_wage: null
+    announced: "2025-03"
+    start: "2025-03"
+    completion: "2026-06"
+    status: under_construction
+    source_url: "https://www.crusoe.ai/newsroom/crusoe-expands-ai-data-center-campus-in-abilene-to-1-2-gigawatts"
+    verified: false   # Crusoe release read (buildings, GW, construction workforce) but gives no $; $11.6B debt+equity (May 2025) comes from trade press (DCD/RCR Wireless) and was not read on a company page; mid-2026 completion not confirmed as of 2026-11
+  - name: "Hendrick Medical Center Endoscopy & GI Clinic, 1750 Pine St (22,000 sf addition; first project of Hendrick's multi-phase Centennial campus expansion)"
+    company: "Hendrick Health"
+    sector: "hospital"
+    investment_usd: 12250000
+    jobs: 0
+    avg_wage: null
+    announced: "2024-11"
+    start: "2024-11"
+    completion: "2026-05"
+    status: completed
+    source_url: "https://www.tdlr.texas.gov/TABS/Projects/TABS2024024567"
+    verified: true    # TDLR state project filing read ($12,250,000; start 11/4/2024; completion 5/4/2026); Hendrick announced opening Mar 2026
+  - name: "Abilene Christian University NEXT Lab Molten Salt Research Reactor (NRC construction permit issued 2024-09-16; first university advanced-reactor permit)"
+    company: "Abilene Christian University (with Natura Resources)"
+    sector: "university"
+    investment_usd: 0
+    jobs: 0
+    avg_wage: null
+    announced: "2022-08"
+    start: "2024-09"
+    completion: ""
+    status: under_construction
+    source_url: "https://www.nrc.gov/reactors/non-power/new-facility-licensing/msrr-acu"
+    verified: true    # NRC licensing page read; cost ($65-95M per 2022 filings) and completion window not read on a primary page so left 0/blank
+
+incentives: []        # City of Abilene First-Time Homebuyer (CDBG/HOME, reportedly up to $5,000, <=80% AMI, owner-occupant) appears only on third-party sites; no official abilenetx.gov page found — not listed
+
+landlord_law:
+  verified: false
+  rent_control: "no — Tex. Loc. Gov't Code §214.902 allows a city rent-control ordinance only on a finding of a housing emergency due to a disaster AND with the governor's approval"
+  just_cause_eviction: "no — Tex. Prop. Code §24.005: 3-day written notice to vacate (lease may set shorter/longer); nonpayment, lease breach or holdover suffice; 2025 amendments (eff. 2026-01-01) add §24.0042 time computation and summary-disposition procedure §24.005106"
+  eviction_timeline_days: 30
+  rental_licensing: ""
+  rental_license_fee_annual: null
+  inspection_frequency: ""
+  lead_rules: "federal only found: pre-1978 lead-based paint disclosure (42 U.S.C. 4852d; 24 CFR 35 / 40 CFR 745); no Abilene-specific lead ordinance located"
+  certificate_of_occupancy_rules: ""
+  security_deposit_limits: "no statutory cap on amount; refund within 30 days of surrender with itemized deductions (Tex. Prop. Code §92.103-.104); bad-faith retention = $100 + 3x deposit + attorney fees (§92.109)"
+  local_landlord_taxes_fees: "none found — no state income tax; no city rental tax or registration fee located"
+  utility_obligations: "landlord may not interrupt tenant-paid or landlord-furnished water/wastewater/gas/electric except for bona fide repairs or emergency (Tex. Prop. Code §92.008; penalty one month's rent + $1,000); duty to repair conditions affecting health/safety and hot water >=120F (§92.052)"
+  sources:
+    - "https://tcss.legis.texas.gov/resources/lg/htm/lg.214.htm"
+    - "https://tcss.legis.texas.gov/resources/pr/htm/pr.24.htm"
+    - "https://tcss.legis.texas.gov/resources/pr/htm/pr.92.htm"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "No reassessment-on-sale event, but Taylor CAD's stated policy is a general reappraisal of ALL taxable real property at 100% market value EVERY year (Reappraisal Plan 2025-2026, citing Tax Code §25.18 three-year minimum) and the CAD calls a sale price a strong indication of market value, so a buyer should expect the Jan 1 appraisal after closing to move toward the purchase price. The 10% homestead cap belongs to the owner-occupant seller and expires Jan 1 after a sale (property re-appraised at market), so a 2-4 unit bought from a homesteaded owner can jump. Non-homestead real property <= ~$5M (CPI-adjusted) gets a 20% annual circuit-breaker cap (Tax Code §23.231), but it does not apply in the first year of new ownership and the statute expires 2026-12-31 unless the Legislature extends it."
+  risk: "HIGH"
+  assessor_url: "https://taylor-cad.org/"
+  treasurer_url: "https://taylor-cad.org/"    # Taylor CAD also collects property tax for all Taylor County jurisdictions; county Tax Assessor-Collector handles motor vehicles only (comptroller directory: https://comptroller.texas.gov/taxes/property-tax/county-directory/taylor.php)
+  source_url: "https://taylor-cad.org/wp-content/uploads/2025/11/Reappraisal-Plan-Taylor-CAD-2025_2026-Final.pdf"
+
+listings: {}
