@@ -1,0 +1,146 @@
+# research/markets/32820.yaml — Memphis, TN-MS-AR (Shelby County). Filled 2026-11-23 from primary sources where marked verified.
+cbsa: "32820"
+name: "Memphis, TN-MS-AR"
+retrieved_at: "2026-11-23"
+cities: ["Memphis", "West Memphis"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "Shelby County population is shrinking: 929,788 (2020) to 919,173 (2024), -1.14%; TNECD forecast 878,589. County unemployment 4.50% (2024) vs TN 3.40%"
+  - "xAI / SpaceX AI Colossus is the headline catalyst but is capital-heavy, job-light (company: 'hundreds of permanent jobs'; Chamber: 500+ initial phase) and contested locally (gas-turbine air permits, water, South Memphis siting). Property-tax upside is real (City Ordinance 5953 Community Benefits Fund, $3.26M FY allocation) but direct rental demand is modest"
+  - "Shelby County reappraised 2025 (4-year cycle, next 2029); Assessor reported values up ~27% vs 2021 and the county cut its rate ~20% to offset (local press) — individual bills still moved; 2026 ratio 1.0000"
+  - "Memphis city residents pay BOTH City of Memphis and Shelby County property tax (rates not read — UNKNOWN); Memphis code enforcement is complaint-driven under Ordinance 5708 (IPMC) with prosecution in Shelby County Environmental Court (est. 1991), which handles high case volumes and has drawn due-process litigation"
+  - "BlueOval City (Stanton, Haywood County, ~50 mi NE, outside the CBSA) reset: EV truck cancelled 2025-12, gas trucks 2029; SK On battery plant 2028 — Memphis spillover later/smaller than 2021 projections"
+  - "West Memphis, AR listings fall under Arkansas landlord-tenant law and Crittenden County assessment — this file's law/tax sections cover Shelby County, TN only"
+  - "Crime: no verified figure gathered this run (UNKNOWN); do not infer"
+major_employers:
+  - "FedEx Corporation (logistics HQ/hub, ~30,000) — https://tnecd.com/counties/shelby/"
+  - "Memphis-Shelby County Schools (education, ~15,000) — https://tnecd.com/counties/shelby/"
+  - "Methodist Le Bonheur Healthcare (hospital, ~14,000) — https://tnecd.com/counties/shelby/"
+  - "Baptist Memorial Health Care (hospital, ~10,666) — https://tnecd.com/counties/shelby/"
+  - "Shelby County Government (government, ~7,990) — https://tnecd.com/counties/shelby/"
+  - "St. Jude Children's Research Hospital (biomedical research hospital, ~7,000) — https://tnecd.com/counties/shelby/"
+state_income_tax: "none — Tennessee levies no tax on wages or salaries; the Hall tax on interest/dividends was repealed for tax periods beginning 2021-01-01 (TN Dept. of Revenue) — https://www.tn.gov/revenue/taxes/hall-income-tax.html"
+cost_of_living: ""
+
+catalysts:
+  - name: "xAI / SpaceX AI 'Colossus' supercomputer campus — Colossus I (Paul R. Lowry Rd, South Memphis, operating since 2024) + expansion to >=1M GPUs announced 2024-12 (Chamber: 'largest capital investment in the region's history'); 1M sq ft second site bought in Southwest Memphis 2025-03 (Colossus II under construction per press); $80M Colossus Water Recycling Plant; MLGW substations. DOLLAR FIGURE NOT IN CHAMBER RELEASE: $12B is the Chamber 2024 Annual Report figure via search snippet (report PDF not readable); JOBS: Chamber materials '500+ high-paying jobs initial phase', company 'hundreds of permanent jobs' — neither read in a primary document"
+    company: "xAI (now SpaceX AI / 'SpaceXSI' after the SpaceX-xAI combination)"
+    sector: "data_center"
+    investment_usd: 12000000000
+    jobs: 500
+    avg_wage: null
+    announced: "2024-12"
+    start: "2024-06"
+    completion: ""
+    status: under_construction
+    source_url: "https://memphischamber.com/economic-development/xai"
+    verified: false
+  - name: "St. Jude Children's Research Hospital 2022-27 strategic plan expansion — $12.9B six-year operating+capital budget (raised $1.4B), $2.3B construction/renovation/capital, campus doubling (Advanced Research Center II, 16 floors/865,000 sf, $187M permit 2026 per press)"
+    company: "St. Jude Children's Research Hospital / ALSAC"
+    sector: "hospital"
+    investment_usd: 2300000000
+    jobs: 2300
+    avg_wage: null
+    announced: "2022-07"
+    start: "2021-07"
+    completion: "2027"
+    status: under_construction
+    source_url: "https://www.stjude.org/media-resources/news-releases/2022-medicine-science-news/st-jude-announces-expansion-of-strategic-plan-targeting-pediatric-catastrophic-diseases.html"
+    verified: true
+  - name: "Hyosung HICO large power transformer plant expansion (only U.S. site to have produced 765kV transformers; Memphis presence >500 jobs after expansion)"
+    company: "Hyosung HICO, Ltd (Hyosung Heavy Industries)"
+    sector: "manufacturing"
+    investment_usd: 51000000
+    jobs: 123
+    avg_wage: null
+    announced: "2025-05"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://www.tn.gov/ecd/news/2025/5/14/governor-lee--commissioner-mcwhorter-announce-hyosung-hico--ltd-to-expand-at-u-s--manufacturing-headquarters.html"
+    verified: true
+  - name: "Peak+ data-center adiabatic pre-cooling systems manufacturing expansion (3696 Knight Road)"
+    company: "Peak+ (Memphis HQ)"
+    sector: "manufacturing"
+    investment_usd: 845000
+    jobs: 96
+    avg_wage: null
+    announced: "2026-11"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://memphischamber.com/blog/press-release/greater-memphis-chamber-celebrate-peak-expansion-in-shelby-county/"
+    verified: true
+  - name: "Ford Tennessee Truck Plant (formerly BlueOval City), Stanton, Haywood County — OUTSIDE the CBSA, ~50 mi NE of Memphis; $5.6B / 5,800 jobs are the 2021 Ford+SK commitment (TN Governor release). Electric truck CANCELLED 2025-12-15; gas-powered trucks from 2029 (Ford release); battery plant now SK On Tennessee, production 2028 (local press)"
+    company: "Ford Motor Company (assembly) / SK On Tennessee (battery)"
+    sector: "manufacturing"
+    investment_usd: 5600000000
+    jobs: 5800
+    avg_wage: null
+    announced: "2021-09"
+    start: "2022-09"
+    completion: "2029"
+    status: under_construction
+    source_url: "https://www.fromtheroad.ford.com/us/en/articles/2025/ford-reinvests-trucks-hybrids-affordable-electric-vehicles"
+    verified: true
+
+incentives:                      # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI
+  - program: "City of Memphis Citywide Down Payment Assistance (Division of Housing & Community Development) — up to 10% of sales price, max $10,000, deferred-payment loan with no monthly payments, second lien for a 5- or 10-year affordability period, released if terms met. Figures come from memphistn.gov search snippets; the program pages returned HTTP 403/503 on 2026-11-23, so NOT read. 2-4 UNIT ELIGIBILITY UNKNOWN. Related: Homebuyer Incentive Program (HIPC, 81-200% AMI, 15 designated areas; police/fire/MSCS employee variants with no income limit)"
+    dollar_value: 10000
+    cash_or_noncash: cash
+    eligibility: "first-time homebuyer; household income <= 80% AMI; property inside Memphis city limits; buyer minimum investment 1% of sales price; homebuyer education (per HCD)"
+    minimum_income: "none stated; maximum 80% AMI applies"
+    employment_requirement: "none for Citywide DPA (police/fire/MSCS incentive variants require 1-2 years of service)"
+    home_purchase_requirement: "within Memphis city limits; sales price cap tied to FHA 203(b) limit (page cites $275,665 — likely outdated); property-type rules not read"
+    residency_requirement: "owner-occupied (HCD); terms not read"
+    minimum_stay: "5 or 10-year affordability period (second lien)"
+    application_deadline: "none listed; through HCD Office of Down Payment Assistance, 901-636-7474"
+    funding_availability: "subject to funding; FY26 city budget notes high demand ($1.40M expended FY25 through 2025-04-30)"
+    source_url: "https://memphistn.gov/down-payment-assistance-program/"
+    verified: false
+  - program: "THDA Great Choice Plus down payment assistance (STATEWIDE, Tennessee Housing Development Agency) — second mortgage paired with a THDA Great Choice 30-yr fixed first mortgage. DOLLAR AMOUNT NOT VERIFIED: THDA's homebuyer page read 2026-11-23 states no amount; the 2026 lender notice (Plus-No Payment tier, pilot) returned HTTP 403. 2-4 unit eligibility NOT verified from a THDA page. Shelby County is a THDA targeted-area county per third-party summaries (not verified)"
+    dollar_value: 0
+    cash_or_noncash: cash
+    eligibility: "Primarily first-time homebuyers (no ownership in 3 years); repeat buyers eligible in 43 targeted counties / designated areas or if qualified military/veteran (Homeownership for Heroes); all borrowers 640+ credit; county income and purchase-price limits apply (chart not read)"
+    minimum_income: "none stated; maximum household income by county applies"
+    employment_requirement: "none"
+    home_purchase_requirement: "must use a THDA Great Choice first mortgage through a THDA-approved lender; property type rules per THDA Originating Agents Guide (not read)"
+    residency_requirement: "primary residence (THDA program; occupancy terms not read)"
+    minimum_stay: "UNKNOWN"
+    application_deadline: "none; continuous through approved lenders"
+    funding_availability: "program open as of 2026-11 per THDA site"
+    source_url: "https://thda.org/homebuyers/first-time"
+    verified: false
+
+landlord_law:
+  verified: false                # statute text read from a code-publisher compilation (CAATN URLTA 2025 PDF; FindLaw for 66-35-102), not capitol.tn.gov; Memphis items from memphistn.gov code-enforcement pages; Environmental Court rules PDF not readable; Memphis City Code not searched.
+  rent_control: "no — state preemption, Tenn. Code Ann. 66-35-102(a): a local governmental unit shall not enact, maintain or enforce an ordinance or resolution controlling the amount of rent for private residential or commercial property; subsection (b) (added 2024, Pub. Ch. 1051, eff. 2024-07-01) also bars mandatory below-market / inclusionary requirements; voluntary incentive programs allowed"
+  just_cause_eviction: "no — Tennessee URLTA (66-28, applies in Shelby County: counties >75,000 pop. per 2010 census, 66-28-102) has no just-cause requirement. Month-to-month terminable by either party on 30 days' written notice (66-28-512(b)); week-to-week 10 days. Nonpayment/curable breach: 14-day notice to cure or terminate (66-28-505(a)(2)), 7 days on repeat within 6 months; non-curable breach 14 days (505(a)(3)); 3-day termination for violence, drug activity or hazardous conditions (66-28-517). 2024 Pub. Ch. 1009 (eff. 2024-07-01) added a sheriff removal remedy for unauthorized occupants/squatters (new 29-18-135; not for current/former tenants) — enrolled text not read. 2025 bills HB1345/SB1088 to cut 14 days to 7 FAILED. Court (detainer warrant, Shelby County General Sessions) timeline after notice: UNKNOWN"
+  eviction_timeline_days: null
+  rental_licensing: "no — Memphis has NO long-term rental registry: state 66-28-107 (landlord registration, $10/yr fee, $50/week fine) applies ONLY to metropolitan governments >500,000 (66-28-107(c)), i.e. Nashville; Memphis/Shelby bills to authorize a registry failed in the General Assembly (2022, 2024 per local press). Short-term rentals have a separate City registry (transitioning to Planning & Development, 2026). Code Enforcement (Division of Community Enhancement) enforces Ordinance 5708 / IPMC on complaint"
+  rental_license_fee_annual: null
+  inspection_frequency: "no routine rental inspection cycle; complaint-driven (311 / 901-636-7464). Violation orders with follow-up inspection (14 days for vehicles); dangerous structures referred to Special Operations (title search, certified 'First Notice', condemnation); uncorrected cases prosecuted in Shelby County Environmental Court (General Sessions Division 14, created 1991)"
+  lead_rules: "federal only confirmed (pre-1978 housing: EPA/HUD Section 1018 — EPA pamphlet, disclosure of known lead-based paint/hazards and records, Lead Warning Statement in lease, records kept 3 years); Shelby County Health Department lead program / any local lead-safe rental rule NOT researched this run — UNKNOWN"
+  certificate_of_occupancy_rules: "no point-of-sale certificate of occupancy or rental inspection on sale found for Memphis (code enforcement pages silent; City Code not opened) — UNKNOWN"
+  security_deposit_limits: "no statutory cap. Deposits must be held in a dedicated account at a TN/federally regulated institution and the tenant told the account location at signing (66-28-301(a),(h)); tenant has right to a move-out inspection and itemized damage list; landlord forfeits right to retain any deposit if not held in the required account or no damage list (301(c)); refund notice to last known address, unclaimed after 60 days reverts to landlord (301(f)); later-discovered damage recoverable only if found within 30 days of vacancy or 7 days after a new tenant (301(g))"
+  local_landlord_taxes_fees: "no Memphis landlord license/fee found. Double property tax inside city limits (City of Memphis + Shelby County; 2026 rates not read — UNKNOWN; county rate cut ~20% at the 2025 reappraisal per press). Statewide: 66-28-302 (as amended by the 2024 'Landlord Transparency Act', SB1694/HB1814, eff. 2025-01-01 — chaptered text not read) requires written disclosure of managing agent, owner/agent for service of process, and a maintenance phone/email or online portal; binds successor owners"
+  utility_obligations: "URLTA 66-28-304(a): landlord must comply with building/housing codes affecting health and safety, keep premises fit and habitable, keep common areas clean and safe, and in complexes of 4+ units provide waste receptacles; no statutory requirement that landlord pay utilities — allocation is by lease. MLGW (municipal) supplies electric, gas and water (tariffs/landlord agreements not read)"
+  sources:
+    - "https://codes.findlaw.com/tn/title-66-property/tn-code-sect-66-35-102/"
+    - "https://assets-002.noviams.com/novi-file-uploads/caatn/URLTA_2025.pdf"
+    - "https://wapp.capitol.tn.gov/apps/BillInfo/Default.aspx?BillNumber=SB1088&GA=114"
+    - "https://memphistn.gov/code-enforcement/"
+    - "https://memphistn.gov/neighborhood-improvement"
+    - "https://www.tncourts.gov/sites/default/files/docs/enviromental_court_rules.pdf"
+    - "https://www.epa.gov/lead/real-estate-disclosures-about-potential-lead-hazards"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "No sale-triggered reassessment in Tennessee. Shelby County reappraises real property every four years: last reappraisal 2025, next 2029 (Comptroller Division of Property Assessments schedule: LAST 2025 / NEXT 2029 / cycle 4; Assessor's site states the same per search — site returned HTTP 403, not read). Between reappraisals value changes only for physical changes. Residential/rental real property assessed at 25% of appraised value. 2026 appraisal ratio 1.0000 (values at market), so a 2026-27 buyer's bill should track the seller's post-2025 bill until the 2029 reset, when City and County rates are recertified revenue-neutral (67-5-1701). The 2025 reappraisal raised values ~27% county-wide (Assessor, via press) — confirm the seller's bill is the POST-2025 bill, not 2024's. Appeals to the County Board of Equalization due June 30 (July 31 in reappraisal years) per Trustee FAQ"
+  risk: "LOW"
+  assessor_url: "https://www.assessor.shelbycountytn.gov/"
+  treasurer_url: "https://www.shelbycountytrustee.com/"
+  source_url: "https://comptroller.tn.gov/office-functions/pa/tax-resources/assessment-information-for-each-county/reappraisal-schedule.html"
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}
