@@ -1,0 +1,105 @@
+# research/markets/33860.yaml — Montgomery, AL (Montgomery + Autauga + Elmore + Lowndes counties). Filled 2026-11-23 from primary sources where marked verified.
+cbsa: "33860"
+name: "Montgomery, AL"
+retrieved_at: "2026-11-23"
+cities: ["Montgomery"]
+single_employer_dependence: false
+energy_boom_watch: false
+risks:
+  - "Employment base is government-heavy (Maxwell-Gunter AFB ~12,700, State of Alabama ~9,500 per Maxwell AFB) — stable but exposed to federal/state budget cycles"
+  - "Private-sector growth is concentrated in one supply chain: Hyundai Motor Manufacturing Alabama (~4,200) plus Mobis (~1,500), Hyundai Power Transformers, DAS and other Hyundai/Kia suppliers — auto-tariff and EV-demand risk lands on one cluster"
+  - "AL assesses non-owner-occupied residential as Class II at 20% vs Class III 10% owner-occupied; Montgomery County mails valuation notices annually and the Act 2024-344 7% cap is removed in the year ownership changes — an investor buying from a homesteaded seller should expect the bill to roughly double, never match the seller's"
+  - "City of Montgomery announced 2026-04 it is developing a rental property registration system and vacant building registry — fee, inspection and timeline not yet published (future compliance cost)"
+major_employers:
+  - "Maxwell-Gunter Air Force Base / federal government (defense, ~12,700 per Maxwell AFB employment page, undated) — https://www.maxwell.af.mil/Custom-Articles/Display/Article/2555742/employment-information/"
+  - "State of Alabama (state government, ~9,500 per Maxwell AFB employment page, undated) — https://www.maxwell.af.mil/Custom-Articles/Display/Article/2555742/employment-information/"
+  - "Hyundai Motor Manufacturing Alabama (manufacturing, ~4,200 per Governor's release 2026-10) — https://governor.alabama.gov/newsroom/2026/10/governor-ivey-joins-hyundai-to-celebrate-major-investment-in-alabama-manufacturing/"
+  - "Baptist Health (hospital, 4,000+ per Maxwell AFB employment page, undated) — https://www.maxwell.af.mil/Custom-Articles/Display/Article/2555742/employment-information/"
+  - "Montgomery Public Schools (other, ~4,000 per Maxwell AFB employment page, undated) — https://www.maxwell.af.mil/Custom-Articles/Display/Article/2555742/employment-information/"
+  - "MOBIS Alabama (manufacturing, 1,500+ per Alabama Dept of Commerce 2024-10) — https://www.madeinalabama.com/2024/10/alabamas-auto-supply-chain-growth-accelerates-with-major-investments/"
+state_income_tax: "graduated 2% / 4% / 5%; 5% applies above $3,000 taxable (single) or $6,000 (MFJ) — Alabama DOR FAQ — https://www.revenue.alabama.gov/faqs/what-is-alabamas-individual-income-tax-rate/"
+cost_of_living: ""
+
+catalysts:
+  - name: "Hyundai Motor Manufacturing Alabama engine-production expansion for hybrid / extended-range EV (Santa Fe refresh, new Tucson)"
+    company: "Hyundai Motor Manufacturing Alabama (HMMA)"
+    sector: "manufacturing"
+    investment_usd: 412885541
+    jobs: 53
+    avg_wage: 62467
+    announced: "2026-10"
+    start: ""
+    completion: ""
+    status: announced
+    source_url: "https://governor.alabama.gov/newsroom/2026/10/governor-ivey-joins-hyundai-to-celebrate-major-investment-in-alabama-manufacturing/"
+    verified: true
+  - name: "Hyundai Power Transformers USA (HD-HPT) large power transformer plant expansion"
+    company: "HD Hyundai Power Transformers USA"
+    sector: "manufacturing"
+    investment_usd: 200000000
+    jobs: 200
+    avg_wage: null
+    announced: "2026-03"
+    start: "2026-03"
+    completion: "2027"
+    status: announced
+    source_url: "https://www.montgomerycountyal.gov/Home/Components/News/News/292/16"
+    verified: true
+  - name: "DAS North America expansion (Hyundai/Kia seat-frame supplier)"
+    company: "DAS North America"
+    sector: "manufacturing"
+    investment_usd: 77600000
+    jobs: 100
+    avg_wage: null
+    announced: "2026-02"
+    start: ""
+    completion: "2028"
+    status: announced
+    source_url: "https://www.montgomerychamber.com/news/details/news-release-2-26-2026-807"
+    verified: false
+  - name: "MOBIS Alabama 460,000 sq ft aftermarket parts expansion"
+    company: "MOBIS Alabama (Hyundai Mobis)"
+    sector: "manufacturing"
+    investment_usd: 52000000
+    jobs: 27
+    avg_wage: 58240
+    announced: "2024-10"
+    start: "2024-10"
+    completion: ""
+    status: under_construction
+    source_url: "https://www.madeinalabama.com/2024/10/alabamas-auto-supply-chain-growth-accelerates-with-major-investments/"
+    verified: true
+
+incentives: []                   # ONE-TIME money => YEAR-1 PERSONAL BENEFIT, never NOI — none found: City of Montgomery Community Development Division page lists no down-payment or homebuyer program as of 2026-11; no MakeMyMove-style relocation cash program found for the metro
+
+landlord_law:
+  verified: true
+  rent_control: "no — state preemption, Ala. Code 11-80-8.1 (no local governmental unit may enact, maintain or enforce any ordinance, resolution or rule controlling the amount of rent charged for leasing private property; Acts 1993 No. 93-421)"
+  just_cause_eviction: "no — Alabama Uniform Residential Landlord and Tenant Act (Ala. Code Title 35 Ch. 9A) has no just-cause requirement; termination for breach governed by 35-9A-421"
+  eviction_timeline_days: 7
+  rental_licensing: "no adopted ordinance — City of Montgomery announced 2026-04-02 it is developing a rental property registration system and vacant building registration framework ('still in development'; no fee, inspection or effective date published); UNKNOWN whether a general city business license is required of a small landlord"
+  rental_license_fee_annual: null
+  inspection_frequency: "no routine rental inspection cycle found; any inspection regime would come with the proposed 2026 registration system (not yet published)"
+  lead_rules: "federal only (pre-1978 housing: EPA/HUD Section 1018 disclosure — pamphlet, known-hazard disclosure, available reports, Lead Warning Statement in lease, signed records kept 3 years); no City of Montgomery or Montgomery County lead ordinance found"
+  certificate_of_occupancy_rules: "no point-of-sale certificate of occupancy or rental inspection requirement found for City of Montgomery"
+  security_deposit_limits: "capped at one month's periodic rent, except for pets, alterations or increased liability risk (35-9A-201(a)); itemized return within 60 days of termination and delivery of possession; landlord who misses the 60 days owes double the deposit (35-9A-201(f))"
+  local_landlord_taxes_fees: "no local landlord-specific tax or fee found; non-owner-occupied residential is Class II assessed at 20% vs Class III 10% owner-occupied (Ala. Code 40-8-1); Montgomery County/city millage UNKNOWN (not published on the pages read)"
+  utility_obligations: "landlord must maintain electrical, plumbing, sanitary, heating, ventilating and A/C facilities and supply running water, reasonable hot water and reasonable heat unless the unit is separately metered under the tenant's exclusive control via direct utility connection (35-9A-204(a)(4),(6))"
+  sources:
+    - "https://alison.legislature.state.al.us/code-of-alabama?section=11-80-8.1"
+    - "https://alison.legislature.state.al.us/code-of-alabama?section=35-9A-421"
+    - "https://alison.legislature.state.al.us/code-of-alabama?section=35-9A-201"
+    - "https://alison.legislature.state.al.us/code-of-alabama?section=35-9A-204"
+    - "https://www.montgomeryal.gov/Home/Components/News/News/4893/16"
+    - "https://www.epa.gov/lead/real-estate-disclosures-about-potential-lead-hazards"
+    - "https://www.revenue.alabama.gov/?p=56781"
+
+tax_rules:
+  verified: true
+  post_sale_treatment: "No sale-triggered reassessment as such, but three mechanisms move the buyer's bill: (1) Montgomery County Revenue Commissioner appraises at fair market value by mass appraisal under Act 160 and mails valuation notices to all owners every year (2026 notices ~April 15); values move on 'sales review indicating the market has increased in value for that neighborhood' using the prior Oct 1-Sep 30 sales window, with a 30-day, no-fee appeal to the Board of Equalization; (2) the Act 2024-344 7% annual cap on assessed-value increases (ALDOR Rule 810-4-1-.28) is REMOVED for the parcel in the year ownership changes (other than between family members or on death/foreclosure redemption), so any gap between capped taxable value and true value closes at once; (3) a rental loses Class III (10%) and is assessed as Class II (20%) — a homesteaded seller's bill doubles before any value change. Tax year Oct 1-Sep 30, lien date Oct 1, paid in arrears (due Oct 1, delinquent after Dec 31)."
+  risk: "HIGH"
+  assessor_url: "https://www.montgomerycountyal.gov/departments/appraisal"
+  treasurer_url: "https://www.mc-ala.org/departments/property-tax"
+  source_url: "https://www.montgomerycountyal.gov/departments/appraisal/appeals/frequently-asked-questions"
+
+listings: {}                     # per RentCast listing id: contractual_rent {monthly_gross, source, verified}, units_verified, legal_units_verified, owner_pays_utilities, vacant_units, immediate_rehab, insurance_quote {annual_premium, source}
