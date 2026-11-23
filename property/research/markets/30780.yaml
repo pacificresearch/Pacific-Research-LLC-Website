@@ -86,6 +86,20 @@ incentives:
     source_url: "https://www.littlerock.gov/media/23767/dpa-flyer-updated-income-limits-2025.pdf"
     verified: true    # City of Little Rock 2025 DPA flyer read 2026-11-23 (income limits effective 2025-04-01 'until superseded')
 
+  - program: "Arkansas Development Finance Authority (ADFA) Down Payment Assistance (DPA) Loan Program — statewide: $1,000-$15,000 for down payment and closing costs as a second mortgage with a 10-year term, available only with an ADFA StartSmart or Move-Up first mortgage"
+    dollar_value: 15000
+    cash_or_noncash: cash
+    eligibility: "Must qualify for an ADFA StartSmart or ADFA Move-Up first mortgage through a participating lender (adfa.arkansas.gov/find-a-lender); income/purchase-price limits, first-time-buyer status and eligible property types are set by the first-mortgage program and are not printed on the DPA page"
+    minimum_income: ""
+    employment_requirement: ""
+    home_purchase_requirement: "Paired with an ADFA first mortgage (owner-occupied financing — a 2-4 unit qualifies only if Andrew occupies a unit and the first-mortgage program allows the property type; not confirmed on the page)"
+    residency_requirement: ""
+    minimum_stay: ""
+    application_deadline: ""
+    funding_availability: "Ongoing program; no funding balance published; ADFA Single Family contact 501-682-5466"
+    source_url: "https://adfa.arkansas.gov/programs/homeloans/down-payment-assistance-program"
+    verified: true    # ADFA program page read 2026-11-23; repayable 10-year second mortgage, not a grant — year-1 benefit is liquidity, not free money
+
 landlord_law:
   verified: false    # city ordinance/registration documents read on littlerock.gov and the AG page read directly; state statute texts read on FindLaw (current as of 2024-03-28), not on the official arkleg.state.ar.us code — so not marked verified
   rent_control: "no — Ark. Code 14-16-601 and 14-54-1409: a local governmental unit (county, city, village, township) shall not enact, maintain, or enforce an ordinance or resolution that would have the effect of controlling the amount of rent charged for leasing private residential or commercial property; no local rent control exists"
