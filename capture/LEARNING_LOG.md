@@ -225,3 +225,27 @@ pushed back on the notice, and the Teams link in the invite was never
 created, so the call fell back to phone. **Rule 15:** propose meetings at
 least one week out, and confirm the meeting link exists before sending the
 invite (`capture/SENDING_AUTHORITY.md`, "Meeting lead time").
+
+## Entry 22 — 2026-11-24 · the migration that was written down but never pushed
+
+The 11-24 Desktop report was blank again ("0 notices screened"). Entry 19
+and CLAUDE.md both said the frozen branch already served main's matcher.
+It did not: the push to `claude/samgov-opportunity-matcher-0a3c2f` was held
+for Andrew's yes and never made, so the PC kept downloading the August 13
+matcher, with its dead key and no fallback page, before every run.
+
+Fix (Andrew, 11-24: "stop everything you're doing and fix this"):
+- `samgov_opportunity_matcher.py` no longer depends on the API key to fill
+  the report. When SAM rejects the key, no key reaches SAM, or the key hits
+  its daily limit (HTTP 429), the rest of the run pulls the same notices
+  from SAM.gov's public search (`sam.gov/api/prod/sgs`, no key, no quota)
+  and each notice's public detail record, mapped to the v2 shape that
+  `evaluate()` reads. The report says so in a source note, with the setup
+  line only when the key was rejected. Tested with a dead key: 919 notices
+  screened, 41 SDVOSB and 118 small business set-asides.
+- The frozen branch now actually carries main's matcher, so the PC's next
+  scheduled run downloads it, repoints its runners at main, deletes the
+  blank page and fills the report.
+
+**Rule 16:** a record that says a fix shipped is checked against the thing
+itself (the branch, the file, the run) before anyone relies on it.

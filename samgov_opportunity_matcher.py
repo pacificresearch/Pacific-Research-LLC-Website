@@ -1417,6 +1417,9 @@ def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
         "ptype": "o,p,k,r,s,a",
     }
 
+    if _PUBLIC_MODE["on"]:
+        return fetch_public(code, posted_from, posted_to, limit, code_param)
+
     collected = []
     try:
         while True:
@@ -1431,19 +1434,22 @@ def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
                     break
                 time.sleep(1.5 * (attempt + 1))
             if resp.status_code == 429:
-                _RUN_STATE["rate_limited"] = True
-                sys.stderr.write(
-                    "WARNING: Rate limited by SAM.gov (HTTP 429). "
-                    "Results are PARTIAL. Try again later or reduce --limit.\n"
-                )
-                break
-            if resp.status_code in (401, 403):
-                _die_auth(resp.status_code, getattr(resp, "text", ""))
-            # Running keyless, api.data.gov answers 404 to a request that
-            # carries no credential at all — same meaning as a 401 here, and
-            # it must not be mistaken for "this code has no notices".
-            if resp.status_code == 404 and _KEYLESS:
-                _die_auth(resp.status_code, "no credential reached SAM")
+                # Daily key quota spent. Switch the rest of this run to SAM's
+                # public search instead of writing a partial or empty report.
+                _switch_to_public("SAM.gov API key over its daily limit (HTTP 429)")
+                return collected + fetch_public(code, posted_from, posted_to,
+                                                limit, code_param)
+            if resp.status_code in (401, 403) or (
+                    resp.status_code == 404 and _KEYLESS):
+                # Rejected, dead or missing key (keyless 404 means no
+                # credential reached SAM). Never let it blank the report:
+                # pull the same notices from SAM's public search.
+                _RUN_STATE["key_rejected"] = True
+                _switch_to_public(
+                    f"SAM.gov rejected the API key (HTTP {resp.status_code})"
+                    if not _KEYLESS else "no SAM.gov API key reached SAM")
+                return fetch_public(code, posted_from, posted_to, limit,
+                                    code_param)
             resp.raise_for_status()
             payload = resp.json()
 
@@ -1475,6 +1481,141 @@ def fetch_opportunities(api_key, code, posted_from, posted_to, limit,
         )
 
     return collected
+
+
+# ---------------------------------------------------------------------------
+# PUBLIC SEARCH FALLBACK (no API key, no daily quota)
+#
+# The API key path has blanked the Windows report more than once: a dead key
+# baked into an old copy of this script, a key over its daily quota, a key
+# never saved for the scheduled task. Each produced "0 notices screened".
+# SAM.gov's own website search (sam.gov/api/prod/sgs) is public, needs no
+# key and has no daily quota, and every notice's detail page is public too.
+# When the key path fails for any reason, the rest of the run pulls the same
+# notices from there and maps each one to the v2 API shape that evaluate()
+# already reads, so screening is unchanged.
+# ---------------------------------------------------------------------------
+PUBLIC_SEARCH_URL = "https://sam.gov/api/prod/sgs/v1/search/"
+PUBLIC_DETAIL_URL = "https://sam.gov/api/prod/opps/v2/opportunities/"
+_PUBLIC_MODE = {"on": False, "why": ""}
+_PUBLIC_PARAM = {"ncode": "naics", "ccode": "psc", "typeOfSetAside": "set_aside",
+                 "deptname": "q"}
+_PUBLIC_TYPES = {"o", "p", "k", "r", "s", "a"}
+_SETASIDE_DESC = {
+    "SBA": "Total Small Business Set-Aside (FAR 19.5)",
+    "SBP": "Partial Small Business Set-Aside (FAR 19.5)",
+    "SDVOSBC": "Service-Disabled Veteran-Owned Small Business (SDVOSB) Set-Aside (FAR 19.14)",
+    "SDVOSBS": "Service-Disabled Veteran-Owned Small Business (SDVOSB) Sole Source (FAR 19.14)",
+    "VSA": "Veteran-Owned Small Business Set-Aside (specific to Department of Veterans Affairs)",
+    "VSS": "Veteran-Owned Small Business Sole source (specific to Department of Veterans Affairs)",
+    "8A": "8(a) Set-Aside (FAR 19.8)", "8AN": "8(a) Sole Source (FAR 19.8)",
+    "HZC": "Historically Underutilized Business (HUBZone) Set-Aside (FAR 19.13)",
+    "HZS": "Historically Underutilized Business (HUBZone) Sole Source (FAR 19.13)",
+    "WOSB": "Women-Owned Small Business (WOSB) Program Set-Aside (FAR 19.15)",
+    "EDWOSB": "Economically Disadvantaged WOSB (EDWOSB) Program Set-Aside (FAR 19.15)",
+    "NONE": "No Set aside used",
+}
+
+
+def _switch_to_public(why):
+    if not _PUBLIC_MODE["on"]:
+        _PUBLIC_MODE["on"] = True
+        _PUBLIC_MODE["why"] = why
+        sys.stderr.write(
+            f"\nNOTE: {why}. Switching this run to SAM.gov's public search "
+            "(no key, no daily limit) so the report still fills.\n\n")
+
+
+def _public_get(url, params=None):
+    resp = _http_retry(requests.get, url, params=params,
+                       headers={"Accept": "application/hal+json"}, timeout=40)
+    resp.raise_for_status()
+    return resp.json()
+
+
+def _public_to_v2(hit, detail):
+    """Map a public search hit plus its public detail record to the v2 shape."""
+    d2 = (detail or {}).get("data2") or {}
+    sol = d2.get("solicitation") or {}
+    naics = [c for n in (d2.get("naics") or []) for c in (n.get("code") or [])]
+    sa = (sol.get("setAside") or "").strip()
+    orgs = hit.get("organizationHierarchy") or []
+    office = (orgs[-1].get("address") if orgs else None) or {}
+    desc = " ".join(_strip_html(x.get("body") or "")
+                    for x in ((detail or {}).get("description") or []))
+    typ = (hit.get("type") or {}).get("value") or ""
+    nid = hit.get("_id")
+    return {
+        "noticeId": nid,
+        "title": hit.get("title") or d2.get("title") or "",
+        "solicitationNumber": hit.get("solicitationNumber") or d2.get("solicitationNumber"),
+        "fullParentPathName": ".".join(o.get("name", "") for o in orgs if o.get("name")),
+        "postedDate": (hit.get("publishDate") or "")[:10],
+        "type": typ, "baseType": typ,
+        "archiveDate": (d2.get("archive") or {}).get("date"),
+        "typeOfSetAside": sa if sa else "",
+        "typeOfSetAsideDescription": _SETASIDE_DESC.get(sa.upper(), sa) if sa else "",
+        "responseDeadLine": (sol.get("deadlines") or {}).get("response")
+                            or hit.get("responseDateActual") or hit.get("responseDate"),
+        "naicsCode": naics[0] if naics else "",
+        "classificationCode": d2.get("classificationCode") or "",
+        "active": "Yes",
+        "award": d2.get("award") or {},
+        "pointOfContact": d2.get("pointOfContact") or [],
+        "description": desc[:20000],
+        "officeAddress": {"zipcode": office.get("zip"), "city": office.get("city"),
+                          "countryCode": office.get("country"), "state": office.get("state")},
+        "placeOfPerformance": d2.get("placeOfPerformance") or {},
+        "uiLink": f"https://sam.gov/opp/{nid}/view" if nid else "",
+        "resourceLinks": [],
+        "_source": "sam.gov public search",
+    }
+
+
+def fetch_public(code, posted_from, posted_to, limit, code_param="ncode"):
+    """Same contract as fetch_opportunities, served from SAM's public search."""
+    field = _PUBLIC_PARAM.get(code_param)
+    if not field:
+        return []
+    lo = dt.datetime.strptime(posted_from, "%m/%d/%Y").date().isoformat()
+    hi = dt.datetime.strptime(posted_to, "%m/%d/%Y").date().isoformat()
+    hits, page = [], 0
+    try:
+        while len(hits) < limit and page < 50:
+            data = _public_get(PUBLIC_SEARCH_URL, {
+                "index": "opp", "mode": "search", "is_active": "true",
+                "sort": "-modifiedDate", "page": page, "size": 100, field: code})
+            batch = (data.get("_embedded") or {}).get("results") or []
+            if not batch:
+                break
+            stop = False
+            for h in batch:
+                if (h.get("modifiedDate") or "")[:10] < lo:
+                    stop = True              # sorted newest-modified first
+                    break
+                posted = (h.get("publishDate") or "")[:10]
+                if (h.get("_type") == "opportunity" and lo <= posted <= hi
+                        and (h.get("type") or {}).get("code") in _PUBLIC_TYPES):
+                    hits.append(h)
+            pages = (data.get("page") or {}).get("totalPages") or 0
+            page += 1
+            if stop or page >= pages:
+                break
+    except Exception as exc:  # noqa: BLE001
+        _RUN_STATE.setdefault("failed_codes", []).append(f"{code_param}={code}")
+        sys.stderr.write(f"WARNING: public search failed for {code_param} {code}: "
+                         f"{exc}. COVERAGE INCOMPLETE for {code}.\n")
+        return []
+    hits = hits[:limit]
+
+    def _detail(h):
+        try:
+            return _public_to_v2(h, _public_get(PUBLIC_DETAIL_URL + h["_id"]))
+        except Exception:            # keep the notice, screened on its title
+            return _public_to_v2(h, None)
+
+    with cf.ThreadPoolExecutor(max_workers=8) as ex:
+        return list(ex.map(_detail, hits))
 
 
 def fetch_recompetes(naics_codes, months_ahead=18, max_pages=10, agency=None):
@@ -4675,6 +4816,19 @@ def export_html_report(results, path, days, recompetes=None, grants=None,
             + "".join(f'<p style="margin:6px 0">{b}</p>' for b in bits)
             + '</div>'
         )
+
+    if _PUBLIC_MODE["on"]:
+        fix = ("<p style=\"margin:6px 0 0\">The saved SAM.gov key was rejected. "
+               "To restore the key path, paste this once into PowerShell: "
+               f"<code>{_html_escape(_SETUP_LINE)}</code></p>"
+               if _RUN_STATE.get("key_rejected") else "")
+        p.append(
+            '<div style="border:1px solid #c9a227;background:#fff8e1;'
+            'border-radius:8px;padding:12px 16px;margin:18px 0;color:#3a2f0b;'
+            'font-size:0.92rem;line-height:1.5">'
+            f'<p style="margin:0"><strong>Source note:</strong> {_html_escape(_PUBLIC_MODE["why"])}, '
+            "so this run pulled notices from SAM.gov's public search instead. "
+            "Same notices, screened the same way.</p>" + fix + '</div>')
 
     # KPI cards — each count card is a clickable filter for the matrix below.
     kpi_filter = {

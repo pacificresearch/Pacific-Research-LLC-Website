@@ -349,12 +349,12 @@ applications.
 
 - The SAM.gov screening tool is `samgov_opportunity_matcher.py` on **main**.
   The old branch `claude/samgov-opportunity-matcher-0a3c2f` (PR #1) is
-  frozen: never point anything new at it. Since 2026-11-19 it carries a
+  frozen: never point anything new at it. Since 2026-11-24 (entry 22; the 11-19 push in entry 19 never happened) it carries a
   copy of main's matcher solely so that PCs still on the August runner
   migrate themselves to main on their next run (`capture/LEARNING_LOG.md`
   entry 19). Andrew's Windows PC runs the tool through
   `automation/setup_prg_automation.ps1` (on main). On a Windows `--outdir`
-  run the matcher never leaves a blank page: a failed run shows the last
+  run the matcher never leaves a blank page. A rejected, missing or over-quota SAM key switches the run to SAM.gov's public search (no key) so the report still fills; any other failure shows the last
   good report with a box explaining the failure. Before diagnosing any
   report problem, search the WHOLE repository history (`git log --all`,
   every branch) for how that report is produced. The tool's capture-v3
