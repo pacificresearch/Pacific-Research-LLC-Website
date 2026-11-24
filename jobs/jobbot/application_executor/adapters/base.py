@@ -88,6 +88,15 @@ def scan(page) -> list[dict]:
 
 # Andrew's standing policy (11/4): skip every optional question; when a voluntary-disclosure
 # question is REQUIRED, choose the "I don't wish to disclose" option. Never pick a substantive answer.
+US_STATE_ABBR = {n.lower(): a for n, a in (("Alabama","AL"),("Alaska","AK"),("Arizona","AZ"),("Arkansas","AR"),("California","CA"),
+    ("Colorado","CO"),("Connecticut","CT"),("Delaware","DE"),("Florida","FL"),("Georgia","GA"),("Hawaii","HI"),("Idaho","ID"),
+    ("Illinois","IL"),("Indiana","IN"),("Iowa","IA"),("Kansas","KS"),("Kentucky","KY"),("Louisiana","LA"),("Maine","ME"),
+    ("Maryland","MD"),("Massachusetts","MA"),("Michigan","MI"),("Minnesota","MN"),("Mississippi","MS"),("Missouri","MO"),
+    ("Montana","MT"),("Nebraska","NE"),("Nevada","NV"),("New Hampshire","NH"),("New Jersey","NJ"),("New Mexico","NM"),
+    ("New York","NY"),("North Carolina","NC"),("North Dakota","ND"),("Ohio","OH"),("Oklahoma","OK"),("Oregon","OR"),
+    ("Pennsylvania","PA"),("Rhode Island","RI"),("South Carolina","SC"),("South Dakota","SD"),("Tennessee","TN"),("Texas","TX"),
+    ("Utah","UT"),("Vermont","VT"),("Virginia","VA"),("Washington","WA"),("West Virginia","WV"),("Wisconsin","WI"),
+    ("Wyoming","WY"),("District of Columbia","DC"))}
 CORE_FIELDS = {"first_name", "last_name", "full_name", "email", "phone", "country"}
 DECLINE_KEYS = {"veteran_status", "disability_status", "gender", "race_ethnicity", "hispanic_latino",
                 "sexual_orientation"}
@@ -398,6 +407,9 @@ def fill(page, actions: list[dict], job: dict | None = None) -> list[dict]:
                         from ..guards import match_option
                         m = match_option(want, texts)
                         pick = texts.index(m) if m else None
+                    if pick is None and texts and str(want).strip().lower() in US_STATE_ABBR:
+                        ab = US_STATE_ABBR[str(want).strip().lower()]  # 'California' -> 'CA' dropdowns
+                        pick = next((k for k, t in enumerate(texts) if t.strip().upper() == ab), None)
                     if pick is None and a.get("key") in DECLINE_KEYS and texts:
                         # self-ID typeahead whose options only appear once open: take its own decline wording
                         alt = decline_option(texts)
