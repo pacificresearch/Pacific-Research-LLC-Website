@@ -4,6 +4,7 @@ import re
 from .base import run_form
 
 
+
 def form_url(url: str, job: dict | None = None) -> str:
     m = re.search(r"greenhouse\.io/(?:embed/job_app\?for=)?([\w-]+)/jobs/(\d+)", url)
     if m:
@@ -20,6 +21,10 @@ def form_url(url: str, job: dict | None = None) -> str:
 def open_and_fill(page, url, job, pr, app_row, evid, wait_human_seconds=0):
     page.goto(form_url(url, job), wait_until="domcontentloaded", timeout=45000)
     page.wait_for_timeout(2500)
+    # A closed Greenhouse job redirects to the company board with ?error=true
+    from .. import Blocked
+    if re.search(r"[?&]error=true", page.url) and not page.locator("input[type=file]").count():
+        raise Blocked(["POSTING CLOSED: Greenhouse redirected to the job board (job no longer open)"])
     btn = page.locator("button:has-text('Apply'), a:has-text('Apply for this job')")
     if btn.count() and not page.locator("input[type=file]").count():
         btn.first.click()
