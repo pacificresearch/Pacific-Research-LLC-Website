@@ -194,6 +194,80 @@ def _open_options(page):
 FOS_OK = re.compile(r"^\s*(international|global)\b.*(stud|relation|affair)|^\s*other\s*$", re.I)
 
 
+_SCROLL_JS = """(e, d) => { let n = e.querySelector("[role='option']") || e;
+    while (n && n !== document.body && !(n.scrollHeight > n.clientHeight + 4 &&
+           /auto|scroll/.test(getComputedStyle(n).overflowY))) n = n.parentElement;
+    if (!n || n === document.body) n = e; n.scrollTop += d * Math.max(200, n.clientHeight * 0.8); }"""
+
+
+def _dbg(msg):
+    import os
+    if os.environ.get("JOBBOT_WD_DEBUG"):
+        with open(os.environ["JOBBOT_WD_DEBUG"], "a") as fh:
+            fh.write(msg + "\n")
+
+
+def _scroll_pick(page, loc, cands, ok_rx=None, max_steps=80):
+    """Open a virtualized Workday listbox and scroll through it, clicking the first option that matches a
+    candidate exactly (case-insensitive) or ok_rx. Prefers earlier candidates; 'Other' only if nothing better."""
+    btn = loc.locator("button[aria-haspopup='listbox']").first
+    try:
+        page.keyboard.press("Escape")
+        btn.click()
+        page.wait_for_timeout(500)
+    except Exception as ex:
+        _dbg(f"scroll_pick open failed: {ex}")
+        return None
+    _dbg(f"scroll_pick start cands={cands} listboxes={page.locator('[role=listbox]:visible').count()}")
+    want = [c.strip().lower() for c in cands]
+    best = None  # (rank, text)
+    seen = set()
+    for _ in range(max_steps):
+        opts = page.locator("[role='listbox']:visible [role='option']")
+        texts = [t.strip() for t in opts.all_inner_texts()]
+        new = [t for t in texts if t and t not in seen]
+        for t in new:
+            seen.add(t)
+            low = t.lower()
+            if low == "other":
+                rank = len(want) + 1  # last resort only
+            elif low in want:
+                rank = want.index(low)
+            elif ok_rx and ok_rx.search(t):
+                rank = len(want)
+            else:
+                rank = None
+            if rank is not None and (best is None or rank < best[0]):
+                best = (rank, t)
+        _dbg(f"scroll step: {len(texts)} visible, {len(new)} new, first={texts[:1]} last={texts[-1:]} best={best}")
+        if best and best[0] == 0:
+            break
+        if not new:
+            break
+        try:
+            page.locator("[role='listbox']:visible").last.evaluate(_SCROLL_JS, 1)
+        except Exception:
+            break
+        page.wait_for_timeout(250)
+    if not best:
+        page.keyboard.press("Escape")
+        return None
+    target = best[1]
+    for _ in range(max_steps):  # the chosen option may have scrolled out of the DOM: bring it back and click it
+        o = page.locator("[role='listbox']:visible [role='option']").filter(has_text=re.compile(rf"^\s*{re.escape(target)}\s*$"))
+        if o.count():
+            o.first.click()
+            page.wait_for_timeout(500)
+            return target
+        try:
+            page.locator("[role='listbox']:visible").last.evaluate(_SCROLL_JS, -1)
+        except Exception:
+            break
+        page.wait_for_timeout(200)
+    page.keyboard.press("Escape")
+    return None
+
+
 def _unselect(page, field, text):
     chips = field.locator("[data-automation-id='selectedItem']", has_text=text)
     for i in range(chips.count() - 1, -1, -1):
@@ -584,420 +658,450 @@ def fill_step(page, job, pr, app_row, log) -> list[str]:
             page.wait_for_timeout(6000)  # Workday parses the resume and may prefill work history
             log.append({"label": "Resume upload", "key": "resume", "value": "<file:resume.pdf>", "ok": True})
         blockers += fill_work_experience(page, pr, log)
-    fields = page.evaluate(FIELDS_JS)
-    for f in fields:
-        label = f["label"].rstrip("*").strip()
-        if "Experience" in step and (f["id"] in ("jobTitle", "companyName", "location", "startDate", "endDate",
-                                                 "currentlyWorkHere", "roleDescription")
-                                     or f["type"] == "other" and "upload" in label.lower()):
-            continue  # handled by fill_work_experience / resume upload above
-        kind, key = classify(label)
-        key = scope_work_auth(key, label, job)
-        req = f["required"]
-        loc = page.locator(f"[data-jobbot-wd='{f['i']}']")
-        is_fos = f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline"
-        if is_fos and f["type"] == "multiselect" and f["value"] not in ("", "0 items selected"):
-            chips = loc.locator("[data-automation-id='selectedItem']")
-            bad = [chips.nth(i) for i in range(chips.count()) if not FOS_OK.search(chips.nth(i).inner_text())]
-            for chip in reversed(bad):  # a wrong field (parse or earlier mistake) is never left in place
-                x = chip.locator("[data-automation-id='DELETE_charm'], [aria-label*='elete' i], [aria-label*='emove' i]")
-                if x.count():
-                    x.first.click(force=True)
-                    page.wait_for_timeout(600)
-            if bad:
-                f["value"] = "" if not loc.locator("[data-automation-id='selectedItem']").count() else f["value"]
-        if f["value"] and f["type"] in ("select", "text", "multiselect") and f["value"] not in ("Select One",
-                                                                                               "0 items selected") \
-                and kind != "sensitive" and not re.search(r"authori|sponsor|citizen|visa|eligib", label, re.I):
-            continue  # Workday prefilled it (from the account or resume parse)
-        # sensitive answers are NEVER trusted from a saved draft or resume parse: always re-answered from the
-        # approved profile (or blocked) - a stale 'Yes' to foreign work authorization went out this way (11/6)
-        # voluntary disclosures -> decline when required
-        if f["type"] == "checkbox" and ("Self Identify" in step or "Disclosure" in step):
-            # disability / veteran self-ID as a checkbox group: tick the "I do not want to answer" box
-            boxes = loc.locator("input[type=checkbox]")
-            dec = None
-            for b_i in range(boxes.count()):
-                bid = boxes.nth(b_i).get_attribute("id") or ""
-                lab = page.locator(f"label[for='{bid}']").first.inner_text().strip() if bid else ""
-                if DECLINE_RX.search(lab):
-                    dec = (boxes.nth(b_i), lab)
-                    break
-            if dec:
-                if not dec[0].is_checked():
-                    dec[0].check(force=True)
-                log.append({"label": label, "key": "self_identify", "value": dec[1], "ok": True})
-                continue
-        if f["type"] in ("text", "textarea") and _override(label) is not None:
-            loc.locator("input, textarea").first.fill(str(_override(label)))  # e.g. initials acknowledgement
-            log.append({"label": label, "key": "override_text", "value": str(_override(label)), "ok": True})
-            continue
-        if key in DECLINE_KEYS or re.search(r"disabilit|veteran|gender|ethnic|race", label, re.I):
-            if not req:
-                continue
-            if f["type"] == "select":
-                loc.locator("button[aria-haspopup='listbox']").click()
-                page.wait_for_timeout(600)
-                opts = _all_listbox_texts(page)
-                page.keyboard.press("Escape")
-                pick = next((o for o in opts if DECLINE_RX.search(o)), None)
-                if not pick and re.search(r"veteran", label, re.I) and pr.get("veteran_fallback"):
-                    # required, no decline option: answer truthfully (service-disabled veteran -> protected veteran)
-                    pick = next((o for o in opts if re.search(r"identify as (a |one or more )?.*protected veteran|^i am a protected veteran", o, re.I)), None)
-                if not pick and re.search(r"hispanic|latino", label, re.I) and \
-                        (pr.get("approved_answers") or {}).get("hispanic_forced"):
-                    # Andrew 11/11: only when the form forces Yes/No with no decline option
-                    pick = match_option(str(pr["approved_answers"]["hispanic_forced"]), opts)
-                if not pick and re.search(r"\bgender\b|\bsex\b", label, re.I) and \
-                        (pr.get("approved_answers") or {}).get("gender_forced"):
-                    # Andrew 11/14: only when the form forces a choice with no decline option
-                    pick = match_option(str(pr["approved_answers"]["gender_forced"]), opts)
-                if not pick and _override(label) is not None:  # e.g. "Were/Are you a member of the U.S. Armed Forces?"
-                    pick = match_option(str(_override(label)), opts) or years_option(str(_override(label)), opts)
-                if pick:
-                    p2, _ = _choose_listbox(page, loc, pick)
-                    log.append({"label": label, "key": key or "disclosure", "value": p2 or pick, "ok": bool(p2)})
-                    if not p2:
-                        blockers.append(f"could not select '{pick}' for '{label[:80]}'")
-                else:
-                    blockers.append(f"required disclosure without a decline option: '{label[:80]}' {opts[:6]}")
-            elif f["type"] in ("radio", "checkbox"):
-                pick = next((o for o in f["options"] if DECLINE_RX.search(o)), None)
-                if not pick and re.search(r"hispanic|latino", label, re.I) and \
-                        (pr.get("approved_answers") or {}).get("hispanic_forced"):
-                    pick = match_option(str(pr["approved_answers"]["hispanic_forced"]), f["options"])
-                if not pick and re.search(r"\bgender\b|\bsex\b", label, re.I) and \
-                        (pr.get("approved_answers") or {}).get("gender_forced"):
-                    pick = match_option(str(pr["approved_answers"]["gender_forced"]), f["options"])
-                if not pick and _override(label) is not None:
-                    pick = match_option(str(_override(label)), f["options"]) or years_option(str(_override(label)), f["options"])
-                if pick:
-                    loc.get_by_label(pick, exact=True).first.check(force=True)
-                    log.append({"label": label, "key": key or "disclosure", "value": pick, "ok": True})
-                else:
-                    blockers.append(f"required disclosure without a decline option: '{label[:80]}'")
-            continue
-        if not req:
-            continue  # policy: optional -> blank (Workday marks required fields reliably)
-        if key == "truth_certification" and pr.get("answer_policy", {}).get("e_sign_when_all_answers_from_profile"):
-            if f["type"] in ("checkbox",):
-                _tick(page, loc)
-            elif f["type"] == "select":
-                _choose_listbox(page, loc, "Yes")
-            elif f["type"] in ("text", "textarea"):
-                loc.locator("input, textarea").first.fill(pr["contact"]["name"])
-            log.append({"label": label, "key": "truth_certification", "value": "<certified (approved 11/4)>", "ok": True})
-            continue
-        if f["type"] == "checkbox" and key in ("us_citizen", "citizenship_country") and str((pr.get("approved_answers") or {}).get("us_citizen")).lower().startswith("yes"):
-            # "Indicate which, if any, where you are a citizen" -> a country checklist: tick United States only
-            boxes = loc.locator("input[type=checkbox]")
-            us = None
-            for b_i in range(boxes.count()):
-                bid = boxes.nth(b_i).get_attribute("id") or ""
-                lab = page.locator(f"label[for='{bid}']").first.inner_text().strip() if bid else ""
-                lab = lab or (boxes.nth(b_i).get_attribute("aria-label") or "")
-                if re.fullmatch(r"(the )?united states( of america)?|usa?|u\.s\.(a\.)?", lab.strip(), re.I):
-                    us = boxes.nth(b_i)
-                    break
-            if us is None and str((pr.get("approved_answers") or {}).get("other_citizenships", "")).lower() == "none":
-                # country checklist without the US (export-control screens: Cuba/Iran/...): "None of these" is true
-                # only for a US-only citizen -> needs the approved other_citizenships: none
-                for b_i in range(boxes.count()):
-                    bid = boxes.nth(b_i).get_attribute("id") or ""
-                    lab = page.locator(f"label[for='{bid}']").first.inner_text().strip() if bid else ""
-                    if re.fullmatch(r"none( of (these|the above))?|not applicable|n/?a", lab.strip(), re.I):
-                        boxes.nth(b_i).check(force=True)
-                        log.append({"label": label, "key": "us_citizen", "value": lab, "ok": True})
-                        us = False
-                        break
-            if us is False:
-                pass
-            elif us is not None:
-                us.check(force=True)
-                log.append({"label": label, "key": "us_citizen", "value": "United States", "ok": True})
-            else:
-                blockers.append(f"citizenship checklist has no 'United States' box: '{label[:120]}'")
-            continue
-        if f["type"] == "checkbox" and loc.locator("input[type=checkbox]").count() > 1:
-            # single-choice checklist ("Indicate which ... describes your relationship"): use Andrew's override
-            from ...evidence_answers import _norm, cache
-            ov = (cache().get(_norm(label)) or {}).get("override")
-            if ov:
-                boxes = loc.locator("input[type=checkbox]")
-                labs = []
-                for b_i in range(boxes.count()):
-                    bid = boxes.nth(b_i).get_attribute("id") or ""
-                    lab = page.locator(f"label[for='{bid}']").first.inner_text().strip() if bid else ""
-                    labs.append(lab or (boxes.nth(b_i).get_attribute("aria-label") or ""))
-                hit = match_option(ov, labs) or next((l for l in labs if re.search(
-                    r"none of (the|these)|not applicable|no (prior |current )?(relationship|affiliation|employment)|external", l, re.I)
-                    and re.match(r"none|n/?a|no\b", ov, re.I)), None)
-                if hit:
-                    boxes.nth(labs.index(hit)).check(force=True)
-                    log.append({"label": label, "key": "checklist_override", "value": hit, "ok": True})
-                    continue
-                blockers.append(f"no checklist option matches '{ov}' for '{label[:100]}' (options: {labs[:6]})")
-                continue
-        if kind == "sensitive" and key == "attestation" or f["type"] == "checkbox":
-            aid = attestation_id(label)
-            pol = pr.get("answer_policy") or {}
-            if aid in approved_att or (req and pol.get("accept_consents") and is_plain_consent(label)):
-                try:
-                    if f["type"] == "select":  # consent rendered as a Yes/No dropdown (BD)
-                        pick = None
-                        for cand in ("Yes", "I consent", "I agree", "Agree", "Accept", "I acknowledge", "Acknowledge", "I have read"):
-                            pick, _o = _choose_listbox(page, loc, cand)
-                            if pick:
-                                break
-                        if not pick:
-                            raise RuntimeError("no affirmative option")
-                    else:
-                        _tick(page, loc)
-                    log.append({"label": label, "key": "attestation", "value": f"<consented {aid}>", "ok": True})
-                except Exception:
-                    blockers.append(f"could not tick approved box [{aid}]: '{label[:120]}'")
-            else:
-                blockers.append(f"attestation needs your explicit approval [{aid}]: '{label[:200]}'")
-            continue
-        # self-identification form signature (CC-305): name + today's date, only alongside a decline answer
-        if re.search(r"^name$|your name|full name|signature|sign here|signed", label, re.I) and \
-                ("Self Identify" in step or "Disclosure" in step) and f["type"] in ("text", "textarea", "other"):
-            loc.locator("input").first.fill(pr["contact"]["name"])
-            continue
-        if f["type"] == "date" and ("Self Identify" in step or "Disclosure" in step):
-            _fill_full_date(page, loc, date.today())  # signature date = today
-            continue
-        if f["type"] == "date" and key == "start_date" and \
-                re.search(r"two weeks|2 weeks", str((pr.get("approved_answers") or {}).get("start_date", "")), re.I):
-            from datetime import timedelta
-            _fill_full_date(page, loc, date.today() + timedelta(days=14))  # approved: within two weeks of offer
-            log.append({"label": label, "key": "start_date", "value": str(date.today() + timedelta(days=14)), "ok": True})
-            continue
-        if f["id"] == "skills" or re.search(r"type to add skills|^skills$", label, re.I):
-            if loc.locator("[data-automation-id='selectedItem']").count() >= 1:
-                continue  # already has skills (earlier pass or saved draft)
-            added = 0
-            for sk in ["Clinical Trials", "Project Management", "Good Clinical Practice", "REDCap", "Clinical Research"]:
-                try:
-                    before = loc.locator("[data-automation-id='selectedItem']").count()
-                    inp = loc.locator("input").first
-                    inp.click()
-                    inp.fill(sk)
-                    inp.press("Enter")
-                    page.wait_for_timeout(1800)
-                    cands = _open_options(page)
-                    pick = next((t for t in cands if t.lower() == sk.lower()), None) or \
-                        next((t for t in cands if sk.lower() in t.lower()), None) or (cands[0] if cands else None)
-                    if pick:
-                        page.locator(OPT).filter(has_text=re.compile(rf"^\s*{re.escape(pick)}\s*$")).first.click()
-                        page.wait_for_timeout(900)
-                    page.keyboard.press("Escape")
-                    if loc.locator("[data-automation-id='selectedItem']").count() > before:
-                        added += 1
-                        log.append({"label": "Skills", "key": "skills", "value": pick, "ok": True})
-                except Exception:
-                    page.keyboard.press("Escape")
-                if added >= 3:
-                    break
-            if not added and req:
-                blockers.append("skills field: could not add any skill")
-            continue
-        val = _value_for(key, label, f, job, pr)
-        if key == "salary_expectation" and val and re.search(r"currency", label, re.I) and "USD" not in str(val):
-            val = f"{val} USD"
-        if val in (None, "") and kind == "unknown":
-            from ...evidence_answers import answer as evidence_answer
-            opts_for_q = f.get("options", [])
-            if f["type"] == "select" and not opts_for_q:  # read the listbox so choice questions get a listed option
-                try:
-                    loc.locator("button[aria-haspopup='listbox']").click()
-                    page.wait_for_timeout(500)
-                    opts_for_q = [t for t in _all_listbox_texts(page) if t != "Select One"]
-                    page.keyboard.press("Escape")
-                except Exception:
-                    opts_for_q = []
-            val = evidence_answer(label, opts_for_q, job)
-        if val in (None, ""):
-            blockers.append(f"{'custom question' if kind == 'unknown' else (key or 'field').replace('_', ' ')} "
-                            f"needs your answer: '{label[:160]}'")
-            continue
-        try:
-            if f["type"] == "select":
-                cands = [str(val)]
-                if f["id"] == "degree" or key in ("degree", "education_level"):
-                    cands = ["Master of Arts", "Master's Degree", "Masters Degree", "Master Degree", "Masters", "Master's",
-                             "Master", "MA", "M.A.", "Graduate Degree", str(val)]
-                elif f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline":
-                    # closest truthful entries for an MA in International Studies; "Other" is always true
-                    cands = [str(val), "International Relations", "International Affairs", "Global Studies", "Other"]
-                pick = opts = None
-                for cand in cands:
-                    pick, opts = _choose_listbox(page, loc, cand)
-                    if pick:
-                        break
-                if not pick and opts and key in ("requires_sponsorship", "legally_authorized_us") and job_in_us(job):
-                    # combined auth+sponsorship question: the option asserting authorization with NO sponsorship need
-                    alt = next((o for o in opts if re.search(r"^\s*yes\b.*authori[sz]ed", o, re.I)
-                                and re.search(r"(do not|don't|will not|won't)\s+(and will not\s+)?(need|require)", o, re.I)), None)
-                    if alt and str((pr.get("approved_answers") or {}).get("us_citizen", "")).lower().startswith("yes"):
-                        pick, opts = _choose_listbox(page, loc, alt)
-                if not pick and opts and key == "salary_expectation":
-                    from ..guards import money_band
-                    band = money_band(str(val), opts)
-                    if band:
-                        pick, opts = _choose_listbox(page, loc, band)
-                if not pick and opts and re.search(r"travel", label, re.I):
-                    from ..guards import travel_band
-                    band = travel_band(str(val), opts)
-                    if not band and re.search(r"up to\s*(\d+)", str(val), re.I):
-                        from .base import travel_yes_no
-                        band = travel_yes_no(str(val), label, opts) or (
-                            next((o for o in opts if o.strip().lower() == "yes"), None)
-                            if int(re.search(r"(\d+)", str(val)).group(1)) >= 50 and not re.search(r"\d+\s*%", label) else None)
-                    if band:
-                        pick, opts = _choose_listbox(page, loc, band)
-                if not pick and (key == "how_did_you_hear" or f["id"] == "source") and opts:
-                    from .base import neutral_source_option
-                    alt = neutral_source_option([o for o in opts if "(+" not in o])
-                    if alt:
-                        pick, opts = _choose_listbox(page, loc, alt)
-                if not pick:  # virtualized list: type-ahead with the keyboard, then confirm what it landed on
-                    btn = loc.locator("button[aria-haspopup='listbox']").first
-                    for cand in cands:
-                        try:
-                            page.keyboard.press("Escape")
-                            btn.click()
-                            page.wait_for_timeout(400)
-                            page.keyboard.type(cand.split()[0][:6], delay=90)
-                            page.wait_for_timeout(500)
-                            if f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline":
-                                # type-ahead lands on the FIRST "Intern..." entry (e.g. International Business):
-                                # step down through neighbours until a truthful one (Int'l Studies/Relations/Affairs)
-                                for _ in range(15):
-                                    act = page.locator("[role='option'][aria-selected='true'], [role='option']:focus, "
-                                                       "[role='option'][data-focused='true']")
-                                    cur = act.first.inner_text().strip() if act.count() else ""
-                                    if FOS_OK.search(cur) or not cur.lower().startswith(cand.split()[0][:4].lower()):
-                                        break
-                                    page.keyboard.press("ArrowDown")
-                                    page.wait_for_timeout(150)
-                            page.keyboard.press("Enter")
-                            page.wait_for_timeout(600)
-                            shown = btn.inner_text().strip()
-                            if shown and shown != "Select One" and (match_option(cand, [shown]) or (
-                                    (f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline") and FOS_OK.search(shown))):
-                                pick = shown
-                                break
-                        except Exception:
-                            continue
-                if pick:  # verify the widget now shows the choice; Workday occasionally drops a click
-                    ok_shown = False
-                    for _ in range(3):
-                        shown = loc.locator("button[aria-haspopup='listbox']").first.inner_text().strip()
-                        if shown == pick or pick in shown:
-                            ok_shown = True
-                            break
+    done_labels: set[str] = set()
+    for _pass in range(3):  # conditional questions appear only after earlier answers: re-scan for new fields
+        fields = [f for f in page.evaluate(FIELDS_JS) if f["label"] not in done_labels]
+        if not fields:
+            break
+        if _pass:
+            page.wait_for_timeout(500)
+        for f in fields:
+            done_labels.add(f["label"])
+            label = f["label"].rstrip("*").strip()
+            if "Experience" in step and (f["id"] in ("jobTitle", "companyName", "location", "startDate", "endDate",
+                                                     "currentlyWorkHere", "roleDescription")
+                                         or f["type"] == "other" and "upload" in label.lower()):
+                continue  # handled by fill_work_experience / resume upload above
+            kind, key = classify(label)
+            key = scope_work_auth(key, label, job)
+            req = f["required"]
+            loc = page.locator(f"[data-jobbot-wd='{f['i']}']")
+            is_fos = f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline"
+            if is_fos and f["type"] == "multiselect" and f["value"] not in ("", "0 items selected"):
+                chips = loc.locator("[data-automation-id='selectedItem']")
+                bad = [chips.nth(i) for i in range(chips.count()) if not FOS_OK.search(chips.nth(i).inner_text())]
+                for chip in reversed(bad):  # a wrong field (parse or earlier mistake) is never left in place
+                    x = chip.locator("[data-automation-id='DELETE_charm'], [aria-label*='elete' i], [aria-label*='emove' i]")
+                    if x.count():
+                        x.first.click(force=True)
                         page.wait_for_timeout(600)
-                        btn = loc.locator("button[aria-haspopup='listbox']").first
-                        btn.focus()
-                        page.keyboard.press("Enter")  # keyboard path: open, type-ahead, confirm
-                        page.wait_for_timeout(400)
-                        page.keyboard.type(pick[:3], delay=80)
-                        page.keyboard.press("Enter")
-                        page.wait_for_timeout(500)
-                    if not ok_shown:
-                        blockers.append(f"selection did not stick for '{label[:80]}' (wanted '{pick}')")
-                        continue
-                if not pick and not req and (f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline"):
-                    page.keyboard.press("Escape")
-                    log.append({"label": label, "key": "discipline", "value": "<optional, left blank>", "ok": True})
-                    continue  # optional field of study: leave blank rather than block the application
-                if not pick:
-                    full = loc.inner_text()[:1500].replace("\n", " ")
-                    blockers.append(f"'{val}' matches no option for '{label[:80]}': {opts[:6]}"
-                                    + (f" || FULL QUESTION: {full}" if all(len(o) <= 2 for o in opts if o != 'Select One') else ""))
+                if bad:
+                    f["value"] = "" if not loc.locator("[data-automation-id='selectedItem']").count() else f["value"]
+            if f["value"] and f["type"] in ("select", "text", "multiselect") and f["value"] not in ("Select One",
+                                                                                                   "0 items selected") \
+                    and kind != "sensitive" and not re.search(r"authori|sponsor|citizen|visa|eligib", label, re.I):
+                continue  # Workday prefilled it (from the account or resume parse)
+            # sensitive answers are NEVER trusted from a saved draft or resume parse: always re-answered from the
+            # approved profile (or blocked) - a stale 'Yes' to foreign work authorization went out this way (11/6)
+            # voluntary disclosures -> decline when required
+            if f["type"] == "checkbox" and ("Self Identify" in step or "Disclosure" in step):
+                # disability / veteran self-ID as a checkbox group: tick the "I do not want to answer" box
+                boxes = loc.locator("input[type=checkbox]")
+                dec = None
+                for b_i in range(boxes.count()):
+                    bid = boxes.nth(b_i).get_attribute("id") or ""
+                    lab = page.locator(f"label[for='{bid}']").first.inner_text().strip() if bid else ""
+                    if DECLINE_RX.search(lab):
+                        dec = (boxes.nth(b_i), lab)
+                        break
+                if dec:
+                    if not dec[0].is_checked():
+                        dec[0].check(force=True)
+                    log.append({"label": label, "key": "self_identify", "value": dec[1], "ok": True})
                     continue
-            elif f["type"] == "multiselect":
-                pick, opts = _choose_multiselect(page, loc, str(val))
-                if pick and is_fos and not FOS_OK.search(pick):
-                    _unselect(page, loc, pick)
-                    pick = None
-                if not pick and is_fos:
-                    for alt in ("International Relations", "International Affairs", "Global Studies", "Other"):
-                        page.keyboard.press("Escape")
-                        page.wait_for_timeout(500)
-                        try:
-                            pick, _ = _choose_multiselect(page, loc, alt, exact=(alt == "Other"))
-                            if pick and not FOS_OK.search(pick):
-                                _unselect(page, loc, pick)
-                                pick = None
-                        except Exception:
+            if f["type"] in ("text", "textarea") and _override(label) is not None:
+                loc.locator("input, textarea").first.fill(str(_override(label)))  # e.g. initials acknowledgement
+                log.append({"label": label, "key": "override_text", "value": str(_override(label)), "ok": True})
+                continue
+            if key in DECLINE_KEYS or re.search(r"disabilit|veteran|gender|ethnic|race", label, re.I):
+                if not req:
+                    continue
+                if f["type"] == "select":
+                    loc.locator("button[aria-haspopup='listbox']").click()
+                    page.wait_for_timeout(600)
+                    opts = _all_listbox_texts(page)
+                    page.keyboard.press("Escape")
+                    pick = next((o for o in opts if DECLINE_RX.search(o)), None)
+                    if not pick and re.search(r"veteran", label, re.I) and pr.get("veteran_fallback"):
+                        # required, no decline option: answer truthfully (service-disabled veteran -> protected veteran)
+                        pick = next((o for o in opts if re.search(r"identify as (a |one or more )?.*protected veteran|^i am a protected veteran", o, re.I)), None)
+                    if not pick and re.search(r"hispanic|latino", label, re.I) and \
+                            (pr.get("approved_answers") or {}).get("hispanic_forced"):
+                        # Andrew 11/11: only when the form forces Yes/No with no decline option
+                        pick = match_option(str(pr["approved_answers"]["hispanic_forced"]), opts)
+                    if not pick and re.search(r"\bgender\b|\bsex\b", label, re.I) and \
+                            (pr.get("approved_answers") or {}).get("gender_forced"):
+                        # Andrew 11/14: only when the form forces a choice with no decline option
+                        pick = match_option(str(pr["approved_answers"]["gender_forced"]), opts)
+                    if not pick and _override(label) is not None:  # e.g. "Were/Are you a member of the U.S. Armed Forces?"
+                        pick = match_option(str(_override(label)), opts) or years_option(str(_override(label)), opts)
+                    if pick:
+                        p2, _ = _choose_listbox(page, loc, pick)
+                        log.append({"label": label, "key": key or "disclosure", "value": p2 or pick, "ok": bool(p2)})
+                        if not p2:
+                            blockers.append(f"could not select '{pick}' for '{label[:80]}'")
+                    else:
+                        blockers.append(f"required disclosure without a decline option: '{label[:80]}' {opts[:6]}")
+                elif f["type"] in ("radio", "checkbox"):
+                    pick = next((o for o in f["options"] if DECLINE_RX.search(o)), None)
+                    if not pick and re.search(r"hispanic|latino", label, re.I) and \
+                            (pr.get("approved_answers") or {}).get("hispanic_forced"):
+                        pick = match_option(str(pr["approved_answers"]["hispanic_forced"]), f["options"])
+                    if not pick and re.search(r"\bgender\b|\bsex\b", label, re.I) and \
+                            (pr.get("approved_answers") or {}).get("gender_forced"):
+                        pick = match_option(str(pr["approved_answers"]["gender_forced"]), f["options"])
+                    if not pick and _override(label) is not None:
+                        pick = match_option(str(_override(label)), f["options"]) or years_option(str(_override(label)), f["options"])
+                    if pick:
+                        loc.get_by_label(pick, exact=True).first.check(force=True)
+                        log.append({"label": label, "key": key or "disclosure", "value": pick, "ok": True})
+                    else:
+                        blockers.append(f"required disclosure without a decline option: '{label[:80]}'")
+                continue
+            if not req:
+                continue  # policy: optional -> blank (Workday marks required fields reliably)
+            if key == "truth_certification" and pr.get("answer_policy", {}).get("e_sign_when_all_answers_from_profile"):
+                if f["type"] in ("checkbox",):
+                    _tick(page, loc)
+                elif f["type"] == "select":
+                    _choose_listbox(page, loc, "Yes")
+                elif f["type"] in ("text", "textarea"):
+                    loc.locator("input, textarea").first.fill(pr["contact"]["name"])
+                log.append({"label": label, "key": "truth_certification", "value": "<certified (approved 11/4)>", "ok": True})
+                continue
+            if f["type"] == "checkbox" and key in ("us_citizen", "citizenship_country") and str((pr.get("approved_answers") or {}).get("us_citizen")).lower().startswith("yes"):
+                # "Indicate which, if any, where you are a citizen" -> a country checklist: tick United States only
+                boxes = loc.locator("input[type=checkbox]")
+                us = None
+                for b_i in range(boxes.count()):
+                    bid = boxes.nth(b_i).get_attribute("id") or ""
+                    lab = page.locator(f"label[for='{bid}']").first.inner_text().strip() if bid else ""
+                    lab = lab or (boxes.nth(b_i).get_attribute("aria-label") or "")
+                    if re.fullmatch(r"(the )?united states( of america)?|usa?|u\.s\.(a\.)?", lab.strip(), re.I):
+                        us = boxes.nth(b_i)
+                        break
+                if us is None and str((pr.get("approved_answers") or {}).get("other_citizenships", "")).lower() == "none":
+                    # country checklist without the US (export-control screens: Cuba/Iran/...): "None of these" is true
+                    # only for a US-only citizen -> needs the approved other_citizenships: none
+                    for b_i in range(boxes.count()):
+                        bid = boxes.nth(b_i).get_attribute("id") or ""
+                        lab = page.locator(f"label[for='{bid}']").first.inner_text().strip() if bid else ""
+                        if re.fullmatch(r"none( of (these|the above))?|not applicable|n/?a", lab.strip(), re.I):
+                            boxes.nth(b_i).check(force=True)
+                            log.append({"label": label, "key": "us_citizen", "value": lab, "ok": True})
+                            us = False
+                            break
+                if us is False:
+                    pass
+                elif us is not None:
+                    us.check(force=True)
+                    log.append({"label": label, "key": "us_citizen", "value": "United States", "ok": True})
+                else:
+                    blockers.append(f"citizenship checklist has no 'United States' box: '{label[:120]}'")
+                continue
+            if f["type"] == "checkbox" and loc.locator("input[type=checkbox]").count() > 1:
+                # single-choice checklist ("Indicate which ... describes your relationship"): use Andrew's override
+                from ...evidence_answers import _norm, cache
+                ov = (cache().get(_norm(label)) or {}).get("override")
+                if ov:
+                    boxes = loc.locator("input[type=checkbox]")
+                    labs = []
+                    for b_i in range(boxes.count()):
+                        bid = boxes.nth(b_i).get_attribute("id") or ""
+                        lab = page.locator(f"label[for='{bid}']").first.inner_text().strip() if bid else ""
+                        labs.append(lab or (boxes.nth(b_i).get_attribute("aria-label") or ""))
+                    hit = match_option(ov, labs) or next((l for l in labs if re.search(
+                        r"none of (the|these)|not applicable|no (prior |current )?(relationship|affiliation|employment)|external", l, re.I)
+                        and re.match(r"none|n/?a|no\b", ov, re.I)), None)
+                    if hit:
+                        boxes.nth(labs.index(hit)).check(force=True)
+                        log.append({"label": label, "key": "checklist_override", "value": hit, "ok": True})
+                        continue
+                    blockers.append(f"no checklist option matches '{ov}' for '{label[:100]}' (options: {labs[:6]})")
+                    continue
+            if kind == "sensitive" and key == "attestation" or f["type"] == "checkbox":
+                aid = attestation_id(label)
+                pol = pr.get("answer_policy") or {}
+                if aid in approved_att or (req and pol.get("accept_consents") and is_plain_consent(label)):
+                    try:
+                        if f["type"] == "select":  # consent rendered as a Yes/No dropdown (BD)
                             pick = None
+                            for cand in ("Yes", "I consent", "I agree", "Agree", "Accept", "I acknowledge", "Acknowledge", "I have read"):
+                                pick, _o = _choose_listbox(page, loc, cand)
+                                if pick:
+                                    break
+                            if not pick:
+                                raise RuntimeError("no affirmative option")
+                        else:
+                            _tick(page, loc)
+                        log.append({"label": label, "key": "attestation", "value": f"<consented {aid}>", "ok": True})
+                    except Exception:
+                        blockers.append(f"could not tick approved box [{aid}]: '{label[:120]}'")
+                else:
+                    blockers.append(f"attestation needs your explicit approval [{aid}]: '{label[:200]}'")
+                continue
+            # self-identification form signature (CC-305): name + today's date, only alongside a decline answer
+            if re.search(r"^name$|your name|full name|signature|sign here|signed", label, re.I) and \
+                    ("Self Identify" in step or "Disclosure" in step) and f["type"] in ("text", "textarea", "other"):
+                loc.locator("input").first.fill(pr["contact"]["name"])
+                continue
+            if f["type"] == "date" and ("Self Identify" in step or "Disclosure" in step):
+                _fill_full_date(page, loc, date.today())  # signature date = today
+                continue
+            if f["type"] == "date" and key == "start_date" and \
+                    re.search(r"two weeks|2 weeks", str((pr.get("approved_answers") or {}).get("start_date", "")), re.I):
+                from datetime import timedelta
+                _fill_full_date(page, loc, date.today() + timedelta(days=14))  # approved: within two weeks of offer
+                log.append({"label": label, "key": "start_date", "value": str(date.today() + timedelta(days=14)), "ok": True})
+                continue
+            if f["id"] == "skills" or re.search(r"type to add skills|^skills$", label, re.I):
+                if loc.locator("[data-automation-id='selectedItem']").count() >= 1:
+                    continue  # already has skills (earlier pass or saved draft)
+                added = 0
+                for sk in ["Clinical Trials", "Project Management", "Good Clinical Practice", "REDCap", "Clinical Research"]:
+                    try:
+                        before = loc.locator("[data-automation-id='selectedItem']").count()
+                        inp = loc.locator("input").first
+                        inp.click()
+                        inp.fill(sk)
+                        inp.press("Enter")
+                        page.wait_for_timeout(1800)
+                        cands = _open_options(page)
+                        pick = next((t for t in cands if t.lower() == sk.lower()), None) or \
+                            next((t for t in cands if sk.lower() in t.lower()), None) or (cands[0] if cands else None)
+                        if pick:
+                            page.locator(OPT).filter(has_text=re.compile(rf"^\s*{re.escape(pick)}\s*$")).first.click()
+                            page.wait_for_timeout(900)
+                        page.keyboard.press("Escape")
+                        if loc.locator("[data-automation-id='selectedItem']").count() > before:
+                            added += 1
+                            log.append({"label": "Skills", "key": "skills", "value": pick, "ok": True})
+                    except Exception:
+                        page.keyboard.press("Escape")
+                    if added >= 3:
+                        break
+                if not added and req:
+                    blockers.append("skills field: could not add any skill")
+                continue
+            val = _value_for(key, label, f, job, pr)
+            if key == "salary_expectation" and val and re.search(r"currency", label, re.I) and "USD" not in str(val):
+                val = f"{val} USD"
+            if val in (None, "") and kind == "unknown":
+                from ...evidence_answers import answer as evidence_answer
+                opts_for_q = f.get("options", [])
+                if f["type"] == "select" and not opts_for_q:  # read the listbox so choice questions get a listed option
+                    try:
+                        loc.locator("button[aria-haspopup='listbox']").click()
+                        page.wait_for_timeout(500)
+                        opts_for_q = [t for t in _all_listbox_texts(page) if t != "Select One"]
+                        page.keyboard.press("Escape")
+                    except Exception:
+                        opts_for_q = []
+                val = evidence_answer(label, opts_for_q, job)
+            if val in (None, ""):
+                blockers.append(f"{'custom question' if kind == 'unknown' else (key or 'field').replace('_', ' ')} "
+                                f"needs your answer: '{label[:160]}'")
+                continue
+            try:
+                if f["type"] == "select":
+                    cands = [str(val)]
+                    if f["id"] == "degree" or key in ("degree", "education_level"):
+                        cands = ["Master of Arts", "Master's Degree", "Masters Degree", "Master Degree", "Masters", "Master's",
+                                 "Master", "MA", "M.A.", "Graduate Degree", str(val)]
+                    elif f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline":
+                        # closest truthful entries for an MA in International Studies; "Other" is always true
+                        cands = [str(val), "International Relations", "International Affairs", "Global Studies", "Other"]
+                    pick = opts = None
+                    for cand in cands:
+                        pick, opts = _choose_listbox(page, loc, cand)
                         if pick:
                             break
-                if not pick and not opts:  # popup opened empty (slow load): close, wait, try once more
-                    page.keyboard.press("Escape")
-                    page.wait_for_timeout(2500)
-                    try:
-                        pick, opts = _choose_multiselect(page, loc, str(val))
-                    except Exception:
-                        pick = None
-                    if not pick and key == "how_did_you_hear" and opts:
+                    if not pick and opts and key in ("requires_sponsorship", "legally_authorized_us") and job_in_us(job):
+                        # combined auth+sponsorship question: the option asserting authorization with NO sponsorship need
+                        alt = next((o for o in opts if re.search(r"^\s*yes\b.*authori[sz]ed", o, re.I)
+                                    and re.search(r"(do not|don't|will not|won't)\s+(and will not\s+)?(need|require)", o, re.I)), None)
+                        if alt and str((pr.get("approved_answers") or {}).get("us_citizen", "")).lower().startswith("yes"):
+                            pick, opts = _choose_listbox(page, loc, alt)
+                    if not pick and opts and key == "salary_expectation":
+                        from ..guards import money_band
+                        band = money_band(str(val), opts)
+                        if band:
+                            pick, opts = _choose_listbox(page, loc, band)
+                    if not pick and opts and re.search(r"travel", label, re.I):
+                        from ..guards import travel_band
+                        band = travel_band(str(val), opts)
+                        if not band and re.search(r"up to\s*(\d+)", str(val), re.I):
+                            from .base import travel_yes_no
+                            band = travel_yes_no(str(val), label, opts) or (
+                                next((o for o in opts if o.strip().lower() == "yes"), None)
+                                if int(re.search(r"(\d+)", str(val)).group(1)) >= 50 and not re.search(r"\d+\s*%", label) else None)
+                        if band:
+                            pick, opts = _choose_listbox(page, loc, band)
+                    if not pick and (key == "how_did_you_hear" or f["id"] == "source") and opts:
                         from .base import neutral_source_option
-                        alt = neutral_source_option(opts)
+                        alt = neutral_source_option([o for o in opts if "(+" not in o])
                         if alt:
-                            pick, opts = _choose_multiselect(page, loc, alt)
-                if not pick and not req and (is_fos or key == "discipline"):
-                    page.keyboard.press("Escape")
-                    log.append({"label": label, "key": "discipline", "value": "<optional, left blank>", "ok": True})
-                    continue
-                if not pick:
-                    blockers.append(f"'{val}' matches no option for '{label[:80]}': {opts[:6]}")
-                    continue
-            elif f["type"] == "radio":
-                pick = match_option(str(val), f["options"])
-                if not pick:
-                    blockers.append(f"'{val}' matches no option for '{label[:80]}': {f['options'][:6]}")
-                    continue
-                try:
-                    loc.get_by_label(pick, exact=True).first.check(force=True, timeout=5000)
-                except Exception:  # Workday radios: the label is the clickable element
-                    loc.locator("label").filter(has_text=re.compile(rf"^\s*{re.escape(pick)}\s*$")).first.click()
-                    page.wait_for_timeout(400)
-            elif f["type"] in ("text", "textarea"):
-                loc.locator("input, textarea").first.fill(str(val))
-            elif f["type"] == "date" and re.fullmatch(r"(19|20)\d\d", str(val)):
-                # year-only box (education From / To (Actual or Expected)): click, type the year
-                done_y = False
-                for sel in ("[data-automation-id*='dateSectionYear-display']", "[data-automation-id*='dateSectionYear']",
-                            "[data-automation-id*='dateSection']", "input"):
-                    el = loc.locator(sel)
-                    if not el.count():
+                            pick, opts = _choose_listbox(page, loc, alt)
+                    if not pick:  # virtualized list: type-ahead with the keyboard, then confirm what it landed on
+                        btn = loc.locator("button[aria-haspopup='listbox']").first
+                        for cand in cands:
+                            try:
+                                page.keyboard.press("Escape")
+                                btn.click()
+                                page.wait_for_timeout(400)
+                                page.keyboard.type(cand.split()[0][:6], delay=90)
+                                page.wait_for_timeout(500)
+                                if f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline":
+                                    # type-ahead lands on the FIRST "Intern..." entry (e.g. International Business):
+                                    # step down through neighbours until a truthful one (Int'l Studies/Relations/Affairs)
+                                    for _ in range(15):
+                                        act = page.locator("[role='option'][aria-selected='true'], [role='option']:focus, "
+                                                           "[role='option'][data-focused='true']")
+                                        cur = act.first.inner_text().strip() if act.count() else ""
+                                        if FOS_OK.search(cur) or not cur.lower().startswith(cand.split()[0][:4].lower()):
+                                            break
+                                        page.keyboard.press("ArrowDown")
+                                        page.wait_for_timeout(150)
+                                page.keyboard.press("Enter")
+                                page.wait_for_timeout(600)
+                                shown = btn.inner_text().strip()
+                                if shown and shown != "Select One" and (match_option(cand, [shown]) or (
+                                        (f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline") and FOS_OK.search(shown))):
+                                    pick = shown
+                                    break
+                            except Exception:
+                                continue
+                    if not pick and opts:  # virtualized list where type-ahead fails: scroll it, matching as we go
+                        pick = _scroll_pick(page, loc, cands, FOS_OK if (f["id"] in ("fieldOfStudy", "fieldsOfStudy")
+                                                                         or key == "discipline") else None)
+                    if pick:  # verify the widget now shows the choice; Workday occasionally drops a click
+                        ok_shown = False
+                        for _ in range(3):
+                            shown = loc.locator("button[aria-haspopup='listbox']").first.inner_text().strip()
+                            if shown == pick or pick in shown:
+                                ok_shown = True
+                                break
+                            page.wait_for_timeout(600)
+                            btn = loc.locator("button[aria-haspopup='listbox']").first
+                            btn.focus()
+                            page.keyboard.press("Enter")  # keyboard path: open, type-ahead, confirm
+                            page.wait_for_timeout(400)
+                            page.keyboard.type(pick[:3], delay=80)
+                            page.keyboard.press("Enter")
+                            page.wait_for_timeout(500)
+                        if not ok_shown:
+                            blockers.append(f"selection did not stick for '{label[:80]}' (wanted '{pick}')")
+                            continue
+                    if not pick and not req and (f["id"] in ("fieldOfStudy", "fieldsOfStudy") or key == "discipline"):
+                        page.keyboard.press("Escape")
+                        log.append({"label": label, "key": "discipline", "value": "<optional, left blank>", "ok": True})
+                        continue  # optional field of study: leave blank rather than block the application
+                    if not pick:
+                        full = loc.inner_text()[:1500].replace("\n", " ")
+                        blockers.append(f"'{val}' matches no option for '{label[:80]}': {opts[:6]}"
+                                        + (f" || FULL QUESTION: {full}" if all(len(o) <= 2 for o in opts if o != 'Select One') else ""))
+                        continue
+                elif f["type"] == "multiselect":
+                    pick, opts = _choose_multiselect(page, loc, str(val))
+                    if pick and is_fos and not FOS_OK.search(pick):
+                        _unselect(page, loc, pick)
+                        pick = None
+                    if not pick and is_fos:
+                        for alt in ("International Relations", "International Affairs", "Global Studies", "Other"):
+                            page.keyboard.press("Escape")
+                            page.wait_for_timeout(500)
+                            try:
+                                pick, _ = _choose_multiselect(page, loc, alt, exact=(alt == "Other"))
+                                if pick and not FOS_OK.search(pick):
+                                    _unselect(page, loc, pick)
+                                    pick = None
+                            except Exception:
+                                pick = None
+                            if pick:
+                                break
+                    if not pick and is_fos:  # tenant wording differs: search one word, take a truthful match
+                        for term in ("International", "Global", "Other"):
+                            try:
+                                page.keyboard.press("Escape")
+                                page.wait_for_timeout(400)
+                                inp = loc.locator("input").first
+                                inp.click(timeout=5000)
+                                inp.fill(term)
+                                inp.press("Enter")
+                                page.wait_for_timeout(1500)
+                                seen_opts = _open_options(page)
+                                _dbg(f"fos search {term!r}: {seen_opts[:25]}")
+                                cand = next((o for o in seen_opts if o.strip().lower() == str(val).strip().lower()), None) \
+                                    or next((o for o in seen_opts if FOS_OK.search(o)), None)
+                                if cand:
+                                    pick, _ = _choose_multiselect(page, loc, cand, exact=True)
+                                    if pick:
+                                        break
+                            except Exception as ex:
+                                _dbg(f"fos search {term!r} failed: {ex}")
+                    if not pick and not opts:  # popup opened empty (slow load): close, wait, try once more
+                        page.keyboard.press("Escape")
+                        page.wait_for_timeout(2500)
+                        try:
+                            pick, opts = _choose_multiselect(page, loc, str(val))
+                        except Exception:
+                            pick = None
+                        if not pick and key == "how_did_you_hear" and opts:
+                            from .base import neutral_source_option
+                            alt = neutral_source_option(opts)
+                            if alt:
+                                pick, opts = _choose_multiselect(page, loc, alt)
+                    if not pick and not req and (is_fos or key == "discipline"):
+                        page.keyboard.press("Escape")
+                        log.append({"label": label, "key": "discipline", "value": "<optional, left blank>", "ok": True})
+                        continue
+                    if not pick:
+                        blockers.append(f"'{val}' matches no option for '{label[:80]}': {opts[:6]}")
+                        continue
+                elif f["type"] == "radio":
+                    pick = match_option(str(val), f["options"])
+                    if not pick:
+                        blockers.append(f"'{val}' matches no option for '{label[:80]}': {f['options'][:6]}")
                         continue
                     try:
-                        el.first.click(timeout=5000)
-                    except Exception:
-                        try:
-                            el.first.click(force=True, timeout=5000)
-                        except Exception:
+                        loc.get_by_label(pick, exact=True).first.check(force=True, timeout=5000)
+                    except Exception:  # Workday radios: the label is the clickable element
+                        loc.locator("label").filter(has_text=re.compile(rf"^\s*{re.escape(pick)}\s*$")).first.click()
+                        page.wait_for_timeout(400)
+                elif f["type"] in ("text", "textarea"):
+                    loc.locator("input, textarea").first.fill(str(val))
+                elif f["type"] == "date" and re.fullmatch(r"(19|20)\d\d", str(val)):
+                    # year-only box (education From / To (Actual or Expected)): click, type the year
+                    done_y = False
+                    for sel in ("[data-automation-id*='dateSectionYear-display']", "[data-automation-id*='dateSectionYear']",
+                                "[data-automation-id*='dateSection']", "input"):
+                        el = loc.locator(sel)
+                        if not el.count():
                             continue
-                    page.keyboard.type(str(val), delay=60)
-                    page.keyboard.press("Tab")
-                    page.wait_for_timeout(300)
-                    if str(val) in (loc.inner_text() + " " + " ".join(
-                            loc.locator("input").evaluate_all("els => els.map(e => e.value)"))):
-                        done_y = True
-                        break
-                if not done_y:
-                    raise RuntimeError(f"year box did not take {val}")
-            elif f["type"] == "date" and str(val).upper() == "TODAY":
-                _fill_full_date(page, loc, date.today())  # acknowledgement signed by dating it today
-            else:
-                blockers.append(f"unsupported Workday widget for '{label[:80]}'")
-                continue
-            log.append({"label": label, "key": key or f["id"], "value": str(val)[:60], "ok": True})
-        except Exception as ex:
-            blockers.append(f"could not fill '{label[:80]}': {str(ex)[:100]}")
+                        try:
+                            el.first.click(timeout=5000)
+                        except Exception:
+                            try:
+                                el.first.click(force=True, timeout=5000)
+                            except Exception:
+                                continue
+                        page.keyboard.type(str(val), delay=60)
+                        page.keyboard.press("Tab")
+                        page.wait_for_timeout(300)
+                        if str(val) in (loc.inner_text() + " " + " ".join(
+                                loc.locator("input").evaluate_all("els => els.map(e => e.value)"))):
+                            done_y = True
+                            break
+                    if not done_y:
+                        raise RuntimeError(f"year box did not take {val}")
+                elif f["type"] == "date" and str(val).upper() == "TODAY":
+                    _fill_full_date(page, loc, date.today())  # acknowledgement signed by dating it today
+                else:
+                    blockers.append(f"unsupported Workday widget for '{label[:80]}'")
+                    continue
+                log.append({"label": label, "key": key or f["id"], "value": str(val)[:60], "ok": True})
+            except Exception as ex:
+                blockers.append(f"could not fill '{label[:80]}': {str(ex)[:100]}")
     return blockers
 
 

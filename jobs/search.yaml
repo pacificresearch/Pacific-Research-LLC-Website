@@ -77,21 +77,18 @@ exclude_title_patterns:
   - 'accountant|payroll|tax |auditor(?!.*clinical)'
   - 'medical writer|regulatory writer|biostatistician|statistical programmer'
 
-workday_queries:
-  - project manager
-  - operations manager
-  - clinical trial manager
-  - clinical research associate
+workday_queries:   # Andrew 11/20 lanes; generic 'project/operations manager' dropped (0 interviews, most requests)
+  - clinical research project manager
+  - clinical research manager
   - clinical project manager
+  - clinical trial manager
   - clinical operations manager
   - clinical study manager
-  - program manager health
-  - global health
-  - clinical research manager
+  - research program manager
   - research coordinator
-  - clinical trial associate
+  - research operations
+  - global health
   - international programs
-  - global affairs
 
 usajobs_queries:   # Andrew 11/17: target VA / NIH / DHA / CDC; federal bar 55 (veterans' preference)
   - clinical research

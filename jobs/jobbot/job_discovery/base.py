@@ -14,15 +14,18 @@ _session.headers["User-Agent"] = UA
 _last: dict[str, float] = {}
 _locks: dict[str, threading.Lock] = {}
 _locks_guard = threading.Lock()
-# Workday rate-limits per shared cluster (wd1/wd3/wd5.myworkdayjobs.com), not per tenant: parallel workers on
-# different tenants were tripping HTTP 429 on nearly every Workday source. Throttle the whole cluster as one host.
-CLUSTER_MIN_INTERVAL = {"myworkdayjobs.com": 2.0}
+# Workday sits behind one rate limiter for ALL tenants and clusters (wd1/wd3/wd5/wd108): parallel workers on
+# different tenants drew HTTP 429 on ~140 sources a day, even at 2s per cluster. Treat every *.myworkdayjobs.com
+# host as ONE host: one request at a time, spaced, and a shared cool-down for everyone after any 429.
+CLUSTER_MIN_INTERVAL = {"myworkdayjobs.com": 2.5}
+COOLDOWN_429 = 60.0
+_cool_until: dict[str, float] = {}
 
 
 def _key(host: str) -> tuple[str, float]:
     for dom, gap in CLUSTER_MIN_INTERVAL.items():
         if host.endswith(dom):
-            return ".".join(host.split(".")[-3:]), gap
+            return dom, gap
     return host, 0.0
 
 
@@ -43,7 +46,7 @@ def http(method: str, url: str, *, min_interval: float = 1.0, retries: int = 4, 
     delay = 5.0 if floor else 2.0
     for attempt in range(retries + 1):
         with _lock(key):  # one request at a time per host/cluster, spaced by min_interval
-            wait = _last.get(key, 0) + min_interval - time.time()
+            wait = max(_last.get(key, 0) + min_interval, _cool_until.get(key, 0)) - time.time()
             if wait > 0:
                 time.sleep(wait)
             _last[key] = time.time()
@@ -53,6 +56,8 @@ def http(method: str, url: str, *, min_interval: float = 1.0, retries: int = 4, 
             if attempt == retries:
                 raise SourceError(f"{host}: {e}") from e
         else:
+            if r.status_code == 429 and floor:
+                _cool_until[key] = time.time() + COOLDOWN_429  # everyone on this limiter waits
             if r.status_code in (429, 500, 502, 503, 504) and attempt < retries:
                 ra = r.headers.get("Retry-After")
                 time.sleep(float(ra) if ra and ra.isdigit() else delay + random.random())
