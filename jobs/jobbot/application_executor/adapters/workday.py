@@ -495,6 +495,12 @@ def fill_work_experience(page, pr, log) -> list[str]:
     """
     roles = pr["experience"]
     titles = page.locator("[data-automation-id='formField-jobTitle']")
+    # Some tenants (e.g. Dana-Farber) omit the Work Experience section entirely; the first add-button is then
+    # Education's, so clicking it would add a blank education row. Skip — the résumé upload carries the history.
+    if not titles.count() and not page.get_by_role("heading", name=re.compile(r"work experience", re.I)).count() \
+            and not page.locator("text=/^\\s*Work Experience\\s*$/i").count():
+        log.append({"label": "Work experience", "key": "experience", "value": "section absent on this tenant: skipped", "ok": True})
+        return []
     for k, role in enumerate(roles):
         if titles.count() <= k:
             page.locator("[data-automation-id='add-button']").first.click()
