@@ -129,7 +129,8 @@ def screen(job: dict, facts: dict) -> dict:
         elif re.search(r"visa sponsorship|relocation (package|support|assistance)|we sponsor", low):
             add("work_authorization", "review", "outside US; sponsorship/relocation mentioned — confirm")
         else:
-            add("work_authorization", "review", f"located in {job.get('country')}; local hire likely — a U.S. citizen "
+            # Andrew 11/20: never abroad postings that need local work rights (was "review", which let 349 through)
+            add("work_authorization", "fail", f"located in {job.get('country')}; local hire likely — a U.S. citizen "
                 "would need a work permit the posting does not offer")
 
     # 3. mandatory foreign language ----------------------------------------------------
