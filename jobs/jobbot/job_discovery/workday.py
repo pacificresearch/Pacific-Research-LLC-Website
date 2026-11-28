@@ -27,12 +27,12 @@ def fetch(e: dict, terms: dict):
     queries = e.get("queries") or terms.get("workday_queries", [])
     max_pages = e.get("max_pages", 2)
     max_details = e.get("max_details", 60)
-    seen, details = set(), 0
+    seen, details, fails = set(), 0, 0
     for q in queries:
         for page in range(max_pages):
             try:
                 data = http("POST", base + "/jobs", json={"appliedFacets": {}, "limit": 20, "offset": page * 20,
-                                                           "searchText": q}, min_interval=1.2).json()
+                                                           "searchText": q}, min_interval=1.2, retries=2).json()
             except SourceError:
                 raise
             posts = data.get("jobPostings") or []
@@ -47,8 +47,14 @@ def fetch(e: dict, terms: dict):
                     return
                 details += 1
                 try:
-                    d = http("GET", base + path, min_interval=1.2).json().get("jobPostingInfo", {})
-                except Exception:
+                    d = http("GET", base + path, min_interval=1.2, retries=1).json().get("jobPostingInfo", {})
+                    fails = 0
+                except Exception as ex:
+                    # Workday rate-limits all tenants together; grinding through 60 details with full backoff
+                    # each turned one blocked board into ~40 min and the daily discover into 12+ hours.
+                    fails += 1
+                    if fails >= 3:
+                        raise SourceError(f"{t}: detail fetches rate-limited, giving up on this board ({ex})")
                     continue
                 yield {
                     "source_job_id": d.get("jobReqId") or path, "employer": e["name"], "title": d.get("title") or p["title"],
